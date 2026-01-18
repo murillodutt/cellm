@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cellm.dev/schemas/workflow.schema.json",
+  "title": "CELLM Workflow Schema",
+  "description": "Schema para validação de arquivos de workflow (cellm-core/workflows/)",
+  "type": "object",
+  "required": ["workflow", "phase", "agent"],
+  "properties": {
+    "workflow": {
+      "type": "string",
+      "pattern": "^[a-z]+(-[a-z]+)*$",
+      "description": "Nome do workflow em kebab-case (ex: implement, plan-product)"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^v[0-9]+\\.[0-9]+\\.[0-9]+$",
+      "description": "Versão semântica (ex: v1.0.0)",
+      "default": "v0.10.0"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["OK", "DRAFT", "REVISAR", "OBSOLETO"],
+      "description": "Status do workflow",
+      "default": "OK"
+    },
+    "budget": {
+      "type": "string",
+      "pattern": "^~[0-9]+( tokens)?$",
+      "description": "Estimativa de tokens (ex: ~300 tokens)"
+    },
+    "phase": {
+      "type": "string",
+      "enum": ["planning", "specification", "implementation", "verification"],
+      "description": "Fase do desenvolvimento em que o workflow é usado"
+    },
+    "agent": {
+      "type": "string",
+      "enum": ["architect", "implementer", "reviewer", "project-manager"],
+      "description": "Agent responsável por executar o workflow"
+    },
+    "inputs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Arquivos ou artefatos de entrada necessários"
+    },
+    "outputs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Arquivos ou artefatos produzidos pelo workflow"
+    },
+    "preconditions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Condições que devem ser satisfeitas antes de executar"
+    }
+  },
+  "examples": [
+    {
+      "workflow": "implement",
+      "phase": "implementation",
+      "agent": "implementer"
+    },
+    {
+      "workflow": "plan-product",
+      "phase": "planning",
+      "agent": "architect",
+      "outputs": ["mission.md", "roadmap.md", "tech-stack.md"]
+    },
+    {
+      "workflow": "verify",
+      "phase": "verification",
+      "agent": "reviewer",
+      "preconditions": ["spec.md exists", "tasks.md exists", "code implemented"]
+    }
+  ]
+}

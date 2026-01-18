@@ -1,0 +1,115 @@
+# CELLM Repository Labels
+# Use with: https://github.com/marketplace/actions/label-syncer
+
+# Categories (Component labels)
+- name: rules
+  color: "0052CC"
+  description: "Changes to cellm-core/rules/"
+
+- name: patterns
+  color: "5319E7"
+  description: "Changes to cellm-core/patterns/"
+
+- name: commands
+  color: "006B75"
+  description: "Changes to cellm-core/commands/"
+
+- name: workflows
+  color: "1D76DB"
+  description: "Changes to cellm-core/workflows/"
+
+- name: agents
+  color: "D93F0B"
+  description: "Changes to cellm-core/agents/"
+
+- name: skills
+  color: "FBCA04"
+  description: "Changes to cellm-core/skills/"
+
+- name: schemas
+  color: "BFD4F2"
+  description: "Changes to schemas/"
+
+- name: tests
+  color: "C2E0C6"
+  description: "Changes to tests/"
+
+- name: scripts
+  color: "FEF2C0"
+  description: "Changes to scripts/"
+
+- name: documentation
+  color: "0075CA"
+  description: "Documentation changes"
+
+# Type labels
+- name: "type: feature"
+  color: "A2EEEF"
+  description: "New feature or enhancement"
+
+- name: "type: bug"
+  color: "D73A4A"
+  description: "Bug report or fix"
+
+- name: "type: refactor"
+  color: "FEF2C0"
+  description: "Code refactoring"
+
+- name: "type: chore"
+  color: "E4E669"
+  description: "Maintenance tasks"
+
+# Priority labels
+- name: "priority: critical"
+  color: "B60205"
+  description: "Critical priority - must fix immediately"
+
+- name: "priority: high"
+  color: "D93F0B"
+  description: "High priority"
+
+- name: "priority: medium"
+  color: "FBCA04"
+  description: "Medium priority"
+
+- name: "priority: low"
+  color: "0E8A16"
+  description: "Low priority"
+
+# Status labels
+- name: "status: in progress"
+  color: "FBCA04"
+  description: "Work in progress"
+
+- name: "status: review needed"
+  color: "D876E3"
+  description: "Needs review"
+
+- name: "status: blocked"
+  color: "B60205"
+  description: "Blocked by dependency"
+
+- name: "status: ready"
+  color: "0E8A16"
+  description: "Ready for merge"
+
+# Special labels
+- name: "breaking change"
+  color: "B60205"
+  description: "Introduces breaking changes"
+
+- name: "good first issue"
+  color: "7057FF"
+  description: "Good for newcomers"
+
+- name: "help wanted"
+  color: "008672"
+  description: "Extra attention needed"
+
+- name: "wontfix"
+  color: "FFFFFF"
+  description: "Will not be worked on"
+
+- name: "duplicate"
+  color: "CFD3D7"
+  description: "Duplicate of another issue"
