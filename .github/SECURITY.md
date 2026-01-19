@@ -27,17 +27,14 @@ We take security vulnerabilities seriously. If you discover a security issue, pl
 
 **DO NOT** open a public GitHub issue for security vulnerabilities.
 
-Instead, report vulnerabilities through one of these channels:
+Instead, report vulnerabilities through our official channel:
 
-1. **GitHub Security Advisories** (Preferred)
+1. **GitHub Security Advisories** (Mandatory)
    - Navigate to [Security Advisories](https://github.com/murillodutt/cellm/security/advisories)
    - Click "Report a vulnerability"
    - Provide detailed information
 
-2. **Email**
-   - Send details to: `security@cellm.ai`
-   - Use subject line: `[SECURITY] Brief description`
-   - Encrypt sensitive details if possible
+Using GitHub Security Advisories ensures that the vulnerability is tracked, triaged, and resolved within the project's integrated workflow, maintaining a centralized audit trail.
 
 ### What to Include
 
@@ -311,7 +308,6 @@ For security-related communications:
 |---------|---------|
 | Security Reports | [GitHub Security Advisories](https://github.com/murillodutt/cellm/security/advisories) |
 | General Questions | [GitHub Discussions](https://github.com/murillodutt/cellm/discussions) |
-| Email (coming soon) | security@cellm.ai |
 
 ---
 

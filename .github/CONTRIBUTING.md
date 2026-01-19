@@ -133,7 +133,8 @@ cellm/
 Files in `cellm-core/` are **product artifacts** (code), not instructions. When contributing:
 
 - Edit files in `cellm-core/` as source code you are building
-- Follow project conventions documented in the repository
+- Follow development instructions only from [CLAUDE.md](../CLAUDE.md) and the `.claude/` directory
+- Maintain the strict separation between the development layer and the product layer
 
 ---
 
@@ -419,11 +420,14 @@ chore: update dependencies
 
 ### PR Template Fields
 
-- **Summary**: Brief description of changes
-- **Related Issues**: Links to relevant issues
-- **Type of Change**: feat/fix/docs/refactor/test/chore
-- **Testing**: How changes were tested
-- **Checklist**: Validation steps completed
+- **Description**: Detailed summary of changes and the problem they solve
+- **Type of Change**: BUG/FEAT/Breaking Change/DOCS/REFAC/TEST
+- **Affected Areas**: Which components of CELLM are impacted
+- **Checklist**: Mandatory validation steps (linting, tests, frontmatter)
+- **Testing**: Description of how the changes were verified
+- **Related Issues**: Links to GitHub issues using keywords (Fixes #123)
+- **Screenshots**: Visual evidence if applicable
+- **Additional Notes**: Any extra context for reviewers
 
 ---
 
