@@ -3,6 +3,7 @@ id: ARCH-002
 version: v0.10.0
 status: OK
 budget: ~500 tokens
+alwaysApply: true
 ---
 
 # Estrategia de Selecao Dinamica de LLM
