@@ -2,7 +2,7 @@
 id: GIT-001
 version: v0.10.0
 status: OK
-alwaysApply: true
+paths: ["**"]
 budget: ~300 tokens
 ---
 

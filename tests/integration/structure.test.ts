@@ -47,10 +47,16 @@ describe('Directory Structure', () => {
 })
 
 describe('File Counts', () => {
-  it('should have at least 5 core rules', () => {
+  it('should have at least 4 core rules', () => {
     const coreRulesDir = join(CELLM_CORE_DIR, 'rules/core')
     const files = readdirSync(coreRulesDir).filter(f => f.endsWith('.md'))
-    expect(files.length).toBeGreaterThanOrEqual(5)
+    expect(files.length).toBeGreaterThanOrEqual(4)
+  })
+
+  it('should have architecture rules', () => {
+    const archRulesDir = join(CELLM_CORE_DIR, 'rules/architecture')
+    const files = readdirSync(archRulesDir).filter(f => f.endsWith('.md'))
+    expect(files.length).toBeGreaterThanOrEqual(2)
   })
 
   it('should have at least 3 domain rules', () => {
@@ -195,12 +201,21 @@ describe('Required Core Files', () => {
     'conventions.md',
     'limits.md',
     'protocols.md',
-    'architecture.md',
-    'git-flow.md'
+    'architecture.md'
   ]
 
   it.each(REQUIRED_CORE_RULES)('should have core rule: %s', (filename) => {
     const filePath = join(CELLM_CORE_DIR, 'rules/core', filename)
+    expect(existsSync(filePath)).toBe(true)
+  })
+
+  const REQUIRED_ARCHITECTURE_RULES = [
+    'git-flow.md',
+    'llm-selection.md'
+  ]
+
+  it.each(REQUIRED_ARCHITECTURE_RULES)('should have architecture rule: %s', (filename) => {
+    const filePath = join(CELLM_CORE_DIR, 'rules/architecture', filename)
     expect(existsSync(filePath)).toBe(true)
   })
 
