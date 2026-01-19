@@ -1,0 +1,150 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cellm.dev/schemas/config.schema.json",
+  "title": "CELLM Config Schema",
+  "description": "Schema para validação de arquivos de configuração CELLM (config.yaml)",
+  "type": "object",
+  "required": ["cellm", "profile"],
+  "properties": {
+    "cellm": {
+      "type": "string",
+      "pattern": "^v[0-9]+\\.[0-9]+\\.[0-9]+$",
+      "description": "Versão do CELLM (ex: v1.0.0)"
+    },
+    "profile": {
+      "type": "string",
+      "pattern": "^[a-z]+(-[a-z]+)*$",
+      "description": "Nome do profile ativo (ex: default, nuxt-saas)"
+    },
+    "project": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Nome do projeto"
+        },
+        "description": {
+          "type": "string",
+          "description": "Descrição breve do projeto"
+        },
+        "repository": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL do repositório"
+        }
+      }
+    },
+    "loading": {
+      "type": "object",
+      "properties": {
+        "maxTokens": {
+          "type": "integer",
+          "minimum": 500,
+          "maximum": 5000,
+          "default": 2000,
+          "description": "Limite máximo de tokens por sessão"
+        },
+        "warnThreshold": {
+          "type": "integer",
+          "minimum": 500,
+          "maximum": 4000,
+          "default": 1500,
+          "description": "Threshold para emitir warning de tokens"
+        },
+        "alwaysLoad": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Arquivos sempre carregados além dos core"
+        },
+        "neverLoad": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Arquivos que nunca devem ser carregados"
+        }
+      }
+    },
+    "overrides": {
+      "type": "object",
+      "properties": {
+        "rules": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object"
+          },
+          "description": "Override de configurações de rules por ID"
+        },
+        "patterns": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object"
+          },
+          "description": "Override de configurações de patterns por ID"
+        }
+      },
+      "description": "Overrides locais de rules e patterns"
+    },
+    "annotations": {
+      "type": "object",
+      "properties": {
+        "allowOverride": {
+          "type": "boolean",
+          "default": true,
+          "description": "Permite uso de @override em project"
+        },
+        "allowTemporary": {
+          "type": "boolean",
+          "default": true,
+          "description": "Permite uso de @temporary em session"
+        }
+      }
+    },
+    "session": {
+      "type": "object",
+      "properties": {
+        "persist": {
+          "type": "boolean",
+          "default": true,
+          "description": "Persistir decisões de sessão"
+        },
+        "clearOnNewSpec": {
+          "type": "boolean",
+          "default": true,
+          "description": "Limpar sessão ao ativar nova spec"
+        }
+      }
+    }
+  },
+  "examples": [
+    {
+      "cellm": "v0.10.0",
+      "profile": "default"
+    },
+    {
+      "cellm": "v0.10.0",
+      "profile": "nuxt-saas",
+      "project": {
+        "name": "My SaaS App",
+        "description": "A SaaS application built with Nuxt 4"
+      },
+      "loading": {
+        "maxTokens": 2000,
+        "warnThreshold": 1500
+      }
+    },
+    {
+      "cellm": "v0.10.0",
+      "profile": "default",
+      "overrides": {
+        "rules": {
+          "LIM-001": {
+            "linesPerFile": 1500
+          }
+        }
+      }
+    }
+  ]
+}

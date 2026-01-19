@@ -1,0 +1,53 @@
+{
+  "name": "cellm",
+  "version": "0.10.0",
+  "description": "Context Engineering for Large Language Models - Optimized for Nuxt 4 stack",
+  "homepage": "https://cellm.ai",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/murillodutt/cellm.git"
+  },
+  "bugs": {
+    "url": "https://github.com/murillodutt/cellm/issues"
+  },
+  "author": "Murillo Dutt <dev@cellm.ai> (https://duttyeshua.tech)",
+  "contributors": [
+    "Nuxt Team <hello@nuxt.com> (https://nuxt.com)",
+    "Claude Opus 4.5 <noreply@anthropic.com> (https://anthropic.com)"
+  ],
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:ui": "vitest --ui",
+    "test:validation": "vitest run tests/validation",
+    "test:integration": "vitest run tests/integration",
+    "validate": "./scripts/validate.sh",
+    "lint:md": "markdownlint 'cellm-core/**/*.md' --ignore cellm-core/templates"
+  },
+  "keywords": [
+    "claude",
+    "llm",
+    "context-engineering",
+    "nuxt",
+    "vue",
+    "ai-development",
+    "cellm"
+  ],
+  "devDependencies": {
+    "@vitest/coverage-v8": "^4.0.17",
+    "@vitest/ui": "^4.0.17",
+    "ajv": "^8.17.0",
+    "ajv-formats": "^3.0.0",
+    "glob": "^13.0.0",
+    "gray-matter": "^4.0.3",
+    "markdownlint-cli": "^0.47.0",
+    "vitest": "^4.0.17",
+    "yaml": "^2.5.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

@@ -1,0 +1,167 @@
+name: Release
+# CELLM Release Workflow
+# Website: https://cellm.ai
+# Repository: https://github.com/murillodutt/cellm
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g., v1.0.0)'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  validate:
+    name: Validate Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run all tests
+        run: npm test
+
+      - name: Run validation
+        run: |
+          chmod +x scripts/*.sh
+          ./scripts/validate.sh
+
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    needs: validate
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Get version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "version=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          # Get previous tag
+          PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+
+          if [ -z "$PREV_TAG" ]; then
+            # First release - get all commits
+            COMMITS=$(git log --pretty=format:"- %s (%h)" HEAD)
+          else
+            # Get commits since previous tag
+            COMMITS=$(git log --pretty=format:"- %s (%h)" ${PREV_TAG}..HEAD)
+          fi
+
+          # Categorize commits
+          FEAT=$(echo "$COMMITS" | grep "^- feat" || true)
+          FIX=$(echo "$COMMITS" | grep "^- fix" || true)
+          DOCS=$(echo "$COMMITS" | grep "^- docs" || true)
+          REFACTOR=$(echo "$COMMITS" | grep "^- refactor" || true)
+          OTHER=$(echo "$COMMITS" | grep -v "^- feat\|^- fix\|^- docs\|^- refactor" || true)
+
+          # Build changelog
+          CHANGELOG=""
+
+          if [ -n "$FEAT" ]; then
+            CHANGELOG="${CHANGELOG}### Features\n${FEAT}\n\n"
+          fi
+
+          if [ -n "$FIX" ]; then
+            CHANGELOG="${CHANGELOG}### Bug Fixes\n${FIX}\n\n"
+          fi
+
+          if [ -n "$DOCS" ]; then
+            CHANGELOG="${CHANGELOG}### Documentation\n${DOCS}\n\n"
+          fi
+
+          if [ -n "$REFACTOR" ]; then
+            CHANGELOG="${CHANGELOG}### Refactoring\n${REFACTOR}\n\n"
+          fi
+
+          if [ -n "$OTHER" ]; then
+            CHANGELOG="${CHANGELOG}### Other Changes\n${OTHER}\n\n"
+          fi
+
+          # Save to file for multiline output
+          echo -e "$CHANGELOG" > changelog.md
+
+      - name: Count artifacts
+        id: count
+        run: |
+          echo "rules=$(find cellm-core/rules -name '*.md' | wc -l | tr -d ' ')" >> $GITHUB_OUTPUT
+          echo "patterns=$(find cellm-core/patterns -name '*.md' | wc -l | tr -d ' ')" >> $GITHUB_OUTPUT
+          echo "commands=$(find cellm-core/commands -name '*.md' | wc -l | tr -d ' ')" >> $GITHUB_OUTPUT
+          echo "workflows=$(find cellm-core/workflows -name '*.md' | wc -l | tr -d ' ')" >> $GITHUB_OUTPUT
+          echo "agents=$(find cellm-core/agents -name '*.md' | wc -l | tr -d ' ')" >> $GITHUB_OUTPUT
+          echo "skills=$(find cellm-core/skills -name '*.md' | wc -l | tr -d ' ')" >> $GITHUB_OUTPUT
+          echo "schemas=$(find schemas -name '*.json' | wc -l | tr -d ' ')" >> $GITHUB_OUTPUT
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.version }}
+          name: CELLM ${{ steps.version.outputs.version }}
+          body: |
+            ## CELLM ${{ steps.version.outputs.version }}
+
+            Context Engineering for Large Language Models - Optimized for Nuxt 4 stack.
+
+            ### Artifacts Included
+
+            | Type | Count |
+            |------|-------|
+            | Rules | ${{ steps.count.outputs.rules }} |
+            | Patterns | ${{ steps.count.outputs.patterns }} |
+            | Commands | ${{ steps.count.outputs.commands }} |
+            | Workflows | ${{ steps.count.outputs.workflows }} |
+            | Agents | ${{ steps.count.outputs.agents }} |
+            | Skills | ${{ steps.count.outputs.skills }} |
+            | Schemas | ${{ steps.count.outputs.schemas }} |
+
+            ### Changelog
+
+            ${{ steps.changelog.outputs.changelog }}
+
+            ---
+
+            ### Installation
+
+            ```bash
+            # Clone the repository
+            git clone https://github.com/${{ github.repository }}.git
+            cd cellm
+
+            # Install to ~/.cellm
+            ./scripts/base-install.sh
+
+            # Initialize a project
+            cd your-project
+            ~/.cellm/scripts/project-install.sh
+            ```
+          draft: false
+          prerelease: ${{ contains(steps.version.outputs.version, '-') }}

@@ -1,0 +1,13 @@
+blank_issues_enabled: false
+contact_links:
+  - name: "[DOCS] Documentation"
+    url: https://github.com/murillodutt/cellm/blob/main/docs/PRD-CELLM.md
+    about: Read the full specification before opening an issue
+
+  - name: "[i] Discussions"
+    url: https://github.com/murillodutt/cellm/discussions
+    about: Ask questions and share ideas with the community
+
+  - name: "[DOCS] Getting Started"
+    url: https://github.com/murillodutt/cellm/blob/main/docs/tutorials/getting-started.md
+    about: New to CELLM? Start here

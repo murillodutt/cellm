@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cellm.dev/schemas/agent.schema.json",
+  "title": "CELLM Agent Schema",
+  "description": "Schema para validação de arquivos de agent (cellm-core/agents/)",
+  "type": "object",
+  "required": ["agent", "triggers"],
+  "properties": {
+    "agent": {
+      "type": "string",
+      "enum": ["architect", "implementer", "reviewer", "project-manager"],
+      "description": "Nome do agent"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^v[0-9]+\\.[0-9]+\\.[0-9]+$",
+      "description": "Versão semântica (ex: v1.0.0)",
+      "default": "v0.10.0"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["OK", "DRAFT", "REVISAR", "OBSOLETO"],
+      "description": "Status do agent",
+      "default": "OK"
+    },
+    "budget": {
+      "type": "string",
+      "pattern": "^~[0-9]+( tokens)?$",
+      "description": "Estimativa de tokens (ex: ~200 tokens)"
+    },
+    "triggers": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^/[a-z]+(-[a-z]+)*$"
+      },
+      "minItems": 1,
+      "uniqueItems": true,
+      "description": "Commands que ativam este agent (ex: /implement, /verify)"
+    },
+    "model": {
+      "type": "string",
+      "enum": ["default", "opus", "sonnet", "haiku"],
+      "description": "Modelo preferido para este agent",
+      "default": "default"
+    },
+    "capabilities": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Lista de capacidades do agent"
+    },
+    "constraints": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Restrições e limitações do agent"
+    }
+  },
+  "examples": [
+    {
+      "agent": "architect",
+      "triggers": ["/plan-product", "/shape-spec", "/write-spec", "/reuse-check"]
+    },
+    {
+      "agent": "implementer",
+      "triggers": ["/implement"],
+      "model": "sonnet"
+    },
+    {
+      "agent": "reviewer",
+      "triggers": ["/verify"],
+      "capabilities": ["code review", "quality analysis", "compliance check"]
+    },
+    {
+      "agent": "project-manager",
+      "triggers": ["/create-tasks", "/status", "/spec", "/metrics"]
+    }
+  ]
+}
