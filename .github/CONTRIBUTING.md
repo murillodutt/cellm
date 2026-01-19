@@ -235,6 +235,41 @@ description: Clear description (max 1024 chars)
 Instructions for Claude Code to execute this skill.
 ```
 
+### Workflows
+
+Workflows define multi-step processes orchestrated by agents.
+
+**Location:** `cellm-core/workflows/`
+
+**Requirements:**
+- Logical progression of steps
+- Role assignment for each phase
+- Clear entry and exit criteria
+- English language
+
+**Correct Example:**
+
+```yaml
+# [+] Good: Logical phase progression with appropriate agents
+phases:
+  - id: planning
+    agent: architect
+    description: High-level system design
+  - id: implementation
+    agent: implementer
+    description: Code execution based on design
+```
+
+**Incorrect Example:**
+
+```yaml
+# [-] Bad: Mismatched agents or ambiguous phases
+phases:
+  - id: start
+    agent: implementer # Should be architect for planning phases
+    description: Just start coding without a plan
+```
+
 ### Documentation
 
 **Location:** `docs/`

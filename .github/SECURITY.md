@@ -35,7 +35,7 @@ Instead, report vulnerabilities through one of these channels:
    - Provide detailed information
 
 2. **Email**
-   - Send details to: `security@cellm.ai` (coming soon)
+   - Send details to: `security@cellm.ai`
    - Use subject line: `[SECURITY] Brief description`
    - Encrypt sensitive details if possible
 
