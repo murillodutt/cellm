@@ -1,3 +1,11 @@
+---
+id: TPL-CONFIG
+version: v0.10.0
+status: OK
+template: true
+budget: ~100 tokens
+---
+
 # config.yaml Template
 
 ```yaml

@@ -1,6 +1,10 @@
 ---
+id: CMD-WRITE-SPEC
+version: v0.10.0
+status: OK
 command: write-spec
 agent: architect
+budget: ~300 tokens
 ---
 
 # /write-spec

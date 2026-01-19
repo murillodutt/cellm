@@ -1,6 +1,9 @@
 ---
 id: DOM-SH-001
+version: v0.10.0
+status: OK
 paths: ["shared/**"]
+budget: ~350 tokens
 ---
 
 # Shared Rules
@@ -28,7 +31,7 @@ Isomorphic code (works on both client and server).
 
 ## Structure
 
-```
+```text
 shared/
   types/
     user.ts        # export type User = {...}

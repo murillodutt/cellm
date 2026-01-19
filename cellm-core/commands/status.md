@@ -1,6 +1,10 @@
 ---
+id: CMD-STATUS
+version: v0.10.0
+status: OK
 command: status
 agent: project-manager
+budget: ~200 tokens
 ---
 
 # /status
@@ -13,7 +17,7 @@ agent: project-manager
 
 ## Output
 
-```
+```text
 ╔════════════════════════════════════════════════════════════╗
 ║ PROJECT: {name}                                            ║
 ║ CELLM: v0.10.0 | Profile: nuxt-saas                        ║

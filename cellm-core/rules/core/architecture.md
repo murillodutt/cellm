@@ -1,13 +1,16 @@
 ---
 id: ARCH-001
+version: v0.10.0
+status: OK
 alwaysApply: true
+budget: ~300 tokens
 ---
 
 # Architecture
 
 ## Nuxt 4 Structure
 
-```
+```text
 app/                    # Frontend
   components/           # Vue Components
   composables/          # Reactive logic (use*)
@@ -29,7 +32,7 @@ shared/                 # Isomorphic
 
 ## Dependency Flow
 
-```
+```text
 pages → components → composables → services → core
          ↓
        shared/types
@@ -53,7 +56,7 @@ pages → components → composables → services → core
 
 Related code stays together:
 
-```
+```text
 features/
   auth/
     components/

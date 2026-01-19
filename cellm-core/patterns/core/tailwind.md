@@ -1,6 +1,9 @@
 ---
 id: TW-INDEX
+version: v0.10.0
+status: OK
 tags: [tailwind, css]
+budget: ~350 tokens
 ---
 
 # Tailwind Patterns

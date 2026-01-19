@@ -1,6 +1,10 @@
 ---
+id: CMD-CREATE-TASKS
+version: v0.10.0
+status: OK
 command: create-tasks
 agent: project-manager
+budget: ~250 tokens
 ---
 
 # /create-tasks

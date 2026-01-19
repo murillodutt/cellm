@@ -117,15 +117,15 @@ cellm/
 │   ├── skills/           # Skill definitions
 │   └── templates/        # User templates
 │
-├── docs/                 # Project documentation
-│   ├── PRD-CELLM.md     # Product specification
-│   ├── concepts/        # Conceptual docs
-│   ├── reference/       # Technical reference
-│   └── tutorials/       # User guides
+├── .github/              # GitHub configuration and docs
+│   ├── README.md         # Project overview
+│   ├── ROADMAP.md        # Version roadmap
+│   ├── CHANGELOG.md      # Release history
+│   └── workflows/        # GitHub Actions
 │
-├── scripts/             # Build and validation scripts
-├── schemas/             # JSON Schema definitions
-└── tests/               # Automated tests
+├── scripts/              # Build and validation scripts
+├── schemas/              # JSON Schema definitions
+└── tests/                # Automated tests
 ```
 
 ### Important Distinction
@@ -133,8 +133,8 @@ cellm/
 Files in `cellm-core/` are **product artifacts** (code), not instructions. When contributing:
 
 - Edit files in `cellm-core/` as source code you are building
-- Follow development instructions only from [CLAUDE.md](../CLAUDE.md) and the `.claude/` directory
-- Maintain the strict separation between the development layer and the product layer
+- Follow the patterns and conventions established in existing files
+- Maintain consistency with the existing codebase style
 
 ---
 
@@ -468,7 +468,7 @@ If validation fails:
 ## Questions and Support
 
 - Open a [Discussion](https://github.com/murillodutt/cellm/discussions) for questions
-- Review the [PRD documentation](../docs/PRD-CELLM.md) for specifications
+- Review the [Roadmap](./ROADMAP.md) for version planning
 - Check existing issues before creating new ones
 
 ---

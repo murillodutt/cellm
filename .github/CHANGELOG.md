@@ -111,6 +111,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Links
 
-- [Documentation](./docs/PRD-CELLM.md)
-- [Installation Guide](./docs/tutorials/getting-started.md)
 - [GitHub Repository](https://github.com/murillodutt/cellm)
+- [Roadmap](./ROADMAP.md)
+- [Contributing Guide](./CONTRIBUTING.md)

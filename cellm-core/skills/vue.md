@@ -1,6 +1,10 @@
 ---
+id: SK-VUE
+version: v0.10.0
+status: OK
 skill: vue
 triggers: ["app/**/*.vue"]
+budget: ~350 tokens
 ---
 
 # Vue 3

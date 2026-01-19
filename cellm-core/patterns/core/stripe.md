@@ -1,6 +1,9 @@
 ---
 id: ST-INDEX
+version: v0.10.0
+status: OK
 tags: [stripe, payments]
+budget: ~400 tokens
 ---
 
 # Stripe Patterns

@@ -1,7 +1,11 @@
 ---
+id: WF-VERIFY
+version: v0.10.0
+status: OK
 workflow: verify
 phase: implementation
 agent: reviewer
+budget: ~350 tokens
 ---
 
 # Verify

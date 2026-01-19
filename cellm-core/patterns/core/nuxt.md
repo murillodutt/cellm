@@ -1,6 +1,9 @@
 ---
 id: NX-INDEX
+version: v0.10.0
+status: OK
 tags: [nuxt, ssr]
+budget: ~1200 tokens
 ---
 
 # Nuxt Patterns
@@ -111,7 +114,8 @@ definePageMeta({
 
 ## NX-008: ClientOnly for Browser Components
 
-> Problem: Browser-only components (charts, datepickers) cause hydration mismatch or "window is not defined" errors during SSR
+> Problem: Browser-only components (charts, datepickers) cause hydration mismatch
+> or "window is not defined" errors during SSR
 
 ```vue
 <!-- [-] Wrong -->
@@ -124,6 +128,7 @@ definePageMeta({
 ```
 
 **When to use ClientOnly:**
+
 - Charts (nuxt-charts, canvas/svg libraries)
 - Date pickers (complex calendar components)
 - Maps/Editors (Google Maps, Leaflet, TipTap)
@@ -249,6 +254,7 @@ async function setup() {
 ```
 
 **Alternatives:**
+
 - Reorder: declare composables BEFORE any await
 - Use call/runWithContext to restore instance
 - Enable experimental.asyncContext in nuxt.config.ts
@@ -267,6 +273,7 @@ const id = useId()
 ```
 
 **Solutions:**
+
 - Dynamic IDs: useId() (Nuxt 3.10+)
 - Inconsistent keys: use stable keys based on unique data
 - Browser modules: wrap in <ClientOnly>
@@ -340,6 +347,7 @@ const data = await $fetch('/api/proxy/data')
 ```
 
 **Policy:**
+
 - ALLOWED: Destructive confirmations (delete, cancel, logout)
 - PROHIBITED: Forms, inputs, selects, complex interactions
 - If needs form -> use navigateTo() for drill-down page
@@ -362,6 +370,7 @@ const url = result.pathname.startsWith('/')
 ```
 
 **API Methods:**
+
 - `blob.put(key, value, options)` - Upload
 - `blob.get(key)` - Download (returns Blob | null)
 - `blob.del(key)` - Delete

@@ -1,3 +1,11 @@
+---
+id: TPL-TECH-STACK
+version: v0.10.0
+status: OK
+template: true
+budget: ~200 tokens
+---
+
 # tech-stack.md Template
 
 ```markdown

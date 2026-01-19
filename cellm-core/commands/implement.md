@@ -1,6 +1,10 @@
 ---
+id: CMD-IMPLEMENT
+version: v0.10.0
+status: OK
 command: implement
 agent: implementer
+budget: ~150 tokens
 ---
 
 # /implement

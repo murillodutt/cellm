@@ -1,7 +1,11 @@
 ---
+id: WF-CREATE-TASKS
+version: v0.10.0
+status: OK
 workflow: create-tasks
 phase: specification
 agent: project-manager
+budget: ~300 tokens
 ---
 
 # Create Tasks
@@ -21,6 +25,7 @@ agent: project-manager
 ### 2. Decompose into Task Groups
 
 Group by:
+
 1. Layer (DB → Backend → Frontend)
 2. Dependency
 3. Specialty

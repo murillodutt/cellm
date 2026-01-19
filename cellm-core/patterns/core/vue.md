@@ -1,6 +1,9 @@
 ---
 id: VU-INDEX
+version: v0.10.0
+status: OK
 tags: [vue, components]
+budget: ~800 tokens
 ---
 
 # Vue Patterns

@@ -1,6 +1,9 @@
 ---
 id: CONV-001
+version: v0.10.0
+status: OK
 alwaysApply: true
+budget: ~150 tokens
 ---
 
 # Conventions

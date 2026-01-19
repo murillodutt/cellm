@@ -1,6 +1,10 @@
 ---
+id: SK-PINIA
+version: v0.10.0
+status: OK
 skill: pinia
 triggers: ["**/store/**", "**/stores/**"]
+budget: ~350 tokens
 ---
 
 # Pinia

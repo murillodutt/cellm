@@ -1,7 +1,11 @@
 ---
+id: WF-PLAN-PRODUCT
+version: v0.10.0
+status: OK
 workflow: plan-product
 phase: planning
 agent: architect
+budget: ~350 tokens
 ---
 
 # Plan Product
@@ -16,6 +20,7 @@ agent: architect
 ### 1. Collect Vision
 
 Ask:
+
 - What is the product name?
 - What problem does it solve?
 - Who are the target users?
@@ -23,6 +28,7 @@ Ask:
 ### 2. Define Mission
 
 Generate mission.md:
+
 ```markdown
 # {Product}
 
@@ -43,6 +49,7 @@ Generate mission.md:
 ### 3. Create Roadmap
 
 Generate roadmap.md:
+
 ```markdown
 # Roadmap
 

@@ -1,6 +1,9 @@
 ---
 id: GIT-001
+version: v0.10.0
+status: OK
 alwaysApply: true
+budget: ~300 tokens
 ---
 
 # Git Flow
@@ -18,7 +21,7 @@ alwaysApply: true
 
 Conventional Commits mandatory:
 
-```
+```text
 {type}({scope}): {description}
 
 Types:
@@ -32,7 +35,8 @@ Types:
 ```
 
 Examples:
-```
+
+```text
 feat(auth): add password reset flow
 fix(api): handle null response from stripe
 refactor(components): extract UserCard logic
@@ -43,6 +47,7 @@ refactor(components): extract UserCard logic
 Title: same format as commit
 
 Description:
+
 ```markdown
 ## Description
 What was done and why.

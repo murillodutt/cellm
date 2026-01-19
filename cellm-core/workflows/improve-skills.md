@@ -1,7 +1,11 @@
 ---
+id: WF-IMPROVE-SKILLS
+version: v0.10.0
+status: OK
 workflow: improve-skills
 phase: verification
 agent: architect
+budget: ~400 tokens
 ---
 
 # Skill Optimization
@@ -46,6 +50,7 @@ agent: architect
 ## Optimization Patterns
 
 **Trigger Improvements:**
+
 ```yaml
 # Bad: too broad
 triggers: ["**/*.ts"]
@@ -55,6 +60,7 @@ triggers: ["app/stores/**", "**/store/**"]
 ```
 
 **Description Improvements:**
+
 ```markdown
 # Bad: passive
 Pinia is a state management library.
@@ -64,6 +70,7 @@ Use Pinia for complex state. Always setup stores with composition API.
 ```
 
 **Example Improvements:**
+
 ```typescript
 // Bad: shows everything
 export const useStore = defineStore('id', () => {

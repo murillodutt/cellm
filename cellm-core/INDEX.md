@@ -1,3 +1,11 @@
+---
+id: CELLM-INDEX
+version: v0.10.0
+status: OK
+alwaysApply: true
+budget: ~200 tokens
+---
+
 # CELLM Core
 
 ## Always Load
@@ -46,7 +54,7 @@
 
 ## Commands
 
-```
+```text
 /plan-product   /shape-spec       /write-spec       /create-tasks
 /orchestrate-tasks                /implement        /verify
 /status         /reuse-check      /improve-skills   /spec

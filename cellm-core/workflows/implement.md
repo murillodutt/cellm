@@ -1,7 +1,11 @@
 ---
+id: WF-IMPLEMENT
+version: v0.10.0
+status: OK
 workflow: implement
 phase: implementation
 agent: implementer
+budget: ~250 tokens
 ---
 
 # Implementation

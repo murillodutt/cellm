@@ -1,6 +1,10 @@
 ---
+id: AGT-IMPLEMENTER
+version: v0.10.0
+status: OK
 agent: implementer
 triggers: [/implement]
+budget: ~150 tokens
 ---
 
 # Implementer

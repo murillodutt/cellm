@@ -1,6 +1,10 @@
 ---
+id: SK-UI
+version: v0.10.0
+status: OK
 skill: nuxt-ui
 triggers: ["app/components/**", "app/pages/**"]
+budget: ~200 tokens
 ---
 
 # Nuxt UI v4

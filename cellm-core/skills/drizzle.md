@@ -1,6 +1,10 @@
 ---
+id: SK-DRIZZLE
+version: v0.10.0
+status: OK
 skill: drizzle
 triggers: ["server/**", "**/db/**"]
+budget: ~250 tokens
 ---
 
 # Drizzle ORM

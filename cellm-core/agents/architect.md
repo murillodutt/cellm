@@ -1,6 +1,10 @@
 ---
+id: AGT-ARCHITECT
+version: v0.10.0
+status: OK
 agent: architect
 triggers: [/plan-product, /shape-spec, /write-spec, /reuse-check, /improve-skills]
+budget: ~150 tokens
 ---
 
 # Architect

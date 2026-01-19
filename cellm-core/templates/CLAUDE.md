@@ -1,3 +1,11 @@
+---
+id: TPL-CLAUDE
+version: v0.10.0
+status: OK
+template: true
+budget: ~150 tokens
+---
+
 # CLAUDE.md Template
 
 ```markdown

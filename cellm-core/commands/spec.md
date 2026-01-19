@@ -1,6 +1,10 @@
 ---
+id: CMD-SPEC
+version: v0.10.0
+status: OK
 command: spec
 agent: project-manager
+budget: ~300 tokens
 ---
 
 # /spec
@@ -11,7 +15,7 @@ agent: project-manager
 
 Lists all specs and their states.
 
-```
+```text
 PROJECT SPECS
 ────────────────────────────────────────────
 [+] 2026-01-15-onboarding      [completed]
@@ -42,7 +46,7 @@ Creates a new spec.
 
 Shows dependencies between specs.
 
-```
+```text
 DEPENDENCIES
 ────────────────────────────────────────────
 billing ──depends──► user-auth

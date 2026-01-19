@@ -1,6 +1,10 @@
 ---
+id: SK-TAILWIND
+version: v0.10.0
+status: OK
 skill: tailwind
 triggers: ["app/**/*.vue", "**/*.css"]
+budget: ~300 tokens
 ---
 
 # Tailwind v4

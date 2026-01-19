@@ -1,0 +1,62 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "CELLM Metrics Schema (v1.0.0)",
+  "description": "Schema for CELLM CLI metrics storage. Used by cellm analytics commands.",
+  "type": "object",
+  "properties": {
+    "session": {
+      "type": "object",
+      "description": "Current session information",
+      "properties": {
+        "id": { "type": "string" },
+        "model": { "enum": ["haiku", "sonnet", "opus"] },
+        "budget_limit": { "type": "integer", "default": 2000 }
+      }
+    },
+    "metrics": {
+      "type": "object",
+      "description": "Collected metrics from CLI usage",
+      "properties": {
+        "pattern_hits": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "pattern_id": { "type": "string" },
+              "count": { "type": "integer" }
+            }
+          }
+        },
+        "anti_pattern_prevents": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "pattern_id": { "type": "string" },
+              "count": { "type": "integer" }
+            }
+          }
+        },
+        "command_frequency": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "command": { "type": "string" },
+              "count": { "type": "integer" }
+            }
+          }
+        }
+      }
+    },
+    "project": {
+      "type": "object",
+      "description": "Project state information",
+      "properties": {
+        "active_spec": { "type": "string" },
+        "profile": { "type": "string" },
+        "health_score": { "type": "number", "minimum": 0, "maximum": 100 }
+      }
+    }
+  }
+}

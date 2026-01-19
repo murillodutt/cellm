@@ -1,6 +1,10 @@
 ---
+id: CMD-ORCHESTRATE-TASKS
+version: v0.10.0
+status: OK
 command: orchestrate-tasks
 agent: project-manager
+budget: ~150 tokens
 ---
 
 # /orchestrate-tasks

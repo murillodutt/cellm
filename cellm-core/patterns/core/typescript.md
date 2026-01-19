@@ -1,6 +1,9 @@
 ---
 id: TS-INDEX
+version: v0.10.0
+status: OK
 tags: [typescript, types]
+budget: ~1300 tokens
 ---
 
 # TypeScript Patterns

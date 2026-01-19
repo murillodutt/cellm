@@ -1,6 +1,9 @@
 ---
 id: ES-INDEX
+version: v0.10.0
+status: OK
 tags: [eslint, linting]
+budget: ~300 tokens
 ---
 
 # ESLint Patterns
@@ -24,6 +27,7 @@ import './local-style.css'
 ```
 
 **Import Order:**
+
 1. Type imports (`import type { X }`)
 2. External libs (vue, pinia, @nuxt/*)
 3. Internal (~/stores, ~/utils)
@@ -45,6 +49,7 @@ const { data, error: _error } = await useFetch('/api')
 ```
 
 **Guidelines:**
+
 - Will use later: keep
 - Partial destructuring: prefix with _ (e.g., `_unused`)
 - Never using: remove
@@ -64,6 +69,7 @@ console.log(x)
 ```
 
 **Declaration Rules:**
+
 - `const`: when no reassignment
 - `let`: when reassignment is necessary
 - `var`: NEVER use (banned)

@@ -1,6 +1,10 @@
 ---
+id: CMD-METRICS
+version: v0.10.0
+status: OK
 command: metrics
 agent: project-manager
+budget: ~300 tokens
 ---
 
 # /metrics
@@ -11,7 +15,7 @@ agent: project-manager
 
 Displays consolidated pattern metrics.
 
-```
+```text
 PATTERN METRICS (last 30 days)
 ────────────────────────────────────────────
 

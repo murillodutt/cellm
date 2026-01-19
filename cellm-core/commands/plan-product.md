@@ -1,6 +1,10 @@
 ---
+id: CMD-PLAN-PRODUCT
+version: v0.10.0
+status: OK
 command: plan-product
 agent: architect
+budget: ~150 tokens
 ---
 
 # /plan-product

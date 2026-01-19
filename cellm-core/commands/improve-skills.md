@@ -1,6 +1,10 @@
 ---
+id: CMD-IMPROVE-SKILLS
+version: v0.10.0
+status: OK
 command: improve-skills
 agent: architect
+budget: ~200 tokens
 ---
 
 # /improve-skills
@@ -40,6 +44,7 @@ Analyze and optimize skill descriptions for better Claude Code recognition.
 ## Output
 
 Report with:
+
 - Current state per skill
 - Suggested improvements
 - Token savings estimate

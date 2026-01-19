@@ -1,3 +1,11 @@
+---
+id: TPL-TASKS
+version: v0.10.0
+status: OK
+template: true
+budget: ~250 tokens
+---
+
 # tasks.md Template
 
 ```markdown

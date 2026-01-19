@@ -1,13 +1,17 @@
 ---
+id: SK-NUXT
+version: v0.10.0
+status: OK
 skill: nuxt
 triggers: ["app/**", "server/**"]
+budget: ~250 tokens
 ---
 
 # Nuxt 4
 
 ## Structure
 
-```
+```text
 app/           # Frontend
   components/  # Auto-imported
   composables/ # use* prefix

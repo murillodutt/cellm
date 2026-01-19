@@ -1,6 +1,9 @@
 ---
 id: PATTERNS-INDEX
+version: v0.10.0
+status: OK
 alwaysApply: true
+budget: ~200 tokens
 ---
 
 # Patterns Index

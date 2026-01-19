@@ -1,7 +1,11 @@
 ---
+id: WF-SHAPE-SPEC
+version: v0.10.0
+status: OK
 workflow: shape-spec
 phase: specification
 agent: architect
+budget: ~350 tokens
 ---
 
 # Shape Spec
@@ -20,7 +24,7 @@ agent: architect
 
 ### 2. Create Structure
 
-```
+```text
 specs/{YYYY-MM-DD}-{feature}/
   planning/
     requirements.md
@@ -30,6 +34,7 @@ specs/{YYYY-MM-DD}-{feature}/
 ### 3. Research
 
 Mandatory questions:
+
 - What problem does it solve?
 - Who uses it?
 - Acceptance criteria?

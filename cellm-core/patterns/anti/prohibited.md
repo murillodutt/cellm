@@ -1,7 +1,10 @@
 ---
 id: ANTI-INDEX
+version: v0.10.0
+status: OK
 severity: critical
 alwaysApply: true
+budget: ~600 tokens
 ---
 
 # Prohibited

@@ -1,6 +1,9 @@
 ---
 id: PN-INDEX
+version: v0.10.0
+status: OK
 tags: [pinia, state]
+budget: ~500 tokens
 ---
 
 # Pinia Patterns
@@ -113,6 +116,7 @@ export const useFinanceStore = defineStore('finance', () => {
 ```
 
 **Benefits:**
+
 - Full TypeScript inference
 - Better composable integration
 - Easier testing

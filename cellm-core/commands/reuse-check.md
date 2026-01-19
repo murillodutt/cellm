@@ -1,6 +1,10 @@
 ---
+id: CMD-REUSE-CHECK
+version: v0.10.0
+status: OK
 command: reuse-check
 agent: architect
+budget: ~300 tokens
 ---
 
 # /reuse-check
@@ -14,12 +18,14 @@ Identify reusable code before implementing.
 ### 1. Intent Analysis
 
 Ask:
+
 - What do you intend to create?
 - What is the main functionality?
 
 ### 2. Layered Search
 
 Search order:
+
 1. shared/ → Shared utils and types
 2. app/composables/ → Existing composables
 3. app/components/ → Existing components
@@ -35,7 +41,7 @@ Search order:
 
 ### 4. Decision
 
-```
+```text
 IF match >= 90%:
   → REUSE directly
   → Import and use
@@ -52,6 +58,7 @@ IF match < 70%:
 ## Output
 
 Recommendation with justification:
+
 - Module found (if any)
 - Match percentage
 - Recommended action

@@ -1,7 +1,11 @@
 ---
+id: WF-ORCHESTRATE-TASKS
+version: v0.10.0
+status: OK
 workflow: orchestrate-tasks
 phase: implementation
 agent: project-manager
+budget: ~350 tokens
 ---
 
 # Task Orchestration
@@ -35,22 +39,26 @@ Detect level from tasks.md:
 ## Adaptive Behavior
 
 **Level 0-1 (Micro):**
+
 - Execute all tasks sequentially
 - Single checkpoint at end
 - No intermediate verification
 
 **Level 2 (Small):**
+
 - Execute tasks in order
 - Checkpoint after each task
 - Continue on non-critical failures
 
 **Level 3 (Medium):**
+
 - Group tasks by dependency
 - Checkpoint after each group
 - Run /verify on critical groups
 - Pause on blocking failures
 
 **Level 4 (Large):**
+
 - Break into phases (setup, core, integration, polish)
 - Interactive confirmation between phases
 - Full /verify after each phase

@@ -1,6 +1,9 @@
 ---
 id: UI-INDEX
+version: v0.10.0
+status: OK
 tags: [nuxt-ui, components]
+budget: ~400 tokens
 ---
 
 # Nuxt UI Patterns

@@ -1,6 +1,10 @@
 ---
+id: CMD-VERIFY
+version: v0.10.0
+status: OK
 command: verify
 agent: reviewer
+budget: ~200 tokens
 ---
 
 # /verify
@@ -15,16 +19,19 @@ agent: reviewer
 ## Checklist
 
 ### Quality
+
 - [ ] TypeScript no errors
 - [ ] No `any`
 - [ ] No console.log
 - [ ] Limits respected
 
 ### Compliance
+
 - [ ] User stories met
 - [ ] Requirements implemented
 
 ### Standards
+
 - [ ] Naming OK
 - [ ] Imports OK
 - [ ] Structure OK

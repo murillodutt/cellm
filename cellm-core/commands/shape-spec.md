@@ -1,6 +1,10 @@
 ---
+id: CMD-SHAPE-SPEC
+version: v0.10.0
+status: OK
 command: shape-spec
 agent: architect
+budget: ~200 tokens
 ---
 
 # /shape-spec

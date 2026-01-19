@@ -1,7 +1,11 @@
 ---
+id: WF-WRITE-SPEC
+version: v0.10.0
+status: OK
 workflow: write-spec
 phase: specification
 agent: architect
+budget: ~300 tokens
 ---
 
 # Write Spec

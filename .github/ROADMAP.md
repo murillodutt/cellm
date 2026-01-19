@@ -7,8 +7,8 @@
 | Metadata | Value |
 |----------|-------|
 | Document | ROADMAP-CELLM-001 |
-| Version | 1.1.0 |
-| Date | 2026-01-18 |
+| Version | 1.2.0 |
+| Date | 2026-01-19 |
 | Status | Draft |
 | Platform | Claude Code CLI (exclusive) |
 
@@ -262,7 +262,78 @@ cellm analytics report      # Monthly report
 
 ---
 
-### v1.0.0 - Scale
+### v0.20.0 - Advanced CLI
+
+**Theme:** Advanced features and Oracle PoC
+
+| Feature | Description |
+|---------|-------------|
+| Compile Command | `cellm compile` for profile compilation |
+| Upgrade Command | `cellm upgrade` for version management |
+| Oracle PoC | Proof of concept for visual dashboard |
+
+#### [F-020-01] Compile Command
+
+Advanced profile compilation with output formats.
+
+```
+cellm compile --profile default     Compile profile to output
+cellm compile --format json         Output as JSON
+cellm compile --minify              Minified output
+cellm compile --watch               Watch mode
+```
+
+#### [F-020-02] Upgrade Command
+
+Version management and updates.
+
+```
+cellm upgrade --check     Check for new versions
+cellm upgrade             Apply updates with backup
+cellm upgrade --rollback  Restore previous version
+```
+
+#### [F-020-03] Oracle PoC
+
+Proof of concept for the visual dashboard (CELLM Oracle):
+- Basic Nuxt 4 scaffold
+- Context tree visualization
+- Analytics display prototype
+
+**Deliverables:**
+- [ ] Compile command functional
+- [ ] Upgrade command with backup/rollback
+- [ ] Oracle PoC demonstrating feasibility
+- [ ] CLI experience polished
+
+---
+
+### v0.90.0 - Beta Testing
+
+**Theme:** Real-world validation
+
+| Feature | Description |
+|---------|-------------|
+| Beta Program | Structured pilot testing |
+| Bug Fixes | Issues from beta feedback |
+| Documentation | Updated based on feedback |
+
+#### Beta Program
+
+- 3-5 pilot users onboarded
+- Feedback collection system
+- Bug triage and prioritization
+- Performance optimization
+
+**Deliverables:**
+- [ ] Beta program completed
+- [ ] Critical bugs resolved
+- [ ] Documentation refined
+- [ ] Ready for v1.0.0 launch
+
+---
+
+### v1.0.0 - Launch
 
 **Theme:** Production-ready for teams
 
@@ -351,14 +422,56 @@ cellm:
 
 ---
 
-## After v1.0.0
+### v1.1.0 - Oracle Dashboard
 
-The roadmap after v1.0.0 will be defined based on:
+**Theme:** Visual interface and advanced MCP
+
+| Feature | Description |
+|---------|-------------|
+| CELLM Oracle | Full Nuxt 4 dashboard application |
+| MCP HTTP Transport | HTTP/SSE transport for web integration |
+| Nuxt MCP Toolkit | Vue composables for MCP integration |
+
+#### [F-110-01] CELLM Oracle Dashboard
+
+Full-featured visual dashboard:
+- Context tree visualization
+- Budget and analytics charts
+- Session history browser
+- Profile editor UI
+- Real-time updates
+
+#### [F-110-02] MCP HTTP Transport
+
+Web-compatible MCP transport:
+- HTTP/SSE streaming
+- Authentication layer
+- Connection management
+- Error recovery
+
+#### [F-110-03] Nuxt MCP Toolkit
+
+Vue/Nuxt integration package (`@cellm/nuxt-mcp`):
+- `useMcpClient()` composable
+- `useMcpTools()` composable
+- `useMcpContext()` composable
+- Auto-reconnection
+- TypeScript support
+
+**Deliverables:**
+- [ ] Oracle dashboard functional
+- [ ] MCP HTTP transport working
+- [ ] Nuxt toolkit published
+- [ ] Integration documentation
+
+---
+
+## After v1.1.0
+
+The roadmap beyond v1.1.0 will be defined based on:
 - Real user feedback
 - Collected usage metrics
 - Patterns that emerge from the community
-
-We don't speculate about the future - we let the system mature.
 
 ---
 
@@ -390,6 +503,7 @@ Features considered but explicitly excluded:
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.2.0 | 2026-01-19 | Add v0.20.0, v0.90.0, v1.1.0 phases |
 | 1.1.0 | 2026-01-18 | Complete rewrite, value-focused structure |
 | 1.0.0 | 2026-01-18 | Initial roadmap document |
 

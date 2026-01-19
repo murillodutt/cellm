@@ -1,6 +1,9 @@
 ---
 id: DOM-FE-001
+version: v0.10.0
+status: OK
 paths: ["app/**"]
+budget: ~300 tokens
 ---
 
 # Frontend Rules

@@ -1,6 +1,10 @@
 ---
+id: AGT-PROJECT-MANAGER
+version: v0.10.0
+status: OK
 agent: project-manager
 triggers: [/create-tasks, /orchestrate-tasks, /status, /spec, /metrics]
+budget: ~200 tokens
 ---
 
 # Project Manager
@@ -25,6 +29,7 @@ You manage tasks and project status.
 ## /status
 
 Show:
+
 - Active spec
 - Completed/pending tasks
 - Current phase

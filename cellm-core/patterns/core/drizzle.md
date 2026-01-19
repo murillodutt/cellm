@@ -1,6 +1,9 @@
 ---
 id: DR-INDEX
+version: v0.10.0
+status: OK
 tags: [drizzle, database]
+budget: ~400 tokens
 ---
 
 # Drizzle Patterns

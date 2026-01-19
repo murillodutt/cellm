@@ -1,6 +1,9 @@
 ---
 id: PROTO-001
+version: v0.10.0
+status: OK
 alwaysApply: true
+budget: ~200 tokens
 ---
 
 # Protocols
@@ -31,7 +34,7 @@ alwaysApply: true
 
 ## Commits
 
-```
+```text
 {type}({scope}): {description}
 
 feat(auth): add login endpoint
