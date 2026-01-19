@@ -30,7 +30,7 @@ budget: ~350 tokens
 Detect level from tasks.md:
 
 | Tasks | Level | Checkpoint | Mode |
-|-------|-------|------------|------|
+ | ------- |------- | ------------ |------|
 | 1-2 | 0-1 | After completion | standard |
 | 3-5 | 2 | Per task | standard |
 | 6-10 | 3 | Per group | resilient |
@@ -67,7 +67,7 @@ Detect level from tasks.md:
 ## Failure Handling
 
 | Failure Type | Level 0-2 | Level 3-4 |
-|--------------|-----------|-----------|
+ | -------------- |----------- | ----------- |
 | Type error | Fix and continue | Pause, ask user |
 | Test failure | Log and continue | Block until fixed |
 | Missing dependency | Skip task | Block group |

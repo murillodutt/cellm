@@ -39,7 +39,7 @@ Group by:
 ### 4. Estimate
 
 | Size | Description |
-|---------|-----------|
+ | --------- |-----------|
 | S | < 1 hour |
 | M | 1-4 hours |
 | L | > 4 hours (consider splitting) |

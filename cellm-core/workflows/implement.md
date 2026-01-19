@@ -29,7 +29,7 @@ budget: ~250 tokens
 Detect complexity level from task scope:
 
 | Level | Scope | Checkpoint | Verification |
-|-------|-------|------------|--------------|
+ | ------- |------- | ------------ |--------------|
 | 0 | Bug fix (1-2 lines) | None | Quick review |
 | 1 | Small change (1 file) | After completion | Type check |
 | 2 | Medium feature (2-3 files) | Per file | Type + lint |

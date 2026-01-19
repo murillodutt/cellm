@@ -69,7 +69,7 @@ throw createError({ message: 'Internal Server Error' })
 ## Quick Lookup
 
 | Error | Pattern | Fix |
-|-------|---------|-----|
+ | ------- |--------- | ----- |
 | TS2589 | TS-015 | Use typedFetch wrapper |
 | TS2345 | TS-006 | Type $fetch call |
 | TS7006 | TS-014 | Use explicit types |
@@ -80,7 +80,7 @@ throw createError({ message: 'Internal Server Error' })
 ## Banned Libraries
 
 | Ban | Use Instead |
-|-----|-------------|
+ | ----- |-------------|
 | axios | $fetch |
 | moment.js | date-fns |
 | lodash | native ES6+ |
@@ -91,7 +91,7 @@ throw createError({ message: 'Internal Server Error' })
 ## Banned UI Patterns
 
 | Ban | Use Instead |
-|-----|-------------|
+ | ----- |-------------|
 | UDrawer | navigateTo() drill-down |
 | USlideover | navigateTo() drill-down |
 | UModal with forms | separate page |
@@ -101,7 +101,7 @@ throw createError({ message: 'Internal Server Error' })
 ## Banned Practices
 
 | Ban | Fix |
-|-----|-----|
+ | ----- |-----|
 | @ts-ignore | Fix the underlying error |
 | as unknown as T | Use type narrowing |
 | eslint-disable | Fix the code violation |
@@ -109,7 +109,7 @@ throw createError({ message: 'Internal Server Error' })
 ## TypeScript Bans
 
 | Ban | Correct | Pattern |
-|-----|---------|---------|
+ | ----- |--------- | --------- |
 | `$fetch<any>()` | `$fetch<T>()` | TS-006 |
 | `method: 'POST' as any` | `method: 'POST'` | TS-007 |
 | `field: string` (null possible) | `field: string \| null` | TS-008 |
@@ -122,7 +122,7 @@ throw createError({ message: 'Internal Server Error' })
 ## Vue Bans
 
 | Ban | Correct | Pattern |
-|-----|---------|---------|
+ | ----- |--------- | --------- |
 | `ref<ComplexClass>()` | `shallowRef<T>()` | VU-007 |
 | `computed(() => ...)` | `computed<T>(() => ...)` | VU-008 |
 | `v-if="item.type === 'x'"` | Type guard function | VU-009 |
@@ -131,7 +131,7 @@ throw createError({ message: 'Internal Server Error' })
 ## Nuxt Bans
 
 | Ban | Correct | Pattern |
-|-----|---------|---------|
+ | ----- |--------- | --------- |
 | `useFetch` without key | `useFetch(url, { key })` | NX-006 |
 | Chart without ClientOnly | `<ClientOnly>` wrapper | NX-008 |
 | `Date.now()` in template | Use computed or mounted | NX-015 |
@@ -142,7 +142,7 @@ throw createError({ message: 'Internal Server Error' })
 ## Charts Bans
 
 | Ban | Correct |
-|-----|---------|
+ | ----- |---------|
 | Hardcoded hex colors | `useChartConfig().colors` |
 | CSS `--vis-*` variables | Tailwind/designStore |
 | Inline color definitions | chartColors composable |
@@ -150,7 +150,7 @@ throw createError({ message: 'Internal Server Error' })
 ## Navigation Bans
 
 | Ban | Fix |
-|-----|-----|
+ | ----- |-----|
 | Orphaned page | Add entry in sidebar menu |
 | URL-only access | Add to global search |
 | Misplaced route | Move to correct semantic group |

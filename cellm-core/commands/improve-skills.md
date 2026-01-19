@@ -35,7 +35,7 @@ Analyze and optimize skill descriptions for better Claude Code recognition.
 ## Analysis Criteria
 
 | Aspect | Good | Needs Improvement |
-|--------|------|-------------------|
+| ------ | ---- | ----------------- |
 | Triggers | Specific globs | Overly broad patterns |
 | Description | Action-oriented | Vague or passive |
 | Examples | Common use cases | Edge cases only |

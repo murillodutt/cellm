@@ -41,7 +41,7 @@ budget: ~400 tokens
 ## Quality Checks
 
 | Check | Pass | Fail |
-|-------|------|------|
+ | ------- |------ | ------ |
 | Trigger specificity | `app/components/**` | `**/*` |
 | Description verb | "Use X for Y" | "X is a thing" |
 | Example relevance | Common pattern | Rare edge case |

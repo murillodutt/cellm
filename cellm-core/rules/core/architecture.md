@@ -44,7 +44,7 @@ pages → components → composables → services → core
 ## Boundaries
 
 | Layer | Can Import |
-|--------|---------------|
+ | -------- |---------------|
 | pages | everything |
 | components | composables, shared |
 | composables | services, shared |

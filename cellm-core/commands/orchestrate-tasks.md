@@ -25,7 +25,7 @@ budget: ~150 tokens
 ## Modes
 
 | Mode | Description |
-|------|-------------|
+| ---- | ----------- |
 | standard | Execute all groups |
 | resilient | Continue on non-critical failures |
 | interactive | Confirm each group before execution |

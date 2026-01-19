@@ -56,7 +56,7 @@ budget: ~250 tokens
 ## Summary
 
 | Group | Specialty | Estimation | Status |
-|-------|---------------|------------|--------|
+ | ------- |--------------- | ------------ |--------|
 | 1 | backend | M | [...] |
 | 2 | backend | M | [...] |
 | 3 | frontend | L | [...] |

@@ -11,7 +11,7 @@ budget: ~150 tokens
 ## Naming
 
 | Type | Pattern | Example |
-|------|--------|---------|
+ | ------ |-------- | --------- |
 | Variables | camelCase | userName |
 | Functions | camelCase | fetchUser() |
 | Components | PascalCase | UserCard.vue |

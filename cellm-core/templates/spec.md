@@ -58,7 +58,7 @@ budget: ~300 tokens
 ## Reusable Components
 
 | Component | Location | Use |
-|------------|-------------|-----|
+ | ------------ |------------- | ----- |
 | {comp} | {path} | {how to use} |
 
 ## Out of Scope

@@ -58,7 +58,7 @@ reports ──depends──► billing
 ## States
 
 | State | Symbol | Description |
-|--------|---------|-----------|
+| ----- | ------ | ----------- |
 | backlog | ◌ | Planned |
 | shaping | ○ | In research |
 | specified | ○ | Spec complete |

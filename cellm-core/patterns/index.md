@@ -11,7 +11,7 @@ budget: ~200 tokens
 ## Anti-Patterns (Critical)
 
 | ID | Rule | File |
-|----|-------|---------|
+ | ---- |------- | --------- |
 | ANTI-001 | Never any | anti/prohibited.md |
 | ANTI-002 | Never hardcode colors | anti/prohibited.md |
 | ANTI-003 | Never sync I/O | anti/prohibited.md |
@@ -21,7 +21,7 @@ budget: ~200 tokens
 ## By Technology
 
 | Prefix | Technology | File |
-|---------|------------|---------|
+ | --------- |------------ | --------- |
 | TS-* | TypeScript | core/typescript.md |
 | VU-* | Vue 3 | core/vue.md |
 | NX-* | Nuxt 4 | core/nuxt.md |

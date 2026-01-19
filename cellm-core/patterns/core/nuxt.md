@@ -324,7 +324,7 @@ const data = await $fetch('/api/proxy/data')
 > Problem: Using old UModal API from Nuxt UI v3
 
 | Aspect | v3 (Old) | v4 (Correct) |
-|--------|----------|--------------|
+ | -------- |---------- | -------------- |
 | Model | `v-model="x"` | `v-model:open="x"` |
 | Title | `#header` slot | `title` prop |
 | Content | direct or `#content` | `#body` slot |

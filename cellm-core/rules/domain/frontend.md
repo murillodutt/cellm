@@ -31,7 +31,7 @@ budget: ~300 tokens
 ## Naming
 
 | Type | Pattern | Example |
-|------|---------|---------|
+ | ------ |--------- | --------- |
 | Components | PascalCase | UserCard.vue |
 | Composables | useXxx | useAuth.ts |
 | Pages | kebab-case | user-profile.vue |

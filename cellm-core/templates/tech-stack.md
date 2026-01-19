@@ -14,7 +14,7 @@ budget: ~200 tokens
 ## Core
 
 | Technology | Version | Purpose |
-|------------|--------|-----------|
+ | ------------ |-------- | ----------- |
 | Nuxt | 4 | Fullstack framework |
 | Vue | 3.5+ | UI framework |
 | TypeScript | 5.x | Type safety |
@@ -22,14 +22,14 @@ budget: ~200 tokens
 ## UI
 
 | Technology | Version | Purpose |
-|------------|--------|-----------|
+ | ------------ |-------- | ----------- |
 | Nuxt UI | v4 | Component library |
 | Tailwind CSS | v4 | Styling |
 
 ## Backend
 
 | Technology | Version | Purpose |
-|------------|--------|-----------|
+ | ------------ |-------- | ----------- |
 | Nitro | latest | Server engine |
 | Drizzle ORM | latest | Database ORM |
 | PostgreSQL | 15+ | Database |
@@ -37,13 +37,13 @@ budget: ~200 tokens
 ## Payments (optional)
 
 | Technology | Version | Purpose |
-|------------|--------|-----------|
+ | ------------ |-------- | ----------- |
 | Stripe | latest | Payments |
 
 ## Auth (optional)
 
 | Technology | Version | Purpose |
-|------------|--------|-----------|
+ | ------------ |-------- | ----------- |
 | Nuxt Auth Utils | latest | Authentication |
 
 ## Justifications

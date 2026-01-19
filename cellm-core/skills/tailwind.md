@@ -25,7 +25,7 @@ budget: ~300 tokens
 ## Available Colors
 
 | Token | Use |
-|-------|-----|
+ | ------- |-----|
 | primary | Main actions, links |
 | neutral | Text, borders, backgrounds |
 | error | Errors, validation |

@@ -36,7 +36,7 @@ export default defineEventHandler(async (event) => {
 ## Naming
 
 | Type | Pattern | Example |
-|------|---------|---------|
+ | ------ |--------- | --------- |
 | GET | [param].get.ts | [id].get.ts |
 | POST | index.post.ts | index.post.ts |
 | PUT | [param].put.ts | [id].put.ts |

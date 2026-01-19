@@ -11,7 +11,7 @@ budget: ~300 tokens
 ## Branches
 
 | Type | Pattern | Example |
-|------|---------|---------|
+ | ------ |--------- | --------- |
 | main | main | Production |
 | feature | feat/{scope}/{desc} | feat/auth/login |
 | fix | fix/{scope}/{desc} | fix/ui/button-align |
