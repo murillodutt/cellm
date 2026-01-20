@@ -1,5 +1,12 @@
 {
-  "MD013": false,
-  "MD033": false,
-  "MD041": false
+  "MD013": {
+    "line_length": 120,
+    "tables": false,
+    "code_blocks": false
+  },
+  "MD033": {
+    "allowed_elements": ["ClientOnly", "details", "summary"]
+  },
+  "MD040": true,
+  "MD060": false
 }
