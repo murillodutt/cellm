@@ -1,6 +1,6 @@
 ---
 id: AGT-REVIEWER
-version: v0.10.0
+version: v1.1.0
 status: OK
 agent: reviewer
 triggers: [/verify]

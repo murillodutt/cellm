@@ -1,6 +1,6 @@
 ---
 id: PN-ADVANCED
-version: v0.10.0
+version: v1.1.0
 status: OK
 tags: [pinia, state, advanced]
 budget: ~350 tokens

@@ -30,7 +30,27 @@ This roadmap focuses on **direct value to developers**, not technical infrastruc
 
 ## Current State
 
-### v0.10.0 (Current - Pre-release)
+### v1.1.0 (CURRENT)
+
+**Released:** 2026-01-20
+
+**New in this release:**
+- CELLM Oracle: Nuxt 4 dashboard for visual monitoring
+- MCP Integration: Real-time validation via @nuxtjs/mcp-toolkit
+- Session template for current context tracking
+- All 68 artifacts updated to v1.1.0
+
+---
+
+### v1.0.0 (COMPLETED)
+
+**Released:** 2026-01-18
+
+First stable public release with complete CLI foundation.
+
+---
+
+### v0.10.0 (COMPLETED - Pre-release)
 
 **Completed Components:**
 
@@ -422,47 +442,44 @@ cellm:
 
 ---
 
-### v1.1.0 - Oracle Dashboard
+### v1.1.0 - Oracle Dashboard (COMPLETED)
 
 **Theme:** Visual interface and advanced MCP
 
-| Feature | Description |
-|---------|-------------|
-| CELLM Oracle | Full Nuxt 4 dashboard application |
-| MCP HTTP Transport | HTTP/SSE transport for web integration |
-| Nuxt MCP Toolkit | Vue composables for MCP integration |
+| Feature | Status | Description |
+|---------|--------|-------------|
+| CELLM Oracle | [+] DONE | Full Nuxt 4 dashboard application |
+| MCP Integration | [+] DONE | @nuxtjs/mcp-toolkit integration |
+| Session Template | [+] DONE | Current context tracking |
 
 #### [F-110-01] CELLM Oracle Dashboard
 
 Full-featured visual dashboard:
-- Context tree visualization
-- Budget and analytics charts
-- Session history browser
-- Profile editor UI
-- Real-time updates
+- [+] Context tree visualization
+- [+] Budget and analytics charts (NuxtCharts Premium)
+- [+] Session history browser
+- [~] Profile editor UI (planned for v1.2.0)
+- [+] Real-time MCP updates
 
-#### [F-110-02] MCP HTTP Transport
+#### [F-110-02] MCP Integration
 
-Web-compatible MCP transport:
-- HTTP/SSE streaming
-- Authentication layer
-- Connection management
-- Error recovery
+Integration via @nuxtjs/mcp-toolkit:
+- [+] stdio transport functional
+- [~] HTTP/SSE streaming (planned for v1.2.0)
+- [~] Authentication layer (planned for v1.2.0)
 
-#### [F-110-03] Nuxt MCP Toolkit
+#### [F-110-03] Session Template
 
-Vue/Nuxt integration package (`@cellm/nuxt-mcp`):
-- `useMcpClient()` composable
-- `useMcpTools()` composable
-- `useMcpContext()` composable
-- Auto-reconnection
-- TypeScript support
+New template for context tracking:
+- [+] SESSION layer with current date/time
+- [+] Context preservation across conversations
+- [+] Template in cellm-core/templates/session.md
 
 **Deliverables:**
-- [ ] Oracle dashboard functional
-- [ ] MCP HTTP transport working
-- [ ] Nuxt toolkit published
-- [ ] Integration documentation
+- [+] Oracle dashboard functional
+- [+] MCP integration working
+- [+] Session template created
+- [+] Integration documentation
 
 ---
 

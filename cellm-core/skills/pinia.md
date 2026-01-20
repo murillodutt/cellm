@@ -1,6 +1,6 @@
 ---
 id: SK-PINIA
-version: v0.10.0
+version: v1.1.0
 status: OK
 skill: pinia
 triggers: ["**/store/**", "**/stores/**"]

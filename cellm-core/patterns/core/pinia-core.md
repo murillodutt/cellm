@@ -1,6 +1,6 @@
 ---
 id: PN-CORE
-version: v0.10.0
+version: v1.1.0
 status: OK
 tags: [pinia, state]
 budget: ~300 tokens

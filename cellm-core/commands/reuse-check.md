@@ -1,6 +1,6 @@
 ---
 id: CMD-REUSE-CHECK
-version: v0.10.0
+version: v1.1.0
 status: OK
 command: reuse-check
 agent: architect

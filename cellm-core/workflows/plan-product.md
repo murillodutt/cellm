@@ -1,6 +1,6 @@
 ---
 id: WF-PLAN-PRODUCT
-version: v0.10.0
+version: v1.1.0
 status: OK
 workflow: plan-product
 phase: planning

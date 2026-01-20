@@ -1,6 +1,6 @@
 ---
 id: AGT-PROJECT-MANAGER
-version: v0.10.0
+version: v1.1.0
 status: OK
 agent: project-manager
 triggers: [/create-tasks, /orchestrate-tasks, /status, /spec, /metrics]

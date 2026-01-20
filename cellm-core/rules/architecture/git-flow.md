@@ -1,6 +1,6 @@
 ---
 id: GIT-001
-version: v0.10.0
+version: v1.1.0
 status: OK
 paths: ["**"]
 budget: ~300 tokens
@@ -11,7 +11,7 @@ budget: ~300 tokens
 ## Branches
 
 | Type | Pattern | Example |
-| ------ | --------- | --------- |
+ | ------ |--------- | --------- |
 | main | main | Production |
 | feature | feat/{scope}/{desc} | feat/auth/login |
 | fix | fix/{scope}/{desc} | fix/ui/button-align |

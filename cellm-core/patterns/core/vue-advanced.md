@@ -1,6 +1,6 @@
 ---
 id: VU-ADVANCED
-version: v0.10.0
+version: v1.1.0
 status: OK
 tags: [vue, advanced]
 budget: ~400 tokens

@@ -1,6 +1,6 @@
 {
   "name": "cellm",
-  "version": "0.10.0",
+  "version": "1.1.0",
   "description": "Spec-Driven Development System for AI Agents - Optimized for Nuxt 4 stack",
   "homepage": "https://cellm.ai",
   "repository": {
@@ -21,7 +21,6 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "test:ui": "vitest --ui",
     "test:validation": "vitest run tests/validation",
     "test:integration": "vitest run tests/integration",
     "validate": "./scripts/validate.sh",
@@ -47,16 +46,14 @@
   ],
   "devDependencies": {
     "@vitest/coverage-v8": "^4.0.17",
-    "@vitest/ui": "^4.0.17",
-    "ajv": "^8.17.0",
-    "ajv-formats": "^3.0.0",
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1",
     "glob": "^13.0.0",
     "gray-matter": "^4.0.3",
-    "husky": "^9.1.0",
+    "husky": "^9.1.7",
     "lint-staged": "^16.2.7",
     "markdownlint-cli": "^0.47.0",
-    "vitest": "^4.0.17",
-    "yaml": "^2.5.0"
+    "vitest": "^4.0.17"
   },
   "engines": {
     "node": ">=20.0.0"

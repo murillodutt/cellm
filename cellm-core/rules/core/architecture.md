@@ -1,6 +1,6 @@
 ---
 id: ARCH-001
-version: v0.10.0
+version: v1.1.0
 status: OK
 alwaysApply: true
 budget: ~300 tokens
@@ -44,7 +44,7 @@ pages → components → composables → services → core
 ## Boundaries
 
 | Layer | Can Import |
-| -------- | --------------- |
+ | -------- |---------------|
 | pages | everything |
 | components | composables, shared |
 | composables | services, shared |

@@ -1,6 +1,6 @@
 ---
 id: LIM-001
-version: v0.10.0
+version: v1.1.0
 status: OK
 alwaysApply: true
 budget: ~100 tokens

@@ -1,6 +1,6 @@
 ---
 id: WF-IMPROVE-SKILLS
-version: v0.10.0
+version: v1.1.0
 status: OK
 workflow: improve-skills
 phase: verification

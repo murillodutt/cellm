@@ -1,6 +1,6 @@
 ---
 id: NX-ROUTING
-version: v0.10.0
+version: v1.1.0
 status: OK
 tags: [nuxt, routing, middleware]
 budget: ~250 tokens

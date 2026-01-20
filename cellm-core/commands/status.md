@@ -1,6 +1,6 @@
 ---
 id: CMD-STATUS
-version: v0.10.0
+version: v1.1.0
 status: OK
 command: status
 agent: project-manager

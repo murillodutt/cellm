@@ -1,6 +1,6 @@
 ---
 id: DOM-BE-001
-version: v0.10.0
+version: v1.1.0
 status: OK
 paths: ["server/**"]
 budget: ~350 tokens

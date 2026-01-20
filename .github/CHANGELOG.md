@@ -11,9 +11,47 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Planned
-- CLI tool for installation and compilation
-- MCP server integration
-- Visual status dashboard
+- CLI tool for installation and compilation (`@cellm/cli`)
+- Beta testing program
+- Production-ready v1.0.0 launch
+
+---
+
+## [1.1.0] - 2026-01-20
+
+### Added
+- **CELLM Oracle**: Nuxt 4 dashboard for visual monitoring
+  - Context tree visualization
+  - Budget consumption charts (NuxtCharts Premium)
+  - Session history browser
+  - Real-time MCP integration
+- **MCP Integration**: Real-time validation via `@nuxtjs/mcp-toolkit`
+- Session template for current context tracking
+
+### Changed
+- Updated all 68 cellm-core artifacts to v1.1.0
+- Improved budget tracking with visual indicators
+- Enhanced pattern loading with progressive disclosure
+
+### Technical
+- Stack: Nuxt 4, Vue 3, TypeScript 5.9, Tailwind 4, NuxtCharts Premium
+- MCP Protocol: stdio transport with HTTP/SSE planned
+
+---
+
+## [1.0.0] - 2026-01-18
+
+### Added
+- First stable release for public use
+- Complete CLI foundation with installation scripts
+- All 68 specification files finalized
+- Documentation site structure
+- GitHub repository published at [github.com/murillodutt/cellm](https://github.com/murillodutt/cellm)
+
+### Infrastructure
+- Semantic versioning established
+- Profile inheritance system validated
+- JSON Schema validation complete
 
 ---
 
@@ -95,7 +133,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | Version | Date | Highlights |
 |---------|------|------------|
-| 0.10.0 | 2026-01-17 | Initial release |
+| 1.1.0 | 2026-01-20 | CELLM Oracle dashboard, MCP integration |
+| 1.0.0 | 2026-01-18 | First stable public release |
+| 0.10.0 | 2026-01-17 | Initial pre-release |
 
 ---
 

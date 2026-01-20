@@ -1,6 +1,6 @@
 ---
 id: CELLM-INDEX
-version: v0.10.0
+version: v1.1.0
 status: OK
 alwaysApply: true
 budget: ~200 tokens
@@ -72,3 +72,14 @@ These specs are loaded by agents based on context:
 /status         /reuse-check      /improve-skills   /spec
 /metrics
 ```
+
+## Templates
+
+| Template | Purpose |
+| -------- | ------- |
+| templates/CLAUDE.md | Project-level instructions |
+| templates/config.yaml.md | CELLM configuration |
+| templates/tech-stack.md | Technology stack definition |
+| templates/tasks.md | Task tracking |
+| templates/spec.md | Specification format |
+| templates/session/current.md | Session state management |

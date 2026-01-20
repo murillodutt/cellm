@@ -1,6 +1,6 @@
 ---
 id: NX-DATA
-version: v0.10.0
+version: v1.1.0
 status: OK
 tags: [nuxt, data-fetching]
 budget: ~300 tokens
