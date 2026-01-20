@@ -456,7 +456,7 @@ cellm:
 
 Full-featured visual dashboard:
 - [+] Context tree visualization
-- [+] Budget and analytics charts (NuxtCharts Premium)
+- [+] Budget and analytics charts (NuxtCharts)
 - [+] Session history browser
 - [~] Profile editor UI (planned for v1.2.0)
 - [+] Real-time MCP updates

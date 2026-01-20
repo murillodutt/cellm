@@ -22,7 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - **CELLM Oracle**: Nuxt 4 dashboard for visual monitoring
   - Context tree visualization
-  - Budget consumption charts (NuxtCharts Premium)
+  - Budget consumption charts (NuxtCharts)
   - Session history browser
   - Real-time MCP integration
 - **MCP Integration**: Real-time validation via `@nuxtjs/mcp-toolkit`
@@ -34,7 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Enhanced pattern loading with progressive disclosure
 
 ### Technical
-- Stack: Nuxt 4, Vue 3, TypeScript 5.9, Tailwind 4, NuxtCharts Premium
+- Stack: Nuxt 4, Vue 3, TypeScript 5.9, Tailwind 4, NuxtCharts 2
 - MCP Protocol: stdio transport with HTTP/SSE planned
 
 ---

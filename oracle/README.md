@@ -48,7 +48,7 @@ Oracle exposes 4 MCP tools:
 - **Framework:** Nuxt 4.2
 - **UI:** Nuxt UI v4.3
 - **MCP:** @nuxtjs/mcp-toolkit v0.6
-- **Charts:** NuxtCharts Premium v2.0 (nuxtcharts.com)
+- **Charts:** NuxtCharts v2.0
 - **State:** Pinia v3.0
 - **Styling:** Tailwind CSS
 
