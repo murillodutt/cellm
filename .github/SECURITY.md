@@ -1,6 +1,6 @@
 # Security Policy
 
-> **CELLM** - Context Engineering for Large Language Models
+> **CELLM** - Spec-Driven Development System for AI Agents
 
 This document outlines security procedures and policies for the CELLM project.
 
@@ -320,6 +320,6 @@ This security policy may be updated periodically. Changes will be reflected in t
 
 ---
 
-**CELLM** - Context Engineering for Large Language Models
+**CELLM** - Spec-Driven Development System for AI Agents
 **Maintainer**: Dutt Yeshua Technology Ltd
 **License**: MIT

@@ -1,6 +1,6 @@
 # CELLM Roadmap
 
-**Context Engineering for Large Language Models**
+**Spec-Driven Development System for AI Agents**
 
 ---
 

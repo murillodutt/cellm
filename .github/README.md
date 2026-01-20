@@ -2,7 +2,7 @@
 
 ![Image](https://github.com/user-attachments/assets/ab475e0a-27d1-44e4-886e-261b96839027)
 
-> **Context Engineering for Large Language Models**
+> **Spec-Driven Development System for AI Agents**
 
 [![Version](https://img.shields.io/badge/version-0.10.0-blue.svg)](https://github.com/murillodutt/cellm/releases)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](../LICENSE)
@@ -14,17 +14,17 @@
 
 ## Overview
 
-CELLM is a context management system for Claude Code CLI. It provides structured, persistent context through rules, patterns, workflows, and specialized agents.
+CELLM provides structured specifications that AI agents consume to understand how to work on a project. Instead of repeating instructions each session, you write specs once - rules, patterns, workflows - and the agent loads them automatically.
 
-The system loads project-specific knowledge automatically, allowing Claude Code to reference stack conventions, anti-patterns, and development workflows across sessions.
+The result: consistent development, no amnesia, no wasted tokens, with knowledge that persists and evolves.
 
 ---
 
 ## Features
 
-- **Persistent Context** - Project knowledge persists across Claude Code sessions
-- **Hierarchical Loading** - Six-layer priority system for context management
-- **Stack-Specific Patterns** - Type-safe patterns for supported technologies
+- **Spec-Driven** - Structured specifications that AI agents interpret as instructions
+- **Persistent Knowledge** - Project rules and patterns persist across sessions
+- **Stack-Optimized** - Type-safe patterns for Nuxt 4, Vue 3, TypeScript, and more
 - **Workflow Commands** - Structured development phases from planning to verification
 - **Pattern Validation** - JSON Schema enforcement for rules and patterns
 - **Specialized Agents** - Architect, Implementer, Reviewer, Project Manager

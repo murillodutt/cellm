@@ -127,8 +127,8 @@ validate_id_pattern() {
             fi
             ;;
         pattern)
-            # Pattern: TS-INDEX, ANTI-001, PATTERNS-INDEX, etc.
-            if [[ "$id" =~ ^[A-Z][A-Z0-9]+-INDEX$ ]] || [[ "$id" =~ ^[A-Z][A-Z0-9]*-[0-9]{3}$ ]]; then
+            # Pattern: TS-INDEX, ANTI-001, PATTERNS-INDEX, NX-DATA, TS-CORE, etc.
+            if [[ "$id" =~ ^[A-Z][A-Z0-9]+-INDEX$ ]] || [[ "$id" =~ ^[A-Z][A-Z0-9]*-[0-9]{3}$ ]] || [[ "$id" =~ ^[A-Z][A-Z0-9]+-[A-Z]+$ ]]; then
                 return 0
             fi
             ;;

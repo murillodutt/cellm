@@ -3,37 +3,27 @@ id: PATTERNS-INDEX
 version: v0.10.0
 status: OK
 alwaysApply: true
-budget: ~200 tokens
+budget: ~150 tokens
 ---
 
 # Patterns Index
 
-## Anti-Patterns (Critical)
-
-| ID | Rule | File |
- | ---- |------- | --------- |
-| ANTI-001 | Never any | anti/prohibited.md |
-| ANTI-002 | Never hardcode colors | anti/prohibited.md |
-| ANTI-003 | Never sync I/O | anti/prohibited.md |
-| ANTI-004 | Never console.log prod | anti/prohibited.md |
-| ANTI-005 | Never expose stack | anti/prohibited.md |
-
 ## By Technology
 
-| Prefix | Technology | File |
- | --------- |------------ | --------- |
-| TS-* | TypeScript | core/typescript.md |
-| VU-* | Vue 3 | core/vue.md |
-| NX-* | Nuxt 4 | core/nuxt.md |
-| UI-* | Nuxt UI | core/nuxt-ui.md |
-| PN-* | Pinia | core/pinia.md |
-| ES-* | ESLint | core/eslint.md |
-| DR-* | Drizzle | core/drizzle.md |
-| TW-* | Tailwind | core/tailwind.md |
-| ST-* | Stripe | core/stripe.md |
+| Prefix | Technology | Files |
+| ------ | ---------- | ----- |
+| TS-* | TypeScript | typescript-core, typescript-fetch, typescript-advanced |
+| VU-* | Vue 3 | vue-core, vue-advanced |
+| NX-* | Nuxt 4 | nuxt-data, nuxt-ssr, nuxt-routing, nuxt-api |
+| UI-* | Nuxt UI | nuxt-ui |
+| PN-* | Pinia | pinia-core, pinia-advanced |
+| ES-* | ESLint | eslint |
+| DR-* | Drizzle | drizzle |
+| TW-* | Tailwind | tailwind |
+| ST-* | Stripe | stripe |
 
 ## Loading
 
-- anti/* → Always
-- index.md → Always
-- core/* → By path trigger
+- anti/* -> Always (prohibited-patterns, prohibited-libs, prohibited-code, prohibited-nav)
+- index.md -> Always
+- core/* -> By path trigger

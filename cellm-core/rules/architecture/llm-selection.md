@@ -8,7 +8,8 @@ paths: ["**"]
 
 # Estrategia de Selecao Dinamica de LLM
 
-O CELLM CLI deve orientar o desenvolvedor na escolha do modelo ideal para cada tarefa, visando o equilibrio entre precisao analitica e economia de tokens.
+O CELLM CLI deve orientar o desenvolvedor na escolha do modelo ideal para cada tarefa,
+visando o equilibrio entre precisao analitica e economia de tokens.
 
 ## Matriz de Decisao
 
@@ -20,15 +21,17 @@ O CELLM CLI deve orientar o desenvolvedor na escolha do modelo ideal para cada t
 
 ## Criterios de Escalonamento
 
-1. **Volume de Contexto**: Se o contexto carregado exceder 1500 tokens em uma tarefa de media complexidade, considerar `Sonnet` em vez de `Haiku` para manter a coerencia.
-2. **Severidade do Erro**: Em casos de falha persistente em `/verify`, o sistema deve sugerir o escalonamento para `Opus` para uma analise de causa raiz.
+1. **Volume de Contexto**: Se o contexto carregado exceder 1500 tokens em uma tarefa de media
+   complexidade, considerar `Sonnet` em vez de `Haiku` para manter a coerencia.
+2. **Severidade do Erro**: Em casos de falha persistente em `/verify`, o sistema deve sugerir
+   o escalonamento para `Opus` para uma analise de causa raiz.
 3. **Custo-Beneficio**: Tarefas repetitivas de boilerplate devem ser forcadas para `Haiku`.
 
 ## Implementacao
 
 A selecao de modelo e feita NO INICIO da sessao, antes de executar o comando:
 
-```
+```text
 1. Desenvolvedor digita: /implement
 2. CELLM CLI detecta o comando
 3. CELLM CLI consulta esta regra (ARCH-002)

@@ -18,7 +18,7 @@ When you use Claude Code to develop software, it needs to understand your projec
 
 ## The Solution
 
-**CELLM** (Context Engineering for Large Language Models) creates a **structured, persistent memory** for Claude Code. Think of it as a living manual of best practices that Claude automatically consults before writing any code.
+**CELLM** (Spec-Driven Development System for AI Agents) provides structured specifications that AI agents consume to understand how to work on a project. Instead of repeating instructions each session, you write specs once and the agent loads them automatically.
 
 ### How It Works
 

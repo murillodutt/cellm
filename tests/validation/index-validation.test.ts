@@ -51,7 +51,10 @@ describe('INDEX.md Validation', () => {
     })
 
     it('should reference anti-patterns', () => {
-      expect(indexContent).toContain('patterns/anti/prohibited.md')
+      expect(indexContent).toContain('patterns/anti/prohibited-patterns.md')
+      expect(indexContent).toContain('patterns/anti/prohibited-libs.md')
+      expect(indexContent).toContain('patterns/anti/prohibited-code.md')
+      expect(indexContent).toContain('patterns/anti/prohibited-nav.md')
     })
 
     it('should reference patterns index', () => {
@@ -187,36 +190,83 @@ describe('Artifact Completeness', () => {
   })
 })
 
-describe('Loading Order Validation', () => {
+describe('Loading Order Validation (STRICT)', () => {
   const ruleFiles = getFilesByType('rules')
   const patternFiles = getFilesByType('patterns')
 
-  describe('Core files should have alwaysApply: true', () => {
-    const coreRules = ruleFiles.filter(f => f.includes('/core/'))
+  describe('Core rules MUST have alwaysApply: true', () => {
+    const coreRules = ruleFiles.filter(f => f.includes('/rules/core/'))
 
-    it.each(coreRules)('%s should have alwaysApply: true', (filePath) => {
+    it.each(coreRules)('%s MUST have alwaysApply: true', (filePath) => {
       const fm = extractFrontmatter(filePath)
-
-      // Most core rules should be always loaded
-      // We check if at least 60% have alwaysApply
-      // Individual test just logs warning
-      if (fm?.alwaysApply !== true) {
-        console.warn(`Core rule missing alwaysApply: true: ${filePath}`)
-      }
+      expect(fm?.alwaysApply).toBe(true)
     })
 
-    it('majority of core rules should have alwaysApply: true', () => {
-      let withAlwaysApply = 0
+    it('ALL core rules must have alwaysApply: true (100%)', () => {
+      const violations: string[] = []
 
       for (const file of coreRules) {
         const fm = extractFrontmatter(file)
-        if (fm?.alwaysApply === true) {
-          withAlwaysApply++
+        if (fm?.alwaysApply !== true) {
+          violations.push(file)
         }
       }
 
-      const percentage = (withAlwaysApply / coreRules.length) * 100
-      expect(percentage).toBeGreaterThanOrEqual(60)
+      if (violations.length > 0) {
+        console.error('\n[!] Core rules missing alwaysApply: true:')
+        violations.forEach(v => console.error(`  - ${v}`))
+      }
+
+      expect(violations).toEqual([])
+    })
+  })
+
+  describe('Architecture rules MUST NOT have alwaysApply: true', () => {
+    const archRules = ruleFiles.filter(f => f.includes('/rules/architecture/'))
+
+    it.each(archRules)('%s MUST NOT have alwaysApply: true', (filePath) => {
+      const fm = extractFrontmatter(filePath)
+      expect(fm?.alwaysApply).not.toBe(true)
+    })
+
+    it('NO architecture rules should have alwaysApply: true', () => {
+      const violations: string[] = []
+
+      for (const file of archRules) {
+        const fm = extractFrontmatter(file)
+        if (fm?.alwaysApply === true) {
+          violations.push(file)
+        }
+      }
+
+      if (violations.length > 0) {
+        console.error('\n[!] Architecture rules incorrectly have alwaysApply: true:')
+        violations.forEach(v => console.error(`  - ${v}`))
+      }
+
+      expect(violations).toEqual([])
+    })
+  })
+
+  describe('Domain rules MUST NOT have alwaysApply: true', () => {
+    const domainRules = ruleFiles.filter(f => f.includes('/rules/domain/'))
+
+    it('NO domain rules should have alwaysApply: true', () => {
+      const violations: string[] = []
+
+      for (const file of domainRules) {
+        const fm = extractFrontmatter(file)
+        if (fm?.alwaysApply === true) {
+          violations.push(file)
+        }
+      }
+
+      if (violations.length > 0) {
+        console.error('\n[!] Domain rules incorrectly have alwaysApply: true:')
+        violations.forEach(v => console.error(`  - ${v}`))
+      }
+
+      expect(violations).toEqual([])
     })
   })
 

@@ -85,9 +85,15 @@ export function isValidRuleId(id: string): boolean {
 
 /**
  * Validate ID pattern for patterns
+ * Accepts:
+ * - XX-INDEX (e.g., TS-INDEX, NX-INDEX)
+ * - XX-NNN (e.g., TS-001, NX-015)
+ * - XX-WORD (e.g., NX-DATA, TS-CORE, VU-ADVANCED, ANTI-BANS)
  */
 export function isValidPatternId(id: string): boolean {
-  return /^[A-Z][A-Z0-9]+-INDEX$/.test(id) || /^[A-Z][A-Z0-9]*-[0-9]{3}$/.test(id)
+  return /^[A-Z][A-Z0-9]+-INDEX$/.test(id) ||
+    /^[A-Z][A-Z0-9]*-[0-9]{3}$/.test(id) ||
+    /^[A-Z][A-Z0-9]+-[A-Z]+$/.test(id)
 }
 
 /**

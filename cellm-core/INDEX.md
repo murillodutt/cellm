@@ -8,12 +8,24 @@ budget: ~200 tokens
 
 # CELLM Core
 
+> Structured specifications that AI agents consume
+> to understand how to work on a project.
+
+These specs are loaded by agents based on context:
+
+- **Always Load**: Core rules and anti-patterns
+- **By Command**: Workflow-specific specs
+- **By Path**: Technology-specific patterns
+
 ## Always Load
 
 - rules/core/conventions.md
 - rules/core/limits.md
 - rules/core/protocols.md
-- patterns/anti/prohibited.md
+- patterns/anti/prohibited-patterns.md
+- patterns/anti/prohibited-libs.md
+- patterns/anti/prohibited-code.md
+- patterns/anti/prohibited-nav.md
 - patterns/index.md
 
 ## By Command

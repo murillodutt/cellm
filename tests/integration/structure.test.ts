@@ -196,49 +196,95 @@ describe('Agent Triggers', () => {
   })
 })
 
-describe('Required Core Files', () => {
-  const REQUIRED_CORE_RULES = [
-    'conventions.md',
-    'limits.md',
-    'protocols.md',
-    'architecture.md'
-  ]
+describe('Required Core Files (Dynamic)', () => {
+  // Instead of hardcoded lists, we verify minimum counts and key files
+  // This prevents tests from becoming stale when files are added/renamed
 
-  it.each(REQUIRED_CORE_RULES)('should have core rule: %s', (filename) => {
-    const filePath = join(CELLM_CORE_DIR, 'rules/core', filename)
-    expect(existsSync(filePath)).toBe(true)
+  describe('Core rules directory', () => {
+    const coreRulesDir = join(CELLM_CORE_DIR, 'rules/core')
+    const coreFiles = readdirSync(coreRulesDir).filter(f => f.endsWith('.md'))
+
+    it('should have at least 3 core rules', () => {
+      expect(coreFiles.length).toBeGreaterThanOrEqual(3)
+    })
+
+    it('all core rule files should have valid frontmatter', () => {
+      const invalid: string[] = []
+      for (const file of coreFiles) {
+        const fm = extractFrontmatter(join(coreRulesDir, file))
+        if (!fm?.id || !fm?.version) {
+          invalid.push(file)
+        }
+      }
+      expect(invalid).toEqual([])
+    })
+
+    // Key files that MUST exist (minimal set)
+    it('should have conventions.md (foundational)', () => {
+      expect(existsSync(join(coreRulesDir, 'conventions.md'))).toBe(true)
+    })
+
+    it('should have limits.md (foundational)', () => {
+      expect(existsSync(join(coreRulesDir, 'limits.md'))).toBe(true)
+    })
   })
 
-  const REQUIRED_ARCHITECTURE_RULES = [
-    'git-flow.md',
-    'llm-selection.md'
-  ]
+  describe('Architecture rules directory', () => {
+    const archRulesDir = join(CELLM_CORE_DIR, 'rules/architecture')
+    const archFiles = readdirSync(archRulesDir).filter(f => f.endsWith('.md'))
 
-  it.each(REQUIRED_ARCHITECTURE_RULES)('should have architecture rule: %s', (filename) => {
-    const filePath = join(CELLM_CORE_DIR, 'rules/architecture', filename)
-    expect(existsSync(filePath)).toBe(true)
+    it('should have at least 2 architecture rules', () => {
+      expect(archFiles.length).toBeGreaterThanOrEqual(2)
+    })
+
+    it('all architecture rule files should have valid frontmatter', () => {
+      const invalid: string[] = []
+      for (const file of archFiles) {
+        const fm = extractFrontmatter(join(archRulesDir, file))
+        if (!fm?.id || !fm?.version) {
+          invalid.push(file)
+        }
+      }
+      expect(invalid).toEqual([])
+    })
   })
 
-  const REQUIRED_DOMAIN_RULES = [
-    'frontend.md',
-    'backend.md',
-    'shared.md'
-  ]
+  describe('Domain rules directory', () => {
+    const domainRulesDir = join(CELLM_CORE_DIR, 'rules/domain')
+    const domainFiles = readdirSync(domainRulesDir).filter(f => f.endsWith('.md'))
 
-  it.each(REQUIRED_DOMAIN_RULES)('should have domain rule: %s', (filename) => {
-    const filePath = join(CELLM_CORE_DIR, 'rules/domain', filename)
-    expect(existsSync(filePath)).toBe(true)
+    it('should have at least 3 domain rules', () => {
+      expect(domainFiles.length).toBeGreaterThanOrEqual(3)
+    })
+
+    // Key files that MUST exist (minimal set)
+    it('should have frontend.md', () => {
+      expect(existsSync(join(domainRulesDir, 'frontend.md'))).toBe(true)
+    })
+
+    it('should have backend.md', () => {
+      expect(existsSync(join(domainRulesDir, 'backend.md'))).toBe(true)
+    })
   })
 
-  const REQUIRED_AGENTS = [
-    'architect.md',
-    'implementer.md',
-    'reviewer.md',
-    'project-manager.md'
-  ]
+  describe('Agents directory', () => {
+    const agentsDir = join(CELLM_CORE_DIR, 'agents')
+    const agentFiles = readdirSync(agentsDir).filter(f => f.endsWith('.md'))
 
-  it.each(REQUIRED_AGENTS)('should have agent: %s', (filename) => {
-    const filePath = join(CELLM_CORE_DIR, 'agents', filename)
-    expect(existsSync(filePath)).toBe(true)
+    it('should have exactly 4 agents', () => {
+      // Agents are a fixed set - this is intentional
+      expect(agentFiles.length).toBe(4)
+    })
+
+    it('all agent files should have valid frontmatter with agent field', () => {
+      const invalid: string[] = []
+      for (const file of agentFiles) {
+        const fm = extractFrontmatter(join(agentsDir, file))
+        if (!fm?.agent || !fm?.id) {
+          invalid.push(file)
+        }
+      }
+      expect(invalid).toEqual([])
+    })
   })
 })

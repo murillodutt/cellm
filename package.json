@@ -1,7 +1,7 @@
 {
   "name": "cellm",
   "version": "0.10.0",
-  "description": "Context Engineering for Large Language Models - Optimized for Nuxt 4 stack",
+  "description": "Spec-Driven Development System for AI Agents - Optimized for Nuxt 4 stack",
   "homepage": "https://cellm.ai",
   "repository": {
     "type": "git",
@@ -25,12 +25,21 @@
     "test:validation": "vitest run tests/validation",
     "test:integration": "vitest run tests/integration",
     "validate": "./scripts/validate.sh",
-    "lint:md": "markdownlint 'cellm-core/**/*.md' --ignore cellm-core/templates"
+    "lint:md": "markdownlint 'cellm-core/**/*.md' --ignore cellm-core/templates",
+    "lint:md:fix": "markdownlint 'cellm-core/**/*.md' --ignore cellm-core/templates --fix",
+    "prepare": "husky",
+    "precommit": "./scripts/validate.sh && npm run lint:md && npm test"
+  },
+  "lint-staged": {
+    "cellm-core/**/*.md": [
+      "markdownlint --fix"
+    ]
   },
   "keywords": [
     "claude",
     "llm",
-    "context-engineering",
+    "spec-driven-development",
+    "ai-agents",
     "nuxt",
     "vue",
     "ai-development",
@@ -43,11 +52,13 @@
     "ajv-formats": "^3.0.0",
     "glob": "^13.0.0",
     "gray-matter": "^4.0.3",
+    "husky": "^9.1.0",
+    "lint-staged": "^16.2.7",
     "markdownlint-cli": "^0.47.0",
     "vitest": "^4.0.17",
     "yaml": "^2.5.0"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=20.0.0"
   }
 }

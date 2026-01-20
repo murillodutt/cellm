@@ -1,59 +1,14 @@
 ---
-id: PN-INDEX
+id: PN-ADVANCED
 version: v0.10.0
 status: OK
-tags: [pinia, state]
-budget: ~500 tokens
+tags: [pinia, state, advanced]
+budget: ~350 tokens
 ---
 
-# Pinia Patterns
+# Pinia Advanced Patterns
 
-## PN-001: Setup Store
-
-```typescript
-// [+] Always Setup Store
-export const useUserStore = defineStore('user', () => {
-  const user = ref<User | null>(null)
-  const isAuthenticated = computed(() => !!user.value)
-  
-  async function login(creds: Credentials) {
-    user.value = await $fetch('/api/auth/login', {
-      method: 'POST',
-      body: creds
-    })
-  }
-  
-  return { user, isAuthenticated, login }
-})
-```
-
-## PN-002: storeToRefs
-
-```typescript
-// [+] Maintain reactivity
-const store = useUserStore()
-const { user, isAuthenticated } = storeToRefs(store)
-
-// [-] Loses reactivity
-const { user } = useUserStore()
-```
-
-## PN-003: Async Actions
-
-```typescript
-async function fetchUsers() {
-  isLoading.value = true
-  error.value = null
-  
-  try {
-    users.value = await $fetch('/api/users')
-  } catch (e) {
-    error.value = e
-  } finally {
-    isLoading.value = false
-  }
-}
-```
+> Part of: [Patterns Index](../index.md#pinia)
 
 ## PN-004: Persist (with plugin)
 
@@ -121,3 +76,7 @@ export const useFinanceStore = defineStore('finance', () => {
 - Better composable integration
 - Easier testing
 - Consistent with Vue 3 setup syntax
+
+## Related
+
+- [pinia-core.md](pinia-core.md) - Basic store patterns
