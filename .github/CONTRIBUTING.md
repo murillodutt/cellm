@@ -157,7 +157,7 @@ Rules define behaviors and constraints for the CELLM system.
 ```markdown
 ---
 id: CONV-XXX
-version: v0.10.0
+version: v1.1.0
 status: DRAFT
 budget: ~100 tokens
 alwaysApply: true
@@ -185,7 +185,7 @@ Patterns define code conventions with examples.
 ```markdown
 ---
 id: TS-XXX
-version: v0.10.0
+version: v1.1.0
 status: DRAFT
 technology: typescript
 ---

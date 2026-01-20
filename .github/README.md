@@ -4,7 +4,7 @@
 
 > **Spec-Driven Development System for AI Agents**
 
-[![Version](https://img.shields.io/badge/version-0.10.0-blue.svg)](https://github.com/murillodutt/cellm/releases)
+[![Version](https://img.shields.io/badge/version-1.1.0-blue.svg)](https://github.com/murillodutt/cellm/releases)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](../LICENSE)
 [![Website](https://img.shields.io/badge/web-cellm.ai_(coming_soon)-blue)](https://cellm.ai)
 [![Claude Code CLI](https://img.shields.io/badge/Claude_Code-CLI-191919?logo=anthropic&logoColor=white)](https://claude.ai)
@@ -97,8 +97,8 @@ Each phase uses specialized agents for planning, implementation, and review.
 
 ## Project Status
 
-**Version:** 0.10.0 (Pre-release)
-**Status:** Feature complete, public testing
+**Version:** 1.1.0
+**Status:** Production ready
 **License:** MIT
 
 ---
