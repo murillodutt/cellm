@@ -1,0 +1,40 @@
+# CELLM Oracle - Docker Compose Configuration
+# Use: docker-compose up -d
+
+services:
+  oracle:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: cellm-oracle
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - CELLM_CORE_PATH=/data
+    volumes:
+      # Mount the CELLM project root to /data
+      - ..:/data:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/status"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+
+  # Development mode (uncomment to use)
+  # oracle-dev:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   container_name: cellm-oracle-dev
+  #   ports:
+  #     - "3001:3000"
+  #   environment:
+  #     - NODE_ENV=development
+  #     - CELLM_CORE_PATH=/data
+  #   volumes:
+  #     - ..:/data:ro
+  #     - ./app:/app/app
+  #   command: npm run dev

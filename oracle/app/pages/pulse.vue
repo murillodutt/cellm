@@ -1,6 +1,6 @@
 <script setup lang="ts">
-// CELLM Oracle - Project Pulse Page
-// Using NuxtCharts Premium for visualizations
+// CELLM Oracle - Project Pulse (Premium Industrial Theme)
+import type { TaskBoardItem } from '~/types/design-system'
 
 interface HealthRecord {
   timestamp: string
@@ -28,7 +28,6 @@ interface PulseData {
 const pulseData = ref<PulseData | null>(null)
 const loading = ref(true)
 
-// Fetch pulse data
 async function fetchPulse(): Promise<void> {
   loading.value = true
 
@@ -37,7 +36,6 @@ async function fetchPulse(): Promise<void> {
     pulseData.value = response
   }
   catch {
-    // Use mock data for demo
     const now = new Date()
     pulseData.value = {
       currentScore: 94,
@@ -52,8 +50,6 @@ async function fetchPulse(): Promise<void> {
         { id: '1', timestamp: new Date().toISOString(), result: 'pass', duration: 234, issues: 0 },
         { id: '2', timestamp: new Date(now.getTime() - 3600000).toISOString(), result: 'pass', duration: 189, issues: 1 },
         { id: '3', timestamp: new Date(now.getTime() - 7200000).toISOString(), result: 'fail', duration: 312, issues: 3 },
-        { id: '4', timestamp: new Date(now.getTime() - 10800000).toISOString(), result: 'pass', duration: 201, issues: 0 },
-        { id: '5', timestamp: new Date(now.getTime() - 14400000).toISOString(), result: 'pass', duration: 178, issues: 2 },
       ],
       activeIssues: 2,
     }
@@ -65,295 +61,184 @@ async function fetchPulse(): Promise<void> {
 
 onMounted(fetchPulse)
 
-// AreaChart data - transform history into chart format
 const chartData = computed(() => {
-  if (!pulseData.value)
-    return []
+  if (!pulseData.value) return []
   return pulseData.value.history.map(h => ({
     day: new Date(h.timestamp).toLocaleDateString('en-US', { weekday: 'short' }),
     score: h.score,
   }))
 })
 
-// AreaChart categories
-const chartCategories = {
-  score: { name: 'Health Score', color: '#16a34a' },
-}
+const chartCategories = { score: { name: 'Score', color: '#10b981' } }
+const chartXFormatter = (i: number): string => chartData.value[i]?.day || ''
 
-// X-axis formatter
-const chartXFormatter = (i: number): string => {
-  return chartData.value[i]?.day || ''
-}
-
-// Score color
-const scoreColor = computed(() => {
-  if (!pulseData.value)
-    return 'text-gray-600'
-  if (pulseData.value.currentScore >= 90)
-    return 'text-green-600'
-  if (pulseData.value.currentScore >= 70)
-    return 'text-yellow-600'
-  return 'text-red-600'
+const scoreStatus = computed(() => {
+  if (!pulseData.value) return 'neutral'
+  if (pulseData.value.currentScore >= 90) return 'success'
+  if (pulseData.value.currentScore >= 70) return 'warning'
+  return 'error'
 })
 
-// Format duration
+const validationItems = computed<TaskBoardItem[]>(() => {
+  if (!pulseData.value) return []
+  return pulseData.value.recentValidations.map(v => ({
+    id: v.id,
+    label: `Validation ${v.result === 'pass' ? 'passed' : 'failed'} - ${formatRelativeTime(v.timestamp)}`,
+    status: v.result === 'pass' ? 'completed' : 'failed',
+    description: `${formatDuration(v.duration)} • ${v.issues} issues`,
+  }))
+})
+
 function formatDuration(ms: number): string {
-  if (ms < 1000)
-    return `${ms}ms`
-  return `${(ms / 1000).toFixed(1)}s`
+  return ms < 1000 ? `${ms}ms` : `${(ms / 1000).toFixed(1)}s`
 }
 
-// Format relative time
 function formatRelativeTime(timestamp: string): string {
   const diff = Date.now() - new Date(timestamp).getTime()
   const minutes = Math.floor(diff / 60000)
   const hours = Math.floor(diff / 3600000)
-
-  if (minutes < 1)
-    return 'just now'
-  if (minutes < 60)
-    return `${minutes}m ago`
-  if (hours < 24)
-    return `${hours}h ago`
+  if (minutes < 1) return 'just now'
+  if (minutes < 60) return `${minutes}m ago`
+  if (hours < 24) return `${hours}h ago`
   return new Date(timestamp).toLocaleDateString()
 }
 </script>
 
 <template>
-  <div class="space-y-6">
-    <!-- Page Header -->
-    <div class="flex justify-between items-center">
+  <div class="space-y-8">
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
       <div>
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+        <h1 class="page-title">
           Project Pulse
         </h1>
-        <p class="text-gray-500 dark:text-gray-400">
+        <p class="page-subtitle">
           Health score timeline and validation history
         </p>
       </div>
-      <button
-        class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
-        @click="fetchPulse"
-      >
+      <UButton icon="i-lucide-refresh-cw" color="primary" size="lg" :loading="loading" class="btn-glow" @click="fetchPulse">
         Refresh
-      </button>
+      </UButton>
     </div>
 
-    <!-- Loading State -->
-    <div
-      v-if="loading"
-      class="flex items-center justify-center py-12"
-    >
+    <!-- Loading -->
+    <div v-if="loading && !pulseData" class="flex items-center justify-center py-20">
       <div class="text-center">
-        <div class="text-4xl mb-4">
-          [~]
+        <div class="relative inline-block">
+          <UIcon name="i-lucide-loader" class="size-12 text-[var(--cellm-orange)] animate-spin" />
+          <div class="absolute inset-0 blur-xl bg-[var(--cellm-orange)] opacity-30 animate-pulse" />
         </div>
-        <p class="text-gray-500">
-          Loading pulse data...
-        </p>
+        <p class="text-[var(--cellm-slate)] mt-4 font-medium">Loading pulse data...</p>
       </div>
     </div>
 
-    <!-- Pulse Content -->
     <template v-else-if="pulseData">
-      <!-- Stats Cards -->
+      <!-- Stats Row -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <!-- Health Score -->
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-          <div class="flex items-center justify-between mb-2">
-            <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">
-              Health Score
-            </h3>
-            <span :class="scoreColor">
-              {{ pulseData.currentScore >= 90 ? '[+]' : pulseData.currentScore >= 70 ? '[!]' : '[-]' }}
-            </span>
-          </div>
-          <div
-            class="text-5xl font-bold"
-            :class="scoreColor"
-          >
-            {{ pulseData.currentScore }}
-          </div>
-          <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">
-            out of 100
-          </p>
-        </div>
+        <BlueprintCard variant="glow" padding="lg" class="flex flex-col items-center justify-center">
+          <GaugeMetric
+            label="Health Score"
+            :value="pulseData.currentScore"
+            :max="100"
+            :status="scoreStatus"
+            size="lg"
+          />
+        </BlueprintCard>
 
-        <!-- Active Issues -->
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-          <div class="flex items-center justify-between mb-2">
-            <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">
-              Active Issues
-            </h3>
-            <span :class="pulseData.activeIssues > 0 ? 'text-yellow-600' : 'text-green-600'">
-              {{ pulseData.activeIssues > 0 ? '[!]' : '[+]' }}
-            </span>
+        <BlueprintCard variant="default" padding="lg" class="text-center flex flex-col justify-center">
+          <div class="relative inline-block mx-auto mb-2">
+            <div
+              class="metric-value tabular-nums"
+              :class="pulseData.activeIssues > 0 ? 'text-[var(--cellm-orange)]' : 'text-[var(--cellm-green)]'"
+              :style="{ textShadow: pulseData.activeIssues > 0 ? '0 0 20px var(--cellm-orange-glow)' : '0 0 20px var(--cellm-green-glow)' }"
+            >
+              {{ pulseData.activeIssues }}
+            </div>
           </div>
-          <div class="text-5xl font-bold text-gray-900 dark:text-white">
-            {{ pulseData.activeIssues }}
-          </div>
-          <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">
-            need attention
-          </p>
-        </div>
+          <p class="metric-label">Active Issues</p>
+        </BlueprintCard>
 
-        <!-- Recent Validations -->
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-          <div class="flex items-center justify-between mb-2">
-            <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">
-              Validations Today
-            </h3>
-            <span class="text-blue-600">[i]</span>
-          </div>
-          <div class="text-5xl font-bold text-gray-900 dark:text-white">
+        <BlueprintCard variant="default" padding="lg" class="text-center flex flex-col justify-center">
+          <div class="metric-value text-[var(--cellm-purple)] tabular-nums" style="text-shadow: 0 0 20px var(--cellm-purple-glow);">
             {{ pulseData.recentValidations.length }}
           </div>
-          <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">
+          <p class="metric-label">Validations Today</p>
+          <p class="text-sm text-[var(--cellm-green)] font-semibold mt-2">
             {{ pulseData.recentValidations.filter(v => v.result === 'pass').length }} passed
           </p>
-        </div>
+        </BlueprintCard>
       </div>
 
-      <!-- Health Score Timeline -->
-      <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-        <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          Health Score Timeline
-        </h2>
-        <div class="h-64">
+      <!-- Timeline Chart -->
+      <BlueprintCard title="Health Timeline" icon="i-lucide-activity" variant="default">
+        <div class="h-72">
           <AreaChart
             :data="chartData"
             :categories="chartCategories"
-            :height="220"
+            :height="260"
             :x-formatter="chartXFormatter"
             :hide-legend="true"
             :y-grid-line="true"
             y-label="Score"
           />
         </div>
-        <div class="flex justify-center gap-6 mt-4 text-sm">
-          <div class="flex items-center gap-2">
-            <span class="w-3 h-3 rounded-full bg-green-500" />
-            <span class="text-gray-500 dark:text-gray-400">Valid</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <span class="w-3 h-3 rounded-full bg-red-500" />
-            <span class="text-gray-500 dark:text-gray-400">Issues</span>
-          </div>
-        </div>
-      </div>
+      </BlueprintCard>
 
-      <!-- Recent Validations List -->
-      <div class="bg-white dark:bg-gray-800 rounded-lg shadow">
-        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-          <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-            Recent Validations
-          </h2>
-        </div>
-        <ul class="divide-y divide-gray-200 dark:divide-gray-700">
-          <li
-            v-for="validation in pulseData.recentValidations"
-            :key="validation.id"
-            class="px-6 py-4 flex items-center justify-between"
-          >
-            <div class="flex items-center gap-4">
-              <span
-                :class="validation.result === 'pass' ? 'text-green-600' : 'text-red-600'"
-                class="text-xl"
-              >
-                {{ validation.result === 'pass' ? '[+]' : '[-]' }}
-              </span>
-              <div>
-                <p class="font-medium text-gray-900 dark:text-white">
-                  Validation {{ validation.result === 'pass' ? 'Passed' : 'Failed' }}
-                </p>
-                <p class="text-sm text-gray-500 dark:text-gray-400">
-                  {{ formatRelativeTime(validation.timestamp) }}
-                </p>
-              </div>
-            </div>
-            <div class="flex items-center gap-6 text-sm">
-              <div class="text-gray-500 dark:text-gray-400">
-                <span class="font-medium text-gray-900 dark:text-white">
-                  {{ formatDuration(validation.duration) }}
-                </span>
-                duration
-              </div>
-              <div
-                v-if="validation.issues > 0"
-                class="text-yellow-600"
-              >
-                {{ validation.issues }} issues
-              </div>
-            </div>
-          </li>
-        </ul>
-      </div>
+      <!-- Recent Validations -->
+      <BlueprintCard title="Recent Validations" icon="i-lucide-clipboard-check" variant="default">
+        <TaskBoard :items="validationItems" />
+      </BlueprintCard>
 
-      <!-- Health History Table -->
-      <div class="bg-white dark:bg-gray-800 rounded-lg shadow">
-        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-          <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-            7-Day History
-          </h2>
-        </div>
-        <div class="overflow-x-auto">
-          <table class="w-full">
-            <thead class="bg-gray-50 dark:bg-gray-700">
+      <!-- History Table -->
+      <BlueprintCard title="7-Day History" icon="i-lucide-calendar" variant="default">
+        <div class="overflow-x-auto -mx-4 px-4">
+          <table class="table-industrial">
+            <thead>
               <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Date
-                </th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Score
-                </th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Status
-                </th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Errors
-                </th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Warnings
-                </th>
+                <th>Date</th>
+                <th>Score</th>
+                <th>Status</th>
+                <th>Errors</th>
+                <th>Warnings</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-              <tr
-                v-for="record in pulseData.history"
-                :key="record.timestamp"
-              >
-                <td class="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white">
+            <tbody>
+              <tr v-for="record in pulseData.history" :key="record.timestamp" class="group">
+                <td class="font-medium text-[var(--cellm-charcoal)] dark:text-white">
                   {{ new Date(record.timestamp).toLocaleDateString() }}
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap">
+                <td>
                   <span
-                    class="font-bold"
-                    :class="record.score >= 90 ? 'text-green-600' : record.score >= 70 ? 'text-yellow-600' : 'text-red-600'"
+                    class="font-mono font-bold tabular-nums"
+                    :class="record.score >= 90 ? 'text-[var(--cellm-green)]' : record.score >= 70 ? 'text-[var(--cellm-orange)]' : 'text-[var(--cellm-red)]'"
+                    :style="{
+                      textShadow: record.score >= 90
+                        ? '0 0 10px var(--cellm-green-glow)'
+                        : record.score >= 70
+                          ? '0 0 10px var(--cellm-orange-glow)'
+                          : '0 0 10px var(--cellm-red-glow)'
+                    }"
                   >
                     {{ record.score }}
                   </span>
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap">
+                <td>
                   <span
+                    class="px-3 py-1 text-xs font-semibold rounded-full"
                     :class="record.valid
-                      ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200'
-                      : 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200'"
-                    class="px-2 py-1 text-xs rounded-full"
+                      ? 'bg-[var(--cellm-green)]/10 text-[var(--cellm-green)]'
+                      : 'bg-[var(--cellm-red)]/10 text-[var(--cellm-red)]'"
                   >
                     {{ record.valid ? 'Valid' : 'Invalid' }}
                   </span>
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white">
-                  {{ record.errors }}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white">
-                  {{ record.warnings }}
-                </td>
+                <td class="font-mono tabular-nums text-[var(--cellm-charcoal)] dark:text-white">{{ record.errors }}</td>
+                <td class="font-mono tabular-nums text-[var(--cellm-charcoal)] dark:text-white">{{ record.warnings }}</td>
               </tr>
             </tbody>
           </table>
         </div>
-      </div>
+      </BlueprintCard>
     </template>
   </div>
 </template>

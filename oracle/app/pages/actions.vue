@@ -1,5 +1,5 @@
 <script setup lang="ts">
-// CELLM Oracle - Prescriptive Actions Page
+// CELLM Oracle - Prescriptive Actions (Premium Industrial Theme)
 
 interface Action {
   id: string
@@ -22,7 +22,6 @@ const actionsData = ref<ActionsData | null>(null)
 const loading = ref(true)
 const selectedFilter = ref('all')
 
-// Fetch actions
 async function fetchActions() {
   loading.value = true
 
@@ -31,7 +30,6 @@ async function fetchActions() {
     actionsData.value = response
   }
   catch {
-    // Use mock data for demo
     actionsData.value = {
       actions: [
         {
@@ -72,27 +70,8 @@ async function fetchActions() {
           impact: 'Ensure proper context loading',
           status: 'in_progress',
         },
-        {
-          id: '5',
-          title: 'Enable Path Triggers',
-          description: 'Vue patterns could be loaded on-demand for .vue files only.',
-          category: 'improvement',
-          priority: 'low',
-          impact: 'Optimize context for non-Vue files',
-          status: 'pending',
-        },
-        {
-          id: '6',
-          title: 'Run Full Validation',
-          description: 'No validation has been run today. Regular validation ensures consistency.',
-          category: 'maintenance',
-          priority: 'low',
-          impact: 'Maintain project health',
-          command: 'cellm validate',
-          status: 'pending',
-        },
       ],
-      totalPending: 5,
+      totalPending: 3,
       totalCompleted: 12,
     }
   }
@@ -103,151 +82,111 @@ async function fetchActions() {
 
 onMounted(fetchActions)
 
-// Filter options
 const filterOptions = ['all', 'pending', 'in_progress', 'completed']
 
-// Filtered actions
 const filteredActions = computed(() => {
-  if (!actionsData.value)
-    return []
-  if (selectedFilter.value === 'all')
-    return actionsData.value.actions
+  if (!actionsData.value) return []
+  if (selectedFilter.value === 'all') return actionsData.value.actions
   return actionsData.value.actions.filter(a => a.status === selectedFilter.value)
 })
 
-// Priority colors
-const priorityColors: Record<string, string> = {
-  high: 'text-red-600 bg-red-100 dark:bg-red-900/20',
-  medium: 'text-yellow-600 bg-yellow-100 dark:bg-yellow-900/20',
-  low: 'text-green-600 bg-green-100 dark:bg-green-900/20',
-}
+const categoryConfig = {
+  optimization: { icon: 'i-lucide-gauge', color: '#3b82f6', bg: 'from-blue-500/20 to-blue-500/5' },
+  fix: { icon: 'i-lucide-wrench', color: '#ef4444', bg: 'from-red-500/20 to-red-500/5' },
+  improvement: { icon: 'i-lucide-sparkles', color: '#10b981', bg: 'from-emerald-500/20 to-emerald-500/5' },
+  maintenance: { icon: 'i-lucide-settings', color: '#6b7280', bg: 'from-gray-500/20 to-gray-500/5' },
+} as const
 
-// Category icons
-const categoryIcons: Record<string, string> = {
-  optimization: '[~]',
-  fix: '[-]',
-  improvement: '[+]',
-  maintenance: '[i]',
-}
+const priorityConfig = {
+  high: { label: 'High', color: '#ef4444', bg: 'bg-red-500/10' },
+  medium: { label: 'Medium', color: '#ff6b35', bg: 'bg-[var(--cellm-orange)]/10' },
+  low: { label: 'Low', color: '#10b981', bg: 'bg-[var(--cellm-green)]/10' },
+} as const
 
-const categoryColors: Record<string, string> = {
-  optimization: 'text-blue-600',
-  fix: 'text-red-600',
-  improvement: 'text-green-600',
-  maintenance: 'text-gray-600',
-}
+const statusConfig = {
+  pending: { label: 'Pending', color: '#6b7280', bg: 'bg-gray-500/10' },
+  in_progress: { label: 'In Progress', color: '#3b82f6', bg: 'bg-blue-500/10' },
+  completed: { label: 'Completed', color: '#10b981', bg: 'bg-[var(--cellm-green)]/10' },
+  dismissed: { label: 'Dismissed', color: '#9ca3af', bg: 'bg-gray-400/10' },
+} as const
 
-// Status colors
-const statusColors: Record<string, string> = {
-  pending: 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300',
-  in_progress: 'bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300',
-  completed: 'bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-300',
-  dismissed: 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400',
-}
-
-// Action handlers
 function executeAction(action: Action) {
   if (action.command) {
-    // Copy command to clipboard
     navigator.clipboard.writeText(action.command)
-    alert(`Command copied to clipboard: ${action.command}`)
   }
 }
 
 function updateStatus(action: Action, status: Action['status']) {
   action.status = status
-  // In real implementation, this would call an API
 }
 </script>
 
 <template>
-  <div class="space-y-6">
-    <!-- Page Header -->
-    <div class="flex justify-between items-center">
+  <div class="space-y-8">
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
       <div>
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+        <h1 class="page-title">
           Prescriptive Actions
         </h1>
-        <p class="text-gray-500 dark:text-gray-400">
+        <p class="page-subtitle">
           Suggested improvements and quick fixes
         </p>
       </div>
-      <button
-        class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
-        @click="fetchActions"
-      >
+      <UButton icon="i-lucide-refresh-cw" color="primary" size="lg" :loading="loading" class="btn-glow" @click="fetchActions">
         Refresh
-      </button>
+      </UButton>
     </div>
 
-    <!-- Loading State -->
-    <div
-      v-if="loading"
-      class="flex items-center justify-center py-12"
-    >
+    <!-- Loading -->
+    <div v-if="loading && !actionsData" class="flex items-center justify-center py-20">
       <div class="text-center">
-        <div class="text-4xl mb-4">
-          [~]
+        <div class="relative inline-block">
+          <UIcon name="i-lucide-loader" class="size-12 text-[var(--cellm-orange)] animate-spin" />
+          <div class="absolute inset-0 blur-xl bg-[var(--cellm-orange)] opacity-30 animate-pulse" />
         </div>
-        <p class="text-gray-500">
-          Loading actions...
-        </p>
+        <p class="text-[var(--cellm-slate)] mt-4 font-medium">Loading actions...</p>
       </div>
     </div>
 
-    <!-- Actions Content -->
     <template v-else-if="actionsData">
-      <!-- Stats Cards -->
+      <!-- Stats Row -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-          <div class="flex items-center justify-between mb-2">
-            <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">
-              Pending Actions
-            </h3>
-            <span class="text-yellow-600">[!]</span>
-          </div>
-          <div class="text-4xl font-bold text-gray-900 dark:text-white">
+        <BlueprintCard variant="glow" padding="lg" class="text-center">
+          <div class="metric-value text-[var(--cellm-orange)] tabular-nums" style="text-shadow: 0 0 20px var(--cellm-orange-glow);">
             {{ actionsData.totalPending }}
           </div>
-        </div>
+          <p class="metric-label">Pending</p>
+        </BlueprintCard>
 
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-          <div class="flex items-center justify-between mb-2">
-            <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">
-              Completed
-            </h3>
-            <span class="text-green-600">[+]</span>
-          </div>
-          <div class="text-4xl font-bold text-green-600">
+        <BlueprintCard variant="default" padding="lg" class="text-center">
+          <div class="metric-value text-[var(--cellm-green)] tabular-nums" style="text-shadow: 0 0 20px var(--cellm-green-glow);">
             {{ actionsData.totalCompleted }}
           </div>
-        </div>
+          <p class="metric-label">Completed</p>
+        </BlueprintCard>
 
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-          <div class="flex items-center justify-between mb-2">
-            <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">
-              High Priority
-            </h3>
-            <span class="text-red-600">[-]</span>
-          </div>
-          <div class="text-4xl font-bold text-red-600">
+        <BlueprintCard variant="default" padding="lg" class="text-center">
+          <div class="metric-value text-[var(--cellm-red)] tabular-nums" style="text-shadow: 0 0 20px var(--cellm-red-glow);">
             {{ actionsData.actions.filter(a => a.priority === 'high' && a.status === 'pending').length }}
           </div>
-        </div>
+          <p class="metric-label">High Priority</p>
+        </BlueprintCard>
       </div>
 
       <!-- Filter Tabs -->
-      <div class="flex gap-2">
+      <div class="flex gap-2 flex-wrap">
         <button
           v-for="filter in filterOptions"
           :key="filter"
-          class="px-4 py-2 rounded-md text-sm font-medium transition-colors"
+          class="px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-200"
           :class="selectedFilter === filter
-            ? 'bg-green-600 text-white'
-            : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'"
+            ? 'bg-[var(--cellm-orange)] text-white shadow-lg'
+            : 'bg-[var(--cellm-muted)] text-[var(--cellm-slate)] hover:bg-[var(--cellm-border-color)]'"
+          :style="selectedFilter === filter ? { boxShadow: '0 0 15px var(--cellm-orange-glow)' } : {}"
           @click="selectedFilter = filter"
         >
-          {{ filter === 'all' ? 'All' : filter.replace('_', ' ').charAt(0).toUpperCase() + filter.replace('_', ' ').slice(1) }}
+          {{ filter === 'all' ? 'All' : filter.replace('_', ' ') }}
         </button>
       </div>
 
@@ -256,105 +195,121 @@ function updateStatus(action: Action, status: Action['status']) {
         <div
           v-for="action in filteredActions"
           :key="action.id"
-          class="bg-white dark:bg-gray-800 rounded-lg shadow p-6"
+          class="oracle-card p-6 hover-lift group"
         >
-          <div class="flex items-start justify-between">
-            <div class="flex items-start gap-4">
-              <span
-                class="text-2xl"
-                :class="categoryColors[action.category]"
+          <div class="flex flex-col lg:flex-row lg:items-start gap-5">
+            <!-- Icon + Content -->
+            <div class="flex items-start gap-4 flex-1">
+              <div
+                class="p-3 rounded-xl shrink-0 transition-all duration-300 group-hover:scale-110"
+                :class="`bg-gradient-to-br ${categoryConfig[action.category].bg}`"
               >
-                {{ categoryIcons[action.category] }}
-              </span>
-              <div class="flex-1">
-                <div class="flex items-center gap-3 mb-2">
-                  <h3 class="font-semibold text-gray-900 dark:text-white">
+                <UIcon
+                  :name="categoryConfig[action.category].icon"
+                  class="size-6"
+                  :style="{ color: categoryConfig[action.category].color }"
+                />
+              </div>
+
+              <div class="flex-1 min-w-0">
+                <div class="flex flex-wrap items-center gap-2 mb-3">
+                  <h3 class="font-bold text-[var(--cellm-charcoal)] dark:text-white group-hover:text-[var(--cellm-orange)] transition-colors">
                     {{ action.title }}
                   </h3>
                   <span
-                    class="px-2 py-0.5 text-xs font-medium rounded-full"
-                    :class="priorityColors[action.priority]"
+                    class="px-3 py-1 text-xs font-semibold rounded-full"
+                    :class="priorityConfig[action.priority].bg"
+                    :style="{ color: priorityConfig[action.priority].color }"
                   >
-                    {{ action.priority }}
+                    {{ priorityConfig[action.priority].label }}
                   </span>
                   <span
-                    class="px-2 py-0.5 text-xs font-medium rounded-full"
-                    :class="statusColors[action.status]"
+                    class="px-3 py-1 text-xs font-semibold rounded-full"
+                    :class="statusConfig[action.status].bg"
+                    :style="{ color: statusConfig[action.status].color }"
                   >
-                    {{ action.status.replace('_', ' ') }}
+                    {{ statusConfig[action.status].label }}
                   </span>
                 </div>
-                <p class="text-gray-600 dark:text-gray-300 mb-3">
-                  {{ action.description }}
-                </p>
-                <div class="flex items-center gap-4 text-sm">
-                  <span class="text-gray-500 dark:text-gray-400">
-                    Impact: <span class="text-gray-900 dark:text-white">{{ action.impact }}</span>
+
+                <p class="text-sm text-[var(--cellm-slate)] mb-4">{{ action.description }}</p>
+
+                <div class="flex flex-wrap gap-6 text-xs text-[var(--cellm-muted-text)]">
+                  <span class="flex items-center gap-1">
+                    <UIcon name="i-lucide-target" class="size-4" />
+                    Impact: <span class="font-semibold text-[var(--cellm-charcoal)] dark:text-white">{{ action.impact }}</span>
                   </span>
-                  <span class="text-gray-500 dark:text-gray-400">
-                    Category: <span class="text-gray-900 dark:text-white">{{ action.category }}</span>
+                  <span class="flex items-center gap-1">
+                    <UIcon name="i-lucide-folder" class="size-4" />
+                    Category: <span class="font-semibold text-[var(--cellm-charcoal)] dark:text-white">{{ action.category }}</span>
                   </span>
                 </div>
+
                 <div
                   v-if="action.command"
-                  class="mt-3 p-3 bg-gray-100 dark:bg-gray-700 rounded-md font-mono text-sm"
+                  class="mt-4 p-4 bg-[var(--cellm-muted)] rounded-lg font-mono text-sm overflow-x-auto border border-[var(--cellm-border-color)]"
                 >
-                  <code>{{ action.command }}</code>
+                  <code class="text-[var(--cellm-purple)]">{{ action.command }}</code>
                 </div>
               </div>
             </div>
 
             <!-- Action Buttons -->
-            <div class="flex items-center gap-2">
-              <button
+            <div class="flex items-center gap-2 lg:flex-col lg:items-end shrink-0">
+              <UButton
                 v-if="action.status === 'pending'"
-                class="px-3 py-1.5 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition-colors"
+                size="md"
+                color="primary"
+                class="btn-glow"
                 @click="updateStatus(action, 'in_progress')"
               >
+                <UIcon name="i-lucide-play" class="size-4 mr-1" />
                 Start
-              </button>
-              <button
+              </UButton>
+              <UButton
                 v-if="action.status === 'in_progress'"
-                class="px-3 py-1.5 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 transition-colors"
+                size="md"
+                color="primary"
+                class="btn-glow"
                 @click="updateStatus(action, 'completed')"
               >
+                <UIcon name="i-lucide-check" class="size-4 mr-1" />
                 Complete
-              </button>
-              <button
+              </UButton>
+              <UButton
                 v-if="action.command && action.status !== 'completed'"
-                class="px-3 py-1.5 bg-gray-600 text-white text-sm rounded-md hover:bg-gray-700 transition-colors"
+                size="md"
+                variant="outline"
+                color="neutral"
                 @click="executeAction(action)"
               >
-                Copy Command
-              </button>
-              <button
+                <UIcon name="i-lucide-copy" class="size-4 mr-1" />
+                Copy
+              </UButton>
+              <UButton
                 v-if="action.status === 'pending'"
-                class="px-3 py-1.5 text-gray-500 text-sm hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
+                size="md"
+                variant="ghost"
+                color="neutral"
                 @click="updateStatus(action, 'dismissed')"
               >
                 Dismiss
-              </button>
+              </UButton>
             </div>
           </div>
         </div>
 
         <!-- Empty State -->
-        <div
-          v-if="filteredActions.length === 0"
-          class="bg-white dark:bg-gray-800 rounded-lg shadow p-12 text-center"
-        >
-          <div class="text-4xl mb-4 text-green-600">
-            [+]
+        <BlueprintCard v-if="filteredActions.length === 0" variant="glow" class="text-center py-12">
+          <div class="relative inline-block mb-4">
+            <UIcon name="i-lucide-check-circle" class="size-16 text-[var(--cellm-green)]" />
+            <div class="absolute inset-0 blur-2xl bg-[var(--cellm-green)] opacity-30" />
           </div>
-          <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-            No actions found
-          </h3>
-          <p class="text-gray-500 dark:text-gray-400">
-            {{ selectedFilter === 'all'
-              ? 'Your project is in great shape!'
-              : `No ${selectedFilter.replace('_', ' ')} actions at the moment.` }}
+          <h3 class="text-xl font-bold text-[var(--cellm-charcoal)] dark:text-white">No actions found</h3>
+          <p class="text-[var(--cellm-slate)] mt-2">
+            {{ selectedFilter === 'all' ? 'Your project is in great shape!' : `No ${selectedFilter.replace('_', ' ')} actions.` }}
           </p>
-        </div>
+        </BlueprintCard>
       </div>
     </template>
   </div>

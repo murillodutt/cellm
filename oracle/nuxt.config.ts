@@ -16,6 +16,11 @@ export default defineNuxtConfig({
     'nuxt-charts',
   ],
 
+  // CSS
+  css: [
+    '~/assets/css/main.css',
+  ],
+
   // MCP Toolkit Configuration
   mcp: {
     // Enable MCP server in development
@@ -46,7 +51,8 @@ export default defineNuxtConfig({
   // Runtime Configuration
   runtimeConfig: {
     // Private keys (server-side)
-    celllmCorePath: process.env.CELLM_CORE_PATH || '../cellm-core',
+    // Points to project root where CLAUDE.md and .claude/ are located
+    celllmCorePath: process.env.CELLM_CORE_PATH || '..',
     // Public keys (client-side)
     public: {
       appName: 'CELLM Oracle',

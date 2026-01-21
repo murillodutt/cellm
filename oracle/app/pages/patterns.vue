@@ -1,8 +1,6 @@
 <script setup lang="ts">
-// CELLM Oracle - Pattern Analytics Page
-// Using NuxtCharts Premium for visualizations
+// CELLM Oracle - Pattern Analytics (Premium Industrial Theme)
 
-// Chart legend position - cast to any for nuxt-charts compatibility
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const legendRight = 'right' as any
 
@@ -26,7 +24,6 @@ const analytics = ref<PatternAnalytics | null>(null)
 const loading = ref(true)
 const selectedCategory = ref('all')
 
-// Fetch pattern analytics
 async function fetchAnalytics(): Promise<void> {
   loading.value = true
 
@@ -35,7 +32,6 @@ async function fetchAnalytics(): Promise<void> {
     analytics.value = response
   }
   catch {
-    // Use mock data for demo
     analytics.value = {
       patterns: [
         { id: 'TS-001', name: 'Explicit Return Types', category: 'typescript', hits: 156, lastUsed: new Date().toISOString() },
@@ -44,19 +40,11 @@ async function fetchAnalytics(): Promise<void> {
         { id: 'VU-002', name: 'Typed Refs', category: 'vue', hits: 87, lastUsed: new Date().toISOString() },
         { id: 'NX-001', name: 'Use $fetch', category: 'nuxt', hits: 76, lastUsed: new Date().toISOString() },
         { id: 'NX-002', name: 'Auto Imports', category: 'nuxt', hits: 65, lastUsed: new Date().toISOString() },
-        { id: 'PN-001', name: 'Pinia Stores', category: 'pinia', hits: 45, lastUsed: new Date().toISOString() },
-        { id: 'UI-001', name: 'Nuxt UI Components', category: 'ui', hits: 34, lastUsed: new Date().toISOString() },
       ],
       totalPatterns: 52,
       totalHits: 703,
       preventionRate: 87,
-      coverageByType: {
-        typescript: 35,
-        vue: 28,
-        nuxt: 20,
-        pinia: 10,
-        other: 7,
-      },
+      coverageByType: { typescript: 35, vue: 28, nuxt: 20, pinia: 10, other: 7 },
     }
   }
   finally {
@@ -66,289 +54,219 @@ async function fetchAnalytics(): Promise<void> {
 
 onMounted(fetchAnalytics)
 
-// Categories
 const categories = computed(() => {
-  if (!analytics.value)
-    return []
+  if (!analytics.value) return []
   const cats = new Set(analytics.value.patterns.map(p => p.category))
   return ['all', ...Array.from(cats)]
 })
 
-// Filtered patterns
 const filteredPatterns = computed(() => {
-  if (!analytics.value)
-    return []
-  if (selectedCategory.value === 'all')
-    return analytics.value.patterns
+  if (!analytics.value) return []
+  if (selectedCategory.value === 'all') return analytics.value.patterns
   return analytics.value.patterns.filter(p => p.category === selectedCategory.value)
 })
 
-// BarChart - Most Used Patterns
 const barData = computed(() => {
-  return filteredPatterns.value.slice(0, 8).map(p => ({
-    id: p.id,
-    hits: p.hits,
-  }))
+  return filteredPatterns.value.slice(0, 6).map(p => ({ id: p.id, hits: p.hits }))
 })
+const barCategories = { hits: { name: 'Hits', color: '#10b981' } }
+const barXFormatter = (i: number): string => barData.value[i]?.id || ''
 
-const barCategories = {
-  hits: { name: 'Pattern Hits', color: '#16a34a' },
-}
-
-const barXFormatter = (i: number): string => {
-  return barData.value[i]?.id || ''
-}
-
-// DonutChart - Coverage by Type (instead of Pie)
 const donutData = computed(() => {
-  if (!analytics.value)
-    return []
+  if (!analytics.value) return []
   return Object.values(analytics.value.coverageByType)
 })
 
 const donutCategories = computed(() => {
-  if (!analytics.value)
-    return {}
-  const colors = ['#16a34a', '#2563eb', '#9333ea', '#f59e0b', '#6b7280'] as const
-  const keys = Object.keys(analytics.value.coverageByType)
-  return keys.reduce((acc, key, index) => {
-    acc[key] = { name: key, color: colors[index % colors.length] ?? '#6b7280' }
+  if (!analytics.value) return {}
+  const colors = ['#10b981', '#3b82f6', '#a855f7', '#ff6b35', '#06d6a0'] as const
+  return Object.keys(analytics.value.coverageByType).reduce((acc, key, i) => {
+    acc[key] = { name: key, color: colors[i % colors.length] ?? '#6b7280' }
     return acc
   }, {} as Record<string, { name: string, color: string }>)
 })
 
-// AreaChart - Prevention Rate Trend (Line chart with fill)
 const areaData = computed(() => {
-  const currentRate = analytics.value?.preventionRate || 87
+  const rate = analytics.value?.preventionRate || 87
   return [
-    { week: 'Week 1', rate: 72 },
-    { week: 'Week 2', rate: 78 },
-    { week: 'Week 3', rate: 83 },
-    { week: 'Week 4', rate: currentRate },
+    { week: 'W1', rate: 72 },
+    { week: 'W2', rate: 78 },
+    { week: 'W3', rate: 83 },
+    { week: 'W4', rate: rate },
   ]
 })
+const areaCategories = { rate: { name: 'Rate', color: '#10b981' } }
+const areaXFormatter = (i: number): string => areaData.value[i]?.week || ''
 
-const areaCategories = {
-  rate: { name: 'Prevention Rate %', color: '#16a34a' },
-}
-
-const areaXFormatter = (i: number): string => {
-  return areaData.value[i]?.week || ''
+const categoryColors: Record<string, string> = {
+  typescript: '#3b82f6',
+  vue: '#10b981',
+  nuxt: '#a855f7',
+  pinia: '#ff6b35',
+  other: '#6b7280',
 }
 </script>
 
 <template>
-  <div class="space-y-6">
-    <!-- Page Header -->
-    <div class="flex justify-between items-center">
+  <div class="space-y-8">
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
       <div>
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+        <h1 class="page-title">
           Pattern Analytics
         </h1>
-        <p class="text-gray-500 dark:text-gray-400">
+        <p class="page-subtitle">
           Track pattern usage and anti-pattern prevention
         </p>
       </div>
-      <button
-        class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
-        @click="fetchAnalytics"
-      >
+      <UButton icon="i-lucide-refresh-cw" color="primary" size="lg" :loading="loading" class="btn-glow" @click="fetchAnalytics">
         Refresh
-      </button>
+      </UButton>
     </div>
 
-    <!-- Loading State -->
-    <div
-      v-if="loading"
-      class="flex items-center justify-center py-12"
-    >
+    <!-- Loading -->
+    <div v-if="loading && !analytics" class="flex items-center justify-center py-20">
       <div class="text-center">
-        <div class="text-4xl mb-4">
-          [~]
+        <div class="relative inline-block">
+          <UIcon name="i-lucide-loader" class="size-12 text-[var(--cellm-orange)] animate-spin" />
+          <div class="absolute inset-0 blur-xl bg-[var(--cellm-orange)] opacity-30 animate-pulse" />
         </div>
-        <p class="text-gray-500">
-          Loading analytics...
-        </p>
+        <p class="text-[var(--cellm-slate)] mt-4 font-medium">Loading analytics...</p>
       </div>
     </div>
 
-    <!-- Analytics Content -->
     <template v-else-if="analytics">
-      <!-- Stats Cards -->
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-          <div class="flex items-center justify-between mb-2">
-            <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">
-              Total Patterns
-            </h3>
-            <span class="text-blue-600">[i]</span>
-          </div>
-          <div class="text-3xl font-bold text-gray-900 dark:text-white">
+      <!-- Stats Row -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <BlueprintCard variant="glow" padding="lg" class="text-center">
+          <div class="metric-value text-[var(--cellm-orange)]" style="text-shadow: 0 0 20px var(--cellm-orange-glow);">
             {{ analytics.totalPatterns }}
           </div>
-        </div>
+          <p class="metric-label">Total Patterns</p>
+        </BlueprintCard>
 
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-          <div class="flex items-center justify-between mb-2">
-            <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">
-              Total Hits
-            </h3>
-            <span class="text-green-600">[+]</span>
+        <BlueprintCard variant="default" padding="lg" class="text-center">
+          <div class="metric-value text-[var(--cellm-purple)]" style="text-shadow: 0 0 20px var(--cellm-purple-glow);">
+            {{ analytics.totalHits.toLocaleString() }}
           </div>
-          <div class="text-3xl font-bold text-gray-900 dark:text-white">
-            {{ analytics.totalHits }}
-          </div>
-        </div>
+          <p class="metric-label">Total Hits</p>
+        </BlueprintCard>
 
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-          <div class="flex items-center justify-between mb-2">
-            <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">
-              Prevention Rate
-            </h3>
-            <span class="text-green-600">[+]</span>
-          </div>
-          <div class="text-3xl font-bold text-green-600">
+        <BlueprintCard variant="glow" padding="lg" class="text-center">
+          <div class="metric-value text-[var(--cellm-green)]" style="text-shadow: 0 0 20px var(--cellm-green-glow);">
             {{ analytics.preventionRate }}%
           </div>
-        </div>
+          <p class="metric-label">Prevention Rate</p>
+        </BlueprintCard>
 
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-          <div class="flex items-center justify-between mb-2">
-            <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">
-              Categories
-            </h3>
-            <span class="text-purple-600">[~]</span>
-          </div>
-          <div class="text-3xl font-bold text-gray-900 dark:text-white">
+        <BlueprintCard variant="default" padding="lg" class="text-center">
+          <div class="metric-value text-[var(--cellm-cyan)]" style="text-shadow: 0 0 20px var(--cellm-cyan-glow);">
             {{ Object.keys(analytics.coverageByType).length }}
           </div>
-        </div>
+          <p class="metric-label">Categories</p>
+        </BlueprintCard>
       </div>
 
       <!-- Charts Row -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- Most Used Patterns Bar Chart -->
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-          <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-4">
-            Most Used Patterns
-          </h3>
-          <div class="h-64">
+        <BlueprintCard title="Most Used" icon="i-lucide-trending-up" variant="default">
+          <div class="h-56">
             <BarChart
               :data="barData"
               :categories="barCategories"
-              :height="220"
+              :height="200"
               :y-axis="['hits']"
               :x-formatter="barXFormatter"
               :hide-legend="true"
               :y-grid-line="true"
-              :radius="4"
+              :radius="6"
             />
           </div>
-        </div>
+        </BlueprintCard>
 
-        <!-- Coverage by Type DonutChart -->
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-          <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-4">
-            Coverage by Type
-          </h3>
-          <div class="h-64 flex items-center justify-center">
+        <BlueprintCard title="Coverage" icon="i-lucide-pie-chart" variant="default">
+          <div class="h-56 flex items-center justify-center">
             <DonutChart
               :data="donutData"
               :categories="donutCategories"
-              :height="220"
+              :height="200"
               :radius="70"
               :arc-width="20"
               :legend-position="legendRight"
             />
           </div>
-        </div>
+        </BlueprintCard>
 
-        <!-- Prevention Rate Trend AreaChart -->
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-          <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-4">
-            Prevention Rate Trend
-          </h3>
-          <div class="h-64">
+        <BlueprintCard title="Trend" icon="i-lucide-activity" variant="default">
+          <div class="h-56">
             <AreaChart
               :data="areaData"
               :categories="areaCategories"
-              :height="220"
+              :height="200"
               :x-formatter="areaXFormatter"
               :hide-legend="true"
               :y-grid-line="true"
               y-label="%"
             />
           </div>
-        </div>
+        </BlueprintCard>
       </div>
 
-      <!-- Pattern List -->
-      <div class="bg-white dark:bg-gray-800 rounded-lg shadow">
-        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
-          <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-            Pattern Usage
-          </h2>
-          <select
-            v-model="selectedCategory"
-            class="px-3 py-1.5 bg-gray-100 dark:bg-gray-700 border-0 rounded-md text-sm"
-          >
-            <option
+      <!-- Pattern Table -->
+      <BlueprintCard title="Pattern Usage" icon="i-lucide-list" variant="default">
+        <template #default>
+          <!-- Category Filters -->
+          <div class="flex flex-wrap gap-2 mb-6">
+            <button
               v-for="cat in categories"
               :key="cat"
-              :value="cat"
+              class="px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-200"
+              :class="selectedCategory === cat
+                ? 'bg-[var(--cellm-orange)] text-white shadow-lg'
+                : 'bg-[var(--cellm-muted)] text-[var(--cellm-slate)] hover:bg-[var(--cellm-border-color)]'"
+              :style="selectedCategory === cat ? { boxShadow: '0 0 15px var(--cellm-orange-glow)' } : {}"
+              @click="selectedCategory = cat"
             >
-              {{ cat === 'all' ? 'All Categories' : cat }}
-            </option>
-          </select>
-        </div>
-        <div class="overflow-x-auto">
-          <table class="w-full">
-            <thead class="bg-gray-50 dark:bg-gray-700">
-              <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Pattern ID
-                </th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Name
-                </th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Category
-                </th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Hits
-                </th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Last Used
-                </th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-              <tr
-                v-for="pattern in filteredPatterns"
-                :key="pattern.id"
-              >
-                <td class="px-6 py-4 whitespace-nowrap font-mono text-sm text-green-600">
-                  {{ pattern.id }}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white">
-                  {{ pattern.name }}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <span class="px-2 py-1 text-xs rounded-full bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
-                    {{ pattern.category }}
-                  </span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white">
-                  {{ pattern.hits }}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400 text-sm">
-                  {{ new Date(pattern.lastUsed).toLocaleDateString() }}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
+              {{ cat === 'all' ? 'All' : cat }}
+            </button>
+          </div>
+
+          <div class="overflow-x-auto -mx-4 px-4">
+            <table class="table-industrial">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Name</th>
+                  <th>Category</th>
+                  <th>Hits</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="pattern in filteredPatterns" :key="pattern.id" class="group">
+                  <td class="font-mono font-bold text-[var(--cellm-green)]">{{ pattern.id }}</td>
+                  <td class="font-semibold text-[var(--cellm-charcoal)] dark:text-white group-hover:text-[var(--cellm-orange)] transition-colors">
+                    {{ pattern.name }}
+                  </td>
+                  <td>
+                    <span
+                      class="px-3 py-1 text-xs font-semibold rounded-full"
+                      :style="{
+                        backgroundColor: `${categoryColors[pattern.category] || '#6b7280'}20`,
+                        color: categoryColors[pattern.category] || '#6b7280'
+                      }"
+                    >
+                      {{ pattern.category }}
+                    </span>
+                  </td>
+                  <td class="font-mono font-bold tabular-nums text-[var(--cellm-charcoal)] dark:text-white">
+                    {{ pattern.hits }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </template>
+      </BlueprintCard>
     </template>
   </div>
 </template>

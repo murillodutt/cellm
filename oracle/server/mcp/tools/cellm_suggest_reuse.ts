@@ -270,7 +270,11 @@ export default defineMcpTool({
     projectPath: z.string().optional().describe('Path to the project root'),
   },
   handler: async ({ query, context, projectPath }) => {
-    const resolvedPath = projectPath ? resolve(projectPath) : process.cwd()
+    const config = useRuntimeConfig()
+    const defaultPath = config.celllmCorePath
+      ? join(process.cwd(), config.celllmCorePath)
+      : process.cwd()
+    const resolvedPath = projectPath ? resolve(projectPath) : defaultPath
     const result = await suggestReuse(query, context || '', resolvedPath)
 
     return {

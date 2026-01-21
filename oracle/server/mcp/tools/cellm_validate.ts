@@ -364,7 +364,11 @@ export default defineMcpTool({
     verbose: z.boolean().optional().describe('Include detailed information').default(false),
   },
   handler: async ({ projectPath, verbose }) => {
-    const resolvedPath = projectPath ? resolve(projectPath) : process.cwd()
+    const config = useRuntimeConfig()
+    const defaultPath = config.celllmCorePath
+      ? join(process.cwd(), config.celllmCorePath)
+      : process.cwd()
+    const resolvedPath = projectPath ? resolve(projectPath) : defaultPath
     const result = await validateProject(resolvedPath)
 
     const output = verbose

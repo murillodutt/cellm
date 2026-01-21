@@ -253,7 +253,11 @@ export default defineMcpTool({
     projectPath: z.string().optional().describe('Path to the project root'),
   },
   handler: async ({ code, patternId, projectPath }) => {
-    const resolvedPath = projectPath || process.cwd()
+    const config = useRuntimeConfig()
+    const defaultPath = config.celllmCorePath
+      ? join(process.cwd(), config.celllmCorePath)
+      : process.cwd()
+    const resolvedPath = projectPath || defaultPath
     const result = await checkPattern(code, patternId, resolvedPath)
 
     return {

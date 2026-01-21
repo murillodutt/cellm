@@ -72,7 +72,10 @@ async function calculateLayerBudget(dir: string): Promise<number> {
 }
 
 export default defineEventHandler(async (_event): Promise<BudgetData> => {
-  const projectPath = process.cwd()
+  const config = useRuntimeConfig()
+  const projectPath = config.celllmCorePath
+    ? join(process.cwd(), config.celllmCorePath)
+    : process.cwd()
   const celllmDir = join(projectPath, '.claude')
   const budgetLimit = 2200
 

@@ -66,7 +66,10 @@ async function scanPatterns(patternsDir: string): Promise<PatternUsage[]> {
 }
 
 export default defineEventHandler(async (_event): Promise<PatternAnalytics> => {
-  const projectPath = process.cwd()
+  const config = useRuntimeConfig()
+  const projectPath = config.celllmCorePath
+    ? join(process.cwd(), config.celllmCorePath)
+    : process.cwd()
   const patternsDir = join(projectPath, '.claude', 'patterns')
 
   const patterns = await scanPatterns(patternsDir)

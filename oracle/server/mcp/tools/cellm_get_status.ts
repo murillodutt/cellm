@@ -147,7 +147,11 @@ export default defineMcpTool({
     projectPath: z.string().optional().describe('Path to the project root. Defaults to current working directory.'),
   },
   handler: async ({ projectPath }) => {
-    const resolvedPath = projectPath ? resolve(projectPath) : process.cwd()
+    const config = useRuntimeConfig()
+    const defaultPath = config.celllmCorePath
+      ? join(process.cwd(), config.celllmCorePath)
+      : process.cwd()
+    const resolvedPath = projectPath ? resolve(projectPath) : defaultPath
     const status = await getProjectStatus(resolvedPath)
 
     return {

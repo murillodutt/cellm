@@ -17,7 +17,10 @@ async function fileExists(path: string): Promise<boolean> {
 }
 
 export default defineEventHandler(async (_event): Promise<ProjectStatus> => {
-  const projectPath = process.cwd()
+  const config = useRuntimeConfig()
+  const projectPath = config.celllmCorePath
+    ? join(process.cwd(), config.celllmCorePath)
+    : process.cwd()
   const celllmDir = join(projectPath, '.claude')
   const claudeMd = join(projectPath, 'CLAUDE.md')
 
@@ -34,31 +37,27 @@ export default defineEventHandler(async (_event): Promise<ProjectStatus> => {
     errors.push('.claude/ directory not found')
   }
 
-  // Parse CLAUDE.md for project info
+  // Get project info from package.json and environment
   let version = 'unknown'
-  let profile = 'unknown'
+  let profile = 'development'
 
-  if (await fileExists(claudeMd)) {
+  // Try to read version from root package.json
+  const rootPackageJson = join(projectPath, 'package.json')
+  if (await fileExists(rootPackageJson)) {
     try {
-      const content = await readFile(claudeMd, 'utf-8')
-
-      // Extract project tag
-      const projectMatch = content.match(/<project>([\s\S]*?)<\/project>/)
-      if (projectMatch && projectMatch[1]) {
-        const projectContent = projectMatch[1]
-        const versionMatch = projectContent.match(/cellm:\s*(v?\d+\.\d+\.\d+)/)
-        const profileMatch = projectContent.match(/profile:\s*(\S+)/)
-
-        if (versionMatch && versionMatch[1])
-          version = versionMatch[1]
-        if (profileMatch && profileMatch[1])
-          profile = profileMatch[1]
+      const packageContent = await readFile(rootPackageJson, 'utf-8')
+      const packageData = JSON.parse(packageContent)
+      if (packageData.version) {
+        version = `v${packageData.version}`
       }
     }
     catch (err) {
-      warnings.push(`Could not parse CLAUDE.md: ${err}`)
+      warnings.push(`Could not parse package.json: ${err}`)
     }
   }
+
+  // Determine profile from environment or default
+  profile = process.env.CELLM_PROFILE || 'development'
 
   // Estimate budget usage
   let budgetUsed = 0

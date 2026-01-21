@@ -1,12 +1,12 @@
 <script setup lang="ts">
-// CELLM Oracle - Dashboard Home
+// CELLM Oracle - Dashboard (Premium Industrial Theme)
 import type { ProjectStatus } from '~/types'
+import type { TaskBoardItem } from '~/types/design-system'
 
 const status = ref<ProjectStatus | null>(null)
 const loading = ref(true)
 const error = ref<string | null>(null)
 
-// Fetch project status
 async function fetchStatus() {
   loading.value = true
   error.value = null
@@ -23,256 +23,274 @@ async function fetchStatus() {
   }
 }
 
-// Refresh on mount
-onMounted(fetchStatus)
+let refreshInterval: ReturnType<typeof setInterval> | null = null
 
-// Auto-refresh every 30 seconds
-const refreshInterval = setInterval(fetchStatus, 30000)
-onUnmounted(() => clearInterval(refreshInterval))
+onMounted(() => {
+  fetchStatus()
+  refreshInterval = setInterval(fetchStatus, 30000)
+})
+
+onUnmounted(() => {
+  if (refreshInterval) {
+    clearInterval(refreshInterval)
+  }
+})
+
+// Convert errors/warnings to task board items
+const issueItems = computed<TaskBoardItem[]>(() => {
+  if (!status.value) return []
+
+  const items: TaskBoardItem[] = []
+
+  status.value.errors.forEach((err, i) => {
+    items.push({
+      id: `error-${i}`,
+      label: err,
+      status: 'failed',
+    })
+  })
+
+  status.value.warnings.forEach((warn, i) => {
+    items.push({
+      id: `warning-${i}`,
+      label: warn,
+      status: 'pending',
+    })
+  })
+
+  return items
+})
+
+// Budget status
+const budgetStatus = computed(() => {
+  if (!status.value) return 'neutral'
+  if (status.value.budget.percentage > 95) return 'error'
+  if (status.value.budget.percentage > 90) return 'warning'
+  return 'success'
+})
+
+// Health status
+const healthStatus = computed(() => {
+  if (!status.value) return 'neutral'
+  return status.value.valid ? 'success' : 'error'
+})
 </script>
 
 <template>
-  <div class="space-y-6">
+  <div class="space-y-8">
     <!-- Page Header -->
-    <div class="flex justify-between items-center">
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
       <div>
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+        <h1 class="page-title">
           Dashboard
         </h1>
-        <p class="text-gray-500 dark:text-gray-400">
+        <p class="page-subtitle">
           CELLM project overview and health status
         </p>
       </div>
-      <button
-        class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+      <UButton
+        icon="i-lucide-refresh-cw"
+        color="primary"
+        size="lg"
+        :loading="loading"
+        class="btn-glow"
         @click="fetchStatus"
       >
         Refresh
-      </button>
+      </UButton>
     </div>
 
     <!-- Loading State -->
-    <div
-      v-if="loading"
-      class="flex items-center justify-center py-12"
-    >
+    <div v-if="loading && !status" class="flex items-center justify-center py-20">
       <div class="text-center">
-        <div class="text-4xl mb-4">
-          [~]
+        <div class="relative inline-block">
+          <UIcon name="i-lucide-loader" class="size-12 text-[var(--cellm-orange)] animate-spin" />
+          <div class="absolute inset-0 blur-xl bg-[var(--cellm-orange)] opacity-30 animate-pulse" />
         </div>
-        <p class="text-gray-500">
-          Loading status...
-        </p>
+        <p class="text-[var(--cellm-slate)] mt-4 font-medium">Loading status...</p>
       </div>
     </div>
 
     <!-- Error State -->
-    <div
-      v-else-if="error"
-      class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6"
-    >
-      <div class="flex items-start gap-3">
-        <span class="text-red-600 text-xl">[-]</span>
+    <BlueprintCard v-else-if="error && !status" variant="flat">
+      <div class="flex items-start gap-4 p-2">
+        <div class="p-3 rounded-xl bg-[var(--cellm-red)]/10">
+          <UIcon name="i-lucide-alert-circle" class="size-6 text-[var(--cellm-red)]" />
+        </div>
         <div>
-          <h3 class="font-semibold text-red-800 dark:text-red-200">
-            Error Loading Status
-          </h3>
-          <p class="text-red-600 dark:text-red-300 mt-1">
-            {{ error }}
-          </p>
+          <h3 class="font-bold text-[var(--cellm-charcoal)] dark:text-white">Error Loading Status</h3>
+          <p class="text-sm mt-1 text-[var(--cellm-slate)]">{{ error }}</p>
         </div>
       </div>
-    </div>
+    </BlueprintCard>
 
-    <!-- Status Grid -->
-    <div
-      v-else-if="status"
-      class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
-    >
-      <!-- Health Status Card -->
-      <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-        <div class="flex items-center justify-between mb-4">
-          <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">
-            Health Status
-          </h3>
-          <span
-            :class="status.valid
-              ? 'text-green-600'
-              : 'text-red-600'"
-            class="text-xl"
-          >
-            {{ status.valid ? '[+]' : '[-]' }}
-          </span>
-        </div>
-        <div class="text-2xl font-bold text-gray-900 dark:text-white">
-          {{ status.valid ? 'Healthy' : 'Issues Found' }}
-        </div>
-        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-          {{ status.errors.length }} errors, {{ status.warnings.length }} warnings
-        </p>
-      </div>
-
-      <!-- Version Card -->
-      <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-        <div class="flex items-center justify-between mb-4">
-          <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">
-            CELLM Version
-          </h3>
-          <span class="text-blue-600 text-xl">[i]</span>
-        </div>
-        <div class="text-2xl font-bold text-gray-900 dark:text-white">
-          {{ status.version }}
-        </div>
-        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-          Profile: {{ status.profile }}
-        </p>
-      </div>
-
-      <!-- Budget Card -->
-      <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-        <div class="flex items-center justify-between mb-4">
-          <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">
-            Token Budget
-          </h3>
-          <span
-            :class="status.budget.percentage > 90
-              ? 'text-red-600'
-              : status.budget.percentage > 70
-                ? 'text-yellow-600'
-                : 'text-green-600'"
-            class="text-xl"
-          >
-            {{ status.budget.percentage > 90 ? '[!]' : '[+]' }}
-          </span>
-        </div>
-        <div class="text-2xl font-bold text-gray-900 dark:text-white">
-          {{ status.budget.percentage }}%
-        </div>
-        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-          {{ status.budget.used }} / {{ status.budget.total }} tokens
-        </p>
-        <!-- Budget Progress Bar -->
-        <div class="mt-3 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-          <div
-            class="h-full transition-all duration-300"
-            :class="status.budget.percentage > 90
-              ? 'bg-red-500'
-              : status.budget.percentage > 70
-                ? 'bg-yellow-500'
-                : 'bg-green-500'"
-            :style="{ width: `${status.budget.percentage}%` }"
+    <!-- Main Content -->
+    <template v-else-if="status">
+      <!-- Primary Metrics Row -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- Health Score -->
+        <BlueprintCard variant="glow" padding="lg" class="flex flex-col items-center">
+          <GaugeMetric
+            label="Health"
+            :value="status.valid ? 100 : 0"
+            :max="100"
+            unit="%"
+            size="lg"
+            :status="healthStatus"
           />
-        </div>
+        </BlueprintCard>
+
+        <!-- Version -->
+        <BlueprintCard variant="default" padding="lg" class="flex flex-col items-center justify-center">
+          <div class="text-center">
+            <div class="metric-value text-[var(--cellm-purple)]" style="text-shadow: 0 0 20px var(--cellm-purple-glow);">
+              {{ status.version }}
+            </div>
+            <span class="metric-label">
+              Version
+            </span>
+          </div>
+        </BlueprintCard>
+
+        <!-- Budget -->
+        <BlueprintCard variant="glow" padding="lg" class="flex flex-col items-center">
+          <GaugeMetric
+            label="Budget"
+            :value="status.budget.percentage"
+            :max="100"
+            unit="%"
+            size="lg"
+            :status="budgetStatus"
+          />
+        </BlueprintCard>
+
+        <!-- Profile -->
+        <BlueprintCard variant="default" padding="lg" class="flex flex-col items-center justify-center">
+          <div class="text-center">
+            <div class="metric-value text-[var(--cellm-cyan)]" style="text-shadow: 0 0 20px var(--cellm-cyan-glow);">
+              {{ status.profile }}
+            </div>
+            <span class="metric-label">
+              Profile
+            </span>
+          </div>
+        </BlueprintCard>
       </div>
 
-      <!-- Last Validation Card -->
-      <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-        <div class="flex items-center justify-between mb-4">
-          <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">
-            Last Validation
-          </h3>
-          <span class="text-gray-600 text-xl">[...]</span>
-        </div>
-        <div class="text-2xl font-bold text-gray-900 dark:text-white">
-          {{ new Date(status.lastValidation).toLocaleTimeString() }}
-        </div>
-        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-          {{ new Date(status.lastValidation).toLocaleDateString() }}
-        </p>
-      </div>
-    </div>
-
-    <!-- Quick Links -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-      <NuxtLink
-        to="/budget"
-        class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 hover:shadow-md transition-shadow flex items-center gap-3"
-      >
-        <span class="text-2xl text-green-600">[+]</span>
-        <div>
-          <h3 class="font-semibold text-gray-900 dark:text-white">
-            Budget Tracker
-          </h3>
-          <p class="text-sm text-gray-500 dark:text-gray-400">
-            Monitor token usage
-          </p>
-        </div>
-      </NuxtLink>
-
-      <NuxtLink
-        to="/patterns"
-        class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 hover:shadow-md transition-shadow flex items-center gap-3"
-      >
-        <span class="text-2xl text-blue-600">[i]</span>
-        <div>
-          <h3 class="font-semibold text-gray-900 dark:text-white">
-            Pattern Analytics
-          </h3>
-          <p class="text-sm text-gray-500 dark:text-gray-400">
-            View pattern usage
-          </p>
-        </div>
-      </NuxtLink>
-
-      <NuxtLink
-        to="/pulse"
-        class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 hover:shadow-md transition-shadow flex items-center gap-3"
-      >
-        <span class="text-2xl text-purple-600">[~]</span>
-        <div>
-          <h3 class="font-semibold text-gray-900 dark:text-white">
-            Project Pulse
-          </h3>
-          <p class="text-sm text-gray-500 dark:text-gray-400">
-            Health timeline
-          </p>
-        </div>
-      </NuxtLink>
-
-      <NuxtLink
-        to="/actions"
-        class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 hover:shadow-md transition-shadow flex items-center gap-3"
-      >
-        <span class="text-2xl text-yellow-600">[!]</span>
-        <div>
-          <h3 class="font-semibold text-gray-900 dark:text-white">
-            Prescriptive Actions
-          </h3>
-          <p class="text-sm text-gray-500 dark:text-gray-400">
-            Suggested fixes
-          </p>
-        </div>
-      </NuxtLink>
-    </div>
-
-    <!-- Issues List -->
-    <div
-      v-if="status && (status.errors.length > 0 || status.warnings.length > 0)"
-      class="bg-white dark:bg-gray-800 rounded-lg shadow"
-    >
-      <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-        <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-          Issues
-        </h2>
-      </div>
-      <ul class="divide-y divide-gray-200 dark:divide-gray-700">
-        <li
-          v-for="err in status.errors"
-          :key="err"
-          class="px-6 py-4 flex items-start gap-3"
+      <!-- Quick Navigation Cards -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <NuxtLink
+          to="/budget"
+          class="oracle-card group p-5 hover-lift"
         >
-          <span class="text-red-600">[-]</span>
-          <span class="text-gray-900 dark:text-white">{{ err }}</span>
-        </li>
-        <li
-          v-for="warning in status.warnings"
-          :key="warning"
-          class="px-6 py-4 flex items-start gap-3"
+          <div class="flex items-center gap-4">
+            <div class="p-3 rounded-xl bg-gradient-to-br from-[var(--cellm-orange)]/20 to-[var(--cellm-orange)]/5 group-hover:from-[var(--cellm-orange)]/30 group-hover:to-[var(--cellm-orange)]/10 transition-colors">
+              <UIcon name="i-lucide-wallet" class="size-6 text-[var(--cellm-orange)]" />
+            </div>
+            <div>
+              <h3 class="font-bold text-[var(--cellm-charcoal)] dark:text-white group-hover:text-[var(--cellm-orange)] transition-colors">Budget</h3>
+              <p class="text-xs text-[var(--cellm-muted-text)]">Token usage</p>
+            </div>
+          </div>
+          <div class="mt-4 flex items-center justify-between">
+            <span class="text-2xl font-mono font-bold text-[var(--cellm-charcoal)] dark:text-white tabular-nums">
+              {{ status.budget.percentage }}%
+            </span>
+            <UIcon name="i-lucide-arrow-right" class="size-5 text-[var(--cellm-muted-text)] group-hover:text-[var(--cellm-orange)] group-hover:translate-x-1 transition-all" />
+          </div>
+        </NuxtLink>
+
+        <NuxtLink
+          to="/patterns"
+          class="oracle-card group p-5 hover-lift"
         >
-          <span class="text-yellow-600">[!]</span>
-          <span class="text-gray-900 dark:text-white">{{ warning }}</span>
-        </li>
-      </ul>
-    </div>
+          <div class="flex items-center gap-4">
+            <div class="p-3 rounded-xl bg-gradient-to-br from-[var(--cellm-green)]/20 to-[var(--cellm-green)]/5 group-hover:from-[var(--cellm-green)]/30 group-hover:to-[var(--cellm-green)]/10 transition-colors">
+              <UIcon name="i-lucide-code" class="size-6 text-[var(--cellm-green)]" />
+            </div>
+            <div>
+              <h3 class="font-bold text-[var(--cellm-charcoal)] dark:text-white group-hover:text-[var(--cellm-green)] transition-colors">Patterns</h3>
+              <p class="text-xs text-[var(--cellm-muted-text)]">Analytics</p>
+            </div>
+          </div>
+          <div class="mt-4 flex items-center justify-between">
+            <span class="text-2xl font-mono font-bold text-[var(--cellm-charcoal)] dark:text-white">
+              Active
+            </span>
+            <UIcon name="i-lucide-arrow-right" class="size-5 text-[var(--cellm-muted-text)] group-hover:text-[var(--cellm-green)] group-hover:translate-x-1 transition-all" />
+          </div>
+        </NuxtLink>
+
+        <NuxtLink
+          to="/pulse"
+          class="oracle-card group p-5 hover-lift"
+        >
+          <div class="flex items-center gap-4">
+            <div class="p-3 rounded-xl bg-gradient-to-br from-[var(--cellm-purple)]/20 to-[var(--cellm-purple)]/5 group-hover:from-[var(--cellm-purple)]/30 group-hover:to-[var(--cellm-purple)]/10 transition-colors">
+              <UIcon name="i-lucide-heart-pulse" class="size-6 text-[var(--cellm-purple)]" />
+            </div>
+            <div>
+              <h3 class="font-bold text-[var(--cellm-charcoal)] dark:text-white group-hover:text-[var(--cellm-purple)] transition-colors">Pulse</h3>
+              <p class="text-xs text-[var(--cellm-muted-text)]">Health timeline</p>
+            </div>
+          </div>
+          <div class="mt-4 flex items-center justify-between">
+            <span class="text-2xl font-mono font-bold text-[var(--cellm-green)]">
+              {{ status.valid ? 'OK' : 'ERR' }}
+            </span>
+            <UIcon name="i-lucide-arrow-right" class="size-5 text-[var(--cellm-muted-text)] group-hover:text-[var(--cellm-purple)] group-hover:translate-x-1 transition-all" />
+          </div>
+        </NuxtLink>
+
+        <NuxtLink
+          to="/actions"
+          class="oracle-card group p-5 hover-lift"
+        >
+          <div class="flex items-center gap-4">
+            <div class="p-3 rounded-xl bg-gradient-to-br from-[var(--cellm-cyan)]/20 to-[var(--cellm-cyan)]/5 group-hover:from-[var(--cellm-cyan)]/30 group-hover:to-[var(--cellm-cyan)]/10 transition-colors">
+              <UIcon name="i-lucide-zap" class="size-6 text-[var(--cellm-cyan)]" />
+            </div>
+            <div>
+              <h3 class="font-bold text-[var(--cellm-charcoal)] dark:text-white group-hover:text-[var(--cellm-cyan)] transition-colors">Actions</h3>
+              <p class="text-xs text-[var(--cellm-muted-text)]">Quick fixes</p>
+            </div>
+          </div>
+          <div class="mt-4 flex items-center justify-between">
+            <span class="text-2xl font-mono font-bold text-[var(--cellm-charcoal)] dark:text-white">
+              Run
+            </span>
+            <UIcon name="i-lucide-arrow-right" class="size-5 text-[var(--cellm-muted-text)] group-hover:text-[var(--cellm-cyan)] group-hover:translate-x-1 transition-all" />
+          </div>
+        </NuxtLink>
+      </div>
+
+      <!-- Issues Section -->
+      <BlueprintCard
+        v-if="issueItems.length > 0"
+        title="Issues"
+        icon="i-lucide-alert-triangle"
+        variant="default"
+      >
+        <TaskBoard :items="issueItems" />
+      </BlueprintCard>
+
+      <!-- All Clear State -->
+      <BlueprintCard v-else variant="glow" class="text-center py-10">
+        <div class="relative inline-block mb-4">
+          <UIcon name="i-lucide-check-circle" class="size-16 text-[var(--cellm-green)]" />
+          <div class="absolute inset-0 blur-2xl bg-[var(--cellm-green)] opacity-30" />
+        </div>
+        <h3 class="text-xl font-bold text-[var(--cellm-charcoal)] dark:text-white">All Systems Operational</h3>
+        <p class="text-[var(--cellm-slate)] mt-2">No errors or warnings detected</p>
+      </BlueprintCard>
+
+      <!-- Last Validation Footer -->
+      <div class="text-center">
+        <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[var(--cellm-muted)]/50 text-sm text-[var(--cellm-muted-text)]">
+          <UIcon name="i-lucide-clock" class="size-4" />
+          Last validated: {{ new Date(status.lastValidation).toLocaleString() }}
+        </span>
+      </div>
+    </template>
   </div>
 </template>
