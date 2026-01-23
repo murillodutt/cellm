@@ -1,0 +1,29 @@
+{
+  "name": "cellm",
+  "version": "2.4.0",
+  "description": "CELLM - Context Engineering for LLM-driven development. Structured specs, intelligent memory, and orchestration for AI agents building software.",
+  "author": {
+    "name": "Murillo Dutt",
+    "email": "contact@cellm.ai",
+    "url": "https://cellm.ai"
+  },
+  "repository": "https://github.com/murillodutt/cellm",
+  "homepage": "https://cellm.ai",
+  "license": "MIT",
+  "keywords": [
+    "ai-development",
+    "context-engineering",
+    "spec-driven",
+    "memory",
+    "semantic-search",
+    "orchestration",
+    "nuxt",
+    "vue",
+    "typescript"
+  ],
+  "commands": "./commands/",
+  "skills": "./skills/",
+  "agents": "./agents/",
+  "hooks": "./hooks/hooks.json",
+  "mcpServers": "./.mcp.json"
+}

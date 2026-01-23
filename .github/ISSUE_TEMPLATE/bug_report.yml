@@ -49,32 +49,18 @@ body:
       required: true
 
   - type: dropdown
-    id: profile
-    attributes:
-      label: CELLM Profile
-      description: Which profile are you using?
-      options:
-        - default
-        - nuxt-saas
-        - custom
-    validations:
-      required: true
-
-  - type: dropdown
     id: component
     attributes:
       label: Affected Component
       description: Which part of CELLM is affected?
       multiple: true
       options:
-        - Rules
-        - Patterns
-        - Commands
-        - Workflows
-        - Agents
         - Skills
-        - Compiler
-        - CLI
+        - Agents
+        - Commands
+        - Hooks
+        - MCP Server
+        - Scripts
         - Documentation
     validations:
       required: true
@@ -87,7 +73,7 @@ body:
         Please provide your environment details:
         - OS: [e.g., macOS 14.0, Ubuntu 24.04]
         - Claude Code: [e.g., 1.0.0]
-        - Node: [e.g., 20.10.0]
+        - Bun: [e.g., 1.0.0]
         - Shell: [e.g., zsh, bash]
       render: markdown
     validations:

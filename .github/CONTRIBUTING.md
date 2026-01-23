@@ -1,478 +1,193 @@
 # Contributing to CELLM
 
-Thank you for your interest in contributing to CELLM. This document provides guidelines for participating in the project.
+> **CELLM** - Spec-Driven Development System for AI Agents
 
-## Table of Contents
-
-- [Code of Conduct](#code-of-conduct)
-- [Getting Started](#getting-started)
-- [Development Setup](#development-setup)
-- [Project Structure](#project-structure)
-- [Contribution Types](#contribution-types)
-- [Code Standards](#code-standards)
-- [Commit Conventions](#commit-conventions)
-- [Pull Request Process](#pull-request-process)
-- [Validation](#validation)
-
----
-
-## Code of Conduct
-
-This project maintains a respectful and constructive environment. By participating, you agree to uphold these standards. See [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) for details.
-
----
-
-## Getting Started
-
-### Reporting Bugs
-
-1. Check existing [Issues](https://github.com/murillodutt/cellm/issues) to avoid duplicates
-2. Use the Bug Report template
-3. Include:
-   - Clear problem description
-   - Steps to reproduce
-   - Expected vs actual behavior
-   - CELLM version and environment details
-
-### Suggesting Features
-
-1. Check existing issues and discussions for similar suggestions
-2. Use the Feature Request template
-3. Describe:
-   - The problem the feature addresses
-   - Your proposed solution
-   - Alternatives you considered
-
-### Contributing Code
-
-1. Fork the repository
-2. Create a branch (`git checkout -b feat/feature-name`)
-3. Make your changes
-4. Run validation (`./scripts/validate.sh`)
-5. Commit following conventions (`git commit -m 'feat(scope): description'`)
-6. Push to your branch (`git push origin feat/feature-name`)
-7. Open a Pull Request
-
----
-
-## Development Setup
-
-### Prerequisites
-
-- Node.js 18+ (for validation tools only)
-- Git
-
-### Local Setup
-
-```bash
-# Clone the repository
-git clone https://github.com/murillodutt/cellm.git
-cd cellm
-
-# Install development dependencies
-npm install
-
-# Run validation
-./scripts/validate.sh
-
-# Run tests
-npm test
-```
-
-### Branch Structure
-
-```
-main              # Production, always stable
-develop           # Feature integration
-feat/<name>       # New features
-fix/<name>        # Bug fixes
-docs/<name>       # Documentation updates
-refactor/<name>   # Refactoring
-```
-
-### Development Workflow
-
-1. **Sync** with the `develop` branch
-2. **Create** your branch from `develop`
-3. **Develop** your changes
-4. **Test** locally with validation scripts
-5. **Commit** with descriptive messages
-6. **Push** to your fork
-7. **Open PR** targeting `develop`
+Thank you for your interest in contributing to CELLM! This document provides guidelines for contributions.
 
 ---
 
 ## Project Structure
 
-Understanding the repository structure is essential for contributing:
-
 ```
 cellm/
-├── cellm-core/           # CELLM product files (artifacts)
-│   ├── rules/            # Rule definitions
-│   ├── patterns/         # Pattern definitions
-│   ├── commands/         # Command definitions
-│   ├── workflows/        # Workflow definitions
-│   ├── agents/           # Agent definitions
-│   ├── skills/           # Skill definitions
-│   └── templates/        # User templates
+├── .github/              # Documentation and community
+│   ├── ISSUE_TEMPLATE/   # Bug and feature templates
+│   ├── workflows/        # GitHub Actions
+│   └── *.md              # Project documentation
 │
-├── .github/              # GitHub configuration and docs
-│   ├── README.md         # Project overview
-│   ├── ROADMAP.md        # Version roadmap
-│   ├── CHANGELOG.md      # Release history
-│   └── workflows/        # GitHub Actions
+├── .claude-plugin/       # Marketplace configuration
+│   └── marketplace.json
 │
-├── scripts/              # Build and validation scripts
-├── schemas/              # JSON Schema definitions
-└── tests/                # Automated tests
+└── cellm/                # Claude Code Plugin
+    ├── .claude-plugin/
+    │   └── plugin.json   # Plugin manifest
+    ├── .mcp.json         # MCP server configuration
+    ├── agents/           # Development agents (4)
+    ├── commands/         # Plugin commands
+    ├── skills/           # Framework skills (7)
+    ├── hooks/            # Event hooks
+    └── scripts/          # Bundled executables
 ```
-
-### Important Distinction
-
-Files in `cellm-core/` are **product artifacts** (code), not instructions. When contributing:
-
-- Edit files in `cellm-core/` as source code you are building
-- Follow the patterns and conventions established in existing files
-- Maintain consistency with the existing codebase style
 
 ---
 
 ## Contribution Types
 
-### Rules
-
-Rules define behaviors and constraints for the CELLM system.
-
-**Location:** `cellm-core/rules/<category>/`
-
-**Requirements:**
-- Unique ID (e.g., `CONV-007`, `LIM-003`)
-- Valid YAML frontmatter
-- Clear, actionable content
-- English language
-
-**Template:**
-
-```markdown
----
-id: CONV-XXX
-version: v1.1.0
-status: DRAFT
-budget: ~100 tokens
-alwaysApply: true
----
-
-# Rule Title
-
-Rule content describing the behavior or constraint.
-```
-
-### Patterns
-
-Patterns define code conventions with examples.
-
-**Location:** `cellm-core/patterns/<category>/`
-
-**Requirements:**
-- Unique ID with technology prefix (e.g., `TS-007`, `VU-015`)
-- Both correct and incorrect examples
-- Valid YAML frontmatter
-- English language
-
-**Template:**
-
-```markdown
----
-id: TS-XXX
-version: v1.1.0
-status: DRAFT
-technology: typescript
----
-
-# Pattern Title
-
-## Description
-
-Brief description of the pattern.
-
-## Correct Example
-
-```typescript
-// [+] Good
-const result = await fetchData()
-```
-
-## Incorrect Example
-
-```typescript
-// [-] Bad
-const result = fetchData() // Missing await
-```
-```
-
-### Skills
-
-Skills are specialized capabilities for Claude Code.
-
-**Location:** `cellm-core/skills/<name>/`
-
-**Requirements:**
-- Directory with `SKILL.md` file
-- Valid frontmatter with name and description
-- Clear instructions
-- English language
-
-**Template:**
-
-```markdown
----
-name: skill-name
-description: Clear description (max 1024 chars)
----
-
-# Skill Name
-
-Instructions for Claude Code to execute this skill.
-```
-
-### Workflows
-
-Workflows define multi-step processes orchestrated by agents.
-
-**Location:** `cellm-core/workflows/`
-
-**Requirements:**
-- Logical progression of steps
-- Role assignment for each phase
-- Clear entry and exit criteria
-- English language
-
-**Correct Example:**
-
-```yaml
-# [+] Good: Logical phase progression with appropriate agents
-phases:
-  - id: planning
-    agent: architect
-    description: High-level system design
-  - id: implementation
-    agent: implementer
-    description: Code execution based on design
-```
-
-**Incorrect Example:**
-
-```yaml
-# [-] Bad: Mismatched agents or ambiguous phases
-phases:
-  - id: start
-    agent: implementer # Should be architect for planning phases
-    description: Just start coding without a plan
-```
-
-### Documentation
-
-**Location:** `docs/`
-
-**Requirements:**
-- Consistency with PRD-CELLM.md
-- Practical examples
-- Valid links and references
-- English language
-
-### Scripts
-
-**Location:** `scripts/`
-
-**Requirements:**
-- Shebang line (`#!/bin/bash` or similar)
-- Error handling
-- Clear comments
-- Usage documentation
+| Type | Description | Location |
+|------|-------------|----------|
+| **Skills** | Framework-specific patterns and guidance | `cellm/skills/` |
+| **Agents** | Specialized development assistants | `cellm/agents/` |
+| **Commands** | Plugin commands | `cellm/commands/` |
+| **Documentation** | Project docs and guides | `.github/` |
 
 ---
 
-## Code Standards
+## Development Setup
 
-### Language
+CELLM is distributed as a Claude Code plugin. No build step is required for most contributions.
 
-- All files in `cellm-core/` must be in **English**
-- All documentation in `docs/` must be in **English**
-- No emojis in code or documentation
+### Prerequisites
 
-### Markdown Files
+- Claude Code CLI 1.0+
+- Bun 1.0+ (for MCP server development)
 
-- Valid YAML frontmatter
-- All required fields present
-- Unique IDs within category
-- Follow category template structure
+### Local Testing
 
-### Frontmatter Requirements
+1. Fork and clone the repository
+2. Make your changes
+3. Test by installing locally:
 
-**Rules:**
-```yaml
----
-id: string          # Required, unique
-version: string     # Required, semver format
-status: string      # Required: OK | DRAFT | REVISAR | OBSOLETO
-budget: string      # Required, token estimate
-alwaysApply: bool   # Optional
----
-```
-
-**Patterns:**
-```yaml
----
-id: string          # Required, unique with tech prefix
-version: string     # Required, semver format
-status: string      # Required
-technology: string  # Required
----
-```
-
-**Skills:**
-```yaml
----
-name: string        # Required, lowercase with hyphens
-description: string # Required, max 1024 chars
----
+```bash
+# Install from local path
+claude /plugin install /path/to/your/fork/cellm
 ```
 
 ---
 
-## Commit Conventions
+## Commit Convention
 
-This project uses [Conventional Commits](https://www.conventionalcommits.org/).
-
-### Format
+We use [Conventional Commits](https://www.conventionalcommits.org/):
 
 ```
 <type>(<scope>): <description>
-
-[optional body]
-
-[optional footer]
 ```
 
 ### Types
 
-| Type | Usage |
-|------|-------|
+| Type | Description |
+|------|-------------|
 | `feat` | New feature |
 | `fix` | Bug fix |
 | `docs` | Documentation changes |
 | `refactor` | Code refactoring |
-| `test` | Adding or modifying tests |
+| `test` | Test additions/changes |
 | `chore` | Maintenance tasks |
 
 ### Scopes
 
-Valid scopes for this project:
-
-- `rules` - Files in cellm-core/rules/
-- `patterns` - Files in cellm-core/patterns/
-- `commands` - Files in cellm-core/commands/
-- `workflows` - Files in cellm-core/workflows/
-- `agents` - Files in cellm-core/agents/
-- `skills` - Files in cellm-core/skills/
-- `docs` - Documentation files
-- `scripts` - Automation scripts
-- `schemas` - JSON Schema files
+| Scope | Description |
+|-------|-------------|
+| `skills` | Changes to skills |
+| `agents` | Changes to agents |
+| `commands` | Changes to commands |
+| `hooks` | Changes to hooks |
+| `scripts` | Changes to bundled scripts |
+| `docs` | Documentation changes |
 
 ### Examples
 
-```bash
-feat(rules): add mobile domain rule
-fix(patterns): correct TS-003 example syntax
-docs: update installation guide
-refactor(commands): simplify implement structure
-test(validation): add frontmatter tests
-chore: update dependencies
+```
+feat(skills): add sk-prisma for Prisma ORM patterns
+fix(agents): correct architect tool restrictions
+docs: update installation instructions
 ```
 
 ---
 
 ## Pull Request Process
 
-### Before Submitting
+1. **Fork** the repository
+2. **Create** a feature branch: `git checkout -b feat/my-feature`
+3. **Make** your changes
+4. **Test** locally with Claude Code
+5. **Commit** using conventional commits
+6. **Push** to your fork
+7. **Open** a Pull Request
 
-1. Run all validation scripts
-2. Ensure all tests pass
-3. Update documentation if needed
-4. Check that your branch is up to date with `develop`
+### PR Checklist
 
-### PR Requirements
-
-- Use the Pull Request template
-- Link related issues
-- Provide clear description of changes
-- Include screenshots if relevant (UI changes, diagrams)
-- Ensure CI checks pass
-
-### Review Process
-
-1. Submit PR to `develop` branch
-2. Wait for automated checks to complete
-3. Address reviewer feedback
-4. Obtain approval from at least one maintainer
-5. Squash and merge when approved
-
-### PR Template Fields
-
-- **Description**: Detailed summary of changes and the problem they solve
-- **Type of Change**: BUG/FEAT/Breaking Change/DOCS/REFAC/TEST
-- **Affected Areas**: Which components of CELLM are impacted
-- **Checklist**: Mandatory validation steps (linting, tests, frontmatter)
-- **Testing**: Description of how the changes were verified
-- **Related Issues**: Links to GitHub issues using keywords (Fixes #123)
-- **Screenshots**: Visual evidence if applicable
-- **Additional Notes**: Any extra context for reviewers
+- [ ] Code follows project conventions
+- [ ] Documentation updated if needed
+- [ ] Commits follow conventional format
+- [ ] PR description explains the changes
 
 ---
 
-## Validation
+## Code Standards
 
-Run these checks before submitting any contribution:
+### Markdown Files
 
-```bash
-# Validate structure and schemas
-./scripts/validate.sh
+- Use YAML frontmatter where applicable
+- Follow consistent heading hierarchy
+- Include code examples where helpful
 
-# Check frontmatter validity
-./scripts/check-frontmatter.sh
+### Skills Format
 
-# Run tests
-npm test
+```markdown
+---
+description: Brief description for Claude Code
+---
+
+# Skill Name
+
+## Overview
+...
+
+## Patterns
+...
+
+## Examples
+...
 ```
 
-### What Validation Checks
+### Agents Format
 
-- **Structure**: Correct file locations and naming
-- **Frontmatter**: Valid YAML, required fields present
-- **Schema**: Compliance with JSON Schema definitions
-- **IDs**: Uniqueness within categories
-- **Links**: Valid internal references
+```markdown
+---
+description: Agent purpose
+tools: [list, of, tools]
+---
 
-### Handling Validation Errors
+# Agent Name
 
-If validation fails:
+## Role
+...
 
-1. Read the error message carefully
-2. Check the referenced file and line
-3. Compare against the relevant schema in `schemas/`
-4. Fix the issue and re-run validation
+## Responsibilities
+...
+```
 
 ---
 
-## Questions and Support
+## Getting Help
 
-- Open a [Discussion](https://github.com/murillodutt/cellm/discussions) for questions
-- Review the [Roadmap](./ROADMAP.md) for version planning
-- Check existing issues before creating new ones
+- **Questions**: Open a [Discussion](https://github.com/murillodutt/cellm/discussions)
+- **Bugs**: Open an [Issue](https://github.com/murillodutt/cellm/issues)
+- **Features**: Open a [Feature Request](https://github.com/murillodutt/cellm/issues/new?template=feature_request.yml)
 
 ---
 
-## Recognition
+## Code of Conduct
 
-Contributors are acknowledged in release notes. We appreciate your participation in improving CELLM.
+Please read our [Code of Conduct](./CODE_OF_CONDUCT.md) before contributing.
+
+---
+
+## License
+
+By contributing to CELLM, you agree that your contributions will be licensed under the MIT License.
+
+---
+
+**CELLM** - Spec-Driven Development System for AI Agents
+**Maintainer**: Dutt Yeshua Technology Ltd

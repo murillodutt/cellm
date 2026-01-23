@@ -35,15 +35,12 @@ body:
       description: Which parts of CELLM would this affect?
       multiple: true
       options:
-        - Rules
-        - Patterns
-        - Commands
-        - Workflows
-        - Agents
         - Skills
-        - Profiles
-        - Compiler
-        - CLI
+        - Agents
+        - Commands
+        - Hooks
+        - MCP Server
+        - Scripts
         - Documentation
     validations:
       required: true

@@ -1,0 +1,19 @@
+{
+  "name": "cellm",
+  "owner": {
+    "name": "Murillo Dutt",
+    "url": "https://cellm.ai"
+  },
+  "metadata": {
+    "description": "CELLM - Context Engineering for LLM Development",
+    "repository": "https://github.com/murillodutt/cellm"
+  },
+  "plugins": [
+    {
+      "name": "cellm",
+      "version": "2.4.0",
+      "source": "./cellm",
+      "description": "Context Engineering for LLM-driven development"
+    }
+  ]
+}

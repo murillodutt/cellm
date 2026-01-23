@@ -13,22 +13,18 @@
 
 ## Affected Areas
 
-- [ ] Rules (`cellm-core/rules/`)
-- [ ] Patterns (`cellm-core/patterns/`)
-- [ ] Commands (`cellm-core/commands/`)
-- [ ] Workflows (`cellm-core/workflows/`)
-- [ ] Agents (`cellm-core/agents/`)
-- [ ] Skills (`cellm-core/skills/`)
-- [ ] Templates (`cellm-core/templates/`)
-- [ ] Scripts (`scripts/`)
-- [ ] Documentation (`docs/`)
+- [ ] Skills (`cellm/skills/`)
+- [ ] Agents (`cellm/agents/`)
+- [ ] Commands (`cellm/commands/`)
+- [ ] Hooks (`cellm/hooks/`)
+- [ ] MCP Server (`cellm/scripts/mcp-server.cjs`)
+- [ ] Scripts (`cellm/scripts/`)
+- [ ] Documentation (`.github/`)
 
 ## Checklist
 
 - [ ] My code follows the project's conventions
 - [ ] I have updated the documentation accordingly
-- [ ] All frontmatter is valid YAML with required fields
-- [ ] I have run `./scripts/validate.sh` and it passes
 - [ ] My commits follow Conventional Commits format
 - [ ] I have updated CHANGELOG.md (if applicable)
 

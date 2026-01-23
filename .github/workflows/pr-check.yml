@@ -19,7 +19,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -31,39 +31,23 @@ jobs:
           if [[ ! "$PR_TITLE" =~ ^(feat|fix|docs|refactor|test|chore)(\([a-z-]+\))?:\ .+ ]]; then
             echo "::error::PR title must follow conventional commit format: type(scope): description"
             echo "Valid types: feat, fix, docs, refactor, test, chore"
-            echo "Valid scopes: rules, patterns, commands, workflows, agents, skills, docs, scripts, schemas"
+            echo "Valid scopes: skills, agents, commands, hooks, scripts, docs"
             exit 1
           fi
 
           echo "[+] PR title format is valid"
-
-      - name: Check for breaking changes
-        run: |
-          # Get changed files
-          CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }}...HEAD)
-
-          # Check for changes in core files
-          CORE_CHANGES=$(echo "$CHANGED_FILES" | grep -E "^cellm-core/(rules|patterns)/core/" || true)
-
-          if [ -n "$CORE_CHANGES" ]; then
-            echo "::warning::This PR modifies core files. Please ensure backwards compatibility."
-            echo "Changed core files:"
-            echo "$CORE_CHANGES"
-          fi
 
       - name: Detect file types changed
         id: changes
         run: |
           CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }}...HEAD)
 
-          echo "rules=$(echo "$CHANGED_FILES" | grep -c "^cellm-core/rules/" || echo 0)" >> $GITHUB_OUTPUT
-          echo "patterns=$(echo "$CHANGED_FILES" | grep -c "^cellm-core/patterns/" || echo 0)" >> $GITHUB_OUTPUT
-          echo "commands=$(echo "$CHANGED_FILES" | grep -c "^cellm-core/commands/" || echo 0)" >> $GITHUB_OUTPUT
-          echo "workflows=$(echo "$CHANGED_FILES" | grep -c "^cellm-core/workflows/" || echo 0)" >> $GITHUB_OUTPUT
-          echo "agents=$(echo "$CHANGED_FILES" | grep -c "^cellm-core/agents/" || echo 0)" >> $GITHUB_OUTPUT
-          echo "skills=$(echo "$CHANGED_FILES" | grep -c "^cellm-core/skills/" || echo 0)" >> $GITHUB_OUTPUT
-          echo "schemas=$(echo "$CHANGED_FILES" | grep -c "^schemas/" || echo 0)" >> $GITHUB_OUTPUT
-          echo "tests=$(echo "$CHANGED_FILES" | grep -c "^tests/" || echo 0)" >> $GITHUB_OUTPUT
+          echo "skills=$(echo "$CHANGED_FILES" | grep -c "^cellm/skills/" || echo 0)" >> $GITHUB_OUTPUT
+          echo "agents=$(echo "$CHANGED_FILES" | grep -c "^cellm/agents/" || echo 0)" >> $GITHUB_OUTPUT
+          echo "commands=$(echo "$CHANGED_FILES" | grep -c "^cellm/commands/" || echo 0)" >> $GITHUB_OUTPUT
+          echo "hooks=$(echo "$CHANGED_FILES" | grep -c "^cellm/hooks/" || echo 0)" >> $GITHUB_OUTPUT
+          echo "scripts=$(echo "$CHANGED_FILES" | grep -c "^cellm/scripts/" || echo 0)" >> $GITHUB_OUTPUT
+          echo "docs=$(echo "$CHANGED_FILES" | grep -c "^\.github/" || echo 0)" >> $GITHUB_OUTPUT
 
       - name: Generate PR summary
         run: |
@@ -71,92 +55,57 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Category | Files Changed |" >> $GITHUB_STEP_SUMMARY
           echo "|----------|---------------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Rules | ${{ steps.changes.outputs.rules }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Patterns | ${{ steps.changes.outputs.patterns }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Commands | ${{ steps.changes.outputs.commands }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Workflows | ${{ steps.changes.outputs.workflows }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Agents | ${{ steps.changes.outputs.agents }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Skills | ${{ steps.changes.outputs.skills }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Schemas | ${{ steps.changes.outputs.schemas }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Tests | ${{ steps.changes.outputs.tests }} |" >> $GITHUB_STEP_SUMMARY
-
-  frontmatter-check:
-    name: Validate Frontmatter
-    runs-on: ubuntu-latest
-    if: github.event.pull_request.draft == false
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: 20
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Run frontmatter validation
-        run: npm run test:validation -- --reporter=verbose
-
-  unique-ids-check:
-    name: Check Unique IDs
-    runs-on: ubuntu-latest
-    if: github.event.pull_request.draft == false
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: 20
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Check for duplicate IDs
-        run: npx vitest run tests/validation/unique-ids.test.ts --reporter=verbose
-
-  budget-check:
-    name: Check Token Budget
-    runs-on: ubuntu-latest
-    if: github.event.pull_request.draft == false
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: 20
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Run budget tests
-        run: npx vitest run tests/integration/budget.test.ts --reporter=verbose
+          echo "| Agents | ${{ steps.changes.outputs.agents }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Commands | ${{ steps.changes.outputs.commands }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Hooks | ${{ steps.changes.outputs.hooks }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Scripts | ${{ steps.changes.outputs.scripts }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Documentation | ${{ steps.changes.outputs.docs }} |" >> $GITHUB_STEP_SUMMARY
 
   structure-check:
-    name: Check Structure
+    name: Check Plugin Structure
     runs-on: ubuntu-latest
     if: github.event.pull_request.draft == false
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
-      - name: Make scripts executable
-        run: chmod +x scripts/*.sh
+      - name: Validate plugin.json
+        run: |
+          if [ ! -f "cellm/.claude-plugin/plugin.json" ]; then
+            echo "::error::Missing plugin.json manifest"
+            exit 1
+          fi
+          if ! python3 -c "import json; json.load(open('cellm/.claude-plugin/plugin.json'))"; then
+            echo "::error::Invalid JSON in plugin.json"
+            exit 1
+          fi
+          echo "[+] plugin.json valid"
 
-      - name: Run structure validation
-        run: ./scripts/validate.sh
+      - name: Validate .mcp.json
+        run: |
+          if [ ! -f "cellm/.mcp.json" ]; then
+            echo "::error::Missing .mcp.json"
+            exit 1
+          fi
+          if ! python3 -c "import json; json.load(open('cellm/.mcp.json'))"; then
+            echo "::error::Invalid JSON in .mcp.json"
+            exit 1
+          fi
+          echo "[+] .mcp.json valid"
+
+      - name: Validate hooks.json
+        run: |
+          if [ ! -f "cellm/hooks/hooks.json" ]; then
+            echo "::error::Missing hooks.json"
+            exit 1
+          fi
+          if ! python3 -c "import json; json.load(open('cellm/hooks/hooks.json'))"; then
+            echo "::error::Invalid JSON in hooks.json"
+            exit 1
+          fi
+          echo "[+] hooks.json valid"
 
   auto-label:
     name: Auto Label PR
@@ -167,12 +116,12 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Add labels based on changes
-        uses: actions/github-script@v8
+        uses: actions/github-script@v7
         with:
           script: |
             const { execSync } = require('child_process');
@@ -186,16 +135,12 @@ jobs:
 
             // Determine labels based on file paths
             for (const file of changedFiles) {
-              if (file.startsWith('cellm-core/rules/')) labels.add('rules');
-              if (file.startsWith('cellm-core/patterns/')) labels.add('patterns');
-              if (file.startsWith('cellm-core/commands/')) labels.add('commands');
-              if (file.startsWith('cellm-core/workflows/')) labels.add('workflows');
-              if (file.startsWith('cellm-core/agents/')) labels.add('agents');
-              if (file.startsWith('cellm-core/skills/')) labels.add('skills');
-              if (file.startsWith('schemas/')) labels.add('schemas');
-              if (file.startsWith('tests/')) labels.add('tests');
-              if (file.startsWith('docs/')) labels.add('documentation');
-              if (file.startsWith('scripts/')) labels.add('scripts');
+              if (file.startsWith('cellm/skills/')) labels.add('skills');
+              if (file.startsWith('cellm/agents/')) labels.add('agents');
+              if (file.startsWith('cellm/commands/')) labels.add('commands');
+              if (file.startsWith('cellm/hooks/')) labels.add('hooks');
+              if (file.startsWith('cellm/scripts/')) labels.add('scripts');
+              if (file.startsWith('.github/')) labels.add('documentation');
             }
 
             // Add labels if any found
