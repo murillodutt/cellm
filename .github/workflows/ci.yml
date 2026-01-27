@@ -90,15 +90,19 @@ jobs:
             echo "[+] Found: $dir"
           done
 
-      - name: Check bundled scripts exist
+      - name: Check shell scripts exist
         run: |
-          REQUIRED_SCRIPTS="cellm/scripts/mcp-server.cjs cellm/scripts/oracle-worker.cjs cellm/scripts/context-generator.cjs cellm/scripts/smart-install.js"
+          REQUIRED_SCRIPTS="cellm/scripts/spawn-worker.sh cellm/scripts/health-check.sh cellm/scripts/configure-otel.sh cellm/scripts/capture-prompt.sh cellm/scripts/capture-context.sh cellm/scripts/inject-context.sh cellm/scripts/track-tool-use.sh cellm/scripts/auto-recovery.sh cellm/scripts/log-rotate.sh cellm/scripts/check-dependencies.sh"
           for script in $REQUIRED_SCRIPTS; do
             if [ ! -f "$script" ]; then
-              echo "::error::Missing bundled script: $script"
+              echo "::error::Missing shell script: $script"
               exit 1
             fi
-            echo "[+] Found: $script"
+            if [ ! -x "$script" ]; then
+              echo "::error::Script not executable: $script"
+              exit 1
+            fi
+            echo "[+] Found and executable: $script"
           done
 
       - name: Count plugin components
@@ -110,7 +114,7 @@ jobs:
           echo "| Agents | $(ls cellm/agents/*.md 2>/dev/null | wc -l | tr -d ' ') |" >> $GITHUB_STEP_SUMMARY
           echo "| Skills | $(ls -d cellm/skills/*/ 2>/dev/null | wc -l | tr -d ' ') |" >> $GITHUB_STEP_SUMMARY
           echo "| Commands | $(ls cellm/commands/*.md 2>/dev/null | wc -l | tr -d ' ') |" >> $GITHUB_STEP_SUMMARY
-          echo "| Scripts | $(ls cellm/scripts/*.{js,cjs} 2>/dev/null | wc -l | tr -d ' ') |" >> $GITHUB_STEP_SUMMARY
+          echo "| Scripts | $(ls cellm/scripts/*.sh 2>/dev/null | wc -l | tr -d ' ') |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "[+] Plugin structure validated successfully" >> $GITHUB_STEP_SUMMARY
 
