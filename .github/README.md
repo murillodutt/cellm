@@ -2,6 +2,8 @@
 
 > **Stop repeating yourself. AI that remembers your project.**
 
+![Image](https://github.com/user-attachments/assets/ab475e0a-27d1-44e4-886e-261b96839027)
+
 **The Problem:** You waste 70% of every AI session re-explaining your stack, patterns, and rules.
 
 **The Solution:** CELLM loads your project's knowledge automatically. Work with AI that already knows how you code.
