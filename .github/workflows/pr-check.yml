@@ -40,21 +40,23 @@ jobs:
       - name: Detect file types changed
         id: changes
         run: |
-          CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }}...HEAD)
+          CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }}...HEAD || echo "")
 
-          SKILLS=$(echo "$CHANGED_FILES" | grep -c "^cellm/skills/" || echo 0)
-          AGENTS=$(echo "$CHANGED_FILES" | grep -c "^cellm/agents/" || echo 0)
-          COMMANDS=$(echo "$CHANGED_FILES" | grep -c "^cellm/commands/" || echo 0)
-          HOOKS=$(echo "$CHANGED_FILES" | grep -c "^cellm/hooks/" || echo 0)
-          SCRIPTS=$(echo "$CHANGED_FILES" | grep -c "^cellm/scripts/" || echo 0)
-          DOCS=$(echo "$CHANGED_FILES" | grep -c "^\.github/" || echo 0)
+          SKILLS=$(echo "$CHANGED_FILES" | grep -c "^cellm/skills/" 2>/dev/null || echo "0")
+          AGENTS=$(echo "$CHANGED_FILES" | grep -c "^cellm/agents/" 2>/dev/null || echo "0")
+          COMMANDS=$(echo "$CHANGED_FILES" | grep -c "^cellm/commands/" 2>/dev/null || echo "0")
+          HOOKS=$(echo "$CHANGED_FILES" | grep -c "^cellm/hooks/" 2>/dev/null || echo "0")
+          SCRIPTS=$(echo "$CHANGED_FILES" | grep -c "^cellm/scripts/" 2>/dev/null || echo "0")
+          DOCS=$(echo "$CHANGED_FILES" | grep -c "^\.github/" 2>/dev/null || echo "0")
 
-          echo "skills=$SKILLS" >> $GITHUB_OUTPUT
-          echo "agents=$AGENTS" >> $GITHUB_OUTPUT
-          echo "commands=$COMMANDS" >> $GITHUB_OUTPUT
-          echo "hooks=$HOOKS" >> $GITHUB_OUTPUT
-          echo "scripts=$SCRIPTS" >> $GITHUB_OUTPUT
-          echo "docs=$DOCS" >> $GITHUB_OUTPUT
+          {
+            echo "skills=${SKILLS}"
+            echo "agents=${AGENTS}"
+            echo "commands=${COMMANDS}"
+            echo "hooks=${HOOKS}"
+            echo "scripts=${SCRIPTS}"
+            echo "docs=${DOCS}"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Generate PR summary
         run: |
