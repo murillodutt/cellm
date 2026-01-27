@@ -16,7 +16,7 @@ CELLM provides 10 workflow commands organized into phases:
 | **Execution** | `/create-tasks`, `/orchestrate-tasks`, `/implement` |
 | **Validation** | `/verify`, `/status` |
 | **Pattern Management** | `/discover-patterns`, `/inject-patterns`, `/index-patterns` |
-| **Monitoring** | `/oracle-status` |
+| **Setup & Monitoring** | `/cellm-init`, `/oracle-status` |
 
 ---
 
@@ -347,7 +347,64 @@ claude /index-patterns
 
 ---
 
-## Monitoring Commands
+## Setup & Monitoring Commands
+
+### /cellm-init
+
+**Purpose:** Interactive Oracle setup and maintenance
+
+**What it does:**
+- Guided Oracle installation with visual feedback
+- Interactive menu with 8 main options
+- Doctor mode with 6 diagnostic checks
+- Advanced configuration (port, data directory, logs)
+- Update and maintenance tools
+
+**Interactive Menu:**
+```
+1. Install Oracle (first time setup)
+2. Check Status (view current state)
+3. Update (upgrade to latest version)
+4. Doctor (diagnose and fix issues)
+5. Restart Worker (if stuck or slow)
+6. Uninstall (remove Oracle completely)
+7. Advanced Options
+8. Exit
+```
+
+**Usage:**
+```bash
+# Interactive mode (recommended)
+claude /cellm-init
+
+# Direct command-line modes
+claude /cellm-init install   # First-time installation
+claude /cellm-init status    # Check current state
+claude /cellm-init update    # Upgrade to latest
+claude /cellm-init doctor    # Run diagnostics
+claude /cellm-init restart   # Restart worker
+claude /cellm-init uninstall # Remove Oracle
+```
+
+**Doctor Mode:**
+Runs 6 automatic checks:
+1. Dependencies (Node.js, npx, Bun)
+2. Installation verification
+3. Worker status test
+4. Port availability check
+5. Database integrity
+6. MCP configuration
+
+Each issue found is automatically fixed with user confirmation.
+
+**Advanced Options:**
+- Change worker port (1024-65535)
+- Change data directory
+- View logs (last 50 lines)
+- Clear cache (preserves observations)
+- Reset configuration (preserves database)
+
+---
 
 ### /oracle-status
 
@@ -435,6 +492,7 @@ claude /inject-patterns
 
 | Command | Agent | Purpose | Output |
 |---------|-------|---------|--------|
+| `/cellm-init` | - | Oracle setup & maintenance | Interactive installation/config |
 | `/plan-product` | Architect | Product foundation | mission.md, roadmap.md, tech-stack.md |
 | `/shape-spec` | Architect | Feature research | spec folder with plan, shape, patterns |
 | `/write-spec` | Architect | Technical spec | spec.md |

@@ -66,8 +66,8 @@ claude /install-plugin murillodutt/cellm
 This command:
 1. Downloads the plugin from GitHub
 2. Installs to `~/.claude/plugins/`
-3. Configures hooks and MCP server
-4. Starts Oracle worker daemon
+3. Configures hooks automatically
+4. Oracle activation is optional (see below)
 
 ### Method 2: Via Marketplace
 
@@ -94,6 +94,26 @@ bun install
 
 ---
 
+## Oracle Setup (Optional)
+
+Oracle provides semantic search and persistent memory. To activate:
+
+```bash
+# Interactive setup (recommended)
+claude /cellm-init
+
+# Or direct install
+claude /cellm-init install
+```
+
+**Features:**
+- Interactive menu with guided setup
+- Doctor mode for diagnostics
+- Advanced configuration options
+- Update and maintenance tools
+
+---
+
 ## Verification
 
 ### Check Plugin Status
@@ -102,11 +122,11 @@ bun install
 # List installed plugins
 claude /plugin list
 
-# Check Oracle health
+# Check Oracle health (if installed)
 claude /oracle-status
 ```
 
-Expected output:
+Expected output (with Oracle):
 ```
 [+] Oracle Worker: Running
 [+] MCP Server: Connected
@@ -176,7 +196,7 @@ Edit `~/.claude/plugins/cellm/.claude-plugin/plugin.json`:
   "settings": {
     "autoStart": true,
     "enableHooks": true,
-    "oraclePort": 3001
+    "oraclePort": 31415
   }
 }
 ```
@@ -230,12 +250,11 @@ claude /install-plugin murillodutt/cellm --force
 
 **Solutions:**
 ```bash
-# Check Bun installation
-bun --version
+# Run interactive setup
+claude /cellm-init
 
-# Manually start worker
-cd ~/.claude/plugins/cellm
-bun scripts/spawn-worker.sh
+# Or use Doctor mode for diagnostics
+claude /cellm-init doctor
 
 # Check logs
 tail -f ~/.cellm/logs/oracle-worker.log
@@ -248,14 +267,16 @@ tail -f ~/.cellm/logs/oracle-worker.log
 **Solutions:**
 ```bash
 # Check port availability
-lsof -i :3001
+lsof -i :31415
 
-# Restart MCP server
-pkill -f oracle-mcp
-bun scripts/spawn-worker.sh
+# Use Doctor mode to diagnose
+claude /cellm-init doctor
+
+# Or restart worker
+claude /cellm-init restart
 
 # Check firewall settings
-# Ensure localhost:3001 is accessible
+# Ensure localhost:31415 is accessible
 ```
 
 ### Skills Not Loading

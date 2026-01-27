@@ -12,8 +12,8 @@
           },
           {
             "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/spawn-worker.sh",
-            "timeout": 15000
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/check-worker-health.sh",
+            "timeout": 2000
           },
           {
             "type": "command",
@@ -26,11 +26,6 @@
     "UserPromptSubmit": [
       {
         "hooks": [
-          {
-            "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/spawn-worker.sh",
-            "timeout": 1000
-          },
           {
             "type": "command",
             "command": "${CLAUDE_PLUGIN_ROOT}/scripts/capture-prompt.sh",

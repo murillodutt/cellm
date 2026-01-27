@@ -1,91 +1,68 @@
 # Changelog
 
-All notable changes to CELLM Oracle will be documented in this file.
+All notable changes to CELLM Plugin will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [2.0.5] - 2026-01-27
-
-### Rollback
-- Revertido para v2.0.5 como versão canônica estável
-- v2.4.0 e v3.0.0 eram branches experimentais descontinuados
-- Estabelecida v2.0.5 como base para desenvolvimento futuro
-
-### Changed
-- Reestruturação completa do repositório para arquitetura aninhada
-- Plugin movido para subdiretório `cellm/` para melhor organização
-- Scripts integrados dentro do plugin (`cellm/scripts/`)
-- Documentação organizada em 3 camadas (desenvolvimento, plugin, projeto)
-
-## [2.4.0] - 2026-01-23 [DESCONTINUADO]
+## [2.0.6] - 2026-01-27
 
 ### Added
-- **Phase 1: Memory Pipeline Visual**
-  - ASCII icons for context injection (`[BUG]`, `[FEAT]`, `[DISC]`, etc.)
-  - `<oracle-context>` wrapper tags for context output
-  - Token economics display (Read/Work costs)
-
-- **Phase 2: Timeline Enhancement**
-  - Timeline API filters (types, dateFrom, dateTo, project)
-  - TimelineFilters component with USelectMenu
-  - ActivityTimeline with UModal/UDrawer for detail views
-  - Virtualized scrolling with UScrollArea
-  - Staggered entrance animations
-  - Token economics in timeline cards
-
-- **Phase 3: Auto-Start Robusto**
-  - Lock file mechanism to prevent race conditions
-  - Retry logic (3 attempts) before spawning
-  - Structured JSON logging
-  - Auto-recovery watchdog script
-  - Health check with `--json`, `--readiness`, `--verbose` options
-  - Log rotation script
-
-- **Phase 4: Marketplace Foundation**
-  - Plugin manifest specification (manifest.yaml)
-  - JSON Schema for manifest validation
-  - /sk-plugin-install skill documentation
-  - Track tool use hook
-  - Dependency check script
+- `/cellm-init` command for assisted Oracle installation/update/repair
+- `init-oracle.sh` script with visual progress indicators (5 steps)
+- `check-worker-health.sh` fast health check (2s timeout)
+- Lazy loading for all framework skills via `paths:` field
+- `argument-hint` to oracle-search skill for better UX
 
 ### Changed
-- Improved spawn-worker.sh with dynamic path resolution
-- Timeline API now returns `availableTypes` for filter options
-- Context generator uses ASCII icons per icon-substitution.md
+- **SessionStart timeout**: 21s → 8s (62% faster)
+- **Skills loading**: Always-loaded → Path-triggered (85% token reduction)
+- **Oracle installation**: Automatic → Assisted (user-initiated)
+- SessionStart hook now uses `check-worker-health.sh` instead of `spawn-worker.sh`
+- Removed redundant `spawn-worker.sh` call from UserPromptSubmit hook
+- `.mcp.json` renamed to `.mcp.json.example` (MCP activation now explicit)
 
 ### Fixed
-- Race conditions in worker spawning
-- Stale process cleanup on spawn
+- oracle-search skill missing required `name:` field
+- oracle-search skill missing `allowed-tools` declaration
+- Skills without `paths:` field caused unnecessary token overhead (~670 lines)
+- Long SessionStart timeout blocked user experience
 
-## [2.3.0] - 2026-01-22
+### Skills Path Configuration
+- **sk-nuxt**: Triggers on `nuxt.config.ts`, `app.vue`, `app/**`, `server/**`, `pages/**`
+- **sk-vue**: Triggers on `*.vue`, `composables/**/*.ts`
+- **sk-typescript**: Triggers on `*.ts`, `*.tsx`, `types/**`
+- **sk-tailwind**: Triggers on `*.vue`, `*.css`, `tailwind.config.ts`
+- **sk-pinia**: Triggers on `stores/**/*.ts`, `store/**/*.ts`
+- **sk-drizzle**: Triggers on `db/**`, `database/**`, `drizzle.config.ts`, `*schema*.ts`
 
-### Added
-- Dashboard pages: observations, timeline, pulse, memory
-- MCP stdio server for Claude Code integration
-- Worker daemon with HTTP API
+### Installation Workflow
+```bash
+# Install Oracle (optional)
+/cellm-init
 
-## [2.2.0] - 2026-01-21
+# Activate MCP tools
+cp cellm/.mcp.json.example cellm/.mcp.json
 
-### Added
-- Semantic search with multilingual-e5-base embeddings
-- Vector storage with sqlite-vec extension
-- Session summary capture
+# Check status
+/cellm-init status
 
-## [2.1.0] - 2026-01-20
+# Update or repair
+/cellm-init update
+/cellm-init repair
+```
 
-### Added
-- Initial Oracle plugin structure
-- Basic hooks for SessionStart and Stop
-- SQLite database with observations table
-
-## [2.0.0] - 2026-01-19
+## [2.0.5] - 2026-01-27
 
 ### Changed
-- Complete rewrite as standalone plugin
-- Separated from claude-mem dependency
+- Repository restructure with nested plugin architecture
+- Plugin moved to `cellm/` subdirectory
+- Documentation organized in 3 layers
 
-## [1.0.0] - 2026-01-15
+### Context
+- v2.0.5 established as stable canonical version
+- v2.4.0 and v3.0.0 were experimental branches (discontinued)
 
-### Added
-- Initial release based on claude-mem integration
+---
+
+For complete version history, see [CHANGELOG-ARCHIVE.md](./CHANGELOG-ARCHIVE.md)

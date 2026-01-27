@@ -336,7 +336,7 @@ Real-time event streaming for:
 
 ```bash
 # Oracle Configuration
-ORACLE_PORT=3001                    # Server port
+ORACLE_PORT=31415                   # Server port (default)
 ORACLE_LOG_LEVEL=info              # Logging level
 ORACLE_DB_PATH=~/.cellm/oracle.db  # Database path
 
@@ -401,12 +401,11 @@ curl -X POST http://localhost:31415/api/actions/{id}/reject
 ### Worker Not Starting
 
 ```bash
-# Check Bun installation
-bun --version
+# Use interactive setup
+claude /cellm-init
 
-# Manually start
-cd ~/.claude/plugins/cellm
-bun scripts/spawn-worker.sh
+# Or use Doctor mode
+claude /cellm-init doctor
 
 # Check logs
 tail -f ~/.cellm/logs/oracle-worker.log

@@ -4,6 +4,10 @@ description: |
   TypeScript patterns and best practices.
   Use when: writing TypeScript code, defining types, type safety issues.
   Triggers: .ts files, type definitions, generics, type errors.
+paths:
+  - "**/*.ts"
+  - "**/*.tsx"
+  - "**/types/**/*"
 allowed-tools: Read, Grep, Glob, Edit, Write
 model: inherit
 ---

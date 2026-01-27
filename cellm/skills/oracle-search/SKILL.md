@@ -1,5 +1,9 @@
 ---
+name: oracle-search
 description: Search Oracle context and observations using semantic search
+argument-hint: "query: your search query"
+allowed-tools: mcp__cellm-oracle__search, mcp__cellm-oracle__timeline, mcp__cellm-oracle__get_observations
+model: inherit
 ---
 
 # Oracle Search Skill
@@ -24,7 +28,7 @@ Get compact results with IDs (~50-100 tokens per result):
 mcp__cellm-oracle__search({
   query: "your search query",
   limit: 20,
-  project: "cellm-private"
+  project: "cellm"
 })
 ```
 

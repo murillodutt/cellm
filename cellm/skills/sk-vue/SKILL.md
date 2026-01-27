@@ -4,6 +4,9 @@ description: |
   Vue 3 Composition API patterns and best practices.
   Use when: editing .vue files, creating components, writing composables.
   Triggers: vue components, script setup, composables, defineProps, defineEmits.
+paths:
+  - "**/*.vue"
+  - "**/composables/**/*.ts"
 allowed-tools: Read, Grep, Glob, Edit, Write
 model: inherit
 ---
