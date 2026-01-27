@@ -1,0 +1,28 @@
+{
+  "name": "cellm",
+  "owner": {
+    "name": "Murillo Dutt",
+    "email": "contact@cellm.ai",
+    "url": "https://cellm.ai"
+  },
+  "metadata": {
+    "description": "CELLM - Context Engineering for LLM Development",
+    "homepage": "https://cellm.ai",
+    "repository": "https://github.com/murillodutt/cellm"
+  },
+  "plugins": [
+    {
+      "name": "cellm",
+      "version": "2.0.5",
+      "source": "./",
+      "description": "Context Engineering for LLM-driven development with structured specs, intelligent memory, and AI agent orchestration",
+      "keywords": [
+        "ai-development",
+        "context-engineering",
+        "memory",
+        "semantic-search",
+        "orchestration"
+      ]
+    }
+  ]
+}
