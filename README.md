@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![CELLM](https://raw.githubusercontent.com/murillodutt/cellm/main/.github/assets/cellm-banner.png)
+![Image](https://github.com/user-attachments/assets/ab475e0a-27d1-44e4-886e-261b96839027)
 
 **Structured specs, intelligent memory, and orchestration for AI agents building software**
 
