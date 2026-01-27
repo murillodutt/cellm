@@ -47,21 +47,21 @@ jobs:
           fi
           echo "[+] plugin.json syntax valid"
 
-      - name: Check MCP configuration exists
+      - name: Check MCP configuration template exists
         run: |
-          if [ ! -f "cellm/.mcp.json" ]; then
-            echo "::error::Missing .mcp.json configuration"
+          if [ ! -f "cellm/.mcp.json.example" ]; then
+            echo "::error::Missing .mcp.json.example template"
             exit 1
           fi
-          echo "[+] MCP configuration found"
+          echo "[+] MCP configuration template found"
 
-      - name: Validate .mcp.json syntax
+      - name: Validate .mcp.json.example syntax
         run: |
-          if ! python3 -c "import json; json.load(open('cellm/.mcp.json'))"; then
-            echo "::error::Invalid JSON in .mcp.json"
+          if ! python3 -c "import json; json.load(open('cellm/.mcp.json.example'))"; then
+            echo "::error::Invalid JSON in .mcp.json.example"
             exit 1
           fi
-          echo "[+] .mcp.json syntax valid"
+          echo "[+] .mcp.json.example syntax valid"
 
       - name: Check hooks configuration exists
         run: |
@@ -92,7 +92,7 @@ jobs:
 
       - name: Check shell scripts exist
         run: |
-          REQUIRED_SCRIPTS="cellm/scripts/spawn-worker.sh cellm/scripts/health-check.sh cellm/scripts/configure-otel.sh cellm/scripts/capture-prompt.sh cellm/scripts/capture-context.sh cellm/scripts/inject-context.sh cellm/scripts/track-tool-use.sh cellm/scripts/auto-recovery.sh cellm/scripts/log-rotate.sh cellm/scripts/check-dependencies.sh"
+          REQUIRED_SCRIPTS="cellm/scripts/spawn-worker.sh cellm/scripts/health-check.sh cellm/scripts/configure-otel.sh cellm/scripts/capture-prompt.sh cellm/scripts/capture-context.sh cellm/scripts/inject-context.sh cellm/scripts/track-tool-use.sh cellm/scripts/auto-recovery.sh cellm/scripts/log-rotate.sh cellm/scripts/check-dependencies.sh cellm/scripts/check-worker-health.sh cellm/scripts/init-oracle.sh"
           for script in $REQUIRED_SCRIPTS; do
             if [ ! -f "$script" ]; then
               echo "::error::Missing shell script: $script"
@@ -128,7 +128,7 @@ jobs:
 
       - name: Check marketplace.json exists
         run: |
-          if [ ! -f ".claude-plugin/marketplace.json" ]; then
+          if [ ! -f "cellm/marketplace.json" ]; then
             echo "::error::Missing marketplace.json"
             exit 1
           fi
@@ -136,7 +136,7 @@ jobs:
 
       - name: Validate marketplace.json syntax
         run: |
-          if ! python3 -c "import json; json.load(open('.claude-plugin/marketplace.json'))"; then
+          if ! python3 -c "import json; json.load(open('cellm/marketplace.json'))"; then
             echo "::error::Invalid JSON in marketplace.json"
             exit 1
           fi
