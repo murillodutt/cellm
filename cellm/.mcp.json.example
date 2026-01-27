@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "cellm-oracle": {
+      "command": "npx",
+      "args": [
+        "@cellm-ai/oracle",
+        "mcp"
+      ],
+      "env": {
+        "CELLM_DATA_DIR": "~/.cellm",
+        "CELLM_WORKER_URL": "http://127.0.0.1:31415"
+      }
+    }
+  }
+}

@@ -4,6 +4,12 @@ description: |
   Nuxt 4 patterns for full-stack Vue applications.
   Use when: working with Nuxt projects, server routes, data fetching, SSR.
   Triggers: nuxt.config, app directory, server directory, useFetch, useAsyncData.
+paths:
+  - "**/nuxt.config.ts"
+  - "**/app.vue"
+  - "**/app/**/*"
+  - "**/server/**/*"
+  - "**/pages/**/*"
 allowed-tools: Read, Grep, Glob, Edit, Write
 model: inherit
 ---

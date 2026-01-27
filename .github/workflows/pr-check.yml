@@ -40,14 +40,21 @@ jobs:
       - name: Detect file types changed
         id: changes
         run: |
-          CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }}...HEAD)
+          git fetch origin ${{ github.base_ref }} --depth=1
 
-          echo "skills=$(echo "$CHANGED_FILES" | grep -c "^cellm/skills/" || echo 0)" >> $GITHUB_OUTPUT
-          echo "agents=$(echo "$CHANGED_FILES" | grep -c "^cellm/agents/" || echo 0)" >> $GITHUB_OUTPUT
-          echo "commands=$(echo "$CHANGED_FILES" | grep -c "^cellm/commands/" || echo 0)" >> $GITHUB_OUTPUT
-          echo "hooks=$(echo "$CHANGED_FILES" | grep -c "^cellm/hooks/" || echo 0)" >> $GITHUB_OUTPUT
-          echo "scripts=$(echo "$CHANGED_FILES" | grep -c "^cellm/scripts/" || echo 0)" >> $GITHUB_OUTPUT
-          echo "docs=$(echo "$CHANGED_FILES" | grep -c "^\.github/" || echo 0)" >> $GITHUB_OUTPUT
+          SKILLS=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | grep "^cellm/skills/" | wc -l | tr -d ' ')
+          AGENTS=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | grep "^cellm/agents/" | wc -l | tr -d ' ')
+          COMMANDS=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | grep "^cellm/commands/" | wc -l | tr -d ' ')
+          HOOKS=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | grep "^cellm/hooks/" | wc -l | tr -d ' ')
+          SCRIPTS=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | grep "^cellm/scripts/" | wc -l | tr -d ' ')
+          DOCS=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | grep "^\.github/" | wc -l | tr -d ' ')
+
+          echo "skills=$SKILLS" >> $GITHUB_OUTPUT
+          echo "agents=$AGENTS" >> $GITHUB_OUTPUT
+          echo "commands=$COMMANDS" >> $GITHUB_OUTPUT
+          echo "hooks=$HOOKS" >> $GITHUB_OUTPUT
+          echo "scripts=$SCRIPTS" >> $GITHUB_OUTPUT
+          echo "docs=$DOCS" >> $GITHUB_OUTPUT
 
       - name: Generate PR summary
         run: |
@@ -83,17 +90,17 @@ jobs:
           fi
           echo "[+] plugin.json valid"
 
-      - name: Validate .mcp.json
+      - name: Validate .mcp.json.example
         run: |
-          if [ ! -f "cellm/.mcp.json" ]; then
-            echo "::error::Missing .mcp.json"
+          if [ ! -f "cellm/.mcp.json.example" ]; then
+            echo "::error::Missing .mcp.json.example template"
             exit 1
           fi
-          if ! python3 -c "import json; json.load(open('cellm/.mcp.json'))"; then
-            echo "::error::Invalid JSON in .mcp.json"
+          if ! python3 -c "import json; json.load(open('cellm/.mcp.json.example'))"; then
+            echo "::error::Invalid JSON in .mcp.json.example"
             exit 1
           fi
-          echo "[+] .mcp.json valid"
+          echo "[+] .mcp.json.example valid"
 
       - name: Validate hooks.json
         run: |

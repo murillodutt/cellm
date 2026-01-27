@@ -4,6 +4,9 @@ description: |
   Pinia state management for Vue/Nuxt applications.
   Use when: creating stores, managing global state, complex state logic.
   Triggers: store files, defineStore, storeToRefs, useStore.
+paths:
+  - "**/stores/**/*.ts"
+  - "**/store/**/*.ts"
 allowed-tools: Read, Grep, Glob, Edit, Write
 model: inherit
 ---

@@ -79,7 +79,9 @@ CLAUDE.md
 ~/.cellm/profiles/*.backup.*
 
 # Documentação de desenvolvimento (privado, em cellm-private/)
-docs/
+# Bloqueia /docs/ mas permite .github/docs/
+/docs/
+!/docs/.gitkeep
 
 # -----------------------------------------------------------------------------
 # Test

@@ -4,6 +4,12 @@ description: |
   Drizzle ORM patterns for database operations.
   Use when: defining schemas, writing queries, database migrations.
   Triggers: db directory, schema.ts, drizzle config, SQL queries.
+paths:
+  - "**/db/**/*.ts"
+  - "**/database/**/*.ts"
+  - "**/drizzle.config.ts"
+  - "**/schema.ts"
+  - "**/*schema*.ts"
 allowed-tools: Read, Grep, Glob, Edit, Write, Bash
 model: inherit
 ---

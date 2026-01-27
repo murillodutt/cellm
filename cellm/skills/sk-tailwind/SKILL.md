@@ -4,6 +4,10 @@ description: |
   Tailwind CSS v4 patterns with semantic tokens.
   Use when: styling components, responsive design, dark mode.
   Triggers: .vue files with classes, CSS files, styling discussions.
+paths:
+  - "**/*.vue"
+  - "**/*.css"
+  - "**/tailwind.config.ts"
 allowed-tools: Read, Grep, Glob, Edit, Write
 model: inherit
 ---

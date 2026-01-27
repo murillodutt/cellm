@@ -1,5 +1,9 @@
 ---
+name: oracle-search
 description: Search Oracle context and observations using semantic search
+argument-hint: "query: your search query"
+allowed-tools: mcp__cellm-oracle__search, mcp__cellm-oracle__timeline, mcp__cellm-oracle__get_observations
+model: inherit
 ---
 
 # Oracle Search Skill
@@ -21,10 +25,10 @@ Use the MCP tools in this order (3-layer retrieval pattern):
 Get compact results with IDs (~50-100 tokens per result):
 
 ```
-mcp__cellm-oracle-context__search({
+mcp__cellm-oracle__search({
   query: "your search query",
   limit: 20,
-  project: "cellm-private"
+  project: "cellm"
 })
 ```
 
@@ -33,7 +37,7 @@ mcp__cellm-oracle-context__search({
 Get observations around a specific result:
 
 ```
-mcp__cellm-oracle-context__timeline({
+mcp__cellm-oracle__timeline({
   anchor: 123,  // ID from search
   depth_before: 5,
   depth_after: 5
@@ -45,7 +49,7 @@ mcp__cellm-oracle-context__timeline({
 Get complete observation content:
 
 ```
-mcp__cellm-oracle-context__get_observations({
+mcp__cellm-oracle__get_observations({
   ids: [123, 124, 125]
 })
 ```
