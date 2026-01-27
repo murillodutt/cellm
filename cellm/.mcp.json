@@ -1,9 +1,13 @@
 {
   "mcpServers": {
-    "cellm-oracle-context": {
+    "cellm-oracle": {
       "type": "stdio",
-      "command": "bun",
-      "args": ["${CLAUDE_PLUGIN_ROOT}/scripts/mcp-server.cjs"]
+      "command": "npx",
+      "args": ["@cellm-ai/oracle", "mcp"],
+      "env": {
+        "CELLM_DATA_DIR": "~/.cellm",
+        "CELLM_WORKER_URL": "http://127.0.0.1:31415"
+      }
     }
   }
 }
