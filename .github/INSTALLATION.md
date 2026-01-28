@@ -174,7 +174,7 @@ Create `~/.claude/plugins/cellm/.env` (optional):
 
 ```bash
 # Oracle Configuration
-ORACLE_PORT=31415                   # MCP server port (default)
+ORACLE_PORT=3001                    # MCP server port
 ORACLE_LOG_LEVEL=info              # Logging level
 ORACLE_DB_PATH=~/.cellm/oracle.db  # Database location
 
@@ -229,6 +229,7 @@ Edit `~/.claude/plugins/cellm/.claude-plugin/plugin.json`:
 claude /plugin update cellm
 
 # Or reinstall
+claude --plugin marketplace add murillodutt/cellm
 claude --plugin install cellm --force
 ```
 
