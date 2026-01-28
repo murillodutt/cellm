@@ -1,5 +1,5 @@
 {
-  "description": "CELLM Oracle hooks for context capture and memory persistence",
+  "description": "CELLM Oracle hooks for context capture, memory persistence, and AI analysis",
   "hooks": {
     "SessionStart": [
       {
@@ -14,6 +14,11 @@
             "type": "command",
             "command": "${CLAUDE_PLUGIN_ROOT}/scripts/check-worker-health.sh",
             "timeout": 2000
+          },
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/init-session.sh",
+            "timeout": 1000
           },
           {
             "type": "command",
@@ -36,12 +41,12 @@
     ],
     "PostToolUse": [
       {
-        "matcher": "Write|Edit|Bash",
+        "matcher": "Write|Edit|Bash|Read|Grep|Glob",
         "hooks": [
           {
             "type": "command",
             "command": "${CLAUDE_PLUGIN_ROOT}/scripts/track-tool-use.sh",
-            "timeout": 300
+            "timeout": 500
           }
         ]
       }

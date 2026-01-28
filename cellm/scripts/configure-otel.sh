@@ -26,7 +26,7 @@ trap cleanup EXIT
 WORKER_PORT="${CELLM_PORT:-31415}"
 
 # Only configure if CLAUDE_ENV_FILE is available (SessionStart only)
-if [ -n "$CLAUDE_ENV_FILE" ]; then
+if [ -n "${CLAUDE_ENV_FILE:-}" ]; then
   cat >> "$CLAUDE_ENV_FILE" <<EOF
 export CLAUDE_CODE_ENABLE_TELEMETRY=1
 export OTEL_METRICS_EXPORTER=otlp
