@@ -37,16 +37,16 @@
 
 ```bash
 # 1. Add marketplace (first time only)
-claude --plugin marketplace add murillodutt/cellm
+/plugin marketplace add murillodutt/cellm
 
 # 2. Install the plugin
-claude --plugin install cellm
+/plugin install cellm
 
 # 3. Verify it's working
-claude /oracle-status
+/oracle-status
 
-# 4. Start building
-claude "create a new Nuxt component with Tailwind"
+# 4. Start building (in Claude Code session)
+"create a new Nuxt component with Tailwind"
 ```
 
 **That's it.** AI now knows your project.

@@ -137,7 +137,7 @@ bun --version
 
 1. **Check port**
    ```bash
-   lsof -i :3001
+   lsof -i :31415
    ```
 
 2. **Restart server**
@@ -147,7 +147,7 @@ bun --version
    ```
 
 3. **Check firewall**
-   - Ensure localhost:3001 is accessible
+   - Ensure localhost:31415 is accessible
    - Check if VPN is blocking
 
 4. **Reset configuration**

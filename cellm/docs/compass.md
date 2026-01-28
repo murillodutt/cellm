@@ -144,7 +144,7 @@ Default port is 3000. To change:
 
 ```bash
 # In .env file
-COMPASS_PORT=3001
+COMPASS_PORT=31415
 ```
 
 ### Theme
