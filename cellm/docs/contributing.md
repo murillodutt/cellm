@@ -84,7 +84,7 @@ cellm/
 5. **Test locally**
    ```bash
    # Install from local path
-   claude /plugin install /path/to/your/fork/cellm
+   /plugin install /path/to/your/fork/cellm
    ```
 
 ---

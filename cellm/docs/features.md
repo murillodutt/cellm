@@ -115,22 +115,22 @@ CELLM provides commands that guide you through a complete development workflow.
 
 ```bash
 # 1. Plan a new feature
-claude /plan-product "user authentication with OAuth"
+/plan-product "user authentication with OAuth"
 
 # 2. Refine requirements
-claude /shape-spec
+/shape-spec
 
 # 3. Write formal spec
-claude /write-spec
+/write-spec
 
 # 4. Break into tasks
-claude /create-tasks
+/create-tasks
 
 # 5. Implement
-claude /implement
+/implement
 
 # 6. Validate
-claude /verify
+/verify
 ```
 
 [Full commands reference](commands.md)

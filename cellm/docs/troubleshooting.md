@@ -12,10 +12,10 @@ Run these commands first:
 
 ```bash
 # Check plugin status
-claude /plugin list
+/plugin list
 
 # Check Oracle health
-claude /oracle-status
+/oracle-status
 
 # Check Bun version
 bun --version
@@ -27,8 +27,8 @@ bun --version
 
 ### Plugin Not Found
 
-**Symptom:** `claude --plugin marketplace add murillodutt/cellm
-claude --plugin install cellm` fails
+**Symptom:** `/plugin marketplace add murillodutt/cellm
+/plugin install cellm` fails
 
 **Solutions:**
 
@@ -86,14 +86,14 @@ claude --plugin install cellm` fails
 
 1. **Force reinstall**
    ```bash
-   claude --plugin install cellm --force
+   /plugin install cellm --force
    ```
 
 2. **Or remove and reinstall**
    ```bash
    rm -rf ~/.claude/plugins/cellm
-   claude --plugin marketplace add murillodutt/cellm
-claude --plugin install cellm
+   /plugin marketplace add murillodutt/cellm
+/plugin install cellm
    ```
 
 ---
@@ -153,7 +153,7 @@ claude --plugin install cellm
 4. **Reset configuration**
    ```bash
    rm ~/.cellm/worker.json
-   claude /plugin restart cellm
+   /plugin restart cellm
    ```
 
 ---
@@ -167,12 +167,12 @@ claude --plugin install cellm
 1. **Reset database**
    ```bash
    rm ~/.cellm/oracle.db
-   claude /plugin restart cellm
+   /plugin restart cellm
    ```
 
 2. **Rebuild embeddings**
    ```bash
-   claude /index-patterns --rebuild
+   /index-patterns --rebuild
    ```
 
 3. **Check disk space**
@@ -190,7 +190,7 @@ claude --plugin install cellm
 
 1. **Check Oracle status**
    ```bash
-   claude /oracle-status
+   /oracle-status
    ```
 
 2. **Verify embeddings**
@@ -200,7 +200,7 @@ claude --plugin install cellm
 
 3. **Rebuild index**
    ```bash
-   claude /index-patterns --rebuild
+   /index-patterns --rebuild
    ```
 
 4. **Check memory**
@@ -266,7 +266,7 @@ claude --plugin install cellm
 
 1. **Verify plugin installed**
    ```bash
-   claude /plugin list
+   /plugin list
    ```
 
 2. **Check command exists**
@@ -310,7 +310,7 @@ claude --plugin install cellm
 
 1. **Check Oracle running**
    ```bash
-   claude /oracle-status
+   /oracle-status
    ```
 
 2. **Check port**
@@ -370,7 +370,7 @@ claude --plugin install cellm
 4. **Rebuild database**
    ```bash
    rm ~/.cellm/oracle.db
-   claude /plugin restart cellm
+   /plugin restart cellm
    ```
 
 ---
@@ -413,8 +413,8 @@ bun --version
 claude --version
 
 # Plugin status
-claude /plugin list
-claude /oracle-status
+/plugin list
+/oracle-status
 
 # Logs
 tail -100 ~/.cellm/logs/oracle-worker.log

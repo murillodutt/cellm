@@ -10,14 +10,15 @@ Complete guide to installing and configuring CELLM.
 
 ```bash
 # Install the plugin
-claude --plugin marketplace add murillodutt/cellm
-claude --plugin install cellm
+/plugin marketplace add murillodutt/cellm
+/plugin install cellm
 
 # Verify it's working
-claude /oracle-status
+/oracle-status
 
 # Start using
-claude "create a new Nuxt component with Tailwind"
+# In Claude Code session
+"create a new Nuxt component with Tailwind"
 ```
 
 **That's it.** AI now knows your project.
@@ -61,8 +62,8 @@ curl -fsSL https://bun.sh/install | bash
 ### Method 1: Direct Install (Recommended)
 
 ```bash
-claude --plugin marketplace add murillodutt/cellm
-claude --plugin install cellm
+/plugin marketplace add murillodutt/cellm
+/plugin install cellm
 ```
 
 This command:
@@ -75,10 +76,10 @@ This command:
 
 ```bash
 # Add to marketplace
-claude /plugin marketplace add murillodutt/cellm
+/plugin marketplace add murillodutt/cellm
 
 # Install
-claude /plugin install cellm@murillodutt-cellm
+/plugin install cellm@murillodutt-cellm
 ```
 
 ### Method 3: Manual Install (Development)
@@ -102,10 +103,10 @@ Oracle provides semantic search and persistent memory. To activate:
 
 ```bash
 # Interactive setup (recommended)
-claude /cellm-init
+/cellm-init
 
 # Or direct install
-claude /cellm-init install
+/cellm-init install
 ```
 
 **Features:**
@@ -122,10 +123,10 @@ claude /cellm-init install
 
 ```bash
 # List installed plugins
-claude /plugin list
+/plugin list
 
 # Check Oracle health (if installed)
-claude /oracle-status
+/oracle-status
 ```
 
 Expected output (with Oracle):
@@ -140,13 +141,14 @@ Expected output (with Oracle):
 
 ```bash
 # Test semantic search
-claude /discover-patterns
+/discover-patterns
 
 # Test skills
-claude "show me Nuxt patterns"
+# In Claude Code session
+"show me Nuxt patterns"
 
 # Test agents
-claude /plan-product "test feature"
+/plan-product "test feature"
 ```
 
 ---
@@ -226,10 +228,10 @@ Edit `~/.claude/plugins/cellm/.claude-plugin/plugin.json`:
 
 ```bash
 # Update to latest version
-claude /plugin update cellm
+/plugin update cellm
 
 # Or reinstall
-claude --plugin install cellm --force
+/plugin install cellm --force
 ```
 
 ---
@@ -238,7 +240,7 @@ claude --plugin install cellm --force
 
 ### Plugin Not Found
 
-**Problem:** `claude /install-plugin` fails
+**Problem:** `/install-plugin` fails
 
 **Solutions:**
 1. Check internet connection
@@ -253,10 +255,10 @@ claude --plugin install cellm --force
 **Solutions:**
 ```bash
 # Run interactive setup
-claude /cellm-init
+/cellm-init
 
 # Or use Doctor mode for diagnostics
-claude /cellm-init doctor
+/cellm-init doctor
 
 # Check logs
 tail -f ~/.cellm/logs/oracle-worker.log
@@ -272,10 +274,10 @@ tail -f ~/.cellm/logs/oracle-worker.log
 lsof -i :31415
 
 # Use Doctor mode to diagnose
-claude /cellm-init doctor
+/cellm-init doctor
 
 # Or restart worker
-claude /cellm-init restart
+/cellm-init restart
 
 # Check firewall settings
 # Ensure localhost:31415 is accessible
@@ -301,10 +303,10 @@ claude /cellm-init restart
 rm ~/.cellm/oracle.db
 
 # Restart plugin
-claude /plugin restart cellm
+/plugin restart cellm
 
 # Rebuild embeddings
-claude /index-patterns --rebuild
+/index-patterns --rebuild
 ```
 
 ---
@@ -315,7 +317,7 @@ claude /index-patterns --rebuild
 
 ```bash
 # Uninstall via CLI
-claude /plugin uninstall cellm
+/plugin uninstall cellm
 
 # Or manual removal
 rm -rf ~/.claude/plugins/cellm

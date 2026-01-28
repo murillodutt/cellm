@@ -28,7 +28,7 @@ Get compact results with IDs (~50-100 tokens per result):
 mcp__cellm-oracle__search({
   query: "your search query",
   limit: 20,
-  project: "cellm"
+  project: "cellm-private"
 })
 ```
 

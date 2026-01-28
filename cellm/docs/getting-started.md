@@ -9,8 +9,8 @@ Get CELLM running in 5 minutes.
 ## Step 1: Install (30 seconds)
 
 ```bash
-claude --plugin marketplace add murillodutt/cellm
-claude --plugin install cellm
+/plugin marketplace add murillodutt/cellm
+/plugin install cellm
 ```
 
 ---
@@ -18,7 +18,7 @@ claude --plugin install cellm
 ## Step 2: Verify (30 seconds)
 
 ```bash
-claude /oracle-status
+/oracle-status
 ```
 
 You should see:
@@ -37,7 +37,8 @@ You should see:
 ### Ask Claude Something
 
 ```bash
-claude "create a Vue 3 component with TypeScript"
+# In Claude Code session
+"create a Vue 3 component with TypeScript"
 ```
 
 **Notice:** Claude already knows:
@@ -48,7 +49,7 @@ claude "create a Vue 3 component with TypeScript"
 ### Try a Command
 
 ```bash
-claude /plan-product "user authentication"
+/plan-product "user authentication"
 ```
 
 Claude will guide you through planning with:
@@ -116,21 +117,21 @@ CELLM loads knowledge automatically:
 
 **Build a Feature:**
 ```bash
-claude /plan-product "my feature"
-claude /shape-spec
-claude /create-tasks
-claude /implement
-claude /verify
+/plan-product "my feature"
+/shape-spec
+/create-tasks
+/implement
+/verify
 ```
 
 **Find Patterns:**
 ```bash
-claude /discover-patterns
+/discover-patterns
 ```
 
 **Check Status:**
 ```bash
-claude /oracle-status
+/oracle-status
 ```
 
 ---
@@ -150,7 +151,7 @@ bun --version
 
 ```bash
 # Verify plugin is installed
-claude /plugin list
+/plugin list
 
 # Should show: cellm
 ```
@@ -167,13 +168,13 @@ claude /plugin list
 
 | Action | Command |
 |--------|---------|
-| Install | `claude --plugin marketplace add murillodutt/cellm
-claude --plugin install cellm` |
-| Status | `claude /oracle-status` |
-| Plan | `claude /plan-product "feature"` |
-| Tasks | `claude /create-tasks` |
-| Build | `claude /implement` |
-| Verify | `claude /verify` |
+| Install | `/plugin marketplace add murillodutt/cellm
+/plugin install cellm` |
+| Status | `/oracle-status` |
+| Plan | `/plan-product "feature"` |
+| Tasks | `/create-tasks` |
+| Build | `/implement` |
+| Verify | `/verify` |
 | Dashboard | `http://localhost:3000/compass` |
 
 ---

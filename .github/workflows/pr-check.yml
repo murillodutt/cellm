@@ -19,7 +19,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -76,7 +76,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       - name: Validate plugin.json
         run: |
@@ -123,12 +123,12 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Add labels based on changes
-        uses: actions/github-script@v8
+        uses: actions/github-script@v7
         with:
           script: |
             const { execSync } = require('child_process');

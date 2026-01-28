@@ -187,7 +187,7 @@ Compass uses Nuxt UI semantic tokens:
 
 ```bash
 # Check if Oracle is running
-claude /oracle-status
+/oracle-status
 
 # Check port availability
 lsof -i :3000

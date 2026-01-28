@@ -54,8 +54,8 @@ CELLM is optimized exclusively for:
 ### How do I install CELLM?
 
 ```bash
-claude --plugin marketplace add murillodutt/cellm
-claude --plugin install cellm
+/plugin marketplace add murillodutt/cellm
+/plugin install cellm
 ```
 
 That's it. One command.
@@ -63,7 +63,7 @@ That's it. One command.
 ### How do I verify it's working?
 
 ```bash
-claude /oracle-status
+/oracle-status
 ```
 
 You should see all systems green.
@@ -80,19 +80,19 @@ CELLM is designed for Claude Code. Support for other editors may come in future 
 
 ```bash
 # 1. Plan the feature
-claude /plan-product "my feature"
+/plan-product "my feature"
 
 # 2. Shape requirements
-claude /shape-spec
+/shape-spec
 
 # 3. Create tasks
-claude /create-tasks
+/create-tasks
 
 # 4. Implement
-claude /implement
+/implement
 
 # 5. Verify
-claude /verify
+/verify
 ```
 
 ### What commands are available?
@@ -232,10 +232,10 @@ tail -f ~/.cellm/logs/oracle-worker.log
 
 ```bash
 # Verify plugin installed
-claude /plugin list
+/plugin list
 
 # Reinstall if needed
-claude --plugin install cellm --force
+/plugin install cellm --force
 ```
 
 ### Skills not loading

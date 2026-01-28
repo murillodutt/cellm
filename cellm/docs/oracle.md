@@ -419,14 +419,14 @@ tail -f ~/.cellm/logs/oracle-worker.log
 rm ~/.cellm/oracle.db
 
 # Restart plugin
-claude /plugin restart cellm
+/plugin restart cellm
 ```
 
 ### Search Not Working
 
 ```bash
 # Check worker status
-claude /oracle-status
+/oracle-status
 
 # Verify embeddings loaded
 curl http://localhost:31415/api/status

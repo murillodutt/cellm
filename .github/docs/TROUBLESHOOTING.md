@@ -12,10 +12,10 @@ Run these commands first:
 
 ```bash
 # Check plugin status
-claude /plugin list
+/plugin list
 
 # Check Oracle health
-claude /oracle-status
+/oracle-status
 
 # Check Bun version
 bun --version
@@ -27,7 +27,7 @@ bun --version
 
 ### Plugin Not Found
 
-**Symptom:** `claude /install-plugin murillodutt/cellm` fails
+**Symptom:** `/plugin marketplace add` or `/plugin install` fails
 
 **Solutions:**
 
@@ -83,15 +83,17 @@ bun --version
 
 **Solutions:**
 
-1. **Force reinstall**
+1. **Remove and reinstall**
    ```bash
-   claude /install-plugin murillodutt/cellm --force
+   /plugin uninstall cellm
+   /plugin install cellm
    ```
 
-2. **Or remove and reinstall**
+2. **Or manual removal**
    ```bash
    rm -rf ~/.claude/plugins/cellm
-   claude /install-plugin murillodutt/cellm
+   /plugin marketplace add murillodutt/cellm
+   /plugin install cellm
    ```
 
 ---
@@ -100,7 +102,7 @@ bun --version
 
 ### Worker Not Starting
 
-**Symptom:** `oracle-status` shows "Worker: Offline"
+**Symptom:** `/oracle-status` shows "Worker: Offline"
 
 **Solutions:**
 
@@ -151,7 +153,7 @@ bun --version
 4. **Reset configuration**
    ```bash
    rm ~/.cellm/worker.json
-   claude /plugin restart cellm
+   /plugin restart cellm
    ```
 
 ---
@@ -165,12 +167,12 @@ bun --version
 1. **Reset database**
    ```bash
    rm ~/.cellm/oracle.db
-   claude /plugin restart cellm
+   /plugin restart cellm
    ```
 
 2. **Rebuild embeddings**
    ```bash
-   claude /index-patterns --rebuild
+   /index-patterns --rebuild
    ```
 
 3. **Check disk space**
@@ -188,7 +190,7 @@ bun --version
 
 1. **Check Oracle status**
    ```bash
-   claude /oracle-status
+   /oracle-status
    ```
 
 2. **Verify embeddings**
@@ -198,7 +200,7 @@ bun --version
 
 3. **Rebuild index**
    ```bash
-   claude /index-patterns --rebuild
+   /index-patterns --rebuild
    ```
 
 4. **Check memory**
@@ -264,7 +266,7 @@ bun --version
 
 1. **Verify plugin installed**
    ```bash
-   claude /plugin list
+   /plugin list
    ```
 
 2. **Check command exists**
@@ -308,7 +310,7 @@ bun --version
 
 1. **Check Oracle running**
    ```bash
-   claude /oracle-status
+   /oracle-status
    ```
 
 2. **Check port**
@@ -408,11 +410,10 @@ Before reporting issues, collect:
 # System info
 uname -a
 bun --version
-claude --version
 
 # Plugin status
-claude /plugin list
-claude /oracle-status
+/plugin list
+/oracle-status
 
 # Logs
 tail -100 ~/.cellm/logs/oracle-worker.log

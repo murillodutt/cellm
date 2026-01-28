@@ -43,7 +43,7 @@ cellm-core/project/product/
 
 **Usage:**
 ```bash
-claude /plan-product "my SaaS product"
+/plan-product "my SaaS product"
 ```
 
 **Process:**
@@ -83,7 +83,7 @@ cellm-core/specs/{YYYY-MM-DD-HHMM-feature-slug}/
 **Usage:**
 ```bash
 # Enter plan mode first
-claude /shape-spec
+/shape-spec
 ```
 
 **Process:**
@@ -149,7 +149,7 @@ claude /shape-spec
 
 **Usage:**
 ```bash
-claude /create-tasks
+/create-tasks
 ```
 
 ---
@@ -169,7 +169,7 @@ claude /create-tasks
 
 **Usage:**
 ```bash
-claude /orchestrate-tasks
+/orchestrate-tasks
 ```
 
 ---
@@ -197,7 +197,7 @@ claude /orchestrate-tasks
 
 **Usage:**
 ```bash
-claude /implement
+/implement
 ```
 
 ---
@@ -250,7 +250,7 @@ claude /implement
 
 **Usage:**
 ```bash
-claude /verify
+/verify
 ```
 
 ---
@@ -292,7 +292,7 @@ Pending:
 
 **Usage:**
 ```bash
-claude /status
+/status
 ```
 
 ---
@@ -310,7 +310,7 @@ claude /status
 
 **Usage:**
 ```bash
-claude /discover-patterns
+/discover-patterns
 ```
 
 ---
@@ -326,7 +326,7 @@ claude /discover-patterns
 
 **Usage:**
 ```bash
-claude /inject-patterns
+/inject-patterns
 ```
 
 ---
@@ -342,7 +342,7 @@ claude /inject-patterns
 
 **Usage:**
 ```bash
-claude /index-patterns
+/index-patterns
 ```
 
 ---
@@ -375,15 +375,15 @@ claude /index-patterns
 **Usage:**
 ```bash
 # Interactive mode (recommended)
-claude /cellm-init
+/cellm-init
 
 # Direct command-line modes
-claude /cellm-init install   # First-time installation
-claude /cellm-init status    # Check current state
-claude /cellm-init update    # Upgrade to latest
-claude /cellm-init doctor    # Run diagnostics
-claude /cellm-init restart   # Restart worker
-claude /cellm-init uninstall # Remove Oracle
+/cellm-init install   # First-time installation
+/cellm-init status    # Check current state
+/cellm-init update    # Upgrade to latest
+/cellm-init doctor    # Run diagnostics
+/cellm-init restart   # Restart worker
+/cellm-init uninstall # Remove Oracle
 ```
 
 **Doctor Mode:**
@@ -434,7 +434,7 @@ Each issue found is automatically fixed with user confirmation.
 
 **Usage:**
 ```bash
-claude /oracle-status
+/oracle-status
 ```
 
 ---
@@ -445,45 +445,45 @@ claude /oracle-status
 
 ```bash
 # 1. Plan the product (if new project)
-claude /plan-product "my app"
+/plan-product "my app"
 
 # 2. Shape the feature (in plan mode)
-claude /shape-spec
+/shape-spec
 
 # 3. Create tasks from spec
-claude /create-tasks
+/create-tasks
 
 # 4. Implement the code
-claude /implement
+/implement
 
 # 5. Verify quality
-claude /verify
+/verify
 
 # 6. Check status anytime
-claude /status
+/status
 ```
 
 ### Quick Fix Workflow
 
 ```bash
 # 1. Implement directly
-claude /implement "fix the login bug"
+/implement "fix the login bug"
 
 # 2. Verify
-claude /verify
+/verify
 ```
 
 ### Pattern Discovery
 
 ```bash
 # 1. Find patterns in codebase
-claude /discover-patterns
+/discover-patterns
 
 # 2. Search for specific pattern
-claude /index-patterns "authentication"
+/index-patterns "authentication"
 
 # 3. Apply patterns to code
-claude /inject-patterns
+/inject-patterns
 ```
 
 ---
