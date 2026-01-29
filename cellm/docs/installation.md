@@ -178,7 +178,7 @@ Create `~/.claude/plugins/cellm/.env` (optional):
 # Oracle Configuration
 ORACLE_PORT=31415                   # MCP server port (default)
 ORACLE_LOG_LEVEL=info              # Logging level
-ORACLE_DB_PATH=~/.cellm/oracle.db  # Database location
+ORACLE_DB_PATH=~/.cellm/compass/compass.db  # Database location
 
 # Embedding Configuration
 ORACLE_MODEL=xenova/multilingual-e5-base  # Embedding model
@@ -300,7 +300,7 @@ lsof -i :31415
 **Solutions:**
 ```bash
 # Reset database
-rm ~/.cellm/oracle.db
+rm ~/.cellm/compass/compass.db
 
 # Restart plugin
 /plugin restart cellm

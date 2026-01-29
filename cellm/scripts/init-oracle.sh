@@ -258,30 +258,21 @@ reset_configuration() {
 check_dependencies() {
   print_step "Step 1/5: Checking dependencies..."
 
-  # Check Node.js
-  if command -v node >/dev/null 2>&1; then
-    local node_version=$(node --version)
-    print_success "Node.js $node_version found"
-  else
-    print_error "Node.js not found"
-    print_info "Install Node.js from https://nodejs.org"
-    return 1
-  fi
-
-  # Check npx
-  if command -v npx >/dev/null 2>&1; then
-    print_success "npx available"
-  else
-    print_error "npx not found"
-    return 1
-  fi
-
-  # Check bun (optional)
+  # Check Bun (required)
   if command -v bun >/dev/null 2>&1; then
     local bun_version=$(bun --version)
-    print_success "Bun $bun_version found (will use for better performance)"
+    local bun_major=$(echo "$bun_version" | cut -d. -f1)
+    if [ "$bun_major" -ge 1 ]; then
+      print_success "Bun $bun_version found (required: >=1.0.0)"
+    else
+      print_error "Bun $bun_version found but requires >=1.0.0"
+      print_info "Upgrade: curl -fsSL https://bun.sh/install | bash"
+      return 1
+    fi
   else
-    print_info "Bun not found (optional, will use Node)"
+    print_error "Bun not found"
+    print_info "Install Bun: curl -fsSL https://bun.sh/install | bash"
+    return 1
   fi
 
   return 0
@@ -294,16 +285,16 @@ install_package() {
   if [ "$MODE" = "update" ]; then
     print_progress "Updating to latest version..."
   else
-    print_progress "Downloading from NPM..."
+    print_progress "Installing from npm registry..."
   fi
 
-  if npx --yes "$PACKAGE_NAME@latest" --version >/dev/null 2>&1; then
-    local version=$(npx --yes "$PACKAGE_NAME@latest" --version 2>/dev/null || echo "unknown")
+  if bun x "$PACKAGE_NAME@latest" --version >/dev/null 2>&1; then
+    local version=$(bun x "$PACKAGE_NAME@latest" --version 2>/dev/null || echo "unknown")
     print_success "Installed v$version"
     return 0
   else
     print_error "Installation failed"
-    print_info "Check network connection and NPM registry access"
+    print_info "Check network connection and npm registry access"
     return 2
   fi
 }
@@ -320,20 +311,9 @@ start_worker() {
     return 0
   fi
 
-  # Determine runtime (prefer bun if available)
-  local runtime="npx"
-  if command -v bun >/dev/null 2>&1; then
-    runtime="bun"
-    print_info "Using Bun runtime for better performance"
-  fi
-
-  # Spawn worker in background
+  # Spawn worker in background using Bun
   local worker_log="$LOG_DIR/oracle-worker.log"
-  if [ "$runtime" = "bun" ]; then
-    nohup bun x "$PACKAGE_NAME" serve > "$worker_log" 2>&1 &
-  else
-    nohup npx "$PACKAGE_NAME" serve > "$worker_log" 2>&1 &
-  fi
+  nohup bun x "$PACKAGE_NAME" serve > "$worker_log" 2>&1 &
 
   local worker_pid=$!
   disown || true
@@ -433,7 +413,7 @@ show_status() {
     print_success "Healthy: YES"
 
     # Get version if available
-    local version=$(npx --yes "$PACKAGE_NAME@latest" --version 2>/dev/null || echo "unknown")
+    local version=$(bun x "$PACKAGE_NAME@latest" --version 2>/dev/null || echo "unknown")
     print_info "Version: $version"
   else
     print_error "Running: NO"
@@ -446,7 +426,7 @@ show_status() {
   fi
 
   # Database info
-  local db_file="$DATA_DIR/oracle.db"
+  local db_file="$DATA_DIR/compass/compass.db"
   if [ -f "$db_file" ]; then
     local db_size=$(du -h "$db_file" | cut -f1)
     echo ""
@@ -486,8 +466,8 @@ run_doctor() {
   else
     print_error "Missing dependencies"
     issues_found=$((issues_found + 1))
-    if ask_yes_no "  Install Node.js instructions?"; then
-      print_info "  Visit: https://nodejs.org"
+    if ask_yes_no "  Install Bun?"; then
+      print_info "  Run: curl -fsSL https://bun.sh/install | bash"
     fi
   fi
 
@@ -526,7 +506,7 @@ run_doctor() {
 
   # Check 5: Database integrity
   print_info "[5/6] Checking database..."
-  local db_file="$DATA_DIR/oracle.db"
+  local db_file="$DATA_DIR/compass/compass.db"
   if [ -f "$db_file" ]; then
     print_success "Database exists"
     # Could add SQLite integrity check here
@@ -641,14 +621,14 @@ uninstall() {
 update() {
   print_header "Update Oracle"
 
-  local current_version=$(npx --yes "$PACKAGE_NAME@latest" --version 2>/dev/null || echo "unknown")
+  local current_version=$(bun x "$PACKAGE_NAME@latest" --version 2>/dev/null || echo "unknown")
   print_info "Current version: $current_version"
 
   echo ""
   if ask_yes_no "Check for updates?"; then
     install_package
 
-    local new_version=$(npx --yes "$PACKAGE_NAME@latest" --version 2>/dev/null || echo "unknown")
+    local new_version=$(bun x "$PACKAGE_NAME@latest" --version 2>/dev/null || echo "unknown")
 
     if [ "$current_version" != "$new_version" ]; then
       print_success "Updated: $current_version → $new_version"

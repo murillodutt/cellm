@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "cellm-oracle": {
+      "command": "bun",
+      "args": [
+        "run",
+        "${CLAUDE_PLUGIN_ROOT}/../../oracle/scripts/mcp-server.ts"
+      ],
+      "env": {
+        "CELLM_DATA_DIR": "~/.cellm",
+        "CELLM_WORKER_URL": "http://127.0.0.1:31415"
+      }
+    }
+  }
+}

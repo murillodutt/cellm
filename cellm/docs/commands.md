@@ -388,7 +388,7 @@ Pending:
 
 **Doctor Mode:**
 Runs 6 automatic checks:
-1. Dependencies (Node.js, npx, Bun)
+1. Dependencies (Bun runtime)
 2. Installation verification
 3. Worker status test
 4. Port availability check
@@ -429,7 +429,7 @@ Each issue found is automatically fixed with user confirmation.
 | Status   | online         |
 | Port     | 31415          |
 | Uptime   | 2h 34m         |
-| Database | ~/.cellm/oracle.db |
+| Database | ~/.cellm/compass/compass.db |
 ```
 
 **Usage:**

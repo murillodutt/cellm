@@ -22,7 +22,7 @@ Oracle is CELLM's intelligent memory system. It provides:
 Oracle is available as a standalone NPM package:
 
 ```bash
-npm install @cellm/oracle
+bun install @cellm/oracle
 ```
 
 **Package:** [@cellm/oracle](https://www.npmjs.com/package/@cellm/oracle)
@@ -65,7 +65,7 @@ npm install @cellm/oracle
 
 ## Database Schema
 
-**Location:** `~/.cellm/oracle.db`
+**Location:** `~/.cellm/compass/compass.db`
 
 ### Tables
 
@@ -244,7 +244,7 @@ Response:
   "worker": "online",
   "port": 31415,
   "database": {
-    "path": "~/.cellm/oracle.db",
+    "path": "~/.cellm/compass/compass.db",
     "size": "12.4 MB"
   },
   "embeddings": {
@@ -338,7 +338,7 @@ Real-time event streaming for:
 # Oracle Configuration
 ORACLE_PORT=31415                    # Server port
 ORACLE_LOG_LEVEL=info              # Logging level
-ORACLE_DB_PATH=~/.cellm/oracle.db  # Database path
+ORACLE_DB_PATH=~/.cellm/compass/compass.db  # Database path
 
 # Embedding Configuration
 ORACLE_MODEL=xenova/multilingual-e5-base
@@ -416,7 +416,7 @@ tail -f ~/.cellm/logs/oracle-worker.log
 
 ```bash
 # Reset database
-rm ~/.cellm/oracle.db
+rm ~/.cellm/compass/compass.db
 
 # Restart plugin
 /plugin restart cellm

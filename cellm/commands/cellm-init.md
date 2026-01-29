@@ -102,9 +102,8 @@ When selecting "Install Oracle":
 
 ```
 Step 1/5: Checking dependencies...
-  [+] Node.js v20.x found
-  [+] npx available
-  [i] Bun not found (optional, will use Node)
+  [+] Bun 1.2.x found
+  [+] bunx available
 
 Step 2/5: Installing @cellm-ai/oracle...
   [~] Downloading from NPM...
@@ -147,7 +146,7 @@ Select "Check Status" to view current state:
   [i] Version: 1.0.0
 
 Database:
-  [i] Location: ~/.cellm/oracle.db
+  [i] Location: ~/.cellm/compass/compass.db
   [i] Size: 2.4 MB
 
 MCP Integration:

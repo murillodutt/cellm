@@ -166,7 +166,7 @@ bun --version
 
 1. **Reset database**
    ```bash
-   rm ~/.cellm/oracle.db
+   rm ~/.cellm/compass/compass.db
    /plugin restart cellm
    ```
 
@@ -369,7 +369,7 @@ bun --version
 
 4. **Rebuild database**
    ```bash
-   rm ~/.cellm/oracle.db
+   rm ~/.cellm/compass/compass.db
    /plugin restart cellm
    ```
 

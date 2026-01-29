@@ -23,7 +23,7 @@ Oracle is a standalone NPM package that powers CELLM's memory and search capabil
 ### Installation
 
 ```bash
-npm install @cellm/oracle
+bun install @cellm/oracle
 ```
 
 ### Use Cases

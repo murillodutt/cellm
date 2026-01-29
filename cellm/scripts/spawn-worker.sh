@@ -177,18 +177,18 @@ cleanup_stale_process() {
 
 # Spawn worker detached (fire-and-forget)
 spawn_worker() {
-  # Primary method: npx @cellm-ai/oracle (works anywhere)
-  if command -v npx >/dev/null 2>&1; then
-    log_json "info" "Spawning worker via npx @cellm-ai/oracle"
+  # Primary method: bun x @cellm-ai/oracle (works anywhere)
+  if command -v bun >/dev/null 2>&1; then
+    log_json "info" "Spawning worker via bun x @cellm-ai/oracle"
 
-    # Spawn detached with npx
-    nohup npx @cellm-ai/oracle start --daemon >> "${LOG_FILE}" 2>&1 &
+    # Spawn detached with bun
+    nohup bun x @cellm-ai/oracle start --daemon >> "${LOG_FILE}" 2>&1 &
     local pid=$!
 
     # Detach completely
     disown "${pid}" 2>/dev/null || true
 
-    log_json "info" "Worker spawn initiated via npx (PID ${pid})"
+    log_json "info" "Worker spawn initiated via bun (PID ${pid})"
     return 0
   fi
 
@@ -213,7 +213,7 @@ spawn_worker() {
     fi
   fi
 
-  log_json "error" "Cannot spawn worker: npx not found and no local oracle"
+  log_json "error" "Cannot spawn worker: bun not found and no local oracle"
   return 1
 }
 

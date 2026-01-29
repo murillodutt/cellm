@@ -1,7 +1,10 @@
 #!/bin/bash
 # CELLM Oracle - Capture Prompt (UserPromptSubmit hook)
 # Captures user prompts during session for context building
-# Phase 2: Memory Pipeline
+# Phase 7: Independent AI Analysis System
+#
+# Claude Code hooks receive data via stdin as JSON, not environment variables.
+# See: https://docs.anthropic.com/en/docs/claude-code/hooks
 
 set -euo pipefail
 
@@ -9,7 +12,7 @@ set -euo pipefail
 cleanup() {
   local exit_code=$?
   if [[ $exit_code -ne 0 ]]; then
-    log "Script failed with exit code $exit_code"
+    echo "[!] Script failed with exit code $exit_code" >&2
   fi
 }
 
@@ -30,16 +33,11 @@ log() {
 get_port() {
   if [[ -f "${WORKER_JSON}" ]]; then
     local port
-
-    # Use jq for reliable JSON parsing
     if command -v jq >/dev/null 2>&1; then
       port=$(jq -r '.port // empty' "${WORKER_JSON}" 2>/dev/null || echo "")
     else
-      # Fallback to grep if jq not available
       port=$(grep -o '"port"[[:space:]]*:[[:space:]]*[0-9]*' "${WORKER_JSON}" 2>/dev/null | grep -o '[0-9]*' || echo "")
     fi
-
-    # Validate port range (1-65535)
     if [[ -n "${port}" ]] && [[ "${port}" =~ ^[0-9]+$ ]] && [[ "${port}" -ge 1 ]] && [[ "${port}" -le 65535 ]]; then
       echo "${port}"
       return
@@ -48,69 +46,81 @@ get_port() {
   echo "${DEFAULT_PORT}"
 }
 
-# Get project name
-get_project() {
-  basename "${PWD}"
-}
+# Main
+main() {
+  local port
+  port=$(get_port)
 
-# Send prompt event to worker (fire-and-forget)
-send_prompt_event() {
-  local port="${1}"
-  local url="http://127.0.0.1:${port}/api/context/ingest"
-  local timestamp
-  timestamp=$(date +%s)000
+  # Quick check if worker is online
+  if ! curl -sf --max-time 0.1 "http://127.0.0.1:${port}/health" >/dev/null 2>&1; then
+    exit 0
+  fi
 
-  # Get prompt from stdin or environment (Claude Code provides it)
-  local prompt_content="${CLAUDE_PROMPT:-}"
+  # Read JSON from stdin (Claude Code hook format)
+  local input=""
+  if [[ ! -t 0 ]]; then
+    input=$(cat)
+  fi
 
-  # Truncate long prompts (log when truncating)
+  # DEBUG: Log raw stdin for diagnosis (first 500 chars)
+  log "RAW_STDIN_LEN=${#input} RAW_STDIN=${input:0:500}"
+
+  if [[ -z "${input}" ]]; then
+    log "No input received"
+    exit 0
+  fi
+
+  # Check if jq is available
+  if ! command -v jq &> /dev/null; then
+    log "jq not found, skipping"
+    exit 0
+  fi
+
+  # Parse JSON input from Claude Code hook
+  local session_id cwd project prompt_content
+  session_id=$(echo "${input}" | jq -r '.session_id // "unknown"')
+  cwd=$(echo "${input}" | jq -r '.cwd // ""')
+  prompt_content=$(echo "${input}" | jq -r '.prompt // ""')
+
+  # Debug: log prompt length
+  log "DEBUG: prompt_content length=${#prompt_content}, first50='${prompt_content:0:50}'"
+
+  # Extract project name from cwd
+  if [[ -n "${cwd}" ]]; then
+    project=$(basename "${cwd}")
+  else
+    project=$(basename "${PWD}")
+  fi
+
+  # Skip if no valid session
+  if [[ "${session_id}" == "unknown" || "${session_id}" == "null" || -z "${session_id}" ]]; then
+    log "No valid session_id, skipping"
+    exit 0
+  fi
+
+  # Truncate long prompts
   if [[ ${#prompt_content} -gt 10000 ]]; then
     log "Truncating prompt from ${#prompt_content} to 10000 chars"
     prompt_content="${prompt_content:0:10000}[truncated]"
   fi
 
-  # Build JSON payload using jq for proper escaping
-  local payload
-  if command -v jq >/dev/null 2>&1; then
-    # Use jq for safe JSON construction (handles all escape cases)
-    payload=$(jq -n \
-      --arg type "user-prompt" \
-      --arg sessionId "${CLAUDE_SESSION_ID:-unknown}" \
-      --arg project "$(get_project)" \
-      --argjson timestamp "${timestamp}" \
-      --arg content "${prompt_content}" \
-      '{
-        type: $type,
-        sessionId: $sessionId,
-        project: $project,
-        timestamp: $timestamp,
-        data: {
-          content: $content
-        }
-      }')
-  else
-    # Fallback: manual escaping (not recommended, but better than nothing)
-    # Escape backslashes first, then quotes, then control chars
-    local escaped_content
-    escaped_content=$(echo "${prompt_content}" | \
-      sed 's/\\/\\\\/g' | \
-      sed 's/"/\\"/g' | \
-      sed 's/	/\\t/g' | \
-      tr '\n' ' ')
+  local url="http://127.0.0.1:${port}/api/session/prompt"
+  local timestamp
+  timestamp=$(date +%s)000
 
-    payload=$(cat <<EOF
-{
-  "type": "user-prompt",
-  "sessionId": "${CLAUDE_SESSION_ID:-unknown}",
-  "project": "$(get_project)",
-  "timestamp": ${timestamp},
-  "data": {
-    "content": "${escaped_content}"
-  }
-}
-EOF
-)
-  fi
+  # Build JSON payload for Oracle API
+  local payload
+  payload=$(jq -n \
+    --arg sid "${session_id}" \
+    --arg proj "${project}" \
+    --arg content "${prompt_content}" \
+    --argjson ts "${timestamp}" \
+    '{
+      sessionId: $sid,
+      project: $proj,
+      userPrompt: $content,
+      timestamp: $ts
+    }')
 
   # Fire and forget - don't wait for response
   curl -sf --max-time 0.5 --connect-timeout 0.2 \
@@ -120,18 +130,8 @@ EOF
     "${url}" >/dev/null 2>&1 &
 
   disown 2>/dev/null || true
-}
 
-# Main
-main() {
-  local port
-  port=$(get_port)
-
-  # Quick check if worker is online (non-blocking)
-  if curl -sf --max-time 0.1 "http://127.0.0.1:${port}/health" >/dev/null 2>&1; then
-    send_prompt_event "${port}"
-    log "Prompt captured"
-  fi
+  log "Prompt captured (session: ${session_id})"
 
   # Always exit successfully and quickly
   exit 0

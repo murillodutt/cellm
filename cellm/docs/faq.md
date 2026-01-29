@@ -136,7 +136,7 @@ Oracle is CELLM's memory system. It provides:
 ### Where is my data stored?
 
 All data is stored locally:
-- **Database:** `~/.cellm/oracle.db`
+- **Database:** `~/.cellm/compass/compass.db`
 - **Logs:** `~/.cellm/logs/`
 - **Config:** `~/.cellm/worker.json`
 

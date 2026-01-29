@@ -1,7 +1,10 @@
 #!/bin/bash
 # CELLM Oracle - Capture Context (Stop hook)
-# Captures session summary when Claude Code session ends
-# Phase 2: Memory Pipeline
+# Ends session and triggers AI summary generation
+# Phase 7: Independent AI Analysis System
+#
+# Claude Code hooks receive data via stdin as JSON, not environment variables.
+# See: https://docs.anthropic.com/en/docs/claude-code/hooks
 
 set -euo pipefail
 
@@ -39,91 +42,106 @@ get_port() {
   echo "${DEFAULT_PORT}"
 }
 
-# Get project name from current directory
-get_project() {
-  local cwd="${PWD}"
-  # Extract last two path components as project identifier
-  basename "${cwd}"
-}
+# Main
+main() {
+  local port
+  port=$(get_port)
 
-# Send session summary to worker
-send_session_summary() {
-  local port="${1}"
-  local url="http://127.0.0.1:${port}/api/session/summary"
-  local session_id="${CLAUDE_SESSION_ID:-unknown}"
-  local project
-  project=$(get_project)
+  # Check if worker is online
+  if ! curl -sf --max-time 0.2 "http://127.0.0.1:${port}/health" >/dev/null 2>&1; then
+    log "Worker offline, skipping capture"
+    exit 0
+  fi
 
-  # Build JSON payload
+  # Read JSON from stdin (Claude Code hook format)
+  local input=""
+  if [[ ! -t 0 ]]; then
+    input=$(cat)
+  fi
+
+  # DEBUG: Log raw stdin for diagnosis (first 500 chars)
+  log "RAW_STDIN_LEN=${#input} RAW_STDIN=${input:0:500}"
+
+  if [[ -z "${input}" ]]; then
+    log "No input received"
+    exit 0
+  fi
+
+  # Check if jq is available
+  if ! command -v jq &> /dev/null; then
+    log "jq not found, skipping"
+    exit 0
+  fi
+
+  # Parse JSON input from Claude Code hook
+  local session_id cwd project stop_reason
+  session_id=$(echo "${input}" | jq -r '.session_id // "unknown"')
+  cwd=$(echo "${input}" | jq -r '.cwd // ""')
+  stop_reason=$(echo "${input}" | jq -r '.stop_hook_reason // "unknown"')
+
+  # Extract project name from cwd
+  if [[ -n "${cwd}" ]]; then
+    project=$(basename "${cwd}")
+  else
+    project=$(basename "${PWD}")
+  fi
+
+  log "Stop hook triggered (session: ${session_id}, reason: ${stop_reason})"
+
+  # Skip if no valid session
+  if [[ "${session_id}" == "unknown" || "${session_id}" == "null" || -z "${session_id}" ]]; then
+    log "No valid session_id, skipping"
+    exit 0
+  fi
+
+  log "Worker online at port ${port}"
+
+  # Send session stop to Oracle (triggers AI summary generation)
+  local url="http://127.0.0.1:${port}/api/session/stop"
   local payload
-  payload=$(cat <<EOF
-{
-  "sessionId": "${session_id}",
-  "project": "${project}",
-  "completed": "Session ended normally",
-  "durationSeconds": ${SECONDS:-0}
-}
-EOF
-)
+  payload=$(jq -n \
+    --arg sid "${session_id}" \
+    --arg reason "${stop_reason}" \
+    '{
+      sessionId: $sid,
+      stopReason: $reason
+    }')
 
-  # Send with short timeout
   curl -sf --max-time 3 --connect-timeout 0.5 \
     -X POST \
     -H "Content-Type: application/json" \
     -d "${payload}" \
     "${url}" >/dev/null 2>&1 || true
-}
 
-# Send stop event to context ingest
-send_stop_event() {
-  local port="${1}"
-  local url="http://127.0.0.1:${port}/api/context/ingest"
+  log "Session stop sent (summary queued)"
+
+  # Legacy: Send stop event for context ingest
+  local legacy_url="http://127.0.0.1:${port}/api/context/ingest"
   local timestamp
   timestamp=$(date +%s)000
 
-  local payload
-  payload=$(cat <<EOF
-{
-  "type": "stop",
-  "sessionId": "${CLAUDE_SESSION_ID:-unknown}",
-  "project": "$(get_project)",
-  "timestamp": ${timestamp},
-  "data": {
-    "title": "Session ended"
-  }
-}
-EOF
-)
+  local legacy_payload
+  legacy_payload=$(jq -n \
+    --arg sid "${session_id}" \
+    --arg proj "${project}" \
+    --argjson ts "${timestamp}" \
+    '{
+      type: "stop",
+      sessionId: $sid,
+      project: $proj,
+      timestamp: $ts,
+      data: {
+        title: "Session ended"
+      }
+    }')
 
   curl -sf --max-time 2 --connect-timeout 0.5 \
     -X POST \
     -H "Content-Type: application/json" \
-    -d "${payload}" \
-    "${url}" >/dev/null 2>&1 || true
-}
+    -d "${legacy_payload}" \
+    "${legacy_url}" >/dev/null 2>&1 || true
 
-# Main
-main() {
-  log "Stop hook triggered (session: ${CLAUDE_SESSION_ID:-unknown})"
-
-  local port
-  port=$(get_port)
-
-  # Check if worker is online
-  if curl -sf --max-time 0.2 "http://127.0.0.1:${port}/health" >/dev/null 2>&1; then
-    log "Worker online at port ${port}"
-
-    # Send session summary
-    send_session_summary "${port}"
-    log "Session summary sent"
-
-    # Send stop event
-    send_stop_event "${port}"
-    log "Stop event sent"
-  else
-    log "Worker offline, skipping capture"
-  fi
-
+  log "Stop event sent"
   log "Stop hook completed"
   exit 0
 }
