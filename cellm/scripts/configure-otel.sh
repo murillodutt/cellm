@@ -9,7 +9,9 @@
 # - OTEL_METRICS_EXPORTER: Use OTLP for metrics
 # - OTEL_LOGS_EXPORTER: Use OTLP for logs
 # - OTEL_EXPORTER_OTLP_PROTOCOL: HTTP/JSON protocol (worker only supports JSON)
-# - OTEL_EXPORTER_OTLP_ENDPOINT: CELLM Worker endpoint
+# - OTEL_EXPORTER_OTLP_METRICS_ENDPOINT: Explicit metrics endpoint path
+# - OTEL_EXPORTER_OTLP_LOGS_ENDPOINT: Explicit logs endpoint path
+# - OTEL_METRIC_EXPORT_INTERVAL: Export interval for metrics (ms)
 
 set -euo pipefail
 
@@ -24,6 +26,7 @@ cleanup() {
 trap cleanup EXIT
 
 WORKER_PORT="${CELLM_PORT:-31415}"
+WORKER_BASE="http://localhost:${WORKER_PORT}"
 
 # Only configure if CLAUDE_ENV_FILE is available (SessionStart only)
 if [ -n "${CLAUDE_ENV_FILE:-}" ]; then
@@ -32,7 +35,9 @@ export CLAUDE_CODE_ENABLE_TELEMETRY=1
 export OTEL_METRICS_EXPORTER=otlp
 export OTEL_LOGS_EXPORTER=otlp
 export OTEL_EXPORTER_OTLP_PROTOCOL=http/json
-export OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:${WORKER_PORT}
+export OTEL_EXPORTER_OTLP_METRICS_ENDPOINT=${WORKER_BASE}/v1/metrics
+export OTEL_EXPORTER_OTLP_LOGS_ENDPOINT=${WORKER_BASE}/v1/logs
+export OTEL_METRIC_EXPORT_INTERVAL=30000
 EOF
 fi
 
