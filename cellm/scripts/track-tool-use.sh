@@ -1,9 +1,10 @@
 #!/bin/bash
 # CELLM Oracle - Track Tool Use (PostToolUse hook)
-# Captures tool usage for analytics
+# Captures tool usage for AI analysis
+# Phase 7: Independent AI Analysis System
 #
-# This is a lightweight hook that buffers tool usage events
-# for later processing by the worker daemon.
+# Claude Code hooks receive data via stdin as JSON, not environment variables.
+# See: https://docs.anthropic.com/en/docs/claude-code/hooks
 
 set -euo pipefail
 
@@ -19,42 +20,103 @@ trap cleanup EXIT
 
 # Configuration
 CELLM_DIR="${HOME}/.cellm"
-BUFFER_FILE="${CELLM_DIR}/tool-buffer.jsonl"
+WORKER_JSON="${CELLM_DIR}/worker.json"
 LOG_FILE="${CELLM_DIR}/oracle-hook.log"
+DEFAULT_PORT=31415
 
-# Ensure directory exists
-mkdir -p "${CELLM_DIR}"
-
-# Structured JSON logging
-log_json() {
-  local level="$1"
-  local message="$2"
-  local ts
-  ts=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-
-  echo "{\"ts\":\"${ts}\",\"level\":\"${level}\",\"msg\":\"${message}\",\"session\":\"${CLAUDE_SESSION_ID:-unknown}\",\"hook\":\"track-tool-use\"}" >> "${LOG_FILE}" 2>/dev/null || true
+# Logging
+log() {
+  echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] [ToolUse] $1" >> "${LOG_FILE}" 2>/dev/null || true
 }
 
-# Buffer tool event
-buffer_tool_event() {
-  local timestamp
-  timestamp=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-
-  # Read tool info from environment (set by Claude Code)
-  local tool_name="${CLAUDE_TOOL_NAME:-unknown}"
-  local tool_input="${CLAUDE_TOOL_INPUT:-}"
-  local tool_output_size="${CLAUDE_TOOL_OUTPUT_SIZE:-0}"
-
-  # Create event JSON (minimal, no sensitive data)
-  local event="{\"event\":\"ToolUse\",\"timestamp\":\"${timestamp}\",\"session_id\":\"${CLAUDE_SESSION_ID:-unknown}\",\"tool\":\"${tool_name}\",\"output_size\":${tool_output_size}}"
-
-  echo "${event}" >> "${BUFFER_FILE}" 2>/dev/null || true
-  log_json "debug" "Tool use tracked: ${tool_name}"
+# Get port from worker.json
+get_port() {
+  if [[ -f "${WORKER_JSON}" ]]; then
+    local port
+    port=$(grep -o '"port"[[:space:]]*:[[:space:]]*[0-9]*' "${WORKER_JSON}" 2>/dev/null | grep -o '[0-9]*' || echo "")
+    if [[ -n "${port}" ]]; then
+      echo "${port}"
+      return
+    fi
+  fi
+  echo "${DEFAULT_PORT}"
 }
 
-# Main execution
+# Main
 main() {
-  buffer_tool_event
+  local port
+  port=$(get_port)
+  local url="http://127.0.0.1:${port}/api/session/observation"
+
+  # Quick health check
+  if ! curl -sf --max-time 0.2 "http://127.0.0.1:${port}/health" >/dev/null 2>&1; then
+    exit 0
+  fi
+
+  # Read JSON from stdin (Claude Code hook format)
+  local input=""
+  if [[ ! -t 0 ]]; then
+    input=$(cat)
+  fi
+
+  if [[ -z "${input}" ]]; then
+    log "No input received"
+    exit 0
+  fi
+
+  # Check if jq is available
+  if ! command -v jq &> /dev/null; then
+    log "jq not found, skipping"
+    exit 0
+  fi
+
+  # Parse JSON input from Claude Code hook
+  local session_id tool_name tool_input tool_response cwd project
+  session_id=$(echo "${input}" | jq -r '.session_id // "unknown"')
+  tool_name=$(echo "${input}" | jq -r '.tool_name // "unknown"')
+  tool_input=$(echo "${input}" | jq -c '.tool_input // {}')
+  tool_response=$(echo "${input}" | jq -c '.tool_response // {}' | head -c 2000)
+  cwd=$(echo "${input}" | jq -r '.cwd // ""')
+
+  # Extract project name from cwd (basename)
+  if [[ -n "${cwd}" ]]; then
+    project=$(basename "${cwd}")
+  else
+    project="unknown"
+  fi
+
+  # Skip if no valid session
+  if [[ "${session_id}" == "unknown" || "${session_id}" == "null" || -z "${session_id}" ]]; then
+    log "No valid session_id, skipping"
+    exit 0
+  fi
+
+  # Build JSON payload for Oracle API
+  local payload
+  payload=$(jq -n \
+    --arg sid "${session_id}" \
+    --arg proj "${project}" \
+    --arg tn "${tool_name}" \
+    --argjson ti "${tool_input}" \
+    --arg tr "${tool_response}" \
+    --arg cwd "${cwd}" \
+    '{
+      sessionId: $sid,
+      project: $proj,
+      toolName: $tn,
+      toolInput: $ti,
+      toolOutput: $tr,
+      cwd: $cwd
+    }')
+
+  # Send observation request (async, don't wait)
+  curl -sf --max-time 1 --connect-timeout 0.3 \
+    -X POST \
+    -H "Content-Type: application/json" \
+    -d "${payload}" \
+    "${url}" >/dev/null 2>&1 &
+
+  log "Queued observation: ${tool_name} (session: ${session_id})"
 
   # Always exit 0 - never break CLI
   exit 0
