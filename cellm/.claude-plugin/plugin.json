@@ -1,6 +1,6 @@
 {
   "name": "cellm",
-  "version": "2.0.5",
+  "version": "2.0.6",
   "description": "CELLM - Context Engineering for LLM-driven development. Structured specs, intelligent memory, and orchestration for AI agents building software.",
   "author": {
     "name": "Murillo Dutt",
