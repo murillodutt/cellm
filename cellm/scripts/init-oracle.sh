@@ -138,9 +138,10 @@ show_advanced_menu() {
   echo "  3. View Logs"
   echo "  4. Clear Cache"
   echo "  5. Reset Configuration"
-  echo "  6. Back to Main Menu"
+  echo "  6. Configure OTEL Telemetry"
+  echo "  7. Back to Main Menu"
   echo ""
-  echo -ne "${CYAN}Choose option [1-6]:${NC} "
+  echo -ne "${CYAN}Choose option [1-7]:${NC} "
   read -r choice
 
   case "$choice" in
@@ -149,7 +150,8 @@ show_advanced_menu() {
     3) view_logs ;;
     4) clear_cache ;;
     5) reset_configuration ;;
-    6) show_menu ;;
+    6) configure_otel_advanced ;;
+    7) show_menu ;;
     *) print_error "Invalid option"; sleep 2; show_advanced_menu ;;
   esac
 }
@@ -254,24 +256,365 @@ reset_configuration() {
   ask_yes_no "Continue with other options?" && show_advanced_menu
 }
 
+# Install jq if not present
+install_jq() {
+  if [[ "$OSTYPE" == "darwin"* ]]; then
+    if command -v brew >/dev/null 2>&1; then
+      print_progress "Installing jq via Homebrew..."
+      if brew install jq >/dev/null 2>&1; then
+        print_success "jq installed successfully"
+        return 0
+      else
+        print_error "Failed to install jq via Homebrew"
+        return 1
+      fi
+    else
+      print_error "Homebrew not found"
+      print_info "Install Homebrew: /bin/bash -c \"\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\""
+      return 1
+    fi
+  elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    if command -v apt-get >/dev/null 2>&1; then
+      print_progress "Installing jq via apt..."
+      if sudo apt-get install -y jq >/dev/null 2>&1; then
+        print_success "jq installed successfully"
+        return 0
+      else
+        print_error "Failed to install jq via apt"
+        return 1
+      fi
+    elif command -v yum >/dev/null 2>&1; then
+      print_progress "Installing jq via yum..."
+      if sudo yum install -y jq >/dev/null 2>&1; then
+        print_success "jq installed successfully"
+        return 0
+      else
+        print_error "Failed to install jq via yum"
+        return 1
+      fi
+    else
+      print_error "No supported package manager found (apt/yum)"
+      return 1
+    fi
+  else
+    print_error "Unsupported OS: $OSTYPE"
+    print_info "Install jq manually: https://jqlang.github.io/jq/download/"
+    return 1
+  fi
+}
+
+# Check jq and offer to install if missing
+ensure_jq() {
+  if command -v jq >/dev/null 2>&1; then
+    return 0
+  fi
+
+  print_warning "jq not found (required for OTEL configuration)"
+  echo ""
+  if ask_yes_no "Install jq now?"; then
+    if install_jq; then
+      return 0
+    fi
+  fi
+  return 1
+}
+
+# Configure OTEL in ~/.claude/settings.json
+configure_otel_settings() {
+  local settings_file="$HOME/.claude/settings.json"
+  local backup_file="$HOME/.claude/settings.json.backup.$(date +%s)"
+
+  print_step "Step 6/6: Configuring OTEL telemetry..."
+
+  # Check if jq is available (should have been installed in Step 1)
+  if ! command -v jq >/dev/null 2>&1; then
+    print_warning "jq not available - OTEL configuration skipped"
+    print_info "Run '/cellm-init' option 7 > 6 to configure later"
+    return 0
+  fi
+
+  # Check if already configured
+  if [ -f "$settings_file" ]; then
+    local existing_otel=$(jq -r '.env.OTEL_EXPORTER_OTLP_ENDPOINT // empty' "$settings_file" 2>/dev/null)
+    if [ -n "$existing_otel" ]; then
+      print_success "OTEL already configured (endpoint: $existing_otel)"
+      return 0
+    fi
+  fi
+
+  # Ask user
+  echo ""
+  print_info "OTEL telemetry sends usage metrics to Oracle dashboard"
+  print_info "This enables: token tracking, cost analysis, cache hit rates"
+  echo ""
+  if ! ask_yes_no "Configure OTEL telemetry?"; then
+    print_info "Skipped - run '/cellm-init' option 7 > 6 to configure later"
+    return 0
+  fi
+
+  # Backup existing settings
+  if [ -f "$settings_file" ]; then
+    cp "$settings_file" "$backup_file"
+    print_info "Backup: $backup_file"
+  fi
+
+  # OTEL environment variables
+  local otel_env='{
+    "CLAUDE_CODE_ENABLE_TELEMETRY": "1",
+    "OTEL_METRICS_EXPORTER": "otlp",
+    "OTEL_LOGS_EXPORTER": "otlp",
+    "OTEL_EXPORTER_OTLP_PROTOCOL": "http/json",
+    "OTEL_EXPORTER_OTLP_ENDPOINT": "http://localhost:31415",
+    "OTEL_METRIC_EXPORT_INTERVAL": "30000"
+  }'
+
+  # Create or merge settings
+  mkdir -p "$HOME/.claude"
+  if [ -f "$settings_file" ]; then
+    # Merge with existing
+    jq --argjson otel "$otel_env" '.env = (.env // {}) + $otel' \
+      "$settings_file" > "${settings_file}.tmp" && \
+      mv "${settings_file}.tmp" "$settings_file"
+  else
+    # Create new
+    echo "{\"env\": $otel_env}" | jq '.' > "$settings_file"
+  fi
+
+  print_success "OTEL configured in $settings_file"
+  print_warning "Restart Claude Code to activate telemetry"
+}
+
+# Advanced OTEL configuration with more options
+configure_otel_advanced() {
+  clear
+  print_header "OTEL Telemetry Configuration"
+
+  local settings_file="$HOME/.claude/settings.json"
+
+  # Show current status
+  if [ -f "$settings_file" ] && command -v jq >/dev/null 2>&1; then
+    local current=$(jq -r '.env.OTEL_EXPORTER_OTLP_ENDPOINT // "Not configured"' "$settings_file" 2>/dev/null)
+    print_info "Current endpoint: $current"
+  else
+    print_info "Status: Not configured"
+  fi
+
+  echo ""
+  echo "  1. Enable OTEL (default settings)"
+  echo "  2. Disable OTEL"
+  echo "  3. Custom endpoint"
+  echo "  4. Back"
+  echo ""
+  echo -ne "${CYAN}Choose option [1-4]:${NC} "
+  read -r choice
+
+  case "$choice" in
+    1) configure_otel_enable ;;
+    2) disable_otel ;;
+    3) configure_otel_custom ;;
+    4) show_advanced_menu ;;
+    *) print_error "Invalid option"; sleep 2; configure_otel_advanced ;;
+  esac
+}
+
+# Enable OTEL with default settings (non-interactive version)
+configure_otel_enable() {
+  local settings_file="$HOME/.claude/settings.json"
+  local backup_file="$HOME/.claude/settings.json.backup.$(date +%s)"
+
+  echo ""
+
+  # Check if jq is available, offer to install
+  if ! ensure_jq; then
+    echo ""
+    ask_yes_no "Continue?" && configure_otel_advanced
+    return 0
+  fi
+
+  # Backup existing settings
+  if [ -f "$settings_file" ]; then
+    cp "$settings_file" "$backup_file"
+    print_info "Backup: $backup_file"
+  fi
+
+  # OTEL environment variables
+  local otel_env='{
+    "CLAUDE_CODE_ENABLE_TELEMETRY": "1",
+    "OTEL_METRICS_EXPORTER": "otlp",
+    "OTEL_LOGS_EXPORTER": "otlp",
+    "OTEL_EXPORTER_OTLP_PROTOCOL": "http/json",
+    "OTEL_EXPORTER_OTLP_ENDPOINT": "http://localhost:31415",
+    "OTEL_METRIC_EXPORT_INTERVAL": "30000"
+  }'
+
+  # Create or merge settings
+  mkdir -p "$HOME/.claude"
+  if [ -f "$settings_file" ]; then
+    jq --argjson otel "$otel_env" '.env = (.env // {}) + $otel' \
+      "$settings_file" > "${settings_file}.tmp" && \
+      mv "${settings_file}.tmp" "$settings_file"
+  else
+    echo "{\"env\": $otel_env}" | jq '.' > "$settings_file"
+  fi
+
+  print_success "OTEL enabled"
+  print_warning "Restart Claude Code to activate telemetry"
+
+  echo ""
+  ask_yes_no "Continue?" && configure_otel_advanced
+}
+
+# Disable OTEL
+disable_otel() {
+  local settings_file="$HOME/.claude/settings.json"
+
+  echo ""
+
+  if [ -f "$settings_file" ] && command -v jq >/dev/null 2>&1; then
+    jq 'del(.env.CLAUDE_CODE_ENABLE_TELEMETRY, .env.OTEL_METRICS_EXPORTER, .env.OTEL_LOGS_EXPORTER, .env.OTEL_EXPORTER_OTLP_PROTOCOL, .env.OTEL_EXPORTER_OTLP_ENDPOINT, .env.OTEL_METRIC_EXPORT_INTERVAL)' \
+      "$settings_file" > "${settings_file}.tmp" && mv "${settings_file}.tmp" "$settings_file"
+    print_success "OTEL disabled"
+    print_warning "Restart Claude Code to apply"
+  else
+    print_info "No OTEL configuration found"
+  fi
+
+  echo ""
+  ask_yes_no "Continue?" && configure_otel_advanced
+}
+
+# Enable OTEL silently (for doctor mode)
+configure_otel_enable_silent() {
+  local settings_file="$HOME/.claude/settings.json"
+
+  if ! command -v jq >/dev/null 2>&1; then
+    return 1
+  fi
+
+  local otel_env='{
+    "CLAUDE_CODE_ENABLE_TELEMETRY": "1",
+    "OTEL_METRICS_EXPORTER": "otlp",
+    "OTEL_LOGS_EXPORTER": "otlp",
+    "OTEL_EXPORTER_OTLP_PROTOCOL": "http/json",
+    "OTEL_EXPORTER_OTLP_ENDPOINT": "http://localhost:31415",
+    "OTEL_METRIC_EXPORT_INTERVAL": "30000"
+  }'
+
+  mkdir -p "$HOME/.claude"
+  if [ -f "$settings_file" ]; then
+    jq --argjson otel "$otel_env" '.env = (.env // {}) + $otel' \
+      "$settings_file" > "${settings_file}.tmp" && \
+      mv "${settings_file}.tmp" "$settings_file"
+  else
+    echo "{\"env\": $otel_env}" | jq '.' > "$settings_file"
+  fi
+
+  print_success "  OTEL configured"
+  print_warning "  Restart Claude Code to activate"
+  return 0
+}
+
+# Configure OTEL with custom endpoint
+configure_otel_custom() {
+  local settings_file="$HOME/.claude/settings.json"
+  local backup_file="$HOME/.claude/settings.json.backup.$(date +%s)"
+
+  echo ""
+
+  # Check if jq is available, offer to install
+  if ! ensure_jq; then
+    echo ""
+    ask_yes_no "Continue?" && configure_otel_advanced
+    return 0
+  fi
+
+  echo -ne "${CYAN}Enter OTEL endpoint (e.g., http://localhost:31415):${NC} "
+  read -r endpoint
+
+  if [ -z "$endpoint" ]; then
+    print_error "No endpoint provided"
+    echo ""
+    ask_yes_no "Continue?" && configure_otel_advanced
+    return 0
+  fi
+
+  # Backup existing settings
+  if [ -f "$settings_file" ]; then
+    cp "$settings_file" "$backup_file"
+    print_info "Backup: $backup_file"
+  fi
+
+  # OTEL environment variables with custom endpoint
+  local otel_env
+  otel_env=$(jq -n \
+    --arg endpoint "$endpoint" \
+    '{
+      "CLAUDE_CODE_ENABLE_TELEMETRY": "1",
+      "OTEL_METRICS_EXPORTER": "otlp",
+      "OTEL_LOGS_EXPORTER": "otlp",
+      "OTEL_EXPORTER_OTLP_PROTOCOL": "http/json",
+      "OTEL_EXPORTER_OTLP_ENDPOINT": $endpoint,
+      "OTEL_METRIC_EXPORT_INTERVAL": "30000"
+    }')
+
+  # Create or merge settings
+  mkdir -p "$HOME/.claude"
+  if [ -f "$settings_file" ]; then
+    jq --argjson otel "$otel_env" '.env = (.env // {}) + $otel' \
+      "$settings_file" > "${settings_file}.tmp" && \
+      mv "${settings_file}.tmp" "$settings_file"
+  else
+    echo "{\"env\": $otel_env}" | jq '.' > "$settings_file"
+  fi
+
+  print_success "OTEL configured with endpoint: $endpoint"
+  print_warning "Restart Claude Code to activate telemetry"
+
+  echo ""
+  ask_yes_no "Continue?" && configure_otel_advanced
+}
+
 # Step 1: Check dependencies
 check_dependencies() {
-  print_step "Step 1/5: Checking dependencies..."
+  print_step "Step 1/6: Checking dependencies..."
+
+  local has_errors=0
 
   # Check Bun (required)
   if command -v bun >/dev/null 2>&1; then
     local bun_version=$(bun --version)
     local bun_major=$(echo "$bun_version" | cut -d. -f1)
     if [ "$bun_major" -ge 1 ]; then
-      print_success "Bun $bun_version found (required: >=1.0.0)"
+      print_success "Bun $bun_version found"
     else
       print_error "Bun $bun_version found but requires >=1.0.0"
       print_info "Upgrade: curl -fsSL https://bun.sh/install | bash"
-      return 1
+      has_errors=1
     fi
   else
-    print_error "Bun not found"
-    print_info "Install Bun: curl -fsSL https://bun.sh/install | bash"
+    print_error "Bun not found (required)"
+    print_info "Install: curl -fsSL https://bun.sh/install | bash"
+    has_errors=1
+  fi
+
+  # Check jq (required for OTEL)
+  if command -v jq >/dev/null 2>&1; then
+    local jq_version=$(jq --version 2>/dev/null || echo "unknown")
+    print_success "jq $jq_version found"
+  else
+    print_warning "jq not found (required for OTEL telemetry)"
+    if ask_yes_no "  Install jq now?"; then
+      if install_jq; then
+        : # success, continue
+      else
+        print_info "  OTEL configuration will be skipped"
+      fi
+    else
+      print_info "  OTEL configuration will be skipped"
+    fi
+  fi
+
+  if [ $has_errors -eq 1 ]; then
     return 1
   fi
 
@@ -280,7 +623,7 @@ check_dependencies() {
 
 # Step 2: Install or update package
 install_package() {
-  print_step "Step 2/5: Installing $PACKAGE_NAME..."
+  print_step "Step 2/6: Installing $PACKAGE_NAME..."
 
   if [ "$MODE" = "update" ]; then
     print_progress "Updating to latest version..."
@@ -301,7 +644,7 @@ install_package() {
 
 # Step 3: Start worker daemon
 start_worker() {
-  print_step "Step 3/5: Starting worker daemon..."
+  print_step "Step 3/6: Starting worker daemon..."
 
   print_progress "Spawning process on port 31415..."
 
@@ -339,7 +682,7 @@ start_worker() {
 
 # Step 4: Validate health
 validate_health() {
-  print_step "Step 4/5: Validating health..."
+  print_step "Step 4/6: Validating health..."
 
   print_progress "Testing /health endpoint..."
 
@@ -359,7 +702,7 @@ validate_health() {
 
 # Step 5: Finalize setup
 finalize_setup() {
-  print_step "Step 5/5: Finalizing setup..."
+  print_step "Step 5/6: Finalizing setup..."
 
   # Create marker file
   echo "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > "$MARKER_FILE"
@@ -460,7 +803,7 @@ run_doctor() {
   echo ""
 
   # Check 1: Dependencies
-  print_info "[1/6] Checking dependencies..."
+  print_info "[1/7] Checking dependencies..."
   if check_dependencies >/dev/null 2>&1; then
     print_success "Dependencies OK"
   else
@@ -472,7 +815,7 @@ run_doctor() {
   fi
 
   # Check 2: Installation
-  print_info "[2/6] Checking installation..."
+  print_info "[2/7] Checking installation..."
   if [ -f "$MARKER_FILE" ]; then
     print_success "Oracle installed"
   else
@@ -484,7 +827,7 @@ run_doctor() {
   fi
 
   # Check 3: Worker status
-  print_info "[3/6] Checking worker status..."
+  print_info "[3/7] Checking worker status..."
   if curl -sf --max-time 2 "${WORKER_URL}/health" >/dev/null 2>&1; then
     print_success "Worker running"
   else
@@ -496,7 +839,7 @@ run_doctor() {
   fi
 
   # Check 4: Port availability
-  print_info "[4/6] Checking port availability..."
+  print_info "[4/7] Checking port availability..."
   if lsof -Pi :31415 -sTCP:LISTEN -t >/dev/null 2>&1; then
     print_success "Port 31415 in use (expected)"
   else
@@ -505,7 +848,7 @@ run_doctor() {
   fi
 
   # Check 5: Database integrity
-  print_info "[5/6] Checking database..."
+  print_info "[5/7] Checking database..."
   local db_file="$DATA_DIR/compass/compass.db"
   if [ -f "$db_file" ]; then
     print_success "Database exists"
@@ -515,7 +858,7 @@ run_doctor() {
   fi
 
   # Check 6: MCP configuration
-  print_info "[6/6] Checking MCP configuration..."
+  print_info "[6/7] Checking MCP configuration..."
   local mcp_file="${CLAUDE_PLUGIN_ROOT:-$(dirname "$0")/..}/.mcp.json"
   if [ -f "$mcp_file" ]; then
     print_success "MCP configured"
@@ -527,6 +870,36 @@ run_doctor() {
         cp "$mcp_example" "$mcp_file"
         print_success "  MCP activated"
         fixes_applied=$((fixes_applied + 1))
+      fi
+    fi
+  fi
+
+  # Check 7: OTEL configuration
+  print_info "[7/7] Checking OTEL configuration..."
+  local settings_file="$HOME/.claude/settings.json"
+  if [ -f "$settings_file" ] && command -v jq >/dev/null 2>&1; then
+    local otel_endpoint=$(jq -r '.env.OTEL_EXPORTER_OTLP_ENDPOINT // empty' "$settings_file" 2>/dev/null)
+    if [ -n "$otel_endpoint" ]; then
+      print_success "OTEL configured (endpoint: $otel_endpoint)"
+    else
+      print_warning "OTEL not configured (optional)"
+      if ask_yes_no "  Configure OTEL?"; then
+        configure_otel_enable_silent && fixes_applied=$((fixes_applied + 1))
+      fi
+    fi
+  else
+    print_warning "OTEL not configured (optional)"
+    if ! command -v jq >/dev/null 2>&1; then
+      if ask_yes_no "  Install jq to enable OTEL?"; then
+        if install_jq; then
+          if ask_yes_no "  Configure OTEL now?"; then
+            configure_otel_enable_silent && fixes_applied=$((fixes_applied + 1))
+          fi
+        fi
+      fi
+    else
+      if ask_yes_no "  Configure OTEL?"; then
+        configure_otel_enable_silent && fixes_applied=$((fixes_applied + 1))
       fi
     fi
   fi
@@ -675,6 +1048,7 @@ main() {
       start_worker || exit 3
       validate_health || exit 4
       finalize_setup
+      configure_otel_settings
       ;;
   esac
 

@@ -1,42 +1,40 @@
 #!/bin/bash
-# CELLM Plugin - Configure OTEL Environment
+# CELLM Plugin - OTEL Configuration Check
 #
-# This script configures OpenTelemetry environment variables using
-# CLAUDE_ENV_FILE (available only in SessionStart hooks).
+# This script verifies OTEL is configured and warns if not.
+# Actual configuration is done via /cellm-init (modifies settings.json)
 #
-# Variables configured:
-# - CLAUDE_CODE_ENABLE_TELEMETRY: Enable Claude Code telemetry
-# - OTEL_METRICS_EXPORTER: Use OTLP for metrics
-# - OTEL_LOGS_EXPORTER: Use OTLP for logs
-# - OTEL_EXPORTER_OTLP_PROTOCOL: HTTP/JSON protocol (worker only supports JSON)
-# - OTEL_EXPORTER_OTLP_ENDPOINT: Base OTLP endpoint (Claude Code adds /v1/metrics and /v1/logs)
-# - OTEL_METRIC_EXPORT_INTERVAL: Export interval for metrics (ms)
+# Note: CLAUDE_ENV_FILE only persists variables for Bash commands,
+# NOT for Claude Code's internal telemetry which reads from the
+# parent process environment at startup.
 
 set -euo pipefail
 
-# Error handling
+# Error handling and cleanup
 cleanup() {
   local exit_code=$?
   if [[ $exit_code -ne 0 ]]; then
-    echo "[!] OTEL configuration failed with exit code $exit_code" >&2
+    echo "[!] configure-otel.sh failed with exit code $exit_code" >&2
   fi
 }
-
 trap cleanup EXIT
 
-WORKER_PORT="${CELLM_PORT:-31415}"
-WORKER_BASE="http://localhost:${WORKER_PORT}"
+LOG_FILE="${HOME}/.cellm/otel-config.log"
+mkdir -p "$(dirname "$LOG_FILE")"
 
-# Only configure if CLAUDE_ENV_FILE is available (SessionStart only)
-if [ -n "${CLAUDE_ENV_FILE:-}" ]; then
-  cat >> "$CLAUDE_ENV_FILE" <<EOF
-export CLAUDE_CODE_ENABLE_TELEMETRY=1
-export OTEL_METRICS_EXPORTER=otlp
-export OTEL_LOGS_EXPORTER=otlp
-export OTEL_EXPORTER_OTLP_PROTOCOL=http/json
-export OTEL_EXPORTER_OTLP_ENDPOINT=${WORKER_BASE}
-export OTEL_METRIC_EXPORT_INTERVAL=30000
-EOF
+log() {
+  echo "[$(date -Iseconds)] $*" >> "$LOG_FILE"
+}
+
+log "configure-otel.sh called"
+
+# Check if OTEL is configured in the environment
+if [ -z "${OTEL_EXPORTER_OTLP_ENDPOINT:-}" ]; then
+  log "OTEL not configured in environment"
+  # This message appears in Claude Code output on session start
+  echo "[!] OTEL telemetry not configured. Run '/cellm-init' option 7 > 6 to enable." >&2
+else
+  log "OTEL configured: $OTEL_EXPORTER_OTLP_ENDPOINT"
 fi
 
 exit 0

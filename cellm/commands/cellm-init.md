@@ -67,9 +67,10 @@ Advanced Configuration:
   3. View Logs
   4. Clear Cache
   5. Reset Configuration
-  6. Back to Main Menu
+  6. Configure OTEL Telemetry
+  7. Back to Main Menu
 
-Choose option [1-6]:
+Choose option [1-7]:
 ```
 
 ## Command-Line Mode
@@ -101,29 +102,40 @@ Use specific modes for automation or scripting:
 When selecting "Install Oracle":
 
 ```
-Step 1/5: Checking dependencies...
+Step 1/6: Checking dependencies...
   [+] Bun 1.2.x found
-  [+] bunx available
+  [!] jq not found (required for OTEL telemetry)
+  Install jq now? [Y/n]: y
+  [~] Installing jq via Homebrew...
+  [+] jq installed successfully
 
-Step 2/5: Installing @cellm-ai/oracle...
+Step 2/6: Installing @cellm-ai/oracle...
   [~] Downloading from NPM...
   [+] Installed v1.0.0
 
-Step 3/5: Starting worker daemon...
+Step 3/6: Starting worker daemon...
   [~] Spawning process on port 31415...
   [+] Worker started (PID: 12345)
   [+] Worker is responsive
 
-Step 4/5: Validating health...
+Step 4/6: Validating health...
   [~] Testing /health endpoint...
   [+] Worker is healthy (response: 45ms)
 
-Step 5/5: Finalizing setup...
+Step 5/6: Finalizing setup...
   [+] Created marker file
   [!] MCP not activated yet
 
 Activate MCP tools now? [Y/n]: y
   [+] MCP activated
+
+Step 6/6: Configuring OTEL telemetry...
+  [i] OTEL telemetry sends usage metrics to Oracle dashboard
+  [i] This enables: token tracking, cost analysis, cache hit rates
+
+Configure OTEL telemetry? [Y/n]: y
+  [+] OTEL configured in ~/.claude/settings.json
+  [!] Restart Claude Code to activate telemetry
 
 [+] Setup complete!
 
@@ -164,36 +176,64 @@ Select "Doctor" for guided diagnostics:
 
 Running diagnostics...
 
-  [i] [1/6] Checking dependencies...
+  [i] [1/7] Checking dependencies...
   [+] Dependencies OK
 
-  [i] [2/6] Checking installation...
+  [i] [2/7] Checking installation...
   [+] Oracle installed
 
-  [i] [3/6] Checking worker status...
+  [i] [3/7] Checking worker status...
   [-] Worker not running
   Start worker? [Y/n]: y
   [+] Worker started
 
-  [i] [4/6] Checking port availability...
+  [i] [4/7] Checking port availability...
   [+] Port 31415 in use (expected)
 
-  [i] [5/6] Checking database...
+  [i] [5/7] Checking database...
   [+] Database exists
 
-  [i] [6/6] Checking MCP configuration...
+  [i] [6/7] Checking MCP configuration...
   [+] MCP configured
+
+  [i] [7/7] Checking OTEL configuration...
+  [!] OTEL not configured (optional)
+  Configure OTEL? [Y/n]: y
+  [+] OTEL configured
+  [!] Restart Claude Code to activate
 
 ╔══════════════════════════════════════════════════════════╗
 ║  Diagnostic Summary
 ╚══════════════════════════════════════════════════════════╝
-  Issues found: 1
-  Fixes applied: 1
+  Issues found: 2
+  Fixes applied: 2
 
-[+] Applied 1 fix(es)
+[+] Applied 2 fix(es)
 ```
 
 ## Advanced Features
+
+### Configure OTEL Telemetry
+
+OTEL (OpenTelemetry) enables usage metrics collection for the Oracle dashboard:
+
+- Token tracking and cost analysis
+- Cache hit rates monitoring
+- API usage patterns
+
+**During Installation:**
+Step 1/6 checks for `jq` and offers to install it automatically if missing (supports Homebrew on macOS, apt/yum on Linux). Step 6/6 then configures OTEL.
+
+**After Installation:**
+1. Select "Advanced Options" -> "Configure OTEL Telemetry"
+2. Choose from:
+   - Enable OTEL (default settings)
+   - Disable OTEL
+   - Custom endpoint (for remote collectors)
+
+**Important:** Restart Claude Code after configuring OTEL for changes to take effect.
+
+OTEL configuration is stored in `~/.claude/settings.json` under the `env` key.
 
 ### Change Worker Port
 

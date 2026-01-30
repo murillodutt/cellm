@@ -3,17 +3,16 @@
   "hooks": {
     "SessionStart": [
       {
-        "matcher": "startup|resume|clear|compact",
         "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/ensure-oracle.sh",
+            "timeout": 15000
+          },
           {
             "type": "command",
             "command": "${CLAUDE_PLUGIN_ROOT}/scripts/configure-otel.sh",
             "timeout": 1000
-          },
-          {
-            "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/check-worker-health.sh",
-            "timeout": 2000
           },
           {
             "type": "command",
@@ -33,6 +32,11 @@
         "hooks": [
           {
             "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/ensure-oracle.sh",
+            "timeout": 15000
+          },
+          {
+            "type": "command",
             "command": "${CLAUDE_PLUGIN_ROOT}/scripts/capture-prompt.sh",
             "timeout": 500
           }
@@ -43,6 +47,11 @@
       {
         "matcher": "Write|Edit|Bash|Read|Grep|Glob",
         "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/ensure-oracle.sh",
+            "timeout": 15000
+          },
           {
             "type": "command",
             "command": "${CLAUDE_PLUGIN_ROOT}/scripts/track-tool-use.sh",
