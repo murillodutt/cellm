@@ -12,6 +12,7 @@ readonly LOG_DIR="$DATA_DIR/logs"
 readonly LOG_FILE="$LOG_DIR/init-oracle.log"
 readonly MARKER_FILE="$DATA_DIR/installed"
 readonly PACKAGE_NAME="@cellm-ai/oracle"
+readonly GLOBAL_CONFIG_FILE="$DATA_DIR/cellm.json"
 
 # Colors for terminal output
 readonly GREEN='\033[0;32m'
@@ -71,6 +72,85 @@ print_info() {
 print_progress() {
   echo -e "${YELLOW}  [~] $*${NC}"
   log "[~] $*"
+}
+
+read_config_value() {
+  local key="$1"
+  if [ ! -f "$GLOBAL_CONFIG_FILE" ]; then
+    echo ""
+    return 0
+  fi
+  local raw
+  raw=$(grep -Eo "\"${key}\"[[:space:]]*:[[:space:]]*[^,}]*" "$GLOBAL_CONFIG_FILE" | head -n1 || true)
+  if [ -z "$raw" ]; then
+    echo ""
+    return 0
+  fi
+  local value
+  value=$(echo "$raw" | sed -E "s/\"${key}\"[[:space:]]*:[[:space:]]*//; s/[[:space:]]*$//; s/^\"//; s/\"$//")
+  echo "$value"
+}
+
+read_config_flag() {
+  local key="$1"
+  local value
+  value="$(read_config_value "$key")"
+  if [ -z "$value" ]; then
+    echo ""
+    return 0
+  fi
+  echo "$(echo "$value" | tr '[:upper:]' '[:lower:]')"
+}
+
+DEV_MODE="$(read_config_flag "CELLM_DEV_MODE")"
+DEV_ORACLE_PATH="$(read_config_value "CELLM_DEV_ORACLE_PATH")"
+if [ -n "$DEV_ORACLE_PATH" ]; then
+  DEV_ORACLE_PATH="${DEV_ORACLE_PATH/#\~/$HOME}"
+fi
+USE_LOCAL_ORACLE="false"
+if [ "$DEV_MODE" = "true" ] || [ "$DEV_MODE" = "1" ]; then
+  if [ -n "$DEV_ORACLE_PATH" ] && [ -d "$DEV_ORACLE_PATH" ]; then
+    USE_LOCAL_ORACLE="true"
+  fi
+fi
+
+get_oracle_version() {
+  if [ "$USE_LOCAL_ORACLE" = "true" ]; then
+    python3 - "$DEV_ORACLE_PATH" <<'PY'
+import json
+import os
+import sys
+
+base = sys.argv[1]
+path = os.path.join(base, "package.json")
+try:
+    with open(path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+    print(data.get("version", "unknown"))
+except Exception:
+    print("unknown")
+PY
+    return 0
+  fi
+
+  bun x "$PACKAGE_NAME@latest" --version 2>/dev/null || echo "unknown"
+}
+
+stop_worker() {
+  if [ "$USE_LOCAL_ORACLE" = "true" ]; then
+    if [ -n "$DEV_ORACLE_PATH" ] && pgrep -f "$DEV_ORACLE_PATH" >/dev/null 2>&1; then
+      pkill -f "$DEV_ORACLE_PATH" || true
+      sleep 2
+      print_success "Worker stopped"
+    fi
+    return 0
+  fi
+
+  if pgrep -f "$PACKAGE_NAME" >/dev/null 2>&1; then
+    pkill -f "$PACKAGE_NAME" || true
+    sleep 2
+    print_success "Worker stopped"
+  fi
 }
 
 # Ask yes/no question
@@ -625,6 +705,24 @@ check_dependencies() {
 install_package() {
   print_step "Step 2/6: Installing $PACKAGE_NAME..."
 
+  if [ "$USE_LOCAL_ORACLE" = "true" ]; then
+    print_progress "Using local source: $DEV_ORACLE_PATH"
+    if [ ! -f "$DEV_ORACLE_PATH/package.json" ]; then
+      print_error "Local Oracle not found: $DEV_ORACLE_PATH/package.json"
+      return 2
+    fi
+
+    if [ ! -d "$DEV_ORACLE_PATH/node_modules" ]; then
+      print_progress "Installing local dependencies..."
+      (cd "$DEV_ORACLE_PATH" && bun install --silent 2>/dev/null || bun install)
+    fi
+
+    local version
+    version=$(get_oracle_version)
+    print_success "Local source ready (v$version)"
+    return 0
+  fi
+
   if [ "$MODE" = "update" ]; then
     print_progress "Updating to latest version..."
   else
@@ -646,7 +744,11 @@ install_package() {
 start_worker() {
   print_step "Step 3/6: Starting worker daemon..."
 
-  print_progress "Spawning process on port 31415..."
+  if [ "$USE_LOCAL_ORACLE" = "true" ]; then
+    print_progress "Spawning local dev server..."
+  else
+    print_progress "Spawning process on port 31415..."
+  fi
 
   # Check if worker is already running
   if curl -sf --max-time 2 "${WORKER_URL}/health" >/dev/null 2>&1; then
@@ -656,7 +758,11 @@ start_worker() {
 
   # Spawn worker in background using Bun
   local worker_log="$LOG_DIR/oracle-worker.log"
-  nohup bun x "$PACKAGE_NAME" serve > "$worker_log" 2>&1 &
+  if [ "$USE_LOCAL_ORACLE" = "true" ]; then
+    nohup bash -c "cd \"$DEV_ORACLE_PATH\" && bun run dev" > "$worker_log" 2>&1 &
+  else
+    nohup bun x "$PACKAGE_NAME" serve > "$worker_log" 2>&1 &
+  fi
 
   local worker_pid=$!
   disown || true
@@ -756,7 +862,8 @@ show_status() {
     print_success "Healthy: YES"
 
     # Get version if available
-    local version=$(bun x "$PACKAGE_NAME@latest" --version 2>/dev/null || echo "unknown")
+    local version
+    version=$(get_oracle_version)
     print_info "Version: $version"
   else
     print_error "Running: NO"
@@ -928,11 +1035,7 @@ restart_worker() {
   print_header "Restart Oracle Worker"
 
   print_step "Stopping existing worker..."
-  if pgrep -f "$PACKAGE_NAME" >/dev/null 2>&1; then
-    pkill -f "$PACKAGE_NAME" || true
-    sleep 2
-    print_success "Worker stopped"
-  else
+  if ! stop_worker; then
     print_info "No worker process found"
   fi
 
@@ -968,11 +1071,7 @@ uninstall() {
   fi
 
   print_step "Stopping worker..."
-  if pgrep -f "$PACKAGE_NAME" >/dev/null 2>&1; then
-    pkill -f "$PACKAGE_NAME" || true
-    sleep 2
-    print_success "Worker stopped"
-  fi
+  stop_worker
 
   print_step "Removing marker..."
   rm -f "$MARKER_FILE"
@@ -994,14 +1093,23 @@ uninstall() {
 update() {
   print_header "Update Oracle"
 
-  local current_version=$(bun x "$PACKAGE_NAME@latest" --version 2>/dev/null || echo "unknown")
+  if [ "$USE_LOCAL_ORACLE" = "true" ]; then
+    print_info "Local source mode enabled (update skipped)"
+    print_info "Path: $DEV_ORACLE_PATH"
+    print_info "Use git pull/bun install in local repo"
+    return 0
+  fi
+
+  local current_version
+  current_version=$(bun x "$PACKAGE_NAME@latest" --version 2>/dev/null || echo "unknown")
   print_info "Current version: $current_version"
 
   echo ""
   if ask_yes_no "Check for updates?"; then
     install_package
 
-    local new_version=$(bun x "$PACKAGE_NAME@latest" --version 2>/dev/null || echo "unknown")
+    local new_version
+    new_version=$(bun x "$PACKAGE_NAME@latest" --version 2>/dev/null || echo "unknown")
 
     if [ "$current_version" != "$new_version" ]; then
       print_success "Updated: $current_version → $new_version"
@@ -1018,6 +1126,13 @@ update() {
 # Main execution
 main() {
   log "[i] Starting init-oracle.sh (mode: ${MODE:-interactive})"
+
+  if [ "$DEV_MODE" = "true" ] || [ "$DEV_MODE" = "1" ]; then
+    if [ "$USE_LOCAL_ORACLE" != "true" ]; then
+      print_warning "CELLM_DEV_MODE enabled but CELLM_DEV_ORACLE_PATH not set or invalid"
+      print_info "Falling back to NPM package: $PACKAGE_NAME"
+    fi
+  fi
 
   # If no mode specified, show interactive menu
   if [ -z "$MODE" ]; then

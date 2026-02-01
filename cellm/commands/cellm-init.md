@@ -97,6 +97,23 @@ Use specific modes for automation or scripting:
 /cellm-init uninstall
 ```
 
+## Dev Mode (Local Source)
+
+When `CELLM_DEV_MODE=true` and `CELLM_DEV_ORACLE_PATH` are set in `~/.cellm/cellm.json`,
+`/cellm-init` will use the local Oracle source instead of the NPM package.
+
+```json
+{
+  "CELLM_DEV_MODE": true,
+  "CELLM_DEV_ORACLE_PATH": "/Users/murillo/Dev/cellm-private/oracle"
+}
+```
+
+**Behavior:**
+- Uses local repo for install/start/version.
+- Skips NPM update flow.
+- Falls back to NPM if the local path is missing.
+
 ## Installation Flow
 
 When selecting "Install Oracle":
@@ -234,6 +251,23 @@ Step 1/6 checks for `jq` and offers to install it automatically if missing (supp
 **Important:** Restart Claude Code after configuring OTEL for changes to take effect.
 
 OTEL configuration is stored in `~/.claude/settings.json` under the `env` key.
+
+### Dev Mode (Node runtime)
+
+For local development only, you can allow Node runtime by setting:
+
+```json
+{
+  "CELLM_DEV_MODE": true
+}
+```
+
+File location: `~/.cellm/cellm.json`
+Arquivo canônico de configuração global.
+
+**Behavior:**
+- `true`: Node runtime is allowed for local development.
+- `false` (default): Node runtime is rejected; Bun is required.
 
 ### Change Worker Port
 
