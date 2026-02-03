@@ -7,22 +7,22 @@
           {
             "type": "command",
             "command": "${CLAUDE_PLUGIN_ROOT}/scripts/ensure-oracle.sh",
-            "timeout": 15000
+            "timeout": 15
           },
           {
             "type": "command",
             "command": "${CLAUDE_PLUGIN_ROOT}/scripts/configure-otel.sh",
-            "timeout": 1000
+            "timeout": 1
           },
           {
             "type": "command",
             "command": "${CLAUDE_PLUGIN_ROOT}/scripts/init-session.sh",
-            "timeout": 1000
+            "timeout": 1
           },
           {
             "type": "command",
             "command": "${CLAUDE_PLUGIN_ROOT}/scripts/inject-context.sh",
-            "timeout": 5000
+            "timeout": 5
           }
         ]
       }
@@ -33,12 +33,12 @@
           {
             "type": "command",
             "command": "${CLAUDE_PLUGIN_ROOT}/scripts/ensure-oracle.sh",
-            "timeout": 15000
+            "timeout": 15
           },
           {
             "type": "command",
             "command": "${CLAUDE_PLUGIN_ROOT}/scripts/capture-prompt.sh",
-            "timeout": 500
+            "timeout": 1
           }
         ]
       }
@@ -50,12 +50,12 @@
           {
             "type": "command",
             "command": "${CLAUDE_PLUGIN_ROOT}/scripts/ensure-oracle.sh",
-            "timeout": 15000
+            "timeout": 15
           },
           {
             "type": "command",
             "command": "${CLAUDE_PLUGIN_ROOT}/scripts/track-tool-use.sh",
-            "timeout": 500
+            "timeout": 1
           }
         ]
       }
@@ -66,7 +66,7 @@
           {
             "type": "command",
             "command": "${CLAUDE_PLUGIN_ROOT}/scripts/capture-context.sh",
-            "timeout": 5000
+            "timeout": 5
           }
         ]
       }
@@ -78,7 +78,7 @@
           {
             "type": "command",
             "command": "${CLAUDE_PLUGIN_ROOT}/scripts/capture-context.sh",
-            "timeout": 5000
+            "timeout": 5
           }
         ]
       }
