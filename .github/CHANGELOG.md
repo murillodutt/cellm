@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Planned
 - Community source code access (`src/` directory)
 - Additional framework skills
+- DocOps Plugin (optional) for documentation maintenance and drift control
 
 ---
 

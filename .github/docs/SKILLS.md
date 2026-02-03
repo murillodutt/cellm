@@ -1,6 +1,6 @@
 # Skills Guide
 
-> [Home](../README.md) > [Docs](README.md) > **Skills**
+> [Home](../README.md) > [Docs](INDEX.md) > **Skills**
 
 Complete guide to CELLM's 7 framework skills.
 
@@ -487,8 +487,8 @@ When skills have conflicting guidance, priority order is:
 
 ## Related Documentation
 
-- [Commands Reference](commands.md) - All commands
-- [Agents Guide](agents.md) - Specialized agents
-- [Features Overview](features.md) - All capabilities
+- [Commands Reference](COMMANDS.md) - All commands
+- [Agents Guide](AGENTS.md) - Specialized agents
+- [Features Overview](FEATURES.md) - All capabilities
 
-[Back to Docs](README.md) | [Back to Home](../README.md)
+[Back to Docs](INDEX.md) | [Back to Home](../README.md)

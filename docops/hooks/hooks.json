@@ -1,0 +1,28 @@
+{
+  "description": "DocOps hooks (optional, non-blocking) for drift reminders",
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/docops-hook.sh",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "matcher": "manual|auto",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/docops-hook.sh",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}

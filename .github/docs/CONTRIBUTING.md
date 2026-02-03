@@ -1,6 +1,6 @@
 # Contributing to CELLM
 
-> [Home](../README.md) > [Docs](README.md) > **Contributing**
+> [Home](../README.md) > [Docs](INDEX.md) > **Contributing**
 
 Guide for contributing to the CELLM project.
 
@@ -381,8 +381,8 @@ By contributing to CELLM, you agree that your contributions will be licensed und
 
 ## Related Documentation
 
-- [Features Overview](features.md) - Understand CELLM
-- [Technical Specs](technical-specs.md) - Architecture
-- [FAQ](faq.md) - Common questions
+- [Features Overview](FEATURES.md) - Understand CELLM
+- [Technical Specs](TECHNICAL-SPECS.md) - Architecture
+- [FAQ](FAQ.md) - Common questions
 
-[Back to Docs](README.md) | [Back to Home](../README.md)
+[Back to Docs](INDEX.md) | [Back to Home](../README.md)

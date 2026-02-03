@@ -1,6 +1,6 @@
 # Frequently Asked Questions
 
-> [Home](../README.md) > [Docs](README.md) > **FAQ**
+> [Home](../README.md) > [Docs](INDEX.md) > **FAQ**
 
 Common questions about CELLM.
 
@@ -106,7 +106,7 @@ CELLM is designed for Claude Code. Support for other editors may come in future 
 | `/verify` | Quality validation |
 | `/oracle-status` | Health check |
 
-See [Commands Reference](commands.md) for full list.
+See [Commands Reference](COMMANDS.md) for full list.
 
 ### Do I need to use all commands?
 
@@ -245,7 +245,7 @@ tail -f ~/.cellm/logs/oracle-worker.log
 - Restart Claude Code session
 - Verify plugin is installed
 
-See [Troubleshooting Guide](troubleshooting.md) for more solutions.
+See [Troubleshooting Guide](TROUBLESHOOTING.md) for more solutions.
 
 ---
 
@@ -258,7 +258,7 @@ See [Troubleshooting Guide](troubleshooting.md) for more solutions.
 - Improve documentation
 - Submit code PRs
 
-See [Contributing Guide](contributing.md).
+See [Contributing Guide](CONTRIBUTING.md).
 
 ### Where do I report bugs?
 
@@ -292,8 +292,8 @@ Yes. MIT license allows commercial use without restrictions.
 
 ## Related Documentation
 
-- [Getting Started](getting-started.md) - Quick setup
-- [Features Overview](features.md) - All capabilities
-- [Troubleshooting](troubleshooting.md) - Problem solving
+- [Getting Started](GETTING-STARTED.md) - Quick setup
+- [Features Overview](FEATURES.md) - All capabilities
+- [Troubleshooting](TROUBLESHOOTING.md) - Problem solving
 
-[Back to Docs](README.md) | [Back to Home](../README.md)
+[Back to Docs](INDEX.md) | [Back to Home](../README.md)

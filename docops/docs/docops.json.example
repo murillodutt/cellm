@@ -1,0 +1,6 @@
+{
+  "docRoot": "docs/technical",
+  "conveyorFile": "project-conveyor.md",
+  "language": "en",
+  "hooksEnabled": false
+}

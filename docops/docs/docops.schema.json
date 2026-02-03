@@ -1,0 +1,82 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://cellm.ai/schemas/docops.json",
+  "title": "DocOps Configuration",
+  "description": "Configuration schema for .claude/docops.json",
+  "type": "object",
+  "properties": {
+    "docRoot": {
+      "type": "string",
+      "description": "Root directory for documentation",
+      "default": "docs/technical"
+    },
+    "conveyorFile": {
+      "type": "string",
+      "description": "Source of truth file name",
+      "default": "project-conveyor.md"
+    },
+    "language": {
+      "type": "string",
+      "description": "Documentation language for templates. Must align with project CLAUDE.md Language rules",
+      "enum": ["en", "pt-BR"],
+      "default": "en"
+    },
+    "hooksEnabled": {
+      "type": "boolean",
+      "description": "Enable drift reminder hooks (Stop, PreCompact)",
+      "default": false
+    },
+    "namingConvention": {
+      "type": "object",
+      "description": "File naming convention suffixes",
+      "properties": {
+        "spec": {
+          "type": "string",
+          "description": "Specification file suffix",
+          "default": ".spec.md"
+        },
+        "ref": {
+          "type": "string",
+          "description": "Reference file suffix",
+          "default": ".ref.md"
+        },
+        "howto": {
+          "type": "string",
+          "description": "How-to guide suffix",
+          "default": ".howto.md"
+        },
+        "runbook": {
+          "type": "string",
+          "description": "Runbook suffix",
+          "default": ".runbook.md"
+        },
+        "adr": {
+          "type": "string",
+          "description": "ADR naming pattern (supports {date} and {slug} placeholders)",
+          "default": "ADR-{date}-{slug}.md"
+        }
+      },
+      "additionalProperties": false
+    },
+    "codeEvidence": {
+      "type": "object",
+      "description": "Code evidence extraction settings",
+      "properties": {
+        "scanPaths": {
+          "type": "array",
+          "description": "Paths to scan for code evidence",
+          "items": { "type": "string" },
+          "default": ["src/", "app/", "server/"]
+        },
+        "excludePaths": {
+          "type": "array",
+          "description": "Paths to exclude from scanning",
+          "items": { "type": "string" },
+          "default": ["node_modules/", "dist/", ".git/"]
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

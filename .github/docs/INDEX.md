@@ -12,39 +12,39 @@ Welcome to the official CELLM Plugin documentation.
 
 | Guide | Description | Time |
 |-------|-------------|------|
-| [Getting Started](getting-started.md) | Quick start in 5 minutes | 5 min |
-| [Installation](installation.md) | Complete setup guide | 10 min |
-| [Features](features.md) | Overview of all features | 15 min |
+| [Getting Started](GETTING-STARTED.md) | Quick start in 5 minutes | 5 min |
+| [Installation](INSTALLATION.md) | Complete setup guide | 10 min |
+| [Features](FEATURES.md) | Overview of all features | 15 min |
 
 ### Core Documentation
 
 | Guide | Description |
 |-------|-------------|
-| [Commands](commands.md) | All workflow commands reference |
-| [Agents](agents.md) | 4 specialized agents guide |
-| [Skills](skills.md) | 7 framework skills guide |
+| [Commands](COMMANDS.md) | All workflow commands reference |
+| [Agents](AGENTS.md) | 4 specialized agents guide |
+| [Skills](SKILLS.md) | 7 framework skills guide |
 
 ### Components
 
 | Guide | Description |
 |-------|-------------|
-| [Oracle](oracle.md) | NPM package for semantic search |
-| [Compass](compass.md) | Visual dashboard |
+| [Oracle](ORACLE.md) | NPM package for semantic search |
+| [Compass](COMPASS.md) | Visual dashboard |
+| [DocOps Plugin](../docops/README.md) | Documentation maintenance (optional) |
 
 ### Reference
 
 | Guide | Description |
 |-------|-------------|
-| [API Reference](api-reference.md) | Complete API documentation |
-| [Configuration](configuration.md) | Advanced configuration |
-| [Troubleshooting](troubleshooting.md) | Common issues and solutions |
-| [FAQ](faq.md) | Frequently asked questions |
+| [Technical Specs](TECHNICAL-SPECS.md) | Architecture details |
+| [Troubleshooting](TROUBLESHOOTING.md) | Common issues and solutions |
+| [FAQ](FAQ.md) | Frequently asked questions |
 
 ### Contributing
 
 | Guide | Description |
 |-------|-------------|
-| [Contributing](contributing.md) | How to contribute |
+| [Contributing](CONTRIBUTING.md) | How to contribute |
 
 ---
 
@@ -52,20 +52,19 @@ Welcome to the official CELLM Plugin documentation.
 
 ```
 docs/
-├── README.md           # This index (you are here)
-├── getting-started.md  # Quick 5-minute setup
-├── installation.md     # Complete installation guide
-├── features.md         # Feature overview
-├── commands.md         # Command reference
-├── agents.md           # Agents guide
-├── skills.md           # Skills guide
-├── oracle.md           # Oracle package docs
-├── compass.md          # Dashboard docs
-├── api-reference.md    # API documentation
-├── configuration.md    # Configuration guide
-├── troubleshooting.md  # Problem solving
-├── faq.md              # FAQ
-└── contributing.md     # Contribution guide
+├── INDEX.md            # This index (you are here)
+├── GETTING-STARTED.md  # Quick 5-minute setup
+├── INSTALLATION.md     # Complete installation guide
+├── FEATURES.md         # Feature overview
+├── COMMANDS.md         # Command reference
+├── AGENTS.md           # Agents guide
+├── SKILLS.md           # Skills guide
+├── ORACLE.md           # Oracle package docs
+├── COMPASS.md          # Dashboard docs
+├── TECHNICAL-SPECS.md  # Architecture details
+├── TROUBLESHOOTING.md  # Problem solving
+├── FAQ.md              # FAQ
+└── CONTRIBUTING.md     # Contribution guide
 ```
 
 ---
@@ -74,20 +73,19 @@ docs/
 
 ### New Users
 
-1. Start with [Getting Started](getting-started.md) (5 min)
-2. Read [Features](features.md) to understand capabilities
-3. Explore [Commands](commands.md) as you work
+1. Start with [Getting Started](GETTING-STARTED.md) (5 min)
+2. Read [Features](FEATURES.md) to understand capabilities
+3. Explore [Commands](COMMANDS.md) as you work
 
 ### Experienced Users
 
-- [API Reference](api-reference.md) for technical details
-- [Configuration](configuration.md) for customization
-- [Troubleshooting](troubleshooting.md) for issues
+- [Technical Specs](TECHNICAL-SPECS.md) for technical details
+- [Troubleshooting](TROUBLESHOOTING.md) for issues
 
 ### Contributors
 
-- [Contributing](contributing.md) for guidelines
-- [Technical Specs](technical-specs.md) for architecture
+- [Contributing](CONTRIBUTING.md) for guidelines
+- [Technical Specs](TECHNICAL-SPECS.md) for architecture
 
 ---
 

@@ -18,6 +18,9 @@
 - 10 Workflow Commands (plan, shape, implement, verify, patterns, etc.)
 - 10 Audited Shell Scripts (modular architecture)
 
+**Optional Plugins**
+- DocOps Plugin: documentation maintenance, code evidence, and drift control
+
 **Oracle Package**
 - Published on NPM: `@cellm/oracle`
 - Semantic search across codebase

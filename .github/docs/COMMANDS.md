@@ -1,6 +1,6 @@
 # Commands Reference
 
-> [Home](../README.md) > [Docs](README.md) > **Commands**
+> [Home](../README.md) > [Docs](INDEX.md) > **Commands**
 
 Complete reference for all CELLM workflow commands.
 
@@ -17,6 +17,20 @@ CELLM provides 10 workflow commands organized into phases:
 | **Validation** | `/verify`, `/status` |
 | **Pattern Management** | `/discover-patterns`, `/inject-patterns`, `/index-patterns` |
 | **Setup & Monitoring** | `/cellm-init`, `/oracle-status` |
+
+---
+
+## Optional Plugin Commands (DocOps)
+
+DocOps is an optional plugin focused on documentation maintenance.
+
+| Command | Purpose |
+|---------|---------|
+| `/docops-init` | Initialize doc structure and templates |
+| `/docops-sync` | Refresh code evidence and gaps |
+| `/docops-verify` | Validate structure and normative vocabulary |
+
+See [DocOps Plugin](../docops/README.md) for details.
 
 ---
 
@@ -510,8 +524,8 @@ claude /inject-patterns
 
 ## Related Documentation
 
-- [Getting Started](getting-started.md) - Quick setup
-- [Agents Guide](agents.md) - Agent details
-- [Features Overview](features.md) - All capabilities
+- [Getting Started](GETTING-STARTED.md) - Quick setup
+- [Agents Guide](AGENTS.md) - Agent details
+- [Features Overview](FEATURES.md) - All capabilities
 
-[Back to Docs](README.md) | [Back to Home](../README.md)
+[Back to Docs](INDEX.md) | [Back to Home](../README.md)

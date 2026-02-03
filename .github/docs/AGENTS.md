@@ -1,6 +1,6 @@
 # Agents Guide
 
-> [Home](../README.md) > [Docs](README.md) > **Agents**
+> [Home](../README.md) > [Docs](INDEX.md) > **Agents**
 
 Complete guide to CELLM's 4 specialized agents.
 
@@ -425,8 +425,8 @@ Show development metrics:
 
 ## Related Documentation
 
-- [Commands Reference](commands.md) - All commands
-- [Skills Guide](skills.md) - Framework skills
-- [Features Overview](features.md) - All capabilities
+- [Commands Reference](COMMANDS.md) - All commands
+- [Skills Guide](SKILLS.md) - Framework skills
+- [Features Overview](FEATURES.md) - All capabilities
 
-[Back to Docs](README.md) | [Back to Home](../README.md)
+[Back to Docs](INDEX.md) | [Back to Home](../README.md)

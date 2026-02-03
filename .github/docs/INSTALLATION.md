@@ -1,6 +1,6 @@
 # Installation Guide
 
-> [Home](../README.md) > [Docs](README.md) > **Installation**
+> [Home](../README.md) > [Docs](INDEX.md) > **Installation**
 
 Complete guide to installing and configuring CELLM.
 
@@ -113,6 +113,14 @@ Oracle provides semantic search and persistent memory. To activate:
 - Doctor mode for diagnostics
 - Advanced configuration options
 - Update and maintenance tools
+
+---
+
+## DocOps Plugin (Optional)
+
+DocOps is a separate plugin for documentation maintenance with code evidence and drift control.
+
+See [DocOps Plugin](../docops/README.md) for setup and usage.
 
 ---
 
@@ -338,18 +346,18 @@ rm -rf ~/.cellm/logs
 
 After successful installation:
 
-1. **Quick Start** - [Getting Started Guide](getting-started.md)
-2. **Explore Features** - [Features Guide](features.md)
-3. **Learn Commands** - [Commands Reference](commands.md)
+1. **Quick Start** - [Getting Started Guide](GETTING-STARTED.md)
+2. **Explore Features** - [Features Guide](FEATURES.md)
+3. **Learn Commands** - [Commands Reference](COMMANDS.md)
 4. **Check Compass** - Visit dashboard at `http://localhost:3000/compass`
 
 ---
 
 ## Related Documentation
 
-- [Getting Started](getting-started.md) - Quick 5-minute setup
-- [Features](features.md) - What's included
-- [Commands](commands.md) - All commands reference
-- [Troubleshooting](troubleshooting.md) - More solutions
+- [Getting Started](GETTING-STARTED.md) - Quick 5-minute setup
+- [Features](FEATURES.md) - What's included
+- [Commands](COMMANDS.md) - All commands reference
+- [Troubleshooting](TROUBLESHOOTING.md) - More solutions
 
-[Back to Docs](README.md) | [Back to Home](../README.md)
+[Back to Docs](INDEX.md) | [Back to Home](../README.md)

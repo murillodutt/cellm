@@ -1,6 +1,6 @@
 # Oracle Documentation
 
-> [Home](../README.md) > [Docs](README.md) > **Oracle**
+> [Home](../README.md) > [Docs](INDEX.md) > **Oracle**
 
 Complete guide to the Oracle NPM package and MCP server.
 
@@ -435,9 +435,9 @@ curl http://localhost:31415/api/status
 
 ## Related Documentation
 
-- [Installation Guide](installation.md) - Setup
-- [Features Overview](features.md) - All features
-- [API Reference](api-reference.md) - Full API docs
-- [Compass Dashboard](compass.md) - Visual interface
+- [Installation Guide](INSTALLATION.md) - Setup
+- [Features Overview](FEATURES.md) - All features
+- [Technical Specs](TECHNICAL-SPECS.md) - Architecture details
+- [Compass Dashboard](COMPASS.md) - Visual interface
 
-[Back to Docs](README.md) | [Back to Home](../README.md)
+[Back to Docs](INDEX.md) | [Back to Home](../README.md)

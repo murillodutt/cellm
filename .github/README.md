@@ -27,6 +27,8 @@
 
 🚀 **Zero Configuration** - Install once, works immediately
 
+📁 **Documentation Maintenance (DocOps Plugin)** - Optional plugin for LLM-first docs, code evidence, and drift control
+
 💎 **100% Free Forever** - Professional tooling, MIT licensed, no strings attached
 
 [Learn more about features →](docs/FEATURES.md)
@@ -72,6 +74,7 @@
 | **[Commands](docs/COMMANDS.md)** | All workflow commands |
 | **[Agents](docs/AGENTS.md)** | 4 specialized agents |
 | **[Skills](docs/SKILLS.md)** | 7 framework skills |
+| **[DocOps Plugin](../docops/README.md)** | Documentation maintenance (optional) |
 | **[Oracle](docs/ORACLE.md)** | Semantic search & memory |
 | **[Compass](docs/COMPASS.md)** | Visual dashboard |
 
@@ -103,6 +106,7 @@
 - 🎯 **10 Workflow Commands** - Structured development ([details](docs/FEATURES.md#-10-workflow-commands))
 - 🤖 **4 Specialized Agents** - Architect, Implementer, Reviewer, PM ([details](docs/FEATURES.md#-4-specialized-agents))
 - 🎨 **7 Framework Skills** - Nuxt, Vue, TypeScript, Tailwind, Pinia, Drizzle, Search ([details](docs/FEATURES.md#-7-framework-skills))
+- **DocOps Plugin (optional)** - Documentation maintenance and drift control ([details](../docops/README.md))
 - 🛡️ **Security Audited** - 10 audited shell scripts ([details](docs/FEATURES.md#️-security--quality))
 
 [Full features documentation →](docs/FEATURES.md)

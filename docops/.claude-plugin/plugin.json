@@ -1,0 +1,22 @@
+{
+  "name": "docops",
+  "version": "0.1.0",
+  "description": "DocOps - Documentation maintenance workflows with LLM-first templates, code evidence, and drift control.",
+  "author": {
+    "name": "Murillo Dutt",
+    "email": "contact@cellm.ai",
+    "url": "https://cellm.ai"
+  },
+  "repository": "https://github.com/murillodutt/cellm",
+  "homepage": "https://cellm.ai",
+  "license": "MIT",
+  "keywords": [
+    "documentation",
+    "docops",
+    "llm-first",
+    "drift-control",
+    "code-evidence"
+  ],
+  "commands": "./commands",
+  "skills": "./skills"
+}

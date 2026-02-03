@@ -1,6 +1,6 @@
 # Troubleshooting Guide
 
-> [Home](../README.md) > [Docs](README.md) > **Troubleshooting**
+> [Home](../README.md) > [Docs](INDEX.md) > **Troubleshooting**
 
 Solutions to common CELLM issues.
 
@@ -435,8 +435,8 @@ tail -100 ~/.cellm/logs/oracle-worker.log
 
 ## Related Documentation
 
-- [Installation Guide](installation.md) - Setup steps
-- [Oracle Documentation](oracle.md) - Backend details
-- [FAQ](faq.md) - Frequently asked questions
+- [Installation Guide](INSTALLATION.md) - Setup steps
+- [Oracle Documentation](ORACLE.md) - Backend details
+- [FAQ](FAQ.md) - Frequently asked questions
 
-[Back to Docs](README.md) | [Back to Home](../README.md)
+[Back to Docs](INDEX.md) | [Back to Home](../README.md)

@@ -1,6 +1,6 @@
 # Getting Started
 
-> [Home](../README.md) > [Docs](README.md) > **Getting Started**
+> [Home](../README.md) > [Docs](INDEX.md) > **Getting Started**
 
 Get CELLM running in 5 minutes.
 
@@ -109,9 +109,10 @@ CELLM loads knowledge automatically:
 
 ### Learn More
 
-- [Features Overview](features.md) - All capabilities
-- [Commands Reference](commands.md) - Every command explained
-- [Skills Guide](skills.md) - Framework knowledge details
+- [Features Overview](FEATURES.md) - All capabilities
+- [Commands Reference](COMMANDS.md) - Every command explained
+- [Skills Guide](SKILLS.md) - Framework knowledge details
+- [DocOps Plugin](../docops/README.md) - Documentation maintenance (optional)
 
 ### Common Workflows
 
@@ -158,8 +159,8 @@ bun --version
 
 ### Need More Help?
 
-- [Full Installation Guide](installation.md)
-- [Troubleshooting Guide](troubleshooting.md)
+- [Full Installation Guide](INSTALLATION.md)
+- [Troubleshooting Guide](TROUBLESHOOTING.md)
 - [GitHub Issues](https://github.com/murillodutt/cellm/issues)
 
 ---
@@ -178,4 +179,4 @@ bun --version
 
 ---
 
-[Back to Docs](README.md) | [Back to Home](../README.md)
+[Back to Docs](INDEX.md) | [Back to Home](../README.md)

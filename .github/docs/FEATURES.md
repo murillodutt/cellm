@@ -1,6 +1,6 @@
 # CELLM Features
 
-> [Home](../README.md) > [Docs](README.md) > **Features**
+> [Home](../README.md) > [Docs](INDEX.md) > **Features**
 
 Complete overview of everything included in CELLM.
 
@@ -33,7 +33,7 @@ npm install @cellm/oracle
 - Get context-aware suggestions during development
 - Track pattern usage and evolution
 
-[Learn more about Oracle](oracle.md)
+[Learn more about Oracle](ORACLE.md)
 
 ---
 
@@ -66,7 +66,7 @@ Compass provides real-time insights into your development process with an intuit
 4. **Agents** - Agent activity and task completion
 5. **Performance** - Development velocity metrics
 
-[Learn more about Compass](compass.md)
+[Learn more about Compass](COMPASS.md)
 
 ---
 
@@ -133,7 +133,7 @@ claude /implement
 claude /verify
 ```
 
-[Full commands reference](commands.md)
+[Full commands reference](COMMANDS.md)
 
 ---
 
@@ -207,7 +207,7 @@ CELLM includes specialized agents that handle different aspects of development.
 - Progress tracking
 - Workload balancing
 
-[Full agents guide](agents.md)
+[Full agents guide](AGENTS.md)
 
 ---
 
@@ -300,7 +300,22 @@ Skills are loaded automatically based on your project files and provide framewor
 
 **Triggered by:** Always available
 
-[Full skills guide](skills.md)
+[Full skills guide](SKILLS.md)
+
+---
+
+## DocOps Plugin (Optional)
+
+**Documentation maintenance and drift control.**
+
+DocOps provides LLM-first templates, code evidence, and gap tracking to keep docs accurate over time.
+
+### Features
+- **LLM-first templates** for conveyor, specs, refs, howto, runbooks, ADRs
+- **Code evidence first**: facts are sourced from code before writing docs
+- **Drift control** with `conveyor-gaps.md`
+
+[Learn more about DocOps](../docops/README.md)
 
 ---
 
@@ -360,9 +375,10 @@ CELLM underwent comprehensive security review to ensure production-grade quality
 
 ## Related Documentation
 
-- [Installation Guide](installation.md) - Setup and configuration
-- [Commands Reference](commands.md) - All workflow commands
-- [Agents Guide](agents.md) - Specialized agents
-- [Skills Guide](skills.md) - Framework skills
+- [Installation Guide](INSTALLATION.md) - Setup and configuration
+- [Commands Reference](COMMANDS.md) - All workflow commands
+- [Agents Guide](AGENTS.md) - Specialized agents
+- [Skills Guide](SKILLS.md) - Framework skills
+- [DocOps Plugin](../docops/README.md) - Documentation maintenance (optional)
 
-[Back to Docs](README.md) | [Back to Home](../README.md)
+[Back to Docs](INDEX.md) | [Back to Home](../README.md)

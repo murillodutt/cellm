@@ -1,6 +1,6 @@
 # Compass Dashboard
 
-> [Home](../README.md) > [Docs](README.md) > **Compass**
+> [Home](../README.md) > [Docs](INDEX.md) > **Compass**
 
 Guide to CELLM's visual dashboard interface.
 
@@ -211,8 +211,8 @@ bun scripts/spawn-worker.sh
 
 ## Related Documentation
 
-- [Oracle Documentation](oracle.md) - Backend details
-- [Installation Guide](installation.md) - Setup
-- [Troubleshooting](troubleshooting.md) - More solutions
+- [Oracle Documentation](ORACLE.md) - Backend details
+- [Installation Guide](INSTALLATION.md) - Setup
+- [Troubleshooting](TROUBLESHOOTING.md) - More solutions
 
-[Back to Docs](README.md) | [Back to Home](../README.md)
+[Back to Docs](INDEX.md) | [Back to Home](../README.md)
