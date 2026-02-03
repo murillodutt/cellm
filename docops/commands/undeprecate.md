@@ -20,7 +20,7 @@ Restore a deprecated document to active status, canceling scheduled archival.
 
 ## Rules
 - Only works on files with `status: deprecated`.
-- Cannot restore already archived files (use `/docops-restore` instead).
+- Cannot restore already archived files (use `/docops:restore` instead).
 - Cleans up all deprecation markers.
 
 ## Steps

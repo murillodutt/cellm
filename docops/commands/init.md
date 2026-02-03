@@ -48,4 +48,4 @@ Bootstrap a clean documentation structure with LLM-first templates.
 - Do NOT invent behavior.
 
 ## Output
-- A minimal documentation base ready for `docops-sync`.
+- A minimal documentation base ready for `/docops:sync`.

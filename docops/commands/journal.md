@@ -13,9 +13,9 @@ Generate a comprehensive JOURNAL.md documenting the project structure and archit
 ## Usage
 
 ```
-/docops-journal              # Generate JOURNAL.md in project root
-/docops-journal docs/        # Generate in docs/ directory
-/docops-journal --force      # Regenerate even if exists
+/docops:journal              # Generate JOURNAL.md in project root
+/docops:journal docs/        # Generate in docs/ directory
+/docops:journal --force      # Regenerate even if exists
 ```
 
 ## What it generates
@@ -37,5 +37,5 @@ Generate a comprehensive JOURNAL.md documenting the project structure and archit
 
 ## Related
 
-- `/docops-sync` - Keep docs aligned with code
-- `/docops-init` - Bootstrap documentation structure
+- `/docops:sync` - Keep docs aligned with code
+- `/docops:init` - Bootstrap documentation structure

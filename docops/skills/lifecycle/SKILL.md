@@ -94,7 +94,7 @@ To list pending deprecations:
 grep -r "status: deprecated" docs/ --include="*.md" -l
 
 # Find files past archive date
-# (implemented in docops-prune)
+# (implemented in /docops:prune)
 ```
 
 ## Restoration Conflict Resolution

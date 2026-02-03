@@ -11,12 +11,12 @@ Este diretorio contem documentacao arquivada que foi deprecada e removida do uso
 
 Para restaurar um documento arquivado:
 ```
-/docops-restore <caminho-arquivo>
+/docops:restore <caminho-arquivo>
 ```
 
 Exemplo:
 ```
-/docops-restore 2026-02/auth.spec.md
+/docops:restore 2026-02/auth.spec.md
 ```
 
 ## Conteudo do Arquivo
@@ -30,7 +30,7 @@ Exemplo:
 ## Politica de Retencao
 
 - **Retencao minima:** 90 dias
-- **Exclusao definitiva:** Somente via `/docops-prune --delete-archived`
+- **Exclusao definitiva:** Somente via `/docops:prune --delete-archived`
 - **ADRs:** Nunca arquivados (registro permanente)
 
 ## Notas

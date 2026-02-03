@@ -79,7 +79,7 @@
     },
     "pruneConfig": {
       "type": "object",
-      "description": "Configuration for docops-prune command",
+      "description": "Configuration for prune command",
       "properties": {
         "mode": {
           "type": "string",
@@ -108,7 +108,7 @@
     },
     "gcConfig": {
       "type": "object",
-      "description": "Configuration for docops-gc command",
+      "description": "Configuration for gc command",
       "properties": {
         "resolvedGapsToKeep": {
           "type": "integer",
@@ -134,7 +134,7 @@
     },
     "freshnessConfig": {
       "type": "object",
-      "description": "Configuration for docops-freshness command",
+      "description": "Configuration for freshness command",
       "properties": {
         "freshDays": {
           "type": "integer",
@@ -163,7 +163,7 @@
     },
     "redundancyConfig": {
       "type": "object",
-      "description": "Configuration for docops-redundancy command",
+      "description": "Configuration for redundancy command",
       "properties": {
         "similarityThreshold": {
           "type": "number",
@@ -194,7 +194,7 @@
     },
     "deprecationConfig": {
       "type": "object",
-      "description": "Configuration for docops-deprecate command",
+      "description": "Configuration for deprecate command",
       "properties": {
         "defaultGracePeriod": {
           "type": "integer",
@@ -215,7 +215,7 @@
         },
         "notifyOnDeprecation": {
           "type": "boolean",
-          "description": "Log deprecation events to docops-deprecations.log",
+          "description": "Log deprecation events to deprecations.log",
           "default": true
         },
         "updateReferences": {

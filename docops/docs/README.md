@@ -3,7 +3,7 @@
 ## 1) Inicializacao
 
 ```text
-/docops-init
+/docops:init
 ```
 
 Resultado:
@@ -13,7 +13,7 @@ Resultado:
 ## 2) Sincronizacao
 
 ```text
-/docops-sync
+/docops:sync
 ```
 
 Resultado:
@@ -24,7 +24,7 @@ Resultado:
 ## 3) Verificacao
 
 ```text
-/docops-verify
+/docops:verify
 ```
 
 Resultado:

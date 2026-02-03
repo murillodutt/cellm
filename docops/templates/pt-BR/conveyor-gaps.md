@@ -20,4 +20,4 @@
 
 | ID | Descricao | Data Resolucao | Resolucao |
 |---|---|---|---|
-<!-- Gaps resolvidos sao movidos aqui por /docops-gc. Manter ultimos 20 para auditoria. -->
+<!-- Gaps resolvidos sao movidos aqui por /docops:gc. Manter ultimos 20 para auditoria. -->

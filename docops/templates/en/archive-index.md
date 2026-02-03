@@ -11,12 +11,12 @@ This directory contains archived documentation that has been deprecated and remo
 
 To restore an archived document:
 ```
-/docops-restore <archive-path>
+/docops:restore <archive-path>
 ```
 
 Example:
 ```
-/docops-restore 2026-02/auth.spec.md
+/docops:restore 2026-02/auth.spec.md
 ```
 
 ## Archive Contents
@@ -30,7 +30,7 @@ Example:
 ## Retention Policy
 
 - **Minimum retention:** 90 days
-- **Hard delete:** Only via explicit `/docops-prune --delete-archived`
+- **Hard delete:** Only via explicit `/docops:prune --delete-archived`
 - **ADRs:** Never archived (permanent record)
 
 ## Notes

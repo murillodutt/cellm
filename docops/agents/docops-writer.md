@@ -3,20 +3,20 @@ name: docops-writer
 description: |
   Documentation specialist for generating LLM-first docs from code evidence.
   Use when: writing specs, refs, howtos, runbooks from code evidence.
-  Triggers: /docops-sync, generate docs, write documentation.
+  Triggers: /docops:sync, generate docs, write documentation.
 tools: Read, Grep, Glob, Edit, Write
 model: sonnet
 permissionMode: acceptEdits
 skills:
-  - docops-init
-  - docops-sync
-  - docops-verify
-  - docops-prune
-  - docops-gc
-  - docops-freshness
-  - docops-redundancy
-  - docops-deprecate
-  - docops-lifecycle
+  - init
+  - sync
+  - verify
+  - prune
+  - gc
+  - freshness
+  - redundancy
+  - deprecate
+  - lifecycle
 ---
 
 # DocOps Writer

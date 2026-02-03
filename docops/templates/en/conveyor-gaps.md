@@ -20,4 +20,4 @@
 
 | ID | Description | Resolved Date | Resolution |
 |---|---|---|---|
-<!-- Resolved gaps are moved here by /docops-gc. Keep last 20 for audit trail. -->
+<!-- Resolved gaps are moved here by /docops:gc. Keep last 20 for audit trail. -->

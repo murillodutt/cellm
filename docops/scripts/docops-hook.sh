@@ -28,7 +28,7 @@ fi
 
 if git -C "${PROJECT_DIR}" status --porcelain "${doc_root}" | grep -q '.'; then
   timestamp="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-  echo "[${timestamp}] DocOps: docs changed under ${doc_root}. Run /docops-sync." >> "${LOG_PATH}" 2>/dev/null || true
+  echo "[${timestamp}] DocOps: docs changed under ${doc_root}. Run /docops:sync." >> "${LOG_PATH}" 2>/dev/null || true
 fi
 
 exit 0
