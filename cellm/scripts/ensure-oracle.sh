@@ -13,7 +13,7 @@ set -euo pipefail
 
 # Error handling and cleanup
 cleanup() {
-  local exit_code=$?
+  local _exit_code=$?  # Captured for potential future logging
   # Silent cleanup - never output errors to not pollute Claude Code
   exit 0
 }

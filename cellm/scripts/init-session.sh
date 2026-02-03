@@ -76,11 +76,61 @@ main() {
   session_id=$(echo "${input}" | jq -r '.session_id // "unknown"')
   cwd=$(echo "${input}" | jq -r '.cwd // ""')
 
-  # Extract project name from cwd
-  if [[ -n "${cwd}" ]]; then
-    project=$(basename "${cwd}")
-  else
-    project=$(basename "${PWD}")
+  # Extract project name using priority order:
+  # 1. CLAUDE_PROJECT_DIR env var (set by Claude Code)
+  # 2. Git repository root
+  # 3. Project marker files (package.json, etc.)
+  # 4. Basename of cwd (with version-like name filtering)
+  project=""
+  local search_dir="${cwd:-${PWD}}"
+
+  # Priority 1: Use CLAUDE_PROJECT_DIR if set by Claude Code
+  if [[ -n "${CLAUDE_PROJECT_DIR:-}" ]]; then
+    project=$(basename "${CLAUDE_PROJECT_DIR}")
+    log "Project from CLAUDE_PROJECT_DIR: ${project}"
+  fi
+
+  # Priority 2: Find git root directory (most reliable for repos)
+  if [[ -z "${project}" && -n "${search_dir}" ]] && command -v git &> /dev/null; then
+    local git_root
+    git_root=$(cd "${search_dir}" 2>/dev/null && git rev-parse --show-toplevel 2>/dev/null || echo "")
+    if [[ -n "${git_root}" ]]; then
+      project=$(basename "${git_root}")
+    fi
+  fi
+
+  # Priority 3: Look for project marker files walking up the tree
+  if [[ -z "${project}" && -n "${search_dir}" ]]; then
+    local check_dir="${search_dir}"
+    while [[ "${check_dir}" != "/" && "${check_dir}" != "." ]]; do
+      if [[ -f "${check_dir}/package.json" ]] || \
+         [[ -f "${check_dir}/Cargo.toml" ]] || \
+         [[ -f "${check_dir}/go.mod" ]] || \
+         [[ -f "${check_dir}/pyproject.toml" ]] || \
+         [[ -d "${check_dir}/.git" ]]; then
+        project=$(basename "${check_dir}")
+        break
+      fi
+      check_dir=$(dirname "${check_dir}")
+    done
+  fi
+
+  # Priority 4: Basename of cwd (filter version-like names)
+  if [[ -z "${project}" ]]; then
+    local base_name
+    base_name=$(basename "${search_dir}")
+    # Skip if it looks like a version number (e.g., 2.0.6, v1.2.3)
+    if [[ ! "${base_name}" =~ ^v?[0-9]+\.[0-9]+ ]]; then
+      project="${base_name}"
+    else
+      # Use parent directory instead
+      project=$(basename "$(dirname "${search_dir}")")
+    fi
+  fi
+
+  # Ultimate fallback
+  if [[ -z "${project}" || "${project}" == "/" ]]; then
+    project="unknown"
   fi
 
   # Skip if no valid session

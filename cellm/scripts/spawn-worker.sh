@@ -27,7 +27,7 @@ LOG_FILE="${CELLM_DIR}/oracle-hook.log"
 LOCK_FILE="${CELLM_DIR}/spawn.lock"
 PID_FILE="${CELLM_DIR}/worker.pid"
 DEFAULT_PORT=31415
-HEALTH_TIMEOUT=500  # ms - increased from 200ms
+_HEALTH_TIMEOUT=500  # ms - reserved for future curl timeout tuning
 MAX_HEALTH_RETRIES=3
 LOCK_TIMEOUT=5  # seconds
 
@@ -95,9 +95,9 @@ check_health_once() {
 check_health_with_retry() {
   local port="${1:-$DEFAULT_PORT}"
   local max_retries="${2:-$MAX_HEALTH_RETRIES}"
-  local i
+  local _i
 
-  for i in $(seq 1 "${max_retries}"); do
+  for _i in $(seq 1 "${max_retries}"); do
     if check_health_once "${port}"; then
       return 0
     fi
@@ -285,7 +285,8 @@ main() {
 
   local end_time
   end_time=$(date +%s%3N 2>/dev/null || date +%s)
-  local duration=$((end_time - start_time))
+  local duration
+  duration=$((end_time - start_time))
   log_json "info" "Hook completed in ${duration}ms"
 
   # Always exit 0 - never break CLI

@@ -26,7 +26,7 @@ CELLM_DIR="${HOME}/.cellm"
 WORKER_JSON="${CELLM_DIR}/worker.json"
 DEFAULT_PORT=31415
 READINESS_TIMEOUT=5
-READINESS_INTERVAL=0.2
+_READINESS_INTERVAL=0.2  # Reserved for future use
 
 # Parse arguments
 JSON_OUTPUT=false
@@ -109,9 +109,10 @@ wait_for_ready() {
 
   # Calculate max_iterations from timeout (timeout in seconds / 0.2s interval)
   local sleep_interval=0.2
-  local max_iterations=$((timeout * 5))  # timeout / 0.2 = timeout * 5
+  local max_iterations
+  max_iterations=$((timeout * 5))  # timeout / 0.2 = timeout * 5
 
-  for i in $(seq 1 "${max_iterations}"); do
+  for _i in $(seq 1 "${max_iterations}"); do
     if check_health "${port}" >/dev/null 2>&1; then
       return 0
     fi

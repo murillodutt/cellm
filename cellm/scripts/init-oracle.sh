@@ -309,7 +309,7 @@ clear_cache() {
   if ask_yes_no "Continue?" "n"; then
     local cache_dir="$DATA_DIR/cache"
     if [ -d "$cache_dir" ]; then
-      rm -rf "$cache_dir"/*
+      rm -rf "${cache_dir:?}"/*
       print_success "Cache cleared"
     else
       print_info "No cache found"
@@ -402,7 +402,8 @@ ensure_jq() {
 # Configure OTEL in ~/.claude/settings.json
 configure_otel_settings() {
   local settings_file="$HOME/.claude/settings.json"
-  local backup_file="$HOME/.claude/settings.json.backup.$(date +%s)"
+  local backup_file
+  backup_file="$HOME/.claude/settings.json.backup.$(date +%s)"
 
   print_step "Step 6/6: Configuring OTEL telemetry..."
 
@@ -415,7 +416,8 @@ configure_otel_settings() {
 
   # Check if already configured
   if [ -f "$settings_file" ]; then
-    local existing_otel=$(jq -r '.env.OTEL_EXPORTER_OTLP_ENDPOINT // empty' "$settings_file" 2>/dev/null)
+    local existing_otel
+    existing_otel=$(jq -r '.env.OTEL_EXPORTER_OTLP_ENDPOINT // empty' "$settings_file" 2>/dev/null)
     if [ -n "$existing_otel" ]; then
       print_success "OTEL already configured (endpoint: $existing_otel)"
       return 0
@@ -473,7 +475,8 @@ configure_otel_advanced() {
 
   # Show current status
   if [ -f "$settings_file" ] && command -v jq >/dev/null 2>&1; then
-    local current=$(jq -r '.env.OTEL_EXPORTER_OTLP_ENDPOINT // "Not configured"' "$settings_file" 2>/dev/null)
+    local current
+    current=$(jq -r '.env.OTEL_EXPORTER_OTLP_ENDPOINT // "Not configured"' "$settings_file" 2>/dev/null)
     print_info "Current endpoint: $current"
   else
     print_info "Status: Not configured"
@@ -500,7 +503,8 @@ configure_otel_advanced() {
 # Enable OTEL with default settings (non-interactive version)
 configure_otel_enable() {
   local settings_file="$HOME/.claude/settings.json"
-  local backup_file="$HOME/.claude/settings.json.backup.$(date +%s)"
+  local backup_file
+  backup_file="$HOME/.claude/settings.json.backup.$(date +%s)"
 
   echo ""
 
@@ -597,7 +601,8 @@ configure_otel_enable_silent() {
 # Configure OTEL with custom endpoint
 configure_otel_custom() {
   local settings_file="$HOME/.claude/settings.json"
-  local backup_file="$HOME/.claude/settings.json.backup.$(date +%s)"
+  local backup_file
+  backup_file="$HOME/.claude/settings.json.backup.$(date +%s)"
 
   echo ""
 
@@ -662,8 +667,10 @@ check_dependencies() {
 
   # Check Bun (required)
   if command -v bun >/dev/null 2>&1; then
-    local bun_version=$(bun --version)
-    local bun_major=$(echo "$bun_version" | cut -d. -f1)
+    local bun_version
+    bun_version=$(bun --version)
+    local bun_major
+    bun_major=$(echo "$bun_version" | cut -d. -f1)
     if [ "$bun_major" -ge 1 ]; then
       print_success "Bun $bun_version found"
     else
@@ -679,7 +686,8 @@ check_dependencies() {
 
   # Check jq (required for OTEL)
   if command -v jq >/dev/null 2>&1; then
-    local jq_version=$(jq --version 2>/dev/null || echo "unknown")
+    local jq_version
+    jq_version=$(jq --version 2>/dev/null || echo "unknown")
     print_success "jq $jq_version found"
   else
     print_warning "jq not found (required for OTEL telemetry)"
@@ -730,7 +738,8 @@ install_package() {
   fi
 
   if bun x "$PACKAGE_NAME@latest" --version >/dev/null 2>&1; then
-    local version=$(bun x "$PACKAGE_NAME@latest" --version 2>/dev/null || echo "unknown")
+    local version
+    version=$(bun x "$PACKAGE_NAME@latest" --version 2>/dev/null || echo "unknown")
     print_success "Installed v$version"
     return 0
   else
@@ -796,7 +805,8 @@ validate_health() {
   response_time=$(curl -sf -w "%{time_total}" --max-time 5 "${WORKER_URL}/health" -o /dev/null 2>/dev/null || echo "0")
 
   if [ "$response_time" != "0" ]; then
-    local ms=$(echo "$response_time * 1000" | bc)
+    local ms
+    ms=$(echo "$response_time * 1000" | bc)
     print_success "Worker is healthy (response: ${ms}ms)"
     return 0
   else
@@ -844,7 +854,8 @@ show_status() {
 
   # Check installation
   if [ -f "$MARKER_FILE" ]; then
-    local install_date=$(cat "$MARKER_FILE")
+    local install_date
+    install_date=$(cat "$MARKER_FILE")
     print_success "Installed: YES ($install_date)"
   else
     print_error "Installed: NO"
@@ -857,8 +868,9 @@ show_status() {
   if curl -sf --max-time 2 "${WORKER_URL}/health" >/dev/null 2>&1; then
     print_success "Running: YES"
 
-    # Get detailed health info
-    local health_json=$(curl -sf --max-time 2 "${WORKER_URL}/health" 2>/dev/null || echo "{}")
+    # Get detailed health info (variable used for future diagnostics)
+    local _health_json
+    _health_json=$(curl -sf --max-time 2 "${WORKER_URL}/health" 2>/dev/null || echo "{}")
     print_success "Healthy: YES"
 
     # Get version if available
@@ -878,7 +890,8 @@ show_status() {
   # Database info
   local db_file="$DATA_DIR/compass/compass.db"
   if [ -f "$db_file" ]; then
-    local db_size=$(du -h "$db_file" | cut -f1)
+    local db_size
+    db_size=$(du -h "$db_file" | cut -f1)
     echo ""
     print_step "Database:"
     print_info "Location: $db_file"
@@ -985,7 +998,8 @@ run_doctor() {
   print_info "[7/7] Checking OTEL configuration..."
   local settings_file="$HOME/.claude/settings.json"
   if [ -f "$settings_file" ] && command -v jq >/dev/null 2>&1; then
-    local otel_endpoint=$(jq -r '.env.OTEL_EXPORTER_OTLP_ENDPOINT // empty' "$settings_file" 2>/dev/null)
+    local otel_endpoint
+    otel_endpoint=$(jq -r '.env.OTEL_EXPORTER_OTLP_ENDPOINT // empty' "$settings_file" 2>/dev/null)
     if [ -n "$otel_endpoint" ]; then
       print_success "OTEL configured (endpoint: $otel_endpoint)"
     else

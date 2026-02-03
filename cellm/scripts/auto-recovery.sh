@@ -164,7 +164,8 @@ main() {
 
   local end_time
   end_time=$(date +%s%3N 2>/dev/null || date +%s)
-  local duration=$((end_time - start_time))
+  local duration
+  duration=$((end_time - start_time))
   log_json "info" "[RECOVERY] Check completed in ${duration}ms"
 
   # Always exit 0 - never break CLI

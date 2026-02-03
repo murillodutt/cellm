@@ -24,7 +24,7 @@ NC='\033[0m' # No Color
 check_command() {
   local cmd="$1"
   local name="$2"
-  local min_version="${3:-}"
+  local _min_version="${3:-}"  # Reserved for future version checking
 
   if command -v "${cmd}" >/dev/null 2>&1; then
     local version
