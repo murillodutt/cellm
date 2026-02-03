@@ -1,9 +1,9 @@
 ---
-name: docops-freshness
+name: freshness
 description: |
   Check and update evidence freshness status across code-evidence files.
   Use when: validating evidence currency, checking stale docs, updating verification dates.
-  Triggers: /docops-freshness, stale evidence, outdated docs, verification check.
+  Triggers: /docops:freshness, stale evidence, outdated docs, verification check.
 argument-hint: "[docRoot] [--update]"
 allowed-tools: Read, Edit, Write, Glob, Grep
 model: inherit

@@ -1,9 +1,9 @@
 ---
-name: docops-lifecycle
+name: lifecycle
 description: |
   Manage complete documentation lifecycle: deprecation, restoration, and archival.
   Use when: managing doc status, checking pending deprecations, restoring archived docs.
-  Triggers: /docops-undeprecate, /docops-restore, lifecycle management, doc status.
+  Triggers: /docops:undeprecate, /docops:restore, lifecycle management, doc status.
 argument-hint: "<action> <file> [options]"
 allowed-tools: Read, Edit, Write, Glob, Grep, Bash
 model: inherit
@@ -38,10 +38,10 @@ Manage the complete documentation lifecycle from creation to archival and restor
 | From | To | Command | Automatic |
 |------|-----|---------|-----------|
 | draft | active | (manual edit) | No |
-| active | deprecated | `/docops-deprecate` | No |
-| deprecated | active | `/docops-undeprecate` | No |
-| deprecated | archived | `/docops-prune` | Yes (after grace) |
-| archived | active | `/docops-restore` | No |
+| active | deprecated | `/docops:deprecate` | No |
+| deprecated | active | `/docops:undeprecate` | No |
+| deprecated | archived | `/docops:prune` | Yes (after grace) |
+| archived | active | `/docops:restore` | No |
 
 ## Archive Directory Structure
 
@@ -76,7 +76,7 @@ Manage the complete documentation lifecycle from creation to archival and restor
 
 ## Deprecation Log Format
 
-File: `.claude/docops-deprecations.log`
+File: `.claude/docops:deprecations.log`
 
 ```
 2026-02-03T10:30:00Z DEPRECATE specs/auth.spec.md reason="Superseded by v2" archive_on=2026-03-05 by=agent

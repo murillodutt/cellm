@@ -1,7 +1,7 @@
 ---
-name: docops-sync
+name: sync
 description: Refresh code evidence, gaps, and derived documentation.
-usage: /docops-sync [docRoot]
+usage: /docops:sync [docRoot]
 arguments:
   - name: docRoot
     description: Optional documentation root (overrides .claude/docops.json)

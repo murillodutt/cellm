@@ -1,7 +1,7 @@
 ---
-name: docops-undeprecate
+name: undeprecate
 description: Restore a deprecated document to active status.
-usage: /docops-undeprecate <file> [--reason "text"]
+usage: /docops:undeprecate <file> [--reason "text"]
 arguments:
   - name: file
     description: File path to restore (relative to docRoot)

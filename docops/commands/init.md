@@ -1,7 +1,7 @@
 ---
-name: docops-init
+name: init
 description: Bootstrap a clean documentation structure with LLM-first templates.
-usage: /docops-init [docRoot]
+usage: /docops:init [docRoot]
 arguments:
   - name: docRoot
     description: Optional documentation root (overrides .claude/docops.json)

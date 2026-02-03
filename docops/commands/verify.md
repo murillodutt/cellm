@@ -1,7 +1,7 @@
 ---
-name: docops-verify
+name: verify
 description: Validate documentation structure, links, and normative vocabulary.
-usage: /docops-verify [docRoot]
+usage: /docops:verify [docRoot]
 arguments:
   - name: docRoot
     description: Optional documentation root (overrides .claude/docops.json)

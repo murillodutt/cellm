@@ -1,9 +1,9 @@
 ---
-name: docops-prune
+name: prune
 description: |
   Archive or remove deprecated documentation and broken references.
   Use when: cleaning up docs, removing deprecated content, fixing broken links.
-  Triggers: /docops-prune, deprecated docs, broken references.
+  Triggers: /docops:prune, deprecated docs, broken references.
 argument-hint: "[docRoot] [--dry-run]"
 allowed-tools: Read, Edit, Write, Glob, Grep, Bash
 model: inherit

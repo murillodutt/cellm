@@ -1,9 +1,9 @@
 ---
-name: docops-verify
+name: verify
 description: |
   Validate documentation structure, links, and normative vocabulary.
   Use when: checking doc quality, validating structure, pre-commit validation.
-  Triggers: /docops-verify, verify docs, check documentation.
+  Triggers: /docops:verify, verify docs, check documentation.
 argument-hint: "[docRoot]"
 allowed-tools: Read, Glob, Grep
 model: inherit

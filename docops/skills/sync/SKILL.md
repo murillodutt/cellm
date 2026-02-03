@@ -1,9 +1,9 @@
 ---
-name: docops-sync
+name: sync
 description: |
   Refresh code evidence, gaps, and derived documentation.
   Use when: updating docs after code changes, syncing evidence, detecting drift.
-  Triggers: /docops-sync, code changes, stale documentation.
+  Triggers: /docops:sync, code changes, stale documentation.
 argument-hint: "[docRoot]"
 allowed-tools: Read, Edit, Write, Glob, Grep
 model: inherit

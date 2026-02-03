@@ -2,7 +2,7 @@
 id: CMD-DOCOPS-JOURNAL
 version: v1.0.0
 status: OK
-command: docops-journal
+name: journal
 budget: ~200 tokens
 ---
 

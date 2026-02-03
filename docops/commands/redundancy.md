@@ -1,7 +1,7 @@
 ---
-name: docops-redundancy
+name: redundancy
 description: Detect redundant and duplicate content across documentation files.
-usage: /docops-redundancy [docRoot] [--threshold N]
+usage: /docops:redundancy [docRoot] [--threshold N]
 arguments:
   - name: docRoot
     description: Optional documentation root (overrides .claude/docops.json)

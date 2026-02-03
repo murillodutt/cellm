@@ -1,7 +1,7 @@
 ---
-name: docops-freshness
+name: freshness
 description: Check and update evidence freshness status across all code-evidence files.
-usage: /docops-freshness [docRoot] [--update]
+usage: /docops:freshness [docRoot] [--update]
 arguments:
   - name: docRoot
     description: Optional documentation root (overrides .claude/docops.json)

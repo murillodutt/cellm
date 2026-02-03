@@ -1,9 +1,9 @@
 ---
-name: docops-gc
+name: gc
 description: |
   Garbage collection for resolved gaps, stale evidence, and redundant content.
   Use when: cleaning gaps, checking evidence freshness, detecting duplicates.
-  Triggers: /docops-gc, clean gaps, stale evidence, redundant docs.
+  Triggers: /docops:gc, clean gaps, stale evidence, redundant docs.
 argument-hint: "[docRoot] [--dry-run]"
 allowed-tools: Read, Edit, Write, Glob, Grep
 model: inherit

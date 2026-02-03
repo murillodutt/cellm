@@ -1,7 +1,7 @@
 ---
-name: docops-prune
+name: prune
 description: Archive or remove deprecated documentation and broken references.
-usage: /docops-prune [docRoot] [--dry-run]
+usage: /docops:prune [docRoot] [--dry-run]
 arguments:
   - name: docRoot
     description: Optional documentation root (overrides .claude/docops.json)

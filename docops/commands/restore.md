@@ -1,7 +1,7 @@
 ---
-name: docops-restore
+name: restore
 description: Restore an archived document back to active documentation.
-usage: /docops-restore <file> [--reason "text"]
+usage: /docops:restore <file> [--reason "text"]
 arguments:
   - name: file
     description: File path in archive to restore (relative to archive/)

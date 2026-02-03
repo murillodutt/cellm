@@ -1,7 +1,7 @@
 ---
-name: docops-gc
+name: gc
 description: Garbage collection for resolved gaps, stale evidence, and redundant content.
-usage: /docops-gc [docRoot] [--dry-run]
+usage: /docops:gc [docRoot] [--dry-run]
 arguments:
   - name: docRoot
     description: Optional documentation root (overrides .claude/docops.json)

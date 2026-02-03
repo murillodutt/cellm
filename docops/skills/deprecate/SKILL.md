@@ -1,9 +1,9 @@
 ---
-name: docops-deprecate
+name: deprecate
 description: |
   Mark documentation for deprecation with grace period and scheduled archival.
   Use when: retiring docs, replacing with new version, scheduling removal.
-  Triggers: /docops-deprecate, deprecate doc, retire documentation, schedule archival.
+  Triggers: /docops:deprecate, deprecate doc, retire documentation, schedule archival.
 argument-hint: "<file> [--days N] [--reason 'text']"
 allowed-tools: Read, Edit, Write, Glob, Grep
 model: inherit

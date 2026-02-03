@@ -1,9 +1,9 @@
 ---
-name: docops-redundancy
+name: redundancy
 description: |
   Detect redundant and duplicate content across documentation files.
   Use when: finding duplicates, consolidating docs, reducing redundancy.
-  Triggers: /docops-redundancy, duplicate content, similar docs, consolidate.
+  Triggers: /docops:redundancy, duplicate content, similar docs, consolidate.
 argument-hint: "[docRoot] [--threshold N]"
 allowed-tools: Read, Glob, Grep
 model: inherit

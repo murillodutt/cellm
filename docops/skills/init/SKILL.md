@@ -1,9 +1,9 @@
 ---
-name: docops-init
+name: init
 description: |
   Initialize documentation structure and LLM-first templates for a project.
   Use when: setting up new project docs, creating doc structure, initializing docops.
-  Triggers: /docops-init, missing docs folder, new project setup.
+  Triggers: /docops:init, missing docs folder, new project setup.
 argument-hint: "[docRoot]"
 allowed-tools: Read, Edit, Write, Glob, Grep
 model: inherit

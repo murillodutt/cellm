@@ -1,9 +1,9 @@
 ---
-name: docops-journal
+name: journal
 description: |
   Generate project JOURNAL.md from code evidence and project structure.
   Use when: creating project overview, documenting architecture, onboarding.
-  Triggers: /docops-journal, generate journal, project overview, architecture doc.
+  Triggers: /docops:journal, generate journal, project overview, architecture doc.
 argument-hint: "[output-path]"
 allowed-tools: Read, Write, Glob, Grep, Bash
 model: inherit
@@ -97,7 +97,7 @@ The JOURNAL.md should contain:
 ### 4. Output
 
 Default output: `JOURNAL.md` in project root.
-Custom output: Use argument `/docops-journal docs/JOURNAL.md`
+Custom output: Use argument `/docops:journal docs/JOURNAL.md`
 
 ## Project Type Templates
 
@@ -173,15 +173,15 @@ tests/         # Test files
 
 ### Generate for current project
 ```
-/docops-journal
+/docops:journal
 ```
 
 ### Generate to specific path
 ```
-/docops-journal docs/architecture/JOURNAL.md
+/docops:journal docs/architecture/JOURNAL.md
 ```
 
 ### Regenerate after changes
 ```
-/docops-journal --force
+/docops:journal --force
 ```
