@@ -2,7 +2,7 @@
 id: CMD-PLAN-PRODUCT
 version: v1.2.0
 status: OK
-command: plan-product
+name: plan
 agent: architect
 budget: ~250 tokens
 ---

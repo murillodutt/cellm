@@ -2,7 +2,7 @@
 id: CMD-DISCOVER-PATTERNS
 version: v1.2.0
 status: OK
-command: discover-patterns
+name: discover
 agent: architect
 budget: ~300 tokens
 ---

@@ -2,7 +2,7 @@
 id: CMD-INDEX-PATTERNS
 version: v1.2.0
 status: OK
-command: index-patterns
+name: index
 agent: project-manager
 budget: ~200 tokens
 ---

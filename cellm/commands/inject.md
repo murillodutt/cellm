@@ -2,7 +2,7 @@
 id: CMD-INJECT-PATTERNS
 version: v1.2.0
 status: OK
-command: inject-patterns
+name: inject
 agent: implementer
 budget: ~250 tokens
 ---

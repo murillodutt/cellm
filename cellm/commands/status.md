@@ -2,7 +2,7 @@
 id: CMD-ORACLE-STATUS
 version: v1.2.0
 status: OK
-command: oracle-status
+name: status
 agent: project-manager
 budget: ~150 tokens
 ---
