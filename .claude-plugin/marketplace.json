@@ -14,6 +14,12 @@
       "version": "2.0.5",
       "source": "./cellm",
       "description": "Context Engineering for LLM-driven development"
+    },
+    {
+      "name": "docops",
+      "version": "1.0.0",
+      "source": "./docops",
+      "description": "Documentation-as-Code automation for Claude Code projects"
     }
   ]
 }
