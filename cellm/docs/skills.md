@@ -8,17 +8,17 @@ Complete guide to CELLM's 7 framework skills.
 
 ## Overview
 
-Skills are specialized knowledge modules that load automatically based on your project files. They provide framework-specific patterns, best practices, and guidance.
+Skills are specialized knowledge modules that load automatically based on your project files. They provide framework-specific patterns, best practices, and guidance. All skills use the `/cellm:` namespace.
 
 | Skill | Technology | Trigger Patterns |
 |-------|------------|------------------|
-| `sk-nuxt` | Nuxt 4 | `*.vue`, `nuxt.config.ts`, `server/**` |
-| `sk-vue` | Vue 3 | `*.vue` files |
-| `sk-typescript` | TypeScript | `*.ts`, `*.tsx` files |
-| `sk-tailwind` | Tailwind CSS v4 | Files with Tailwind classes |
-| `sk-pinia` | Pinia | `stores/**`, `pinia` imports |
-| `sk-drizzle` | Drizzle ORM | `db/**`, `drizzle` imports |
-| `oracle-search` | Semantic Search | Always available |
+| `/cellm:nuxt` | Nuxt 4 | `*.vue`, `nuxt.config.ts`, `server/**` |
+| `/cellm:vue` | Vue 3 | `*.vue` files |
+| `/cellm:typescript` | TypeScript | `*.ts`, `*.tsx` files |
+| `/cellm:tailwind` | Tailwind CSS v4 | Files with Tailwind classes |
+| `/cellm:pinia` | Pinia | `stores/**`, `pinia` imports |
+| `/cellm:drizzle` | Drizzle ORM | `db/**`, `drizzle` imports |
+| `/cellm:oracle-search` | Semantic Search | Always available |
 
 ---
 
@@ -30,17 +30,17 @@ Skills load based on file patterns:
 
 ```
 You open: src/components/Button.vue
-Loaded:   sk-vue, sk-nuxt, sk-tailwind
+Loaded:   cellm:vue, cellm:nuxt, cellm:tailwind
 ```
 
 ```
 You open: server/api/users.get.ts
-Loaded:   sk-nuxt, sk-typescript
+Loaded:   cellm:nuxt, cellm:typescript
 ```
 
 ```
 You open: db/schema.ts
-Loaded:   sk-drizzle, sk-typescript
+Loaded:   cellm:drizzle, cellm:typescript
 ```
 
 ### What Skills Provide
@@ -52,7 +52,7 @@ Loaded:   sk-drizzle, sk-typescript
 
 ---
 
-## sk-nuxt
+## /cellm:nuxt
 
 **Nuxt 4 full-stack patterns and best practices**
 
@@ -97,7 +97,7 @@ export default defineEventHandler(async (event) => {
 
 ---
 
-## sk-vue
+## /cellm:vue
 
 **Vue 3 Composition API patterns**
 
@@ -168,7 +168,7 @@ onMounted(() => {
 
 ---
 
-## sk-typescript
+## /cellm:typescript
 
 **Type-safe patterns and utilities**
 
@@ -225,7 +225,7 @@ function isUser(obj: unknown): obj is User {
 
 ---
 
-## sk-tailwind
+## /cellm:tailwind
 
 **Tailwind CSS v4 with semantic tokens**
 
@@ -283,7 +283,7 @@ function isUser(obj: unknown): obj is User {
 
 ---
 
-## sk-pinia
+## /cellm:pinia
 
 **State management patterns**
 
@@ -359,7 +359,7 @@ export const useUserStore = defineStore('user', () => {
 
 ---
 
-## sk-drizzle
+## /cellm:drizzle
 
 **Database ORM patterns**
 
@@ -427,7 +427,7 @@ await db
 
 ---
 
-## oracle-search
+## /cellm:oracle-search
 
 **Semantic search integration**
 
@@ -466,11 +466,11 @@ When working on different file types, multiple skills load together:
 
 | File Type | Skills Loaded |
 |-----------|---------------|
-| `*.vue` | sk-vue, sk-nuxt, sk-tailwind |
-| `server/**/*.ts` | sk-nuxt, sk-typescript |
-| `stores/*.ts` | sk-pinia, sk-typescript |
-| `db/*.ts` | sk-drizzle, sk-typescript |
-| `*.ts` (general) | sk-typescript |
+| `*.vue` | cellm:vue, cellm:nuxt, cellm:tailwind |
+| `server/**/*.ts` | cellm:nuxt, cellm:typescript |
+| `stores/*.ts` | cellm:pinia, cellm:typescript |
+| `db/*.ts` | cellm:drizzle, cellm:typescript |
+| `*.ts` (general) | cellm:typescript |
 
 ---
 

@@ -8,21 +8,21 @@ Complete reference for all CELLM workflow commands.
 
 ## Overview
 
-CELLM provides 10 workflow commands organized into phases:
+CELLM provides workflow commands organized into phases. All commands use the `/cellm:` namespace.
 
 | Phase | Commands |
 |-------|----------|
-| **Planning** | `/plan-product`, `/shape-spec`, `/write-spec` |
+| **Planning** | `/cellm:plan`, `/cellm:shape`, `/write-spec` |
 | **Execution** | `/create-tasks`, `/orchestrate-tasks`, `/implement` |
-| **Validation** | `/verify`, `/status` |
-| **Pattern Management** | `/discover-patterns`, `/inject-patterns`, `/index-patterns` |
-| **Setup & Monitoring** | `/cellm-init`, `/oracle-status` |
+| **Validation** | `/verify`, `/cellm:status` |
+| **Pattern Management** | `/cellm:discover`, `/cellm:inject`, `/cellm:index` |
+| **Setup & Monitoring** | `/cellm:init` |
 
 ---
 
 ## Planning Commands
 
-### /plan-product
+### /cellm:plan
 
 **Purpose:** Establish foundational product documentation
 
@@ -43,7 +43,7 @@ cellm-core/project/product/
 
 **Usage:**
 ```bash
-/plan-product "my SaaS product"
+/cellm:plan "my SaaS product"
 ```
 
 **Process:**
@@ -55,7 +55,7 @@ cellm-core/project/product/
 
 ---
 
-### /shape-spec
+### /cellm:shape
 
 **Purpose:** Research and define requirements for a feature
 
@@ -83,7 +83,7 @@ cellm-core/specs/{YYYY-MM-DD-HHMM-feature-slug}/
 **Usage:**
 ```bash
 # Enter plan mode first
-/shape-spec
+/cellm:shape
 ```
 
 **Process:**
@@ -255,7 +255,7 @@ cellm-core/specs/{YYYY-MM-DD-HHMM-feature-slug}/
 
 ---
 
-### /status
+### /cellm:status
 
 **Purpose:** Display current project status
 
@@ -292,14 +292,14 @@ Pending:
 
 **Usage:**
 ```bash
-/status
+/cellm:status
 ```
 
 ---
 
 ## Pattern Management Commands
 
-### /discover-patterns
+### /cellm:discover
 
 **Purpose:** Find patterns in your codebase
 
@@ -310,12 +310,12 @@ Pending:
 
 **Usage:**
 ```bash
-/discover-patterns
+/cellm:discover
 ```
 
 ---
 
-### /inject-patterns
+### /cellm:inject
 
 **Purpose:** Apply patterns consistently to code
 
@@ -326,12 +326,12 @@ Pending:
 
 **Usage:**
 ```bash
-/inject-patterns
+/cellm:inject
 ```
 
 ---
 
-### /index-patterns
+### /cellm:index
 
 **Purpose:** Search available patterns
 
@@ -342,14 +342,14 @@ Pending:
 
 **Usage:**
 ```bash
-/index-patterns
+/cellm:index
 ```
 
 ---
 
 ## Setup & Monitoring Commands
 
-### /cellm-init
+### /cellm:init
 
 **Purpose:** Interactive Oracle setup and maintenance
 
@@ -375,15 +375,15 @@ Pending:
 **Usage:**
 ```bash
 # Interactive mode (recommended)
-/cellm-init
+/cellm:init
 
 # Direct command-line modes
-/cellm-init install   # First-time installation
-/cellm-init status    # Check current state
-/cellm-init update    # Upgrade to latest
-/cellm-init doctor    # Run diagnostics
-/cellm-init restart   # Restart worker
-/cellm-init uninstall # Remove Oracle
+/cellm:init install   # First-time installation
+/cellm:init status    # Check current state
+/cellm:init update    # Upgrade to latest
+/cellm:init doctor    # Run diagnostics
+/cellm:init restart   # Restart worker
+/cellm:init uninstall # Remove Oracle
 ```
 
 **Doctor Mode:**
@@ -406,49 +406,16 @@ Each issue found is automatically fixed with user confirmation.
 
 ---
 
-### /oracle-status
-
-**Purpose:** Check Oracle worker daemon status
-
-**Agent:** Project Manager
-
-**What it does:**
-- Reads worker configuration
-- Calls health endpoint
-- Reports status in table format
-
-**Output:**
-```
-[+] Oracle Worker: Running
-[+] MCP Server: Connected
-[+] Database: Ready
-[+] Embeddings: Loaded
-
-| Field    | Value          |
-|----------|----------------|
-| Status   | online         |
-| Port     | 31415          |
-| Uptime   | 2h 34m         |
-| Database | ~/.cellm/compass/compass.db |
-```
-
-**Usage:**
-```bash
-/oracle-status
-```
-
----
-
 ## Typical Workflow
 
 ### Full Feature Development
 
 ```bash
 # 1. Plan the product (if new project)
-/plan-product "my app"
+/cellm:plan "my app"
 
 # 2. Shape the feature (in plan mode)
-/shape-spec
+/cellm:shape
 
 # 3. Create tasks from spec
 /create-tasks
@@ -460,7 +427,7 @@ Each issue found is automatically fixed with user confirmation.
 /verify
 
 # 6. Check status anytime
-/status
+/cellm:status
 ```
 
 ### Quick Fix Workflow
@@ -477,13 +444,13 @@ Each issue found is automatically fixed with user confirmation.
 
 ```bash
 # 1. Find patterns in codebase
-/discover-patterns
+/cellm:discover
 
 # 2. Search for specific pattern
-/index-patterns "authentication"
+/cellm:index "authentication"
 
 # 3. Apply patterns to code
-/inject-patterns
+/cellm:inject
 ```
 
 ---
@@ -492,19 +459,18 @@ Each issue found is automatically fixed with user confirmation.
 
 | Command | Agent | Purpose | Output |
 |---------|-------|---------|--------|
-| `/cellm-init` | - | Oracle setup & maintenance | Interactive installation/config |
-| `/plan-product` | Architect | Product foundation | mission.md, roadmap.md, tech-stack.md |
-| `/shape-spec` | Architect | Feature research | spec folder with plan, shape, patterns |
+| `/cellm:init` | - | Oracle setup & maintenance | Interactive installation/config |
+| `/cellm:plan` | Architect | Product foundation | mission.md, roadmap.md, tech-stack.md |
+| `/cellm:shape` | Architect | Feature research | spec folder with plan, shape, patterns |
 | `/write-spec` | Architect | Technical spec | spec.md |
 | `/create-tasks` | PM | Task breakdown | tasks.md |
 | `/orchestrate-tasks` | PM | Execute tasks | Updated tasks.md |
 | `/implement` | Implementer | Code generation | Working code |
 | `/verify` | Reviewer | Quality check | verification report |
-| `/status` | PM | Progress check | Status display |
-| `/discover-patterns` | - | Pattern search | Pattern list |
-| `/inject-patterns` | - | Apply patterns | Updated code |
-| `/index-patterns` | - | Search patterns | Pattern index |
-| `/oracle-status` | PM | Health check | Status table |
+| `/cellm:status` | PM | Progress check | Status display |
+| `/cellm:discover` | - | Pattern search | Pattern list |
+| `/cellm:inject` | - | Apply patterns | Updated code |
+| `/cellm:index` | - | Search patterns | Pattern index |
 
 ---
 
