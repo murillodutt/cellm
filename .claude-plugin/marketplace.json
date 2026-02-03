@@ -17,9 +17,9 @@
     },
     {
       "name": "docops",
-      "version": "1.0.0",
+      "version": "0.4.5",
       "source": "./docops",
-      "description": "Documentation-as-Code automation for Claude Code projects"
+      "description": "Documentation maintenance with LLM-first templates, drift control, and cleanup"
     }
   ]
 }
