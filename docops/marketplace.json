@@ -13,7 +13,7 @@
   "plugins": [
     {
       "name": "docops",
-      "version": "0.1.0",
+      "version": "0.4.0",
       "source": "./",
       "description": "LLM-first documentation workflows with drift control and code evidence",
       "keywords": [

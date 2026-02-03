@@ -15,3 +15,9 @@
 | ID | Descricao | Evidencia | Secao do conveyor | Classificacao | Acao |
 |---|---|---|---|---|---|
 | CONFLITO-001 |  |  |  | code drift | adr |
+
+## Resolvidos (Arquivo)
+
+| ID | Descricao | Data Resolucao | Resolucao |
+|---|---|---|---|
+<!-- Gaps resolvidos sao movidos aqui por /docops-gc. Manter ultimos 20 para auditoria. -->

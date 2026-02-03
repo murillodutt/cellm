@@ -76,6 +76,194 @@
         }
       },
       "additionalProperties": false
+    },
+    "pruneConfig": {
+      "type": "object",
+      "description": "Configuration for docops-prune command",
+      "properties": {
+        "mode": {
+          "type": "string",
+          "description": "How to handle deprecated content",
+          "enum": ["archive", "delete"],
+          "default": "archive"
+        },
+        "archivePath": {
+          "type": "string",
+          "description": "Directory for archived content (relative to docRoot)",
+          "default": "archive"
+        },
+        "retentionDays": {
+          "type": "integer",
+          "description": "Days before flagging unreviewed docs as stale",
+          "default": 90,
+          "minimum": 7
+        },
+        "autoRemoveOrphans": {
+          "type": "boolean",
+          "description": "Automatically remove orphaned files without confirmation",
+          "default": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "gcConfig": {
+      "type": "object",
+      "description": "Configuration for docops-gc command",
+      "properties": {
+        "resolvedGapsToKeep": {
+          "type": "integer",
+          "description": "Number of resolved gaps to keep in archive section",
+          "default": 20,
+          "minimum": 0
+        },
+        "evidenceFreshnessDays": {
+          "type": "integer",
+          "description": "Days before evidence is considered stale",
+          "default": 30,
+          "minimum": 7
+        },
+        "redundancyThreshold": {
+          "type": "number",
+          "description": "Similarity threshold (0-1) for flagging redundant content",
+          "default": 0.7,
+          "minimum": 0.5,
+          "maximum": 1.0
+        }
+      },
+      "additionalProperties": false
+    },
+    "freshnessConfig": {
+      "type": "object",
+      "description": "Configuration for docops-freshness command",
+      "properties": {
+        "freshDays": {
+          "type": "integer",
+          "description": "Days before evidence transitions from fresh to stale",
+          "default": 30,
+          "minimum": 7
+        },
+        "staleDays": {
+          "type": "integer",
+          "description": "Days before evidence transitions from stale to expired",
+          "default": 60,
+          "minimum": 14
+        },
+        "autoCreateGaps": {
+          "type": "boolean",
+          "description": "Automatically create gaps for expired evidence",
+          "default": true
+        },
+        "blockOnExpired": {
+          "type": "boolean",
+          "description": "Warn when docs reference expired evidence",
+          "default": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "redundancyConfig": {
+      "type": "object",
+      "description": "Configuration for docops-redundancy command",
+      "properties": {
+        "similarityThreshold": {
+          "type": "number",
+          "description": "Minimum Jaccard similarity to flag as redundant (0.5-1.0)",
+          "default": 0.7,
+          "minimum": 0.5,
+          "maximum": 1.0
+        },
+        "minHeadings": {
+          "type": "integer",
+          "description": "Minimum headings required for structural comparison",
+          "default": 3,
+          "minimum": 2
+        },
+        "ignorePaths": {
+          "type": "array",
+          "description": "Paths to exclude from redundancy detection",
+          "items": { "type": "string" },
+          "default": ["archive/", "decisions/"]
+        },
+        "compareAcrossTypes": {
+          "type": "boolean",
+          "description": "Compare docs of different types (spec vs ref vs howto)",
+          "default": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "deprecationConfig": {
+      "type": "object",
+      "description": "Configuration for docops-deprecate command",
+      "properties": {
+        "defaultGracePeriod": {
+          "type": "integer",
+          "description": "Default grace period in days before archival",
+          "default": 30,
+          "minimum": 7
+        },
+        "gracePeriodByType": {
+          "type": "object",
+          "description": "Grace period overrides by document type",
+          "properties": {
+            "spec": { "type": "integer", "default": 30 },
+            "ref": { "type": "integer", "default": 30 },
+            "howto": { "type": "integer", "default": 14 },
+            "runbook": { "type": "integer", "default": 7 }
+          },
+          "additionalProperties": false
+        },
+        "notifyOnDeprecation": {
+          "type": "boolean",
+          "description": "Log deprecation events to docops-deprecations.log",
+          "default": true
+        },
+        "updateReferences": {
+          "type": "boolean",
+          "description": "Automatically mark references to deprecated docs",
+          "default": true
+        },
+        "requireReplacement": {
+          "type": "boolean",
+          "description": "Require replacement document when deprecating",
+          "default": false
+        },
+        "protectedTypes": {
+          "type": "array",
+          "description": "Document types that cannot be deprecated (e.g., ADRs)",
+          "items": { "type": "string" },
+          "default": ["adr"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "archiveConfig": {
+      "type": "object",
+      "description": "Configuration for archive management",
+      "properties": {
+        "retentionDays": {
+          "type": "integer",
+          "description": "Minimum days to retain archived files before hard delete",
+          "default": 90,
+          "minimum": 30
+        },
+        "organizationByDate": {
+          "type": "boolean",
+          "description": "Organize archive by YYYY-MM subdirectories",
+          "default": true
+        },
+        "maintainIndex": {
+          "type": "boolean",
+          "description": "Maintain archive/index.md with archived files list",
+          "default": true
+        },
+        "preserveHistory": {
+          "type": "boolean",
+          "description": "Keep full frontmatter history in archived files",
+          "default": true
+        }
+      },
+      "additionalProperties": false
     }
   },
   "additionalProperties": false

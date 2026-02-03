@@ -11,6 +11,12 @@ skills:
   - docops-init
   - docops-sync
   - docops-verify
+  - docops-prune
+  - docops-gc
+  - docops-freshness
+  - docops-redundancy
+  - docops-deprecate
+  - docops-lifecycle
 ---
 
 # DocOps Writer

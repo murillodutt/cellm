@@ -15,3 +15,9 @@
 | ID | Description | Evidence | Conveyor section | Classification | Action |
 |---|---|---|---|---|---|
 | CONFLICT-001 |  |  |  | code drift | adr |
+
+## Resolved (Archive)
+
+| ID | Description | Resolved Date | Resolution |
+|---|---|---|---|
+<!-- Resolved gaps are moved here by /docops-gc. Keep last 20 for audit trail. -->
