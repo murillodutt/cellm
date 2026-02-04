@@ -85,11 +85,18 @@ main() {
   # Debug: log prompt length
   log "DEBUG: prompt_content length=${#prompt_content}, first50='${prompt_content:0:50}'"
 
-  # Extract project name from cwd
-  if [[ -n "${cwd}" ]]; then
-    project=$(basename "${cwd}")
+  # Extract project name from git root (ensures consistent metrics)
+  local search_dir="${cwd:-${PWD}}"
+  if command -v git &> /dev/null; then
+    local git_root
+    git_root=$(cd "${search_dir}" 2>/dev/null && git rev-parse --show-toplevel 2>/dev/null || echo "")
+    if [[ -n "${git_root}" ]]; then
+      project=$(basename "${git_root}")
+    else
+      project=$(basename "${search_dir}")
+    fi
   else
-    project=$(basename "${PWD}")
+    project=$(basename "${search_dir}")
   fi
 
   # Skip if no valid session

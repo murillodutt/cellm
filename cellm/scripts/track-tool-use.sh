@@ -78,9 +78,16 @@ main() {
   tool_response=$(echo "${input}" | jq -c '.tool_response // {}' | head -c 2000)
   cwd=$(echo "${input}" | jq -r '.cwd // ""')
 
-  # Extract project name from cwd (basename)
-  if [[ -n "${cwd}" ]]; then
-    project=$(basename "${cwd}")
+  # Extract project name from git root (ensures consistent metrics)
+  local search_dir="${cwd:-${PWD}}"
+  if [[ -n "${search_dir}" ]] && command -v git &> /dev/null; then
+    local git_root
+    git_root=$(cd "${search_dir}" 2>/dev/null && git rev-parse --show-toplevel 2>/dev/null || echo "")
+    if [[ -n "${git_root}" ]]; then
+      project=$(basename "${git_root}")
+    else
+      project=$(basename "${search_dir}")
+    fi
   else
     project="unknown"
   fi

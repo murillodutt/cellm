@@ -79,11 +79,18 @@ main() {
   cwd=$(echo "${input}" | jq -r '.cwd // ""')
   stop_reason=$(echo "${input}" | jq -r '.stop_hook_reason // "unknown"')
 
-  # Extract project name from cwd
-  if [[ -n "${cwd}" ]]; then
-    project=$(basename "${cwd}")
+  # Extract project name from git root (ensures consistent metrics)
+  local search_dir="${cwd:-${PWD}}"
+  if command -v git &> /dev/null; then
+    local git_root
+    git_root=$(cd "${search_dir}" 2>/dev/null && git rev-parse --show-toplevel 2>/dev/null || echo "")
+    if [[ -n "${git_root}" ]]; then
+      project=$(basename "${git_root}")
+    else
+      project=$(basename "${search_dir}")
+    fi
   else
-    project=$(basename "${PWD}")
+    project=$(basename "${search_dir}")
   fi
 
   log "Stop hook triggered (session: ${session_id}, reason: ${stop_reason})"

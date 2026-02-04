@@ -77,26 +77,30 @@ main() {
   cwd=$(echo "${input}" | jq -r '.cwd // ""')
 
   # Extract project name using priority order:
-  # 1. CLAUDE_PROJECT_DIR env var (set by Claude Code)
-  # 2. Git repository root
+  # 1. Git repository root (ALWAYS preferred - ensures consistent metrics)
+  # 2. CLAUDE_PROJECT_DIR env var (fallback if not in a git repo)
   # 3. Project marker files (package.json, etc.)
   # 4. Basename of cwd (with version-like name filtering)
+  #
+  # IMPORTANT: Always use git root to ensure sub-projects (oracle/, cli/, etc.)
+  # are correctly attributed to the parent project (cellm-private).
   project=""
   local search_dir="${cwd:-${PWD}}"
 
-  # Priority 1: Use CLAUDE_PROJECT_DIR if set by Claude Code
-  if [[ -n "${CLAUDE_PROJECT_DIR:-}" ]]; then
-    project=$(basename "${CLAUDE_PROJECT_DIR}")
-    log "Project from CLAUDE_PROJECT_DIR: ${project}"
-  fi
-
-  # Priority 2: Find git root directory (most reliable for repos)
-  if [[ -z "${project}" && -n "${search_dir}" ]] && command -v git &> /dev/null; then
+  # Priority 1: Find git root directory (ALWAYS preferred for consistent metrics)
+  if [[ -n "${search_dir}" ]] && command -v git &> /dev/null; then
     local git_root
     git_root=$(cd "${search_dir}" 2>/dev/null && git rev-parse --show-toplevel 2>/dev/null || echo "")
     if [[ -n "${git_root}" ]]; then
       project=$(basename "${git_root}")
+      log "Project from git root: ${project}"
     fi
+  fi
+
+  # Priority 2: Use CLAUDE_PROJECT_DIR if not in a git repo
+  if [[ -z "${project}" && -n "${CLAUDE_PROJECT_DIR:-}" ]]; then
+    project=$(basename "${CLAUDE_PROJECT_DIR}")
+    log "Project from CLAUDE_PROJECT_DIR: ${project}"
   fi
 
   # Priority 3: Look for project marker files walking up the tree
