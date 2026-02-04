@@ -1,13 +1,6 @@
 ---
-name: verify
-description: Validate documentation structure, links, and normative vocabulary.
-usage: /docops:verify [docRoot]
-arguments:
-  - name: docRoot
-    description: Optional documentation root (overrides .claude/docops.json)
-    required: false
-agent: none
-budget: ~150
+description: Validate documentation structure, links, and normative vocabulary
+argument-hint: "[docRoot]"
 ---
 
 # DocOps Verify

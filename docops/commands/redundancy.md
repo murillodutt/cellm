@@ -1,16 +1,6 @@
 ---
-name: redundancy
-description: Detect redundant and duplicate content across documentation files.
-usage: /docops:redundancy [docRoot] [--threshold N]
-arguments:
-  - name: docRoot
-    description: Optional documentation root (overrides .claude/docops.json)
-    required: false
-  - name: --threshold
-    description: Similarity threshold 0.5-1.0 (default 0.7)
-    required: false
-agent: docops-writer
-budget: ~300
+description: Detect redundant and duplicate content across documentation files
+argument-hint: "[docRoot] [--threshold N]"
 ---
 
 # DocOps Redundancy

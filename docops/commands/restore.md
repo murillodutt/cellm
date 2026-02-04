@@ -1,16 +1,6 @@
 ---
-name: restore
-description: Restore an archived document back to active documentation.
-usage: /docops:restore <file> [--reason "text"]
-arguments:
-  - name: file
-    description: File path in archive to restore (relative to archive/)
-    required: true
-  - name: --reason
-    description: Reason for restoration
-    required: false
-agent: docops-writer
-budget: ~150
+description: Restore an archived document back to active documentation
+argument-hint: "<file> [--reason \"text\"]"
 ---
 
 # DocOps Restore

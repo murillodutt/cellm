@@ -1,16 +1,6 @@
 ---
-name: freshness
-description: Check and update evidence freshness status across all code-evidence files.
-usage: /docops:freshness [docRoot] [--update]
-arguments:
-  - name: docRoot
-    description: Optional documentation root (overrides .claude/docops.json)
-    required: false
-  - name: --update
-    description: Automatically update freshness status in frontmatter
-    required: false
-agent: docops-writer
-budget: ~200
+description: Check and update evidence freshness status across all code-evidence files
+argument-hint: "[docRoot] [--update]"
 ---
 
 # DocOps Freshness

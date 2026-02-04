@@ -1,13 +1,6 @@
 ---
-name: init
 description: Interactive Oracle setup with menus and guided troubleshooting
-usage: /cellm:init [mode]
-arguments:
-  - name: mode
-    description: Optional mode (install|status|update|doctor|restart|uninstall) - omit for interactive menu
-    required: false
-agent: none
-budget: ~150
+argument-hint: "[mode]"
 ---
 
 # CELLM Init

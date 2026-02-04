@@ -1,10 +1,5 @@
 ---
-id: CMD-DISCOVER-PATTERNS
-version: v1.2.0
-status: OK
-name: discover
-agent: architect
-budget: ~300 tokens
+description: Extract tribal knowledge from your codebase into documented patterns
 ---
 
 # Discover Patterns

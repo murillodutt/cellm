@@ -1,10 +1,5 @@
 ---
-id: CMD-SHAPE-SPEC
-version: v1.2.0
-status: OK
-name: shape
-agent: architect
-budget: ~300 tokens
+description: Gather context and structure planning for significant work (run in plan mode)
 ---
 
 # Shape Spec

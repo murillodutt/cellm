@@ -1,10 +1,5 @@
 ---
-id: CMD-ORACLE-STATUS
-version: v1.2.0
-status: OK
-name: status
-agent: project-manager
-budget: ~150 tokens
+description: Check CELLM Oracle Worker daemon status
 ---
 
 # Oracle Status

@@ -1,10 +1,6 @@
 ---
-id: CMD-INJECT-PATTERNS
-version: v1.2.0
-status: OK
-name: inject
-agent: implementer
-budget: ~250 tokens
+description: Inject relevant patterns into the current context
+argument-hint: "[pattern-path...]"
 ---
 
 # Inject Patterns

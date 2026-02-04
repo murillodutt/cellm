@@ -1,10 +1,5 @@
 ---
-id: CMD-PLAN-PRODUCT
-version: v1.2.0
-status: OK
-name: plan
-agent: architect
-budget: ~250 tokens
+description: Establish foundational product documentation through interactive conversation
 ---
 
 # Plan Product

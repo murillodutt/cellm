@@ -1,19 +1,6 @@
 ---
-name: deprecate
-description: Mark documentation for deprecation with grace period and scheduled archival.
-usage: /docops:deprecate <file> [--days N] [--reason "text"]
-arguments:
-  - name: file
-    description: File path to deprecate (relative to docRoot)
-    required: true
-  - name: --days
-    description: Grace period in days before archival (default 30)
-    required: false
-  - name: --reason
-    description: Reason for deprecation
-    required: false
-agent: docops-writer
-budget: ~150
+description: Mark documentation for deprecation with grace period and scheduled archival
+argument-hint: "<file> [--days N] [--reason \"text\"]"
 ---
 
 # DocOps Deprecate

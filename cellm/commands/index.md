@@ -1,10 +1,5 @@
 ---
-id: CMD-INDEX-PATTERNS
-version: v1.2.0
-status: OK
-name: index
-agent: project-manager
-budget: ~200 tokens
+description: Rebuild and maintain the patterns index file (index.yml)
 ---
 
 # Index Patterns

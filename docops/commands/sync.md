@@ -1,13 +1,6 @@
 ---
-name: sync
-description: Refresh code evidence, gaps, and derived documentation.
-usage: /docops:sync [docRoot]
-arguments:
-  - name: docRoot
-    description: Optional documentation root (overrides .claude/docops.json)
-    required: false
-agent: docops-writer
-budget: ~250
+description: Refresh code evidence, gaps, and derived documentation
+argument-hint: "[docRoot]"
 ---
 
 # DocOps Sync

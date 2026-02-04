@@ -1,16 +1,6 @@
 ---
-name: gc
-description: Garbage collection for resolved gaps, stale evidence, and redundant content.
-usage: /docops:gc [docRoot] [--dry-run]
-arguments:
-  - name: docRoot
-    description: Optional documentation root (overrides .claude/docops.json)
-    required: false
-  - name: --dry-run
-    description: List what would be cleaned without making changes
-    required: false
-agent: docops-writer
-budget: ~250
+description: Garbage collection for resolved gaps, stale evidence, and redundant content
+argument-hint: "[docRoot] [--dry-run]"
 ---
 
 # DocOps GC (Garbage Collection)
