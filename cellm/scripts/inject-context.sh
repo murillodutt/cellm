@@ -1,7 +1,7 @@
 #!/bin/bash
 # CELLM Oracle - Inject Context (SessionStart helper)
 # Fetches recent context from Worker and outputs for injection
-# Phase 3: Timeline Avançado
+# Output: plain text stdout -> injected as <system-reminder> in Claude context
 
 set -euo pipefail
 
@@ -39,56 +39,48 @@ get_port() {
   echo "${DEFAULT_PORT}"
 }
 
-# Get project name
-get_project() {
-  basename "${PWD}"
-}
-
-# Fetch and output context
-fetch_context() {
-  local port="${1}"
-  local project="${2}"
-  local url="http://127.0.0.1:${port}/api/context/generate?project=${project}"
-
-  # Fetch context with timeout
-  local response
-  response=$(curl -sf --max-time 3 "${url}" 2>/dev/null)
-
-  if [[ $? -eq 0 && -n "${response}" ]]; then
-    # Extract markdown from JSON response
-    local markdown
-    markdown=$(echo "${response}" | grep -o '"markdown":"[^"]*"' | sed 's/"markdown":"//;s/"$//' | sed 's/\\n/\n/g')
-
-    if [[ -n "${markdown}" ]]; then
-      echo "${markdown}"
-      return 0
-    fi
-  fi
-
-  return 1
-}
+# Shared helpers (consistent with init-session.sh)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/_detect-project.sh"
+source "${SCRIPT_DIR}/_health-gate.sh"
 
 # Main
 main() {
+  # Non-critical: exit 0 silently if worker offline (no stale message in context)
+  health_gate "non-critical"
+
   local port
   port=$(get_port)
 
+  # Read stdin (hook data) to extract cwd for project detection
+  local input=""
+  if [[ ! -t 0 ]]; then
+    input=$(cat)
+  fi
+
+  local cwd=""
+  if [[ -n "${input}" ]]; then
+    if command -v jq &> /dev/null; then
+      cwd=$(echo "${input}" | jq -r '.cwd // ""')
+    else
+      cwd=$(echo "${input}" | grep -o '"cwd"[[:space:]]*:[[:space:]]*"[^"]*"' 2>/dev/null | sed 's/"cwd"[[:space:]]*:[[:space:]]*"//;s/"$//' || echo "")
+    fi
+  fi
+
   local project
-  project=$(get_project)
+  project=$(detect_project "${cwd:-${PWD}}")
 
   log "Injecting context for project: ${project}"
 
-  # Check if worker is online
-  if curl -sf --max-time 0.2 "http://127.0.0.1:${port}/health" >/dev/null 2>&1; then
-    if fetch_context "${port}" "${project}"; then
-      log "Context injected successfully"
-    else
-      log "No context available"
-      echo "*No recent context available*"
-    fi
+  # Endpoint returns plain text markdown — no JSON parsing needed
+  local response
+  response=$(curl -sf --max-time 3 --connect-timeout 0.5 "http://127.0.0.1:${port}/api/context/generate?project=${project}" 2>/dev/null)
+
+  if [[ $? -eq 0 && -n "${response}" ]]; then
+    echo "${response}"
+    log "Context injected successfully"
   else
-    log "Worker offline, no context injection"
-    echo "*Worker offline - context unavailable*"
+    log "No context available"
   fi
 
   exit 0

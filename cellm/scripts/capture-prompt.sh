@@ -48,22 +48,20 @@ get_port() {
 
 # Main
 main() {
+  # Source health gate
+  source "$(dirname "${BASH_SOURCE[0]}")/_health-gate.sh"
+
   local port
   port=$(get_port)
 
-  # Quick check if worker is online
-  if ! curl -sf --max-time 0.1 "http://127.0.0.1:${port}/health" >/dev/null 2>&1; then
-    exit 0
-  fi
+  # Health gate (non-critical hook - exits silently if offline)
+  health_gate "non-critical"
 
   # Read JSON from stdin (Claude Code hook format)
   local input=""
   if [[ ! -t 0 ]]; then
     input=$(cat)
   fi
-
-  # DEBUG: Log raw stdin for diagnosis (first 500 chars)
-  log "RAW_STDIN_LEN=${#input} RAW_STDIN=${input:0:500}"
 
   if [[ -z "${input}" ]]; then
     log "No input received"
@@ -77,31 +75,20 @@ main() {
   fi
 
   # Parse JSON input from Claude Code hook
-  local session_id cwd project prompt_content
+  local session_id prompt_content
   session_id=$(echo "${input}" | jq -r '.session_id // "unknown"')
-  cwd=$(echo "${input}" | jq -r '.cwd // ""')
   prompt_content=$(echo "${input}" | jq -r '.prompt // ""')
-
-  # Debug: log prompt length
-  log "DEBUG: prompt_content length=${#prompt_content}, first50='${prompt_content:0:50}'"
-
-  # Extract project name from git root (ensures consistent metrics)
-  local search_dir="${cwd:-${PWD}}"
-  if command -v git &> /dev/null; then
-    local git_root
-    git_root=$(cd "${search_dir}" 2>/dev/null && git rev-parse --show-toplevel 2>/dev/null || echo "")
-    if [[ -n "${git_root}" ]]; then
-      project=$(basename "${git_root}")
-    else
-      project=$(basename "${search_dir}")
-    fi
-  else
-    project=$(basename "${search_dir}")
-  fi
 
   # Skip if no valid session
   if [[ "${session_id}" == "unknown" || "${session_id}" == "null" || -z "${session_id}" ]]; then
     log "No valid session_id, skipping"
+    exit 0
+  fi
+
+  # Skip system messages (task-notification, system-reminder)
+  # These are injected by Claude Code, not actual human prompts
+  if [[ "${prompt_content}" == "<task-notification>"* ]] || \
+     [[ "${prompt_content}" == "<system-reminder>"* ]]; then
     exit 0
   fi
 
@@ -112,21 +99,17 @@ main() {
   fi
 
   local url="http://127.0.0.1:${port}/api/session/prompt"
-  local timestamp
-  timestamp=$(date +%s)000
 
   # Build JSON payload for Oracle API
+  # Note: project not sent here (already set in initSession, schema strips it)
+  # Note: promptNumber not sent (server auto-increments)
   local payload
   payload=$(jq -n \
     --arg sid "${session_id}" \
-    --arg proj "${project}" \
     --arg content "${prompt_content}" \
-    --argjson ts "${timestamp}" \
     '{
       sessionId: $sid,
-      project: $proj,
-      userPrompt: $content,
-      timestamp: $ts
+      userPrompt: $content
     }')
 
   # Fire and forget - don't wait for response

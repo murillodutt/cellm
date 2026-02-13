@@ -44,14 +44,14 @@ get_port() {
 
 # Main
 main() {
+  # Source health gate
+  source "$(dirname "${BASH_SOURCE[0]}")/_health-gate.sh"
+
   local port
   port=$(get_port)
 
-  # Check if worker is online
-  if ! curl -sf --max-time 0.2 "http://127.0.0.1:${port}/health" >/dev/null 2>&1; then
-    log "Worker offline, skipping capture"
-    exit 0
-  fi
+  # Health gate with retry (critical hook)
+  health_gate "critical"
 
   # Read JSON from stdin (Claude Code hook format)
   local input=""
@@ -74,26 +74,12 @@ main() {
   fi
 
   # Parse JSON input from Claude Code hook
-  local session_id cwd project stop_reason
+  local session_id stop_reason hook_event
   session_id=$(echo "${input}" | jq -r '.session_id // "unknown"')
-  cwd=$(echo "${input}" | jq -r '.cwd // ""')
   stop_reason=$(echo "${input}" | jq -r '.stop_hook_reason // "unknown"')
+  hook_event=$(echo "${input}" | jq -r '.hook_event_name // "Stop"')
 
-  # Extract project name from git root (ensures consistent metrics)
-  local search_dir="${cwd:-${PWD}}"
-  if command -v git &> /dev/null; then
-    local git_root
-    git_root=$(cd "${search_dir}" 2>/dev/null && git rev-parse --show-toplevel 2>/dev/null || echo "")
-    if [[ -n "${git_root}" ]]; then
-      project=$(basename "${git_root}")
-    else
-      project=$(basename "${search_dir}")
-    fi
-  else
-    project=$(basename "${search_dir}")
-  fi
-
-  log "Stop hook triggered (session: ${session_id}, reason: ${stop_reason})"
+  log "Hook triggered (event: ${hook_event}, session: ${session_id}, reason: ${stop_reason})"
 
   # Skip if no valid session
   if [[ "${session_id}" == "unknown" || "${session_id}" == "null" || -z "${session_id}" ]]; then
@@ -103,53 +89,47 @@ main() {
 
   log "Worker online at port ${port}"
 
-  # Send session stop to Oracle (triggers AI summary generation)
-  local url="http://127.0.0.1:${port}/api/session/stop"
-  local payload
-  payload=$(jq -n \
-    --arg sid "${session_id}" \
-    --arg reason "${stop_reason}" \
-    '{
-      sessionId: $sid,
-      stopReason: $reason
-    }')
+  # Route based on hook event: PreCompact = snapshot, Stop = summary
+  if [[ "${hook_event}" == "PreCompact" ]]; then
+    # PreCompact: lightweight snapshot, does NOT end session
+    local url="http://127.0.0.1:${port}/api/session/compact"
+    local payload
+    payload=$(jq -n \
+      --arg sid "${session_id}" \
+      --arg reason "${stop_reason}" \
+      '{
+        sessionId: $sid,
+        reason: $reason
+      }')
 
-  curl -sf --max-time 3 --connect-timeout 0.5 \
-    -X POST \
-    -H "Content-Type: application/json" \
-    -d "${payload}" \
-    "${url}" >/dev/null 2>&1 || true
+    curl -sf --max-time 3 --connect-timeout 0.5 \
+      -X POST \
+      -H "Content-Type: application/json" \
+      -d "${payload}" \
+      "${url}" >/dev/null 2>&1 || true
 
-  log "Session stop sent (summary queued)"
+    log "Compaction snapshot sent"
+  else
+    # Stop: full session end + summary generation
+    local url="http://127.0.0.1:${port}/api/session/stop"
+    local payload
+    payload=$(jq -n \
+      --arg sid "${session_id}" \
+      --arg reason "${stop_reason}" \
+      '{
+        sessionId: $sid,
+        stopReason: $reason
+      }')
 
-  # Legacy: Send stop event for context ingest
-  local legacy_url="http://127.0.0.1:${port}/api/context/ingest"
-  local timestamp
-  timestamp=$(date +%s)000
+    curl -sf --max-time 3 --connect-timeout 0.5 \
+      -X POST \
+      -H "Content-Type: application/json" \
+      -d "${payload}" \
+      "${url}" >/dev/null 2>&1 || true
 
-  local legacy_payload
-  legacy_payload=$(jq -n \
-    --arg sid "${session_id}" \
-    --arg proj "${project}" \
-    --argjson ts "${timestamp}" \
-    '{
-      type: "stop",
-      sessionId: $sid,
-      project: $proj,
-      timestamp: $ts,
-      data: {
-        title: "Session ended"
-      }
-    }')
+    log "Session stop sent (summary queued)"
+  fi
 
-  curl -sf --max-time 2 --connect-timeout 0.5 \
-    -X POST \
-    -H "Content-Type: application/json" \
-    -d "${legacy_payload}" \
-    "${legacy_url}" >/dev/null 2>&1 || true
-
-  log "Stop event sent"
-  log "Stop hook completed"
   exit 0
 }
 

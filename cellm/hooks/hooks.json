@@ -17,7 +17,7 @@
           {
             "type": "command",
             "command": "${CLAUDE_PLUGIN_ROOT}/scripts/init-session.sh",
-            "timeout": 1
+            "timeout": 3
           },
           {
             "type": "command",
@@ -45,7 +45,7 @@
     ],
     "PostToolUse": [
       {
-        "matcher": "Write|Edit|Bash|Read|Grep|Glob",
+        "matcher": "Write|Edit|Bash|Read|Grep|Glob|NotebookEdit|WebFetch|WebSearch|Task",
         "hooks": [
           {
             "type": "command",

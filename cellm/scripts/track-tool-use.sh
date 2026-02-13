@@ -44,14 +44,15 @@ get_port() {
 
 # Main
 main() {
+  # Source health gate
+  source "$(dirname "${BASH_SOURCE[0]}")/_health-gate.sh"
+
   local port
   port=$(get_port)
   local url="http://127.0.0.1:${port}/api/session/observation"
 
-  # Quick health check
-  if ! curl -sf --max-time 0.2 "http://127.0.0.1:${port}/health" >/dev/null 2>&1; then
-    exit 0
-  fi
+  # Health gate (non-critical hook - exits silently if offline)
+  health_gate "non-critical"
 
   # Read JSON from stdin (Claude Code hook format)
   local input=""
@@ -75,22 +76,16 @@ main() {
   session_id=$(echo "${input}" | jq -r '.session_id // "unknown"')
   tool_name=$(echo "${input}" | jq -r '.tool_name // "unknown"')
   tool_input=$(echo "${input}" | jq -c '.tool_input // {}')
-  tool_response=$(echo "${input}" | jq -c '.tool_response // {}' | head -c 2000)
+  tool_response=$(echo "${input}" | jq -c '.tool_response // ""')
+  if [[ ${#tool_response} -gt 8000 ]]; then
+    log "Truncating response from ${#tool_response} to 8000 chars"
+    tool_response="${tool_response:0:8000}[... truncated]"
+  fi
   cwd=$(echo "${input}" | jq -r '.cwd // ""')
 
-  # Extract project name from git root (ensures consistent metrics)
-  local search_dir="${cwd:-${PWD}}"
-  if [[ -n "${search_dir}" ]] && command -v git &> /dev/null; then
-    local git_root
-    git_root=$(cd "${search_dir}" 2>/dev/null && git rev-parse --show-toplevel 2>/dev/null || echo "")
-    if [[ -n "${git_root}" ]]; then
-      project=$(basename "${git_root}")
-    else
-      project=$(basename "${search_dir}")
-    fi
-  else
-    project="unknown"
-  fi
+  # Shared project detection (5 priority levels)
+  source "$(dirname "${BASH_SOURCE[0]}")/_detect-project.sh"
+  project=$(detect_project "${cwd:-${PWD}}")
 
   # Skip if no valid session
   if [[ "${session_id}" == "unknown" || "${session_id}" == "null" || -z "${session_id}" ]]; then

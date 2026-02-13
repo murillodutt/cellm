@@ -44,15 +44,15 @@ get_port() {
 
 # Main
 main() {
+  # Source health gate
+  source "$(dirname "${BASH_SOURCE[0]}")/_health-gate.sh"
+
   local port
   port=$(get_port)
   local url="http://127.0.0.1:${port}/api/session/init"
 
-  # Check if worker is online
-  if ! curl -sf --max-time 0.3 "http://127.0.0.1:${port}/health" >/dev/null 2>&1; then
-    log "Worker offline, skipping session init"
-    exit 0
-  fi
+  # Health gate with retry (critical hook)
+  health_gate "critical"
 
   # Read JSON from stdin (Claude Code hook format)
   local input=""
@@ -76,66 +76,10 @@ main() {
   session_id=$(echo "${input}" | jq -r '.session_id // "unknown"')
   cwd=$(echo "${input}" | jq -r '.cwd // ""')
 
-  # Extract project name using priority order:
-  # 1. Git repository root (ALWAYS preferred - ensures consistent metrics)
-  # 2. CLAUDE_PROJECT_DIR env var (fallback if not in a git repo)
-  # 3. Project marker files (package.json, etc.)
-  # 4. Basename of cwd (with version-like name filtering)
-  #
-  # IMPORTANT: Always use git root to ensure sub-projects (oracle/, cli/, etc.)
-  # are correctly attributed to the parent project (cellm-private).
-  project=""
-  local search_dir="${cwd:-${PWD}}"
-
-  # Priority 1: Find git root directory (ALWAYS preferred for consistent metrics)
-  if [[ -n "${search_dir}" ]] && command -v git &> /dev/null; then
-    local git_root
-    git_root=$(cd "${search_dir}" 2>/dev/null && git rev-parse --show-toplevel 2>/dev/null || echo "")
-    if [[ -n "${git_root}" ]]; then
-      project=$(basename "${git_root}")
-      log "Project from git root: ${project}"
-    fi
-  fi
-
-  # Priority 2: Use CLAUDE_PROJECT_DIR if not in a git repo
-  if [[ -z "${project}" && -n "${CLAUDE_PROJECT_DIR:-}" ]]; then
-    project=$(basename "${CLAUDE_PROJECT_DIR}")
-    log "Project from CLAUDE_PROJECT_DIR: ${project}"
-  fi
-
-  # Priority 3: Look for project marker files walking up the tree
-  if [[ -z "${project}" && -n "${search_dir}" ]]; then
-    local check_dir="${search_dir}"
-    while [[ "${check_dir}" != "/" && "${check_dir}" != "." ]]; do
-      if [[ -f "${check_dir}/package.json" ]] || \
-         [[ -f "${check_dir}/Cargo.toml" ]] || \
-         [[ -f "${check_dir}/go.mod" ]] || \
-         [[ -f "${check_dir}/pyproject.toml" ]] || \
-         [[ -d "${check_dir}/.git" ]]; then
-        project=$(basename "${check_dir}")
-        break
-      fi
-      check_dir=$(dirname "${check_dir}")
-    done
-  fi
-
-  # Priority 4: Basename of cwd (filter version-like names)
-  if [[ -z "${project}" ]]; then
-    local base_name
-    base_name=$(basename "${search_dir}")
-    # Skip if it looks like a version number (e.g., 2.0.6, v1.2.3)
-    if [[ ! "${base_name}" =~ ^v?[0-9]+\.[0-9]+ ]]; then
-      project="${base_name}"
-    else
-      # Use parent directory instead
-      project=$(basename "$(dirname "${search_dir}")")
-    fi
-  fi
-
-  # Ultimate fallback
-  if [[ -z "${project}" || "${project}" == "/" ]]; then
-    project="unknown"
-  fi
+  # Shared project detection (5 priority levels)
+  source "$(dirname "${BASH_SOURCE[0]}")/_detect-project.sh"
+  project=$(detect_project "${cwd:-${PWD}}")
+  log "Project detected: ${project}"
 
   # Skip if no valid session
   if [[ "${session_id}" == "unknown" || "${session_id}" == "null" || -z "${session_id}" ]]; then
