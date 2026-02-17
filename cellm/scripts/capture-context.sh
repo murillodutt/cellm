@@ -50,8 +50,8 @@ main() {
   local port
   port=$(get_port)
 
-  # Health gate with retry (critical hook)
-  health_gate "critical"
+  # Health gate (non-critical: skip silently if worker offline)
+  health_gate "non-critical"
 
   # Read JSON from stdin (Claude Code hook format)
   local input=""
