@@ -39,6 +39,11 @@
             "type": "command",
             "command": "${CLAUDE_PLUGIN_ROOT}/scripts/capture-prompt.sh",
             "timeout": 1
+          },
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/inject-knowledge.sh",
+            "timeout": 3
           }
         ]
       }

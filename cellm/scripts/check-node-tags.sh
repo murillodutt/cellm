@@ -131,11 +131,25 @@ main() {
   # Build context string
   local context_parts=""
 
-  # Format tags as uppercase markers
+  # Check for locked tag
+  local is_locked
+  is_locked=$(echo "${tags_json}" | jq 'map(ascii_downcase) | any(. == "locked")')
+
+  local decision="allow"
+
+  # Format tags as uppercase markers (exclude "locked" — handled separately)
   if [[ "${tag_count}" -gt 0 ]]; then
     local tags_upper
-    tags_upper=$(echo "${tags_json}" | jq -r '.[] | ascii_upcase' | tr '\n' ' ' | sed 's/ $//')
-    context_parts="[${tags_upper// /] [}]"
+    tags_upper=$(echo "${tags_json}" | jq -r '[.[] | ascii_upcase | select(. != "LOCKED")] | .[] ' | tr '\n' ' ' | sed 's/ $//')
+    if [[ -n "${tags_upper}" ]]; then
+      context_parts="[${tags_upper// /] [}]"
+    fi
+  fi
+
+  if [[ "${is_locked}" == "true" ]]; then
+    decision="deny"
+    context_parts="[LOCKED] ${context_parts}"
+    log "BLOCKED edit on locked node: ${label} (${normalized})"
   fi
 
   context_parts="${context_parts} node: ${label} (${type})"
@@ -144,16 +158,7 @@ main() {
     context_parts="${context_parts} | action_note: ${action_note}"
   fi
 
-  # Check for locked tag
-  local is_locked
-  is_locked=$(echo "${tags_json}" | jq 'map(ascii_downcase) | any(. == "locked")')
-
-  local decision="allow"
-  if [[ "${is_locked}" == "true" ]]; then
-    decision="deny"
-    context_parts="[LOCKED] ${context_parts}"
-    log "BLOCKED edit on locked node: ${label} (${normalized})"
-  else
+  if [[ "${decision}" == "allow" ]]; then
     log "Injecting context for node: ${label} (${normalized})"
   fi
 

@@ -83,10 +83,38 @@ main() {
     log "No context available"
   fi
 
+  # Knowledge: Inject active facts briefing (non-critical)
+  inject_knowledge "${port}" "${project}"
+
   # DSE: Inject design system summary (non-critical)
   inject_design_system "${port}"
 
   exit 0
+}
+
+# Fetch knowledge atoms briefing for session start
+inject_knowledge() {
+  local port="$1"
+  local project="$2"
+
+  local payload
+  payload=$(jq -n \
+    --arg proj "${project}" \
+    --arg ctx "SessionStart ${project}" \
+    '{project: $proj, context: $ctx, limit: 15}') 2>/dev/null || return 0
+
+  local response
+  response=$(curl -sf --max-time 3 --connect-timeout 1 \
+    -X POST \
+    -H "Content-Type: application/json" \
+    -d "${payload}" \
+    "http://127.0.0.1:${port}/api/knowledge/inject" 2>/dev/null) || return 0
+
+  if [[ -n "${response}" ]]; then
+    echo ""
+    echo "${response}"
+    log "Knowledge: injected briefing for ${project}"
+  fi
 }
 
 # Fetch design system summary and output compact markdown table
