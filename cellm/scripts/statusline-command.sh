@@ -2,7 +2,7 @@
 # CELLM Oracle - Status Line for Claude Code
 # Deployed to ~/.claude/statusline-command.sh by cellm-init
 # Shows: model, context bar, cost, project, branch, duration
-# Stack alerts appear only during first 30s after SessionStart
+# Stack alerts shown whenever pending updates > 0
 
 input=$(cat)
 
@@ -35,10 +35,6 @@ STATE_FILE="$HOME/.cellm/statusline-state"
 if [ -f "$STATE_FILE" ]; then
   PENDING=$(cat "$STATE_FILE" 2>/dev/null)
   if [ -n "$PENDING" ] && [ "$PENDING" -gt 0 ] 2>/dev/null; then
-    # Only show in first 30s — check file age as proxy for session start
-    FILE_AGE=$(( $(date +%s) - $(stat -f%m "$STATE_FILE" 2>/dev/null || stat -c%Y "$STATE_FILE" 2>/dev/null || echo "0") ))
-    if [ "$FILE_AGE" -le 30 ]; then
-      echo -e "${YELLOW}[!]${RESET} ${PENDING} pending updates — Settings > Stack Updates"
-    fi
+    echo -e "${YELLOW}[!]${RESET} ${PENDING} pending updates — Settings > Stack Updates"
   fi
 fi
