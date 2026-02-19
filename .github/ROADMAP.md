@@ -35,7 +35,7 @@
 
 **Architecture**
 - Modular shell scripts (audited for security)
-- SQLite + sqlite-vec for vector search
+- LibSQL with native vector support (F32_BLOB)
 - Xenova embeddings (768 dims, 100 languages)
 - MCP server integration
 - Event-driven hooks

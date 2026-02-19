@@ -22,7 +22,7 @@ CELLM is optimized exclusively for this modern stack:
 | **Styling** | Tailwind CSS | v4 | Exclusive |
 | **State** | Pinia | 3.0+ | Exclusive |
 | **Database** | Drizzle ORM | 0.38+ | Exclusive |
-| **Vector DB** | SQLite + sqlite-vec | Latest | Required |
+| **Vector DB** | LibSQL (native vectors) | Latest | Required |
 
 ### Why Exclusive?
 
@@ -71,9 +71,9 @@ CELLM is optimized exclusively for this modern stack:
 │  │  • Pattern Tracking                      │   │
 │  │                                          │   │
 │  │  ┌────────────────────────────────────┐  │   │
-│  │  │  SQLite + sqlite-vec               │  │   │
+│  │  │  LibSQL (native vectors)            │  │   │
 │  │  │  • Observations (metadata)         │  │   │
-│  │  │  • Embeddings (vectors, 768d)      │  │   │
+│  │  │  • Embeddings (F32_BLOB, 384d)     │  │   │
 │  │  │  • Sessions                        │  │   │
 │  │  └────────────────────────────────────┘  │   │
 │  └──────────────────────────────────────────┘   │
@@ -130,10 +130,9 @@ CREATE TABLE sessions (
   status TEXT NOT NULL             -- 'active', 'completed', 'abandoned'
 );
 
--- Vector index (sqlite-vec extension)
-CREATE VIRTUAL TABLE vec_index USING vec0(
-  embedding FLOAT[768]
-);
+-- Vector columns (LibSQL native)
+-- Embeddings stored as F32_BLOB(384) columns on source tables
+-- Search via vector_distance_cos(embedding, vector32(?))
 ```
 
 ### Embedding Model

@@ -69,7 +69,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Semantic search with multilingual-e5-base embeddings
-- Vector storage with sqlite-vec extension
+- Vector storage with LibSQL native vectors
 - Session summary capture
 
 ## [2.1.0] - 2026-01-20

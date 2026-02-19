@@ -83,6 +83,9 @@ main() {
     log "No context available"
   fi
 
+  # Stack updates: write pending count for statusline (non-critical)
+  write_stack_state "${port}"
+
   # Knowledge: Inject active facts briefing (non-critical)
   inject_knowledge "${port}" "${project}"
 
@@ -114,6 +117,22 @@ inject_knowledge() {
     echo ""
     echo "${response}"
     log "Knowledge: injected briefing for ${project}"
+  fi
+}
+
+# Write stack pending count to file for statusline consumption
+write_stack_state() {
+  local port="$1"
+  local state_file="${CELLM_DIR}/statusline-state"
+
+  local status_json
+  status_json=$(curl -sf --max-time 1 --connect-timeout 0.3 "http://127.0.0.1:${port}/api/stack-tracker/status" 2>/dev/null) || return 0
+
+  if [[ -n "${status_json}" ]] && command -v jq &> /dev/null; then
+    local pending
+    pending=$(echo "${status_json}" | jq -r '[.migrations[] | select(.status == "pending" or .status == "approved" or .status == "blocked")] | length' 2>/dev/null)
+    echo "${pending:-0}" > "${state_file}"
+    log "Stack state: ${pending:-0} pending updates"
   fi
 }
 

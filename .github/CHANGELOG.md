@@ -84,7 +84,7 @@ Visual navigation UI for workflow management and development metrics.
 ### Technical
 - Runtime: Bun 1.0+ (required for MCP server)
 - Stack: Nuxt 4.3, Vue 3.5, TypeScript 5.6, Tailwind v4, Nuxt UI 4.4
-- Database: SQLite + sqlite-vec for vector search
+- Database: LibSQL with native vector support (F32_BLOB)
 - Embedding: Xenova/multilingual-e5-base (768 dims, 100 languages)
 
 ### Installation

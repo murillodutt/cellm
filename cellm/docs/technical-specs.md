@@ -12,7 +12,7 @@
 | Framework | Nuxt 4 | Required |
 | UI | Vue 3 | Required |
 | Language | TypeScript | Required |
-| Vector DB | SQLite + sqlite-vec | Required |
+| Vector DB | LibSQL (native vectors) | Required |
 
 ---
 

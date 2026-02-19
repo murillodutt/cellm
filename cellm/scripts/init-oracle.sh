@@ -462,6 +462,24 @@ configure_otel_settings() {
     echo "{\"env\": $otel_env}" | jq '.' > "$settings_file"
   fi
 
+  # Deploy statusline script
+  local statusline_src
+  statusline_src="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/statusline-command.sh"
+  local statusline_dest="$HOME/.claude/statusline-command.sh"
+
+  if [ -f "$statusline_src" ]; then
+    cp "$statusline_src" "$statusline_dest"
+    chmod +x "$statusline_dest"
+
+    # Add statusLine config to settings.json
+    if [ -f "$settings_file" ]; then
+      jq '.statusLine = {"type": "command", "command": "bash ~/.claude/statusline-command.sh"}' \
+        "$settings_file" > "${settings_file}.tmp" && \
+        mv "${settings_file}.tmp" "$settings_file"
+    fi
+    print_success "Status line deployed to $statusline_dest"
+  fi
+
   print_success "OTEL configured in $settings_file"
   print_warning "Restart Claude Code to activate telemetry"
 }

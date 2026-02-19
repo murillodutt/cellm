@@ -52,7 +52,7 @@ bun install @cellm/oracle
 │  └────────────────────────────────────────────┘ │
 │                                                  │
 │  ┌────────────────────────────────────────────┐ │
-│  │         SQLite + sqlite-vec                 │ │
+│  │         LibSQL (native vectors)              │ │
 │  │                                              │ │
 │  │  • Observations (metadata)                  │ │
 │  │  • Embeddings (vectors)                     │ │
