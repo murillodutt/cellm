@@ -63,6 +63,16 @@
             "timeout": 2
           }
         ]
+      },
+      {
+        "matcher": "Write|Edit|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/version-guard.sh",
+            "timeout": 2
+          }
+        ]
       }
     ],
     "PostToolUse": [
