@@ -1,10 +1,10 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # CELLM Oracle - Status Line for Claude Code
 # Deployed to ~/.claude/statusline-command.sh by cellm-init
 # Shows: model, context bar, cost, project, branch, duration
 # Stack alerts shown whenever pending updates > 0
 
-input=$(cat)
+input=$(head -c 65536)
 
 MODEL=$(echo "$input" | jq -r '.model.display_name')
 DIR=$(echo "$input" | jq -r '.workspace.current_dir')

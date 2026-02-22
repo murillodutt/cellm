@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # CELLM Oracle - Inject Context (SessionStart helper)
 # Fetches recent context from Worker and outputs for injection
 # Output: plain text stdout -> injected as <system-reminder> in Claude context
@@ -26,18 +26,8 @@ log() {
   echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] [Inject] $1" >> "${LOG_FILE}" 2>/dev/null || true
 }
 
-# Get port from worker.json
-get_port() {
-  if [[ -f "${WORKER_JSON}" ]]; then
-    local port
-    port=$(grep -o '"port"[[:space:]]*:[[:space:]]*[0-9]*' "${WORKER_JSON}" 2>/dev/null | grep -o '[0-9]*' || echo "")
-    if [[ -n "${port}" ]]; then
-      echo "${port}"
-      return
-    fi
-  fi
-  echo "${DEFAULT_PORT}"
-}
+# Shared port extraction (jq with grep fallback + range validation)
+source "$(dirname "${BASH_SOURCE[0]}")/_get-port.sh"
 
 # Shared helpers (consistent with init-session.sh)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -55,7 +45,7 @@ main() {
   # Read stdin (hook data) to extract cwd for project detection
   local input=""
   if [[ ! -t 0 ]]; then
-    input=$(cat)
+    input=$(head -c 65536)
   fi
 
   local cwd=""

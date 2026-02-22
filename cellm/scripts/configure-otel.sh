@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # CELLM Plugin - OTEL Configuration Check
 #
 # This script verifies OTEL is configured and warns if not.

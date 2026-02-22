@@ -1,5 +1,7 @@
 ---
-description: Check CELLM Oracle Worker daemon status
+name: status
+description: Check CELLM Oracle Worker daemon status. Reads worker.json for port config, calls health endpoint, and reports online/offline state with uptime and database info.
+allowed-tools: Bash(curl *), Bash(cat *), Read
 ---
 
 # Oracle Status

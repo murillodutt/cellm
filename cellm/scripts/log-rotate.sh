@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # CELLM Oracle - Log Rotation Script
 # Rotates log files to prevent unbounded growth
 #

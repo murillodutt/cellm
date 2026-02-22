@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # CELLM Oracle - Capture Context (Stop hook)
 # Ends session and triggers AI summary generation
 # Phase 7: Independent AI Analysis System
@@ -29,18 +29,8 @@ log() {
   echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] [Stop] $1" >> "${LOG_FILE}" 2>/dev/null || true
 }
 
-# Get port from worker.json
-get_port() {
-  if [[ -f "${WORKER_JSON}" ]]; then
-    local port
-    port=$(grep -o '"port"[[:space:]]*:[[:space:]]*[0-9]*' "${WORKER_JSON}" 2>/dev/null | grep -o '[0-9]*' || echo "")
-    if [[ -n "${port}" ]]; then
-      echo "${port}"
-      return
-    fi
-  fi
-  echo "${DEFAULT_PORT}"
-}
+# Shared port extraction (jq with grep fallback + range validation)
+source "$(dirname "${BASH_SOURCE[0]}")/_get-port.sh"
 
 # Main
 main() {
@@ -56,11 +46,8 @@ main() {
   # Read JSON from stdin (Claude Code hook format)
   local input=""
   if [[ ! -t 0 ]]; then
-    input=$(cat)
+    input=$(head -c 65536)
   fi
-
-  # DEBUG: Log raw stdin for diagnosis (first 500 chars)
-  log "RAW_STDIN_LEN=${#input} RAW_STDIN=${input:0:500}"
 
   if [[ -z "${input}" ]]; then
     log "No input received"

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # CELLM Oracle - Spawn Worker (SessionStart hook)
 # Target: < 2000ms execution, fire-and-forget
 #
@@ -27,7 +27,6 @@ LOG_FILE="${CELLM_DIR}/oracle-hook.log"
 LOCK_FILE="${CELLM_DIR}/spawn.lock"
 PID_FILE="${CELLM_DIR}/worker.pid"
 DEFAULT_PORT=31415
-_HEALTH_TIMEOUT=500  # ms - reserved for future curl timeout tuning
 MAX_HEALTH_RETRIES=3
 LOCK_TIMEOUT=5  # seconds
 
@@ -108,27 +107,8 @@ check_health_with_retry() {
   return 1
 }
 
-# Get port from worker.json or default
-get_port() {
-  if [[ -f "${WORKER_JSON}" ]]; then
-    local port
-
-    # Use jq for reliable JSON parsing, fallback to DEFAULT_PORT
-    if command -v jq >/dev/null 2>&1; then
-      port=$(jq -r '.port // empty' "${WORKER_JSON}" 2>/dev/null || echo "")
-    else
-      # Fallback to grep if jq not available (not recommended)
-      port=$(grep -o '"port"[[:space:]]*:[[:space:]]*[0-9]*' "${WORKER_JSON}" 2>/dev/null | grep -o '[0-9]*' || echo "")
-    fi
-
-    # Validate port range (1-65535)
-    if [[ -n "${port}" ]] && [[ "${port}" =~ ^[0-9]+$ ]] && [[ "${port}" -ge 1 ]] && [[ "${port}" -le 65535 ]]; then
-      echo "${port}"
-      return
-    fi
-  fi
-  echo "${DEFAULT_PORT}"
-}
+# Port extraction (shared utility)
+source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/_get-port.sh"
 
 # Get oracle root path (dynamic, supports CLAUDE_PLUGIN_ROOT)
 get_oracle_root() {

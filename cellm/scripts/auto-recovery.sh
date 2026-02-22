@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # CELLM Oracle - Auto Recovery Watchdog
 # Called on UserPromptSubmit if health fails
 #
@@ -49,18 +49,9 @@ check_health() {
   return 1
 }
 
-# Get port from worker.json or default
-get_port() {
-  if [[ -f "${WORKER_JSON}" ]]; then
-    local port
-    port=$(grep -o '"port"[[:space:]]*:[[:space:]]*[0-9]*' "${WORKER_JSON}" 2>/dev/null | grep -o '[0-9]*' || echo "")
-    if [[ -n "${port}" ]]; then
-      echo "${port}"
-      return
-    fi
-  fi
-  echo "${DEFAULT_PORT}"
-}
+# Port extraction (shared utility)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/_get-port.sh"
 
 # Kill stale worker process
 kill_stale_process() {

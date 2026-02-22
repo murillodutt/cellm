@@ -21,7 +21,6 @@
     "vue",
     "typescript"
   ],
-  "commands": "./commands/",
   "skills": "./skills/",
   "mcpServers": "./.mcp.json"
 }

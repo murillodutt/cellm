@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # CELLM Oracle - Shared project detection logic
 # Sourced by all hook scripts to ensure consistent project extraction.
 #

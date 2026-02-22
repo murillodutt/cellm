@@ -1,51 +1,16 @@
 ---
 name: init
-description: |
-  Initialize documentation structure and LLM-first templates for a project.
-  Use when: setting up new project docs, creating doc structure, initializing docops.
-  Triggers: /docops:init, missing docs folder, new project setup.
+description: Initialize documentation structure and LLM-first templates for a project. Creates directory hierarchy, copies templates without overwrite, and sets up docops.json configuration.
 argument-hint: "[docRoot]"
-allowed-tools: Read, Edit, Write, Glob, Grep
-model: inherit
 paths:
   - "**/.claude/docops.json"
   - "**/docs/**"
   - "**/technical/**"
 ---
 
-# DocOps Init
-
-## Purpose
-Create a predictable documentation base using the DocOps templates.
-
-## Inputs
-- `docRoot` (optional)
-- `.claude/docops.json` (preferred)
-
-## Output
-- Directory structure under `docRoot`
-- Template files copied without overwrite
-
-## Rules
-- Use templates from `${CLAUDE_PLUGIN_ROOT}/templates/<language>/`.
-- If evidence is missing, write: `Not found by evidence`.
-- Do NOT invent behavior.
-
-## Naming Convention
-
-When creating files, use these suffixes:
-
-| Type | Suffix | Example |
-|------|--------|---------|
-| Specification | `.spec.md` | `auth.spec.md` |
-| Reference | `.ref.md` | `env-vars.ref.md` |
-| How-to | `.howto.md` | `deploy.howto.md` |
-| Runbook | `.runbook.md` | `incident.runbook.md` |
-| Decision | `ADR-YYYYMMDD-<slug>.md` | `ADR-20260203-auth-method.md` |
+Create a predictable documentation base using DocOps templates from `${CLAUDE_PLUGIN_ROOT}/templates/<language>/`. Read `docRoot` from argument or `.claude/docops.json`.
 
 ## Directory Structure
-
-Create under `{docRoot}`:
 
 ```
 {docRoot}/
@@ -60,3 +25,19 @@ Create under `{docRoot}`:
   runbooks/             # Operational runbooks (.runbook.md)
   decisions/            # ADRs (ADR-YYYYMMDD-slug.md)
 ```
+
+## Naming Convention
+
+| Type | Suffix | Example |
+|------|--------|---------|
+| Specification | `.spec.md` | `auth.spec.md` |
+| Reference | `.ref.md` | `env-vars.ref.md` |
+| How-to | `.howto.md` | `deploy.howto.md` |
+| Runbook | `.runbook.md` | `incident.runbook.md` |
+| Decision | `ADR-YYYYMMDD-<slug>.md` | `ADR-20260203-auth-method.md` |
+
+## NEVER
+
+- **Overwrite existing files** — copy templates only where files don't exist
+- **Invent behavior** — if evidence is missing, write "Not found by evidence"
+- **Skip docops.json** — always check for existing config before creating structure

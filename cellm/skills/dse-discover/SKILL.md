@@ -1,11 +1,7 @@
 ---
 name: dse-discover
-description: |
-  Scan a project to extract design system signals and bootstrap its DSE.
-  Use when: a project has no design system preset yet.
+description: Scan a project to extract design system signals and bootstrap its DSE. Detects framework, colors, typography, and components, then applies a preset, imports palette, and indexes chunks.
 argument-hint: "[project-path]"
-allowed-tools: Bash, Read, Grep, Glob
-model: inherit
 ---
 
 # DSE Discover

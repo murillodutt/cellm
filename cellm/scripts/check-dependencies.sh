@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # CELLM Oracle - Check Dependencies (pre_install hook)
 # Validates that all required dependencies are available
 

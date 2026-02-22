@@ -1,12 +1,7 @@
 ---
 name: prune
-description: |
-  Archive or remove deprecated documentation and broken references.
-  Use when: cleaning up docs, removing deprecated content, fixing broken links.
-  Triggers: /docops:prune, deprecated docs, broken references.
+description: Archive or remove deprecated documentation, broken references, and orphaned files. Scans for deprecated frontmatter, validates internal links, and identifies unreferenced files.
 argument-hint: "[docRoot] [--dry-run]"
-allowed-tools: Read, Edit, Write, Glob, Grep, Bash
-model: inherit
 paths:
   - "**/.claude/docops.json"
   - "**/docs/**"
@@ -14,45 +9,26 @@ paths:
   - "**/archive/**"
 ---
 
-# DocOps Prune
+Find **deprecated docs**, **broken references**, and **orphaned files** — then archive or remove them with user confirmation.
 
-## Purpose
-Remove deprecated documentation, broken references, and orphaned files.
+## Detection
 
-## Detection Patterns
-
-### Deprecated Content
-```yaml
-# Frontmatter patterns to detect
-status: deprecated
-status: obsolete
-status: archived
-```
-
-### Broken References
-```markdown
-# Link patterns to validate
-[text](path/to/file.md)      # Internal file link
-[text](#section)             # Section anchor
-[text](./relative/path.md)   # Relative path
-```
-
-### Orphaned Files
-- Files in `reference/code-evidence/` not referenced by any SPEC/REF
-- Files in `specs/` not linked from `index.md`
-- Files in `howto/` not linked from any doc
+- **Deprecated** — frontmatter `status: deprecated` or `status: obsolete`
+- **Broken references** — internal `[text](path.md)` links pointing to non-existent files
+- **Orphaned files** — evidence files not referenced by any SPEC/REF, specs not linked from index.md
 
 ## Workflow
 
-1. **Scan** - Find all candidates for pruning
-2. **Classify** - Deprecated, broken, orphaned
-3. **Preview** - Show dry-run results
-4. **Confirm** - Ask user for approval
-5. **Execute** - Archive or delete
-6. **Report** - Summary of changes
+1. **Scan** — find all candidates
+2. **Classify** — deprecated, broken, orphaned
+3. **Preview** — show dry-run results
+4. **Confirm** — ask user for approval
+5. **Execute** — archive (default) or delete (explicit)
+6. **Report** — summary, log actions in conveyor-gaps.md
 
-## Rules
-- Always preview before executing
-- Archive by default, delete only if explicitly requested
-- Update references after moving files
-- Log all actions in conveyor-gaps.md
+## NEVER
+
+- **Execute without preview** — always show dry-run first, then confirm
+- **Delete by default** — archive is the default, delete only when explicitly requested
+- **Leave dangling references** — update all links after moving files
+- **Skip logging** — log all actions in conveyor-gaps.md

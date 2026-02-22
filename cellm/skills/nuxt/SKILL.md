@@ -1,98 +1,40 @@
 ---
 name: nuxt
-description: |
-  Nuxt 4 patterns for full-stack Vue applications.
-  Use when: working with Nuxt projects, server routes, data fetching, SSR.
-  Triggers: nuxt.config, app directory, server directory, useFetch, useAsyncData.
+description: Nuxt 4 patterns for full-stack Vue applications. Activates on nuxt.config, app/, server/, and pages/ to enforce correct data fetching, routing, and server/client separation.
 paths:
   - "**/nuxt.config.ts"
   - "**/app.vue"
   - "**/app/**/*"
   - "**/server/**/*"
   - "**/pages/**/*"
-allowed-tools: Read, Grep, Glob, Edit, Write
-model: inherit
+user-invocable: false
 ---
 
-# Nuxt 4
-
-## Structure
+Frontend lives in **`app/`**, backend in **`server/`**, shared isomorphic code in **`shared/`**. Every data fetch in components uses **`useFetch`** or **`useAsyncData`** — never raw `$fetch` in component setup.
 
 ```text
-app/           # Frontend
-  components/  # Auto-imported
-  composables/ # use* prefix
-  pages/       # File routing
-server/        # Nitro Backend
-  api/         # Routes
-  utils/       # Utils
-shared/        # Isomorphic
+app/           # Frontend (auto-imported components, composables, pages)
+server/        # Nitro backend (api/, utils/)
+shared/        # Isomorphic types and utilities
 ```
 
-## Data Fetching
+**Data fetching** — `useFetch('/api/endpoint')` for simple, `useAsyncData('key', () => $fetch(...))` when you need a dedup key or transform.
 
-```typescript
-// With key for deduplication
-const { data } = await useAsyncData('users', () => $fetch('/api/users'))
+**Server routes** — file-based with method suffix: `server/api/users/[id].get.ts`. Use `defineEventHandler`, `getRouterParam`, `readBody`.
 
-// Simple fetch
-const { data } = await useFetch('/api/users')
+**State** — `useState('key', () => default)` for SSR-safe globals. Complex state goes to Pinia.
 
-// With options
-const { data, refresh, status } = await useFetch('/api/users', {
-  lazy: true,
-  server: false,
-  transform: (data) => data.users
-})
-```
+**Middleware** — `defineNuxtRouteMiddleware((to, from) => { ... })` in `middleware/`.
 
-## State
+**Error handling** — `throw createError({ statusCode: 404, statusMessage: 'Not found' })`.
 
-```typescript
-// SSR-safe global state
-const count = useState('count', () => 0)
+**Config** — runtime config via `useRuntimeConfig()`, never `process.env` in client code.
 
-// Complex state -> Pinia
-const store = useUserStore()
-```
+## NEVER
 
-## Server Route
-
-```typescript
-// server/api/users/[id].get.ts
-export default defineEventHandler(async (event) => {
-  const id = getRouterParam(event, 'id')
-  return await getUserById(id)
-})
-```
-
-## Middleware
-
-```typescript
-// middleware/auth.ts
-export default defineNuxtRouteMiddleware((to, from) => {
-  const user = useUserStore()
-  if (!user.isAuthenticated) {
-    return navigateTo('/login')
-  }
-})
-```
-
-## Error Handling
-
-```typescript
-// Throw error
-throw createError({
-  statusCode: 404,
-  statusMessage: 'User not found'
-})
-
-// Error page: error.vue
-```
-
-## Rules
-
-1. Use app/ for frontend, server/ for backend
-2. Always useAsyncData/useFetch for data (never raw fetch in components)
-3. Use shared/ for isomorphic code
-4. Server routes with .get.ts, .post.ts suffixes
+- **Raw `fetch`/`$fetch` in component setup** — breaks SSR hydration, use `useFetch`/`useAsyncData`
+- **`process.env` in client code** — use `useRuntimeConfig().public`
+- **Components in `server/`** — server directory is Nitro-only, no Vue
+- **Server imports in `app/`** — never import from `server/` in frontend code
+- **Missing method suffix** on server routes — always `.get.ts`, `.post.ts`, etc.
+- **`navigateTo` outside middleware/composable** — not available in server context

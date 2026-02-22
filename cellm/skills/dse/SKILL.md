@@ -1,37 +1,23 @@
 ---
 name: dse
-description: |
-  Design System Engine — project-specific design decisions and context routing.
-  Use when: creating or editing UI components.
-  Triggers: .vue files, styling, component composition.
+description: Design System Engine — routes UI decisions to project-specific tokens, patterns, and compositions. Activates on .vue files to ensure project design decisions override generic framework defaults.
 paths:
   - "**/*.vue"
-allowed-tools: Read, Grep, Glob, Edit, Write
-model: inherit
+user-invocable: false
 ---
 
-# Design System Engine
-
-This project has a Design System with project-specific decisions: tokens, patterns, compositions, and avoid rules. These decisions override generic framework defaults.
-
-## Before Creating or Editing UI
-
-1. Call `dse_search` with your intent (e.g. "card layout", "badge styling", "kpi metrics")
-2. Apply the returned patterns, compositions, and avoid rules
-3. For component API (props, slots, events), use the appropriate MCP tool
-
-## Where to Find Answers
+Before creating or editing any UI component, call **`dse_search`** with your intent (e.g. "card layout", "badge styling", "kpi metrics"). Apply the returned tokens, patterns, compositions, and avoid rules. Project decisions from DSE **take priority** over generic framework defaults.
 
 | Question | Source |
 |----------|--------|
 | How does THIS project compose UI? | MCP `dse_search("your context")` |
-| Component API (props, slots)? | MCP `nuxt-ui-remote` or `context7` |
+| Component API (props, slots, events)? | MCP `nuxt-ui-remote` or `context7` |
 | Framework patterns (SSR, routing)? | MCP `nuxt-remote` |
 | Library reference (Tailwind, Pinia)? | MCP `context7` |
 
-## Rules
+## NEVER
 
-1. Project decisions from `dse_search` take priority over generic patterns
-2. Never guess styling — search first, then compose
-3. Respect `avoid` rules returned by the DSE
-4. If `dse_search` returns nothing, use framework defaults
+- **Guess styling** — search DSE first, then compose
+- **Ignore avoid rules** — DSE avoid rules are hard constraints, not suggestions
+- **Override project tokens** — if DSE returns a token, use it over framework defaults
+- **Skip DSE for "simple" components** — all UI goes through DSE, no exceptions

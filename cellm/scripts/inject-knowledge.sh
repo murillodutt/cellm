@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # CELLM Oracle - Inject Knowledge (UserPromptSubmit hook)
 # Fetches relevant knowledge atoms based on user prompt and injects into context.
 # Output: plain text stdout -> injected as additionalContext in Claude context
@@ -28,22 +28,8 @@ log() {
   echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] [Knowledge] $1" >> "${LOG_FILE}" 2>/dev/null || true
 }
 
-# Get port from worker.json
-get_port() {
-  if [[ -f "${WORKER_JSON}" ]]; then
-    local port
-    if command -v jq >/dev/null 2>&1; then
-      port=$(jq -r '.port // empty' "${WORKER_JSON}" 2>/dev/null || echo "")
-    else
-      port=$(grep -o '"port"[[:space:]]*:[[:space:]]*[0-9]*' "${WORKER_JSON}" 2>/dev/null | grep -o '[0-9]*' || echo "")
-    fi
-    if [[ -n "${port}" ]] && [[ "${port}" =~ ^[0-9]+$ ]] && [[ "${port}" -ge 1 ]] && [[ "${port}" -le 65535 ]]; then
-      echo "${port}"
-      return
-    fi
-  fi
-  echo "${DEFAULT_PORT}"
-}
+# Shared port extraction (jq with grep fallback + range validation)
+source "$(dirname "${BASH_SOURCE[0]}")/_get-port.sh"
 
 # Shared helpers
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -61,7 +47,7 @@ main() {
   # Read JSON from stdin (Claude Code hook format)
   local input=""
   if [[ ! -t 0 ]]; then
-    input=$(cat)
+    input=$(head -c 65536)
   fi
 
   if [[ -z "${input}" ]]; then

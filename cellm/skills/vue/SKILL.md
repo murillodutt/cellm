@@ -1,27 +1,19 @@
 ---
 name: vue
-description: |
-  Vue 3 Composition API patterns and best practices.
-  Use when: editing .vue files, creating components, writing composables.
-  Triggers: vue components, script setup, composables, defineProps, defineEmits.
+description: Vue 3 Composition API patterns for components and composables. Activates when editing .vue files or composables to enforce script setup, typed props/emits, and canonical section ordering.
 paths:
   - "**/*.vue"
   - "**/composables/**/*.ts"
-allowed-tools: Read, Grep, Glob, Edit, Write
-model: inherit
+user-invocable: false
 ---
 
-# Vue 3
-
-## Composition API
+Every Vue component uses **`<script setup lang="ts">`** with sections in this exact order: imports, props/emits, state, computed, methods, watchers, lifecycle.
 
 ```vue
 <script setup lang="ts">
-// 1. Imports
 import { ref, computed, watch, onMounted } from 'vue'
 import type { User } from '~/shared/types'
 
-// 2. Props/Emits
 const props = defineProps<{
   user: User
   loading?: boolean
@@ -32,68 +24,32 @@ const emit = defineEmits<{
   delete: [id: string]
 }>()
 
-// 3. Refs and State
 const count = ref(0)
-const name = ref('')
-
-// 4. Computed
 const fullName = computed(() => `${props.user.firstName} ${props.user.lastName}`)
 
-// 5. Methods
-function increment() {
-  count.value++
-}
+function increment() { count.value++ }
 
-// 6. Watchers
-watch(() => props.user, (newVal) => {
-  console.log('User changed:', newVal)
-}, { deep: true })
-
-// 7. Lifecycle
-onMounted(() => {
-  // init
-})
+watch(() => props.user, (v) => console.log('changed:', v), { deep: true })
+onMounted(() => { /* init */ })
 </script>
 ```
 
-## Rules
+**Props** — always generic typed: `defineProps<{ name: Type }>()`. No runtime props object.
 
-1. Always `<script setup lang="ts">`
-2. Order: imports -> props/emits -> state -> computed -> methods -> watch -> lifecycle
-3. Never Options API
-4. Typed props with generics
-5. Typed emits
+**Emits** — always typed: `defineEmits<{ event: [payload: Type] }>()`.
 
-## Composables
+**Composables** — `use` prefix, return reactive refs: `export function useCounter(initial = 0) { ... }`.
 
-```typescript
-// composables/useCounter.ts
-export function useCounter(initial = 0) {
-  const count = ref(initial)
-  const increment = () => count.value++
-  const decrement = () => count.value--
-  return { count, increment, decrement }
-}
-```
+**v-model** — use `defineModel<T>()`, never manual prop+emit pair.
 
-## v-model Pattern
+**Provide/Inject** — typed injection key: `provide('key', value)` / `inject<Type>('key')`.
 
-```vue
-<script setup lang="ts">
-const model = defineModel<string>()
-</script>
+**storeToRefs** — always destructure store state through `storeToRefs(store)`, never `store.someRef`.
 
-<template>
-  <input v-model="model" />
-</template>
-```
+## NEVER
 
-## Provide/Inject
-
-```typescript
-// Parent
-provide('user', user)
-
-// Child
-const user = inject<User>('user')
-```
+- **Options API** — no `data()`, `methods:`, `computed:`, `watch:` objects
+- **Untyped props/emits** — no `defineProps(['name'])` or `defineEmits(['click'])`
+- **`any` type** — use `unknown` then narrow with type guards
+- **`<script>` without `setup`** — every component is `<script setup lang="ts">`
+- **Reactive destructuring** without `toRefs`/`storeToRefs` — loses reactivity

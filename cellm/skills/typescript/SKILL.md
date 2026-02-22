@@ -1,23 +1,16 @@
 ---
 name: typescript
-description: |
-  TypeScript patterns and best practices.
-  Use when: writing TypeScript code, defining types, type safety issues.
-  Triggers: .ts files, type definitions, generics, type errors.
+description: TypeScript patterns for type-safe code. Activates on .ts/.tsx files to enforce strict typing, Zod validation, and proper use of generics and utility types.
 paths:
   - "**/*.ts"
   - "**/*.tsx"
   - "**/types/**/*"
-allowed-tools: Read, Grep, Glob, Edit, Write
-model: inherit
+user-invocable: false
 ---
 
-# TypeScript
-
-## Type Definitions
+Every function has an **explicit return type**. Every object shape is an **interface**. Every union/primitive alias is a **type**. Runtime validation uses **Zod schemas** with `z.infer<typeof schema>` for type derivation.
 
 ```typescript
-// Interfaces for objects
 interface User {
   id: string
   email: string
@@ -25,88 +18,33 @@ interface User {
   createdAt: Date
 }
 
-// Types for unions/primitives
 type Status = 'pending' | 'active' | 'inactive'
-type ID = string | number
-
-// Generics
-interface ApiResponse<T> {
-  data: T
-  error?: string
-}
-```
-
-## Type Guards
-
-```typescript
-function isUser(value: unknown): value is User {
-  return (
-    typeof value === 'object' &&
-    value !== null &&
-    'id' in value &&
-    'email' in value
-  )
-}
-
-// Usage
-if (isUser(data)) {
-  console.log(data.email) // Type-safe
-}
-```
-
-## Utility Types
-
-```typescript
-// Partial - all optional
-type UpdateUser = Partial<User>
-
-// Pick - subset
-type UserPreview = Pick<User, 'id' | 'name'>
-
-// Omit - exclude
-type CreateUser = Omit<User, 'id' | 'createdAt'>
-
-// Required - all required
-type RequiredUser = Required<User>
-
-// Record - key-value
-type UserMap = Record<string, User>
-```
-
-## Zod Schemas
-
-```typescript
-import { z } from 'zod'
 
 const userSchema = z.object({
   email: z.string().email(),
   name: z.string().min(2),
   age: z.number().optional()
 })
-
-type User = z.infer<typeof userSchema>
-
-// Validate
-const result = userSchema.safeParse(input)
-if (result.success) {
-  // result.data is typed
-}
+type UserInput = z.infer<typeof userSchema>
 ```
 
-## $fetch Typing
+**Interfaces** — objects and API contracts. **Types** — unions, intersections, mapped types.
 
-```typescript
-// Typed response
-const user = await $fetch<User>('/api/user/1')
+**Utility types** — `Partial<T>`, `Pick<T, K>`, `Omit<T, K>`, `Record<K, V>` — use instead of manual redefinition.
 
-// With error handling
-const { data, error } = await useFetch<User>('/api/user/1')
-```
+**Type guards** — `function isUser(v: unknown): v is User` with runtime checks, not assertions.
 
-## Rules
+**Generics** — `ApiResponse<T>` for reusable contracts. Constrain with `extends` when needed.
 
-1. Prefer interfaces for objects, types for unions
-2. Always define return types for functions
-3. Use `unknown` instead of `any`
-4. Use Zod for runtime validation
-5. Avoid type assertions (`as`) when possible
+**Zod** — `safeParse` for external input, access `result.data` only after `result.success` check.
+
+**$fetch typing** — `$fetch<User>('/api/user/1')` or `useFetch<User>(...)`.
+
+## NEVER
+
+- **`any`** — use `unknown` then narrow with type guards or Zod
+- **Type assertions (`as`)** — fix the type at the source, don't cast
+- **Untyped function returns** — every function declares its return type
+- **Manual type redefinition** — use utility types (`Partial`, `Pick`, `Omit`)
+- **`// @ts-ignore`** — fix the type error, don't suppress it
+- **Runtime props without Zod** — external input must be validated, not trusted

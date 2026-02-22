@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # CELLM Oracle - Health Check Script
 # Standalone script to check worker health status
 #
@@ -26,7 +26,6 @@ CELLM_DIR="${HOME}/.cellm"
 WORKER_JSON="${CELLM_DIR}/worker.json"
 DEFAULT_PORT=31415
 READINESS_TIMEOUT=5
-_READINESS_INTERVAL=0.2  # Reserved for future use
 
 # Parse arguments
 JSON_OUTPUT=false
@@ -53,18 +52,9 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-# Get port from worker.json or default
-get_port() {
-  if [[ -f "${WORKER_JSON}" ]]; then
-    local port
-    port=$(grep -o '"port"[[:space:]]*:[[:space:]]*[0-9]*' "${WORKER_JSON}" 2>/dev/null | grep -o '[0-9]*' || echo "")
-    if [[ -n "${port}" ]]; then
-      echo "${port}"
-      return
-    fi
-  fi
-  echo "${DEFAULT_PORT}"
-}
+# Port extraction (shared utility)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/_get-port.sh"
 
 # Quick health check
 check_health() {

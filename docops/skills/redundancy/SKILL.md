@@ -1,12 +1,7 @@
 ---
 name: redundancy
-description: |
-  Detect redundant and duplicate content across documentation files.
-  Use when: finding duplicates, consolidating docs, reducing redundancy.
-  Triggers: /docops:redundancy, duplicate content, similar docs, consolidate.
+description: Detect redundant and duplicate content across documentation files. Compares heading structures (Jaccard similarity), extracts topic keywords, and reports consolidation opportunities ranked by severity.
 argument-hint: "[docRoot] [--threshold N]"
-allowed-tools: Read, Glob, Grep
-model: inherit
 paths:
   - "**/.claude/docops.json"
   - "**/docs/**"
@@ -15,90 +10,35 @@ paths:
   - "**/reference/**"
 ---
 
-# DocOps Redundancy Detection
+Identify **redundant, duplicate, or overlapping** documentation by comparing heading structures, topic keywords, and content hashes. Report consolidation opportunities without auto-merging.
 
-## Purpose
-Identify redundant, duplicate, or overlapping documentation content for consolidation.
+## Detection
 
-## Detection Algorithms
+- **Structural similarity** — Jaccard index on normalized headings: `|A intersect B| / |A union B|`
+- **Topic detection** — extract keywords from titles, metadata, first paragraphs; group by topic
+- **Content hashing** — hash normalized paragraphs to find exact duplicates across files
 
-### Structural Similarity (Jaccard)
+## Severity
 
-```
-similarity(A, B) = |headings(A) ∩ headings(B)| / |headings(A) ∪ headings(B)|
-```
+| Level | Similarity | Action |
+|-------|------------|--------|
+| Critical | >90% | Must consolidate |
+| High | 70-90% | Should consolidate |
+| Medium | 50-70% | Review recommended |
+| Low | <50% | No action |
 
-Extract headings:
-```markdown
-## Heading Level 2    -> "Heading Level 2"
-### Heading Level 3   -> "Heading Level 3"
-```
+## Consolidation Strategies
 
-Normalize:
-- Lowercase
-- Remove numbers and special chars
-- Stem common words
+| Finding | Strategy |
+|---------|----------|
+| Near-duplicate SPECs | Merge into one |
+| SPEC overlaps REF | Keep both, clear boundaries (what vs how) |
+| HOWTO overlaps RUNBOOK | Keep both, different purpose (learn vs operate) |
+| Duplicated paragraph | Replace with link to source |
 
-### Topic Detection
+## NEVER
 
-Keywords extraction:
-```markdown
-# Document Title          -> primary topic
-## Metadata > Related:    -> related topics
-First paragraph           -> context keywords
-```
-
-Grouping:
-```
-Topic "authentication":
-  - auth.spec.md (primary: title match)
-  - login.howto.md (secondary: content match)
-  - security.ref.md (tertiary: section match)
-```
-
-### Content Hashing
-
-```python
-# Pseudocode for content deduplication
-def hash_content(doc):
-    paragraphs = extract_paragraphs(doc)
-    return {hash(normalize(p)): p for p in paragraphs}
-
-def find_duplicates(docs):
-    all_hashes = {}
-    duplicates = []
-    for doc in docs:
-        for h, content in hash_content(doc).items():
-            if h in all_hashes:
-                duplicates.append((all_hashes[h], doc, content))
-            else:
-                all_hashes[h] = doc
-    return duplicates
-```
-
-## Report Format
-
-### Severity Levels
-
-| Level | Similarity | Icon | Action |
-|-------|------------|------|--------|
-| Critical | >90% | `[-]` | Must consolidate |
-| High | 70-90% | `[!]` | Should consolidate |
-| Medium | 50-70% | `[i]` | Review recommended |
-| Low | <50% | - | No action |
-
-### Consolidation Strategies
-
-| Finding | Strategy | Example |
-|---------|----------|---------|
-| Near-duplicate SPECs | Merge into one | auth.spec.md + authentication.spec.md |
-| SPEC overlaps REF | Keep both, clear boundaries | auth.spec.md (what) + auth.ref.md (how) |
-| HOWTO overlaps RUNBOOK | Keep both, different purpose | deploy.howto.md (learn) + deploy.runbook.md (operate) |
-| Duplicated paragraph | Link to source | "See [env.ref.md](../reference/env.ref.md)" |
-
-## Rules
-- Never auto-merge; report only
-- Preserve all information
-- Suggest, don't mandate
-- Consider document purpose (SPEC vs REF vs HOWTO)
-- Link is often better than duplicate
+- **Auto-merge** — report only, never auto-merge documents
+- **Discard information** — preserve all content, consolidate structure
+- **Mandate consolidation** — suggest, don't mandate
+- **Ignore document purpose** — SPEC vs REF vs HOWTO serve different audiences

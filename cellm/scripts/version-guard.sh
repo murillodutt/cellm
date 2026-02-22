@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # CELLM - Version Guard (PreToolUse hook)
 # Detects when the LLM is about to write dependency versions or run install
 # commands, and injects a warning to verify versions before proceeding.

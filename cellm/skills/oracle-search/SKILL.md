@@ -1,9 +1,10 @@
 ---
 name: oracle-search
-description: Search Oracle context and observations using semantic search
+description: Search Oracle context and observations using semantic vector search. Uses a 3-layer retrieval pattern (search index, timeline context, full observations) to minimize token usage.
 argument-hint: "query: your search query"
 allowed-tools: mcp__cellm-oracle__search, mcp__cellm-oracle__timeline, mcp__cellm-oracle__get_observations
-model: inherit
+context: fork
+agent: Explore
 ---
 
 # Oracle Search Skill
@@ -69,12 +70,12 @@ mcp__cellm-oracle__get_observations({
 
 | Type | Icon | Description |
 |------|------|-------------|
-| bugfix | 🔴 | Bug fixes and error resolution |
-| feature | 🟣 | New features implemented |
-| refactor | 🔄 | Code refactoring work |
-| change | ✅ | General changes |
-| discovery | 🔵 | Learnings and discoveries |
-| decision | ⚖️ | Architectural decisions |
+| bugfix | [BUG] | Bug fixes and error resolution |
+| feature | [FEAT] | New features implemented |
+| refactor | [REFAC] | Code refactoring work |
+| change | [+] | General changes |
+| discovery | [i] | Learnings and discoveries |
+| decision | [=] | Architectural decisions |
 
 ## Token Economy
 

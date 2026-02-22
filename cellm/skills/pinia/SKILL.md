@@ -1,41 +1,25 @@
 ---
 name: pinia
-description: |
-  Pinia state management for Vue/Nuxt applications.
-  Use when: creating stores, managing global state, complex state logic.
-  Triggers: store files, defineStore, storeToRefs, useStore.
+description: Pinia state management for Vue/Nuxt applications. Activates on store files to enforce Setup Store syntax, storeToRefs destructuring, and focused single-domain stores.
 paths:
   - "**/stores/**/*.ts"
   - "**/store/**/*.ts"
-allowed-tools: Read, Grep, Glob, Edit, Write
-model: inherit
+user-invocable: false
 ---
 
-# Pinia
-
-## Setup Store (Recommended)
+Every store uses **Setup Store syntax** (function-based `defineStore`). State is destructured with **`storeToRefs()`** to preserve reactivity. Each store owns **one domain** — never a god store.
 
 ```typescript
-// stores/user.ts
 export const useUserStore = defineStore('user', () => {
-  // State
   const user = ref<User | null>(null)
   const isLoading = ref(false)
 
-  // Getters (computed)
   const isAuthenticated = computed(() => !!user.value)
-  const fullName = computed(() =>
-    user.value ? `${user.value.firstName} ${user.value.lastName}` : ''
-  )
 
-  // Actions
   async function login(credentials: LoginCredentials) {
     isLoading.value = true
     try {
-      user.value = await $fetch('/api/auth/login', {
-        method: 'POST',
-        body: credentials
-      })
+      user.value = await $fetch('/api/auth/login', { method: 'POST', body: credentials })
     } finally {
       isLoading.value = false
     }
@@ -46,48 +30,22 @@ export const useUserStore = defineStore('user', () => {
     navigateTo('/login')
   }
 
-  return {
-    // State
-    user,
-    isLoading,
-    // Getters
-    isAuthenticated,
-    fullName,
-    // Actions
-    login,
-    logout
-  }
+  return { user, isLoading, isAuthenticated, login, logout }
 })
 ```
 
-## Use in Components
+**In components** — `const store = useUserStore()`, then `const { user, isLoading } = storeToRefs(store)` for state, `store.login(...)` for actions.
 
-```vue
-<script setup lang="ts">
-const userStore = useUserStore()
+**Naming** — `use` prefix + domain + `Store` suffix: `useUserStore`, `useCartStore`.
 
-// Access state with reactivity
-const { user, isLoading } = storeToRefs(userStore)
+**Async actions** — always `try/finally` to reset loading state even on error.
 
-// Call actions
-await userStore.login({ email, password })
-</script>
-```
+**Persist** — `{ persist: true }` as third argument (requires `pinia-plugin-persistedstate`).
 
-## Persist State
+## NEVER
 
-```typescript
-export const useUserStore = defineStore('user', () => {
-  // ...
-}, {
-  persist: true  // Requires pinia-plugin-persistedstate
-})
-```
-
-## Rules
-
-1. Always Setup Store (not Options API)
-2. Use `storeToRefs` to maintain reactivity when destructuring
-3. Async actions with try/finally
-4. Name stores with `use` prefix and `Store` suffix
-5. Keep stores focused - one domain per store
+- **Options Store syntax** — no `state()`, `getters:`, `actions:` objects
+- **Destructure without `storeToRefs`** — `const { count } = store` loses reactivity
+- **God stores** — one store per domain, not one store for everything
+- **Direct `store.$state` mutation** — use actions for state changes
+- **`any` in store types** — fully type all state, getters, and action parameters

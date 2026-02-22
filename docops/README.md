@@ -1,54 +1,34 @@
 # DocOps Plugin
 
-Plugin opcional para manutencao de documentacao com foco em LLM-first, evidencia de codigo e controle de drift.
+Documentation maintenance with LLM-first templates, code evidence, and drift control. 10 skills, 1 agent, 11 commands.
 
-## Objetivo
-- Padronizar estrutura de docs.
-- Evitar degradacao e desatualizacao.
-- Separar fonte de verdade, evidencia e operacao.
+See [../README.md](../README.md) for full reference.
 
-## Comandos
+## Quick Start
 
-### Operacoes Basicas
-- `/docops:init`: cria estrutura e templates.
-- `/docops:sync`: atualiza code-evidence, gaps e docs derivadas.
-- `/docops:verify`: valida estrutura e links.
+```
+/docops:init
+```
 
-### Manutencao e Limpeza
-- `/docops:prune`: arquiva/remove docs deprecated e referencias quebradas.
-- `/docops:gc`: garbage collection de gaps resolvidos e evidencia stale.
-- `/docops:freshness`: verifica e atualiza status de freshness da evidencia.
-- `/docops:redundancy`: detecta conteudo duplicado e redundante.
+## Structure
 
-### Ciclo de Vida
-- `/docops:deprecate`: marca documento para deprecacao com grace period.
-- `/docops:undeprecate`: restaura documento deprecated para ativo.
-- `/docops:restore`: restaura documento arquivado para uso ativo.
+```
+.claude-plugin/plugin.json   # Manifest
+skills/                      # 10 documentation skills
+agents/docops-writer.md      # Documentation specialist agent
+commands/                    # 11 slash commands (thin wrappers to skills)
+hooks/hooks.json             # Stop + PreCompact drift reminders
+scripts/docops-hook.sh       # Hook script
+templates/                   # en/ and pt-BR/ document templates
+```
 
-## Configuracao
-Crie `.claude/docops.json` no projeto. Exemplo:
+## Configuration
 
+`.claude/docops.json`:
 ```json
 {
   "docRoot": "docs/technical",
   "conveyorFile": "project-conveyor.md",
-  "language": "en",
-  "hooksEnabled": false
+  "language": "en"
 }
 ```
-
-Observacao:
-- Defina `language` conforme a regra de idioma do projeto em `CLAUDE.md`.
-
-## Hooks (opcionais)
-- Desabilitado por default.
-- Ative com `"hooksEnabled": true`.
-- Logs: `.claude/docops:hook.log`.
-
-## Templates
-Os templates ficam em `templates/`:
-- `templates/en/`
-- `templates/pt-BR/`
-
-## Referencias
-- Guia rapido: `docs/README.md`
