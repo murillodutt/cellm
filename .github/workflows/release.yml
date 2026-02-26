@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Version to release (e.g., v1.0.0)'
+        description: 'Version to release (e.g., v3.3.0)'
         required: true
         type: string
 
@@ -24,24 +24,45 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: 20
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Run all tests
-        run: npm test
-
-      - name: Run validation
+      - name: Validate plugin structure
         run: |
-          chmod +x scripts/*.sh
-          ./scripts/validate.sh
+          # Validate all plugin manifests
+          for plugin in cellm docops dse; do
+            manifest="${plugin}/.claude-plugin/plugin.json"
+            if [ ! -f "$manifest" ]; then
+              echo "::error::Missing ${manifest}"
+              exit 1
+            fi
+            python3 -c "import json; d=json.load(open('${manifest}')); assert 'skills' in d" || exit 1
+            echo "[+] ${manifest} valid"
+          done
+
+          # Validate marketplace
+          python3 -c "
+          import json
+          mp = json.load(open('.claude-plugin/marketplace.json'))
+          names = [p['name'] for p in mp['plugins']]
+          for expected in ['cellm', 'docops', 'dse']:
+              assert expected in names, f'Missing {expected}'
+          print('[+] marketplace.json valid:', names)
+          "
+
+          # Validate hooks and MCP
+          for f in cellm/hooks/hooks.json cellm/.mcp.json.example; do
+            python3 -c "import json; json.load(open('$f'))" || exit 1
+            echo "[+] $f valid"
+          done
+
+          # No commands directories
+          for plugin in cellm docops dse; do
+            if [ -d "${plugin}/commands" ]; then
+              echo "::error::Found obsolete commands/ in ${plugin}"
+              exit 1
+            fi
+          done
+          echo "[+] Skills-only architecture confirmed"
 
   release:
     name: Create Release
@@ -50,7 +71,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -70,56 +91,34 @@ jobs:
           PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
 
           if [ -z "$PREV_TAG" ]; then
-            # First release - get all commits
             COMMITS=$(git log --pretty=format:"- %s (%h)" HEAD)
           else
-            # Get commits since previous tag
             COMMITS=$(git log --pretty=format:"- %s (%h)" ${PREV_TAG}..HEAD)
           fi
 
-          # Categorize commits
           FEAT=$(echo "$COMMITS" | grep "^- feat" || true)
           FIX=$(echo "$COMMITS" | grep "^- fix" || true)
           DOCS=$(echo "$COMMITS" | grep "^- docs" || true)
           REFACTOR=$(echo "$COMMITS" | grep "^- refactor" || true)
           OTHER=$(echo "$COMMITS" | grep -v "^- feat\|^- fix\|^- docs\|^- refactor" || true)
 
-          # Build changelog
           CHANGELOG=""
+          if [ -n "$FEAT" ]; then CHANGELOG="${CHANGELOG}### Features\n${FEAT}\n\n"; fi
+          if [ -n "$FIX" ]; then CHANGELOG="${CHANGELOG}### Bug Fixes\n${FIX}\n\n"; fi
+          if [ -n "$DOCS" ]; then CHANGELOG="${CHANGELOG}### Documentation\n${DOCS}\n\n"; fi
+          if [ -n "$REFACTOR" ]; then CHANGELOG="${CHANGELOG}### Refactoring\n${REFACTOR}\n\n"; fi
+          if [ -n "$OTHER" ]; then CHANGELOG="${CHANGELOG}### Other Changes\n${OTHER}\n\n"; fi
 
-          if [ -n "$FEAT" ]; then
-            CHANGELOG="${CHANGELOG}### Features\n${FEAT}\n\n"
-          fi
-
-          if [ -n "$FIX" ]; then
-            CHANGELOG="${CHANGELOG}### Bug Fixes\n${FIX}\n\n"
-          fi
-
-          if [ -n "$DOCS" ]; then
-            CHANGELOG="${CHANGELOG}### Documentation\n${DOCS}\n\n"
-          fi
-
-          if [ -n "$REFACTOR" ]; then
-            CHANGELOG="${CHANGELOG}### Refactoring\n${REFACTOR}\n\n"
-          fi
-
-          if [ -n "$OTHER" ]; then
-            CHANGELOG="${CHANGELOG}### Other Changes\n${OTHER}\n\n"
-          fi
-
-          # Save to file for multiline output
           echo -e "$CHANGELOG" > changelog.md
 
       - name: Count artifacts
         id: count
         run: |
-          echo "rules=$(find cellm-core/rules -name '*.md' | wc -l | tr -d ' ')" >> $GITHUB_OUTPUT
-          echo "patterns=$(find cellm-core/patterns -name '*.md' | wc -l | tr -d ' ')" >> $GITHUB_OUTPUT
-          echo "commands=$(find cellm-core/commands -name '*.md' | wc -l | tr -d ' ')" >> $GITHUB_OUTPUT
-          echo "workflows=$(find cellm-core/workflows -name '*.md' | wc -l | tr -d ' ')" >> $GITHUB_OUTPUT
-          echo "agents=$(find cellm-core/agents -name '*.md' | wc -l | tr -d ' ')" >> $GITHUB_OUTPUT
-          echo "skills=$(find cellm-core/skills -name '*.md' | wc -l | tr -d ' ')" >> $GITHUB_OUTPUT
-          echo "schemas=$(find schemas -name '*.json' | wc -l | tr -d ' ')" >> $GITHUB_OUTPUT
+          echo "cellm_skills=$(find cellm/skills -name 'SKILL.md' | wc -l | tr -d ' ')" >> $GITHUB_OUTPUT
+          echo "docops_skills=$(find docops/skills -name 'SKILL.md' | wc -l | tr -d ' ')" >> $GITHUB_OUTPUT
+          echo "dse_skills=$(find dse/skills -name 'SKILL.md' | wc -l | tr -d ' ')" >> $GITHUB_OUTPUT
+          echo "agents=$(find cellm/agents docops/agents -name '*.md' 2>/dev/null | wc -l | tr -d ' ')" >> $GITHUB_OUTPUT
+          echo "scripts=$(find cellm/scripts -name '*.sh' | wc -l | tr -d ' ')" >> $GITHUB_OUTPUT
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
@@ -129,39 +128,32 @@ jobs:
           body: |
             ## CELLM ${{ steps.version.outputs.version }}
 
-            Context Engineering for Large Language Models - Optimized for Nuxt 4 stack.
+            Context Engineering for LLM-driven development. Skills-only architecture.
 
-            ### Artifacts Included
+            ### Plugin Inventory
 
-            | Type | Count |
-            |------|-------|
-            | Rules | ${{ steps.count.outputs.rules }} |
-            | Patterns | ${{ steps.count.outputs.patterns }} |
-            | Commands | ${{ steps.count.outputs.commands }} |
-            | Workflows | ${{ steps.count.outputs.workflows }} |
+            | Plugin | Skills | Description |
+            |--------|--------|-------------|
+            | cellm | ${{ steps.count.outputs.cellm_skills }} | Core development (context + workflow) |
+            | docops | ${{ steps.count.outputs.docops_skills }} | Documentation maintenance |
+            | dse | ${{ steps.count.outputs.dse_skills }} | Design system engine |
+
+            | Component | Count |
+            |-----------|-------|
             | Agents | ${{ steps.count.outputs.agents }} |
-            | Skills | ${{ steps.count.outputs.skills }} |
-            | Schemas | ${{ steps.count.outputs.schemas }} |
+            | Scripts | ${{ steps.count.outputs.scripts }} |
 
             ### Changelog
 
-            ${{ steps.changelog.outputs.changelog }}
+            $(cat changelog.md)
 
             ---
 
             ### Installation
 
             ```bash
-            # Clone the repository
-            git clone https://github.com/${{ github.repository }}.git
-            cd cellm
-
-            # Install to ~/.cellm
-            ./scripts/base-install.sh
-
-            # Initialize a project
-            cd your-project
-            ~/.cellm/scripts/project-install.sh
+            /plugin marketplace add murillodutt/cellm
+            /plugin install cellm
             ```
           draft: false
           prerelease: ${{ contains(steps.version.outputs.version, '-') }}

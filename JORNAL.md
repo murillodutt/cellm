@@ -311,6 +311,32 @@ frontend-ui
 
 ---
 
+## Decisao 14: Correcao dos CI Workflows
+
+**Decisao:** Reescrever os 4 workflows do GitHub Actions para refletir a arquitetura skills-only com 3 plugins.
+
+**Problemas encontrados:**
+
+| Workflow | Problema |
+|----------|----------|
+| `ci.yml` | Validava apenas cellm. Ignorava docops e dse. |
+| `pr-check.yml` | Detectava `cellm/commands/` nos diffs. Label `commands` no auto-labeler. Scope `commands` no PR title. |
+| `release.yml` | Referenciava `cellm-core/rules`, `cellm-core/commands`, `schemas/` (estrutura v1.x). Usava `actions/checkout@v6` e `actions/setup-node@v6` (nao existem). Rodava `npm ci`, `npm test`, `./scripts/validate.sh` (nao existem no repo). |
+| `claude.yml` | Usava `actions/checkout@v6` (nao existe, v4 e a mais recente). |
+
+**Correcoes aplicadas:**
+
+| Workflow | Mudanca |
+|----------|---------|
+| `ci.yml` | Valida 3 plugins, marketplace.json, frontmatter de todos SKILL.md, verifica ausencia de commands/ |
+| `pr-check.yml` | Removida deteccao de commands/. Patterns atualizados para cellm/docops/dse. Labels: skills, agents, hooks, scripts, docops, dse. |
+| `release.yml` | Removida referencia a cellm-core/. Conta skills por plugin. Usa checkout@v4. Removido npm ci/test (nao aplicavel). |
+| `claude.yml` | Corrigido para checkout@v4. |
+
+**Validacao:** CI simulado localmente — todos os checks passam. 38 skills validados, 3 plugins, 0 commands/.
+
+---
+
 ## Proximos Passos
 
 1. Bump de versao no cellm plugin.json (3.2.2 → 3.3.0)

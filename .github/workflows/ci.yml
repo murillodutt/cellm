@@ -8,12 +8,16 @@ on:
     branches: [main]
     paths:
       - 'cellm/**'
+      - 'docops/**'
+      - 'dse/**'
       - '.claude-plugin/**'
       - '.github/workflows/ci.yml'
   pull_request:
     branches: [main]
     paths:
       - 'cellm/**'
+      - 'docops/**'
+      - 'dse/**'
       - '.claude-plugin/**'
       - '.github/workflows/ci.yml'
   workflow_dispatch:
@@ -31,48 +35,54 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Check plugin manifest exists
+      - name: Validate all plugin manifests
         run: |
-          if [ ! -f "cellm/.claude-plugin/plugin.json" ]; then
-            echo "::error::Missing plugin.json manifest"
+          for plugin in cellm docops dse; do
+            manifest="${plugin}/.claude-plugin/plugin.json"
+            if [ ! -f "$manifest" ]; then
+              echo "::error::Missing ${manifest}"
+              exit 1
+            fi
+            if ! python3 -c "import json; d=json.load(open('${manifest}')); assert 'skills' in d, 'missing skills key'"; then
+              echo "::error::Invalid or incomplete ${manifest}"
+              exit 1
+            fi
+            echo "[+] ${manifest} valid"
+          done
+
+      - name: Validate marketplace.json
+        run: |
+          if [ ! -f ".claude-plugin/marketplace.json" ]; then
+            echo "::error::Missing marketplace.json"
             exit 1
           fi
-          echo "[+] Plugin manifest found"
+          python3 -c "
+          import json
+          mp = json.load(open('.claude-plugin/marketplace.json'))
+          names = [p['name'] for p in mp['plugins']]
+          for expected in ['cellm', 'docops', 'dse']:
+              assert expected in names, f'Missing {expected} in marketplace'
+          print('[+] marketplace.json valid:', names)
+          "
 
-      - name: Validate plugin.json syntax
-        run: |
-          if ! python3 -c "import json; json.load(open('cellm/.claude-plugin/plugin.json'))"; then
-            echo "::error::Invalid JSON in plugin.json"
-            exit 1
-          fi
-          echo "[+] plugin.json syntax valid"
-
-      - name: Check MCP configuration template exists
+      - name: Validate MCP configuration template
         run: |
           if [ ! -f "cellm/.mcp.json.example" ]; then
             echo "::error::Missing .mcp.json.example template"
             exit 1
           fi
-          echo "[+] MCP configuration template found"
-
-      - name: Validate .mcp.json.example syntax
-        run: |
           if ! python3 -c "import json; json.load(open('cellm/.mcp.json.example'))"; then
             echo "::error::Invalid JSON in .mcp.json.example"
             exit 1
           fi
           echo "[+] .mcp.json.example syntax valid"
 
-      - name: Check hooks configuration exists
+      - name: Validate hooks configuration
         run: |
           if [ ! -f "cellm/hooks/hooks.json" ]; then
             echo "::error::Missing hooks.json configuration"
             exit 1
           fi
-          echo "[+] Hooks configuration found"
-
-      - name: Validate hooks.json syntax
-        run: |
           if ! python3 -c "import json; json.load(open('cellm/hooks/hooks.json'))"; then
             echo "::error::Invalid JSON in hooks.json"
             exit 1
@@ -81,7 +91,7 @@ jobs:
 
       - name: Check required directories exist
         run: |
-          REQUIRED_DIRS="cellm/agents cellm/skills cellm/hooks cellm/scripts"
+          REQUIRED_DIRS="cellm/agents cellm/skills cellm/hooks cellm/scripts docops/skills dse/skills"
           for dir in $REQUIRED_DIRS; do
             if [ ! -d "$dir" ]; then
               echo "::error::Missing required directory: $dir"
@@ -90,7 +100,23 @@ jobs:
             echo "[+] Found: $dir"
           done
 
-      - name: Check shell scripts exist
+      - name: Validate all SKILL.md files have frontmatter
+        run: |
+          ERRORS=0
+          for skill_md in $(find cellm/skills docops/skills dse/skills -name "SKILL.md" 2>/dev/null); do
+            if ! head -1 "$skill_md" | grep -q "^---"; then
+              echo "::error::Missing frontmatter in $skill_md"
+              ERRORS=$((ERRORS + 1))
+            fi
+          done
+          if [ $ERRORS -gt 0 ]; then
+            echo "::error::$ERRORS skills missing frontmatter"
+            exit 1
+          fi
+          TOTAL=$(find cellm/skills docops/skills dse/skills -name "SKILL.md" | wc -l | tr -d ' ')
+          echo "[+] All $TOTAL SKILL.md files have frontmatter"
+
+      - name: Check shell scripts exist and are executable
         run: |
           REQUIRED_SCRIPTS="cellm/scripts/spawn-worker.sh cellm/scripts/health-check.sh cellm/scripts/configure-otel.sh cellm/scripts/capture-prompt.sh cellm/scripts/capture-context.sh cellm/scripts/inject-context.sh cellm/scripts/track-tool-use.sh cellm/scripts/auto-recovery.sh cellm/scripts/log-rotate.sh cellm/scripts/check-dependencies.sh cellm/scripts/check-worker-health.sh cellm/scripts/init-oracle.sh"
           for script in $REQUIRED_SCRIPTS; do
@@ -105,16 +131,27 @@ jobs:
             echo "[+] Found and executable: $script"
           done
 
+      - name: Check no commands directories exist
+        run: |
+          for plugin in cellm docops dse; do
+            if [ -d "${plugin}/commands" ]; then
+              echo "::error::Found obsolete commands/ directory in ${plugin}. Skills-only architecture."
+              exit 1
+            fi
+          done
+          echo "[+] No commands/ directories (skills-only confirmed)"
+
       - name: Count plugin components
         run: |
           echo "## Plugin Structure Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Component | Count |" >> $GITHUB_STEP_SUMMARY
-          echo "|-----------|-------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Agents | $(ls cellm/agents/*.md 2>/dev/null | wc -l | tr -d ' ') |" >> $GITHUB_STEP_SUMMARY
-          echo "| Skills | $(ls -d cellm/skills/*/ 2>/dev/null | wc -l | tr -d ' ') |" >> $GITHUB_STEP_SUMMARY
-          echo "| Hooks | $(ls cellm/hooks/*.json 2>/dev/null | wc -l | tr -d ' ') |" >> $GITHUB_STEP_SUMMARY
-          echo "| Scripts | $(ls cellm/scripts/*.sh 2>/dev/null | wc -l | tr -d ' ') |" >> $GITHUB_STEP_SUMMARY
+          echo "| Plugin | Skills | Agents |" >> $GITHUB_STEP_SUMMARY
+          echo "|--------|--------|--------|" >> $GITHUB_STEP_SUMMARY
+          for plugin in cellm docops dse; do
+            skills=$(find ${plugin}/skills -name "SKILL.md" 2>/dev/null | wc -l | tr -d ' ')
+            agents=$(ls ${plugin}/agents/*.md 2>/dev/null | wc -l | tr -d ' ')
+            echo "| ${plugin} | ${skills} | ${agents} |" >> $GITHUB_STEP_SUMMARY
+          done
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "[+] Plugin structure validated successfully" >> $GITHUB_STEP_SUMMARY
 
