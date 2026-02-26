@@ -1,0 +1,22 @@
+{
+  "name": "dse",
+  "version": "0.1.0",
+  "description": "DSE - Design System Engine. Visual design skills for distinctive, production-grade frontend interfaces.",
+  "author": {
+    "name": "Murillo Dutt",
+    "email": "contact@cellm.ai",
+    "url": "https://cellm.ai"
+  },
+  "repository": "https://github.com/murillodutt/cellm",
+  "homepage": "https://cellm.ai",
+  "license": "MIT",
+  "keywords": [
+    "design-system",
+    "frontend",
+    "ui",
+    "css",
+    "components",
+    "visual-design"
+  ],
+  "skills": "./skills"
+}
