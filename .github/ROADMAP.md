@@ -40,17 +40,17 @@
 
 ## What's Next
 
-### v0.36.0 - Enhanced Patterns
+### Next - Enhanced Patterns
 - Additional framework skills (Prisma, tRPC, Zod)
 - Pattern recommendation engine
 - Community pattern sharing
 
-### v0.37.0 - Oracle Intelligence
+### Next - Oracle Intelligence
 - Improved semantic search accuracy
 - Multi-project context
 - Cross-repository pattern discovery
 
-### v1.0.0 - Community Tools
+### Next - Community Tools
 - Build system for custom plugins
 - Test framework for skills and agents
 - Community contribution workflow
