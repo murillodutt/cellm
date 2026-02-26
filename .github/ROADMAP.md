@@ -4,22 +4,18 @@
 
 ---
 
-## Current Version: 2.0.5
+## Current Version: 3.3.0
 
-**Released:** 2026-01-27
+**Released:** 2026-02-25
 **Status:** Production Ready
 **Cost:** Free Forever (MIT License)
 
 ### What's Delivered
 
-**Core Plugin**
-- 7 Framework Skills (Nuxt, Vue, TypeScript, Tailwind, Pinia, Drizzle, Search)
-- 4 Development Agents (Architect, Implementer, Reviewer, Project Manager)
-- 10 Workflow Commands (plan, shape, implement, verify, patterns, etc.)
-- 10 Audited Shell Scripts (modular architecture)
-
-**Optional Plugins**
-- DocOps Plugin: documentation maintenance, code evidence, and drift control
+**3 Plugins, Skills-Only Architecture**
+- cellm: 25 skills (7 context auto-loaded + 18 workflow), 4 agents
+- docops: 12 documentation maintenance skills, 1 agent
+- dse: 1 design thinking skill (frontend-ui)
 
 **Oracle Package**
 - Published on NPM: `@cellm/oracle`
@@ -102,7 +98,8 @@ This roadmap focuses on **direct value to developers**, not technical infrastruc
 
 | Version | Date | Highlights |
 |---------|------|------------|
-| **2.0.5** | 2026-01-27 | Security audit, Oracle NPM, Compass UI, 5 new commands |
+| **3.3.0** | 2026-02-25 | Skills-only architecture, 3 plugins, 38 skills total |
+| 2.0.5 | 2026-01-27 | Security audit, Oracle NPM, Compass UI |
 | 2.0.0 | 2026-01-23 | Claude Code Plugin distribution |
 | 1.1.0 | 2026-01-20 | Legacy: Oracle dashboard, MCP integration |
 | 1.0.0 | 2026-01-18 | Legacy: First stable release |

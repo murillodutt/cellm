@@ -1,483 +1,165 @@
-# Commands Reference
+# Skills Reference
 
-> [Home](../README.md) > [Docs](README.md) > **Commands**
+> [Home](../README.md) > [Docs](README.md) > **Skills**
 
-Complete reference for all CELLM workflow commands.
+Complete reference for all CELLM skills. All skills use the `/cellm:` namespace.
 
 ---
 
 ## Overview
 
-CELLM provides workflow commands organized into phases. All commands use the `/cellm:` namespace.
+CELLM uses a **skills-only architecture** — every capability is a skill registered in `skills/{name}/SKILL.md`. There is no separate commands directory. Skills are invoked as `/cellm:{name}` and can also auto-load based on file context.
 
-| Phase | Commands |
-|-------|----------|
-| **Planning** | `/cellm:plan`, `/cellm:shape`, `/write-spec` |
-| **Execution** | `/create-tasks`, `/orchestrate-tasks`, `/implement` |
-| **Validation** | `/verify`, `/cellm:status` |
-| **Pattern Management** | `/cellm:discover`, `/cellm:inject`, `/cellm:index` |
-| **Setup & Monitoring** | `/cellm:init` |
+Skills are organized in two categories: **workflow skills** (invoked explicitly by the user) and **context skills** (auto-loaded based on file patterns).
 
 ---
 
-## Planning Commands
+## Workflow Skills
 
-### /cellm:plan
+### Planning Phase
 
-**Purpose:** Establish foundational product documentation
+| Skill | Purpose | Usage |
+|-------|---------|-------|
+| `/cellm:plan` | Product foundation (mission, roadmap, tech stack) | `/cellm:plan "my app"` |
+| `/cellm:shape` | Feature research and shaping (requires plan mode) | `/cellm:shape` |
+| `/cellm:write-spec` | Formalize shaping into technical specification | `/cellm:write-spec` |
 
-**Agent:** Architect
+### Execution Phase
 
-**What it does:**
-- Creates mission, roadmap, and tech stack documentation
-- Interactive conversation to gather product vision
-- Checks for existing patterns to inform tech stack
+| Skill | Purpose | Usage |
+|-------|---------|-------|
+| `/cellm:create-tasks` | Break spec into dependency-ordered task groups | `/cellm:create-tasks` |
+| `/cellm:orchestrate` | Execute tasks systematically via implementer | `/cellm:orchestrate` |
+| `/cellm:implement` | Generate code from spec or direct instruction | `/cellm:implement "fix login bug"` |
 
-**Output:**
-```
-cellm-core/project/product/
-├── mission.md      # Core purpose and vision
-├── roadmap.md      # Feature timeline (MVP + future)
-└── tech-stack.md   # Technology choices
-```
+### Validation Phase
 
-**Usage:**
-```bash
-/cellm:plan "my SaaS product"
-```
+| Skill | Purpose | Usage |
+|-------|---------|-------|
+| `/cellm:verify` | Quality gate — rules, security, spec compliance | `/cellm:verify` |
+| `/cellm:arena` | Run test suites, typecheck, health checks | `/cellm:arena all` |
+| `/cellm:arena-debug` | Automated runtime debugging with instrumentation | `/cellm:arena-debug "error message"` |
 
-**Process:**
-1. Check for existing product docs
-2. Gather product vision (problem, users, solution)
-3. Define roadmap (MVP features, future features)
-4. Establish tech stack
-5. Generate documentation files
+### Spec OS (Atomic Spec System)
 
----
+| Skill | Purpose | Usage |
+|-------|---------|-------|
+| `/cellm:spec` | Spec command center — list, create, status | `/cellm:spec create "feature"` |
+| `/cellm:spec-treat` | Work through a spec check task by task | `/cellm:spec-treat "check title"` |
 
-### /cellm:shape
+### Pattern Management
 
-**Purpose:** Research and define requirements for a feature
+| Skill | Purpose | Usage |
+|-------|---------|-------|
+| `/cellm:discover` | Extract tribal knowledge into pattern files | `/cellm:discover` |
+| `/cellm:inject` | Load relevant patterns into context | `/cellm:inject core/typescript` |
+| `/cellm:index` | Rebuild patterns index.yml | `/cellm:index` |
 
-**Agent:** Architect
+### Setup & Monitoring
 
-**Prerequisites:** Must be run in plan mode
+| Skill | Purpose | Usage |
+|-------|---------|-------|
+| `/cellm:init` | Oracle worker installation and management | `/cellm:init install` |
+| `/cellm:status` | Check Oracle worker daemon status | `/cellm:status` |
 
-**What it does:**
-- Clarifies what's being built through Q&A
-- Gathers visual references (mockups, screenshots)
-- Identifies similar code in codebase
-- Surfaces relevant patterns
-- Creates spec folder with documentation
+### Design System
 
-**Output:**
-```
-cellm-core/specs/{YYYY-MM-DD-HHMM-feature-slug}/
-├── plan.md         # Full implementation plan
-├── shape.md        # Shaping notes and decisions
-├── patterns.md     # Applicable patterns
-├── references.md   # Similar code references
-└── visuals/        # Mockups, screenshots
-```
-
-**Usage:**
-```bash
-# Enter plan mode first
-/cellm:shape
-```
-
-**Process:**
-1. Clarify scope (what are we building?)
-2. Gather visuals (mockups, examples)
-3. Identify reference implementations
-4. Check product context alignment
-5. Surface relevant patterns
-6. Generate spec folder
-7. Structure the plan
+| Skill | Purpose | Usage |
+|-------|---------|-------|
+| `/cellm:dse-discover` | Bootstrap design system for a project | `/cellm:dse-discover ~/Dev/myapp` |
+| `/cellm:oracle-search` | Semantic search through Oracle observations | `/cellm:oracle-search "auth pattern"` |
 
 ---
 
-### /write-spec
+## Context Skills (Auto-Load)
 
-**Purpose:** Create detailed technical specification
+These skills load automatically based on file patterns. They are not invoked directly.
 
-**Agent:** Architect
-
-**What it does:**
-- Formalizes requirements from shaping
-- Creates technical design document
-- Defines data models and API contracts
-- Documents component structure
-
-**Output:**
-- Detailed spec.md with technical design
-- Data models
-- API contracts
-- Component structure
+| Skill | Technology | Trigger Patterns |
+|-------|------------|------------------|
+| `cellm:nuxt` | Nuxt 4 | `nuxt.config.ts`, `app/**`, `server/**`, `pages/**` |
+| `cellm:vue` | Vue 3 | `*.vue`, `composables/**/*.ts` |
+| `cellm:typescript` | TypeScript | `*.ts`, `*.tsx`, `types/**` |
+| `cellm:tailwind` | Tailwind CSS v4 | `*.vue`, `*.css`, `tailwind.config.ts` |
+| `cellm:pinia` | Pinia | `stores/**/*.ts`, `store/**/*.ts` |
+| `cellm:drizzle` | Drizzle ORM | `db/**/*.ts`, `drizzle.config.ts`, `*schema*.ts` |
+| `cellm:dse` | Design System Engine | `*.vue` (routes UI decisions to project tokens) |
 
 ---
 
-## Execution Commands
-
-### /create-tasks
-
-**Purpose:** Break specification into actionable tasks
-
-**Agent:** Project Manager
-
-**What it does:**
-- Reads spec.md for requirements
-- Decomposes into logical task groups
-- Sorts by dependencies (critical path first)
-- Creates tasks.md
-
-**Output:**
-```markdown
-# Tasks for [Feature Name]
-
-## Group 1: Foundation
-- [ ] Task 1.1 - Description
-- [ ] Task 1.2 - Description
-
-## Group 2: Core Features (depends on Group 1)
-- [ ] Task 2.1 - Description
-- [ ] Task 2.2 - Description
-
-## Group 3: Polish (depends on Group 2)
-- [ ] Task 3.1 - Description
-```
-
-**Usage:**
-```bash
-/create-tasks
-```
-
----
-
-### /orchestrate-tasks
-
-**Purpose:** Execute tasks systematically
-
-**Agent:** Project Manager
-
-**What it does:**
-- Reads tasks.md
-- Identifies next executable group
-- Delegates to implementer agent
-- Updates task status
-- Reports completion
-
-**Usage:**
-```bash
-/orchestrate-tasks
-```
-
----
-
-### /implement
-
-**Purpose:** Generate code from specification
-
-**Agent:** Implementer
-
-**What it does:**
-- Reads spec.md requirements
-- Checks for reusable code
-- Implements following patterns and rules
-- Updates tasks.md with progress
-- Self-reviews for rule compliance
-
-**Rules enforced:**
-- No `any` types
-- No hardcoded colors (semantic tokens only)
-- No sync I/O
-- Composition API always
-- Code limits (1000 lines/file, 50/function)
-- Error handling required
-
-**Usage:**
-```bash
-/implement
-```
-
----
-
-## Validation Commands
-
-### /verify
-
-**Purpose:** Quality gate validation
-
-**Agent:** Reviewer
-
-**What it does:**
-- Reviews code against checklist
-- Validates spec compliance
-- Checks for security vulnerabilities
-- Documents findings with file:line references
-
-**Review Checklist:**
-
-| Category | Checks |
-|----------|--------|
-| **Quality** | No TS errors, no `any`, no console.log, code limits |
-| **Spec Compliance** | User stories, requirements, acceptance criteria |
-| **Standards** | Naming, imports, file structure, comments |
-| **Patterns** | Anti-patterns avoided, stack patterns followed |
-| **Security** | Input validation, SQL injection, XSS, data protection |
-
-**Output:**
-```markdown
-# Verification Report
-
-## Summary
-- Files reviewed: X
-- Issues found: Y
-- Status: PASS/FAIL
-
-## Findings
-
-### [CRITICAL] Issue Title
-- File: path/to/file.ts:42
-- Description: ...
-- Recommendation: ...
-```
-
-**Severity Levels:**
-- **CRITICAL** - Blocks deployment, must fix
-- **WARNING** - Should fix before merge
-- **INFO** - Improvement suggestion
-
-**Usage:**
-```bash
-/verify
-```
-
----
-
-### /cellm:status
-
-**Purpose:** Display current project status
-
-**Agent:** Project Manager
-
-**Output:**
-```
-Project: [Name]
-Phase: [Planning|Implementation|Review]
-
-Active Spec: spec-name.md
-Progress: 8/15 tasks (53%)
-
-Completed:
-  [x] Group 1: Foundation (4/4)
-  [x] Group 2: Data Layer (4/4)
-
-In Progress:
-  [ ] Group 3: API Layer (0/4)
-
-Pending:
-  [ ] Group 4: UI Components
-  [ ] Group 5: Integration
-```
-
-**Task Status Symbols:**
-```
-[ ] Pending
-[~] In Progress
-[x] Completed
-[!] Blocked
-[-] Cancelled
-```
-
-**Usage:**
-```bash
-/cellm:status
-```
-
----
-
-## Pattern Management Commands
-
-### /cellm:discover
-
-**Purpose:** Find patterns in your codebase
-
-**What it does:**
-- Searches for code patterns
-- Identifies reusable structures
-- Reports pattern usage
-
-**Usage:**
-```bash
-/cellm:discover
-```
-
----
-
-### /cellm:inject
-
-**Purpose:** Apply patterns consistently to code
-
-**What it does:**
-- Reads pattern definitions
-- Applies to new or existing code
-- Ensures consistency
-
-**Usage:**
-```bash
-/cellm:inject
-```
-
----
-
-### /cellm:index
-
-**Purpose:** Search available patterns
-
-**What it does:**
-- Lists all available patterns
-- Searches by keyword
-- Shows pattern details
-
-**Usage:**
-```bash
-/cellm:index
-```
-
----
-
-## Setup & Monitoring Commands
-
-### /cellm:init
-
-**Purpose:** Interactive Oracle setup and maintenance
-
-**What it does:**
-- Guided Oracle installation with visual feedback
-- Interactive menu with 8 main options
-- Doctor mode with 6 diagnostic checks
-- Advanced configuration (port, data directory, logs)
-- Update and maintenance tools
-
-**Interactive Menu:**
-```
-1. Install Oracle (first time setup)
-2. Check Status (view current state)
-3. Update (upgrade to latest version)
-4. Doctor (diagnose and fix issues)
-5. Restart Worker (if stuck or slow)
-6. Uninstall (remove Oracle completely)
-7. Advanced Options
-8. Exit
-```
-
-**Usage:**
-```bash
-# Interactive mode (recommended)
-/cellm:init
-
-# Direct command-line modes
-/cellm:init install   # First-time installation
-/cellm:init status    # Check current state
-/cellm:init update    # Upgrade to latest
-/cellm:init doctor    # Run diagnostics
-/cellm:init restart   # Restart worker
-/cellm:init uninstall # Remove Oracle
-```
-
-**Doctor Mode:**
-Runs 6 automatic checks:
-1. Dependencies (Bun runtime)
-2. Installation verification
-3. Worker status test
-4. Port availability check
-5. Database integrity
-6. MCP configuration
-
-Each issue found is automatically fixed with user confirmation.
-
-**Advanced Options:**
-- Change worker port (1024-65535)
-- Change data directory
-- View logs (last 50 lines)
-- Clear cache (preserves observations)
-- Reset configuration (preserves database)
-
----
-
-## Typical Workflow
+## Typical Workflows
 
 ### Full Feature Development
 
 ```bash
-# 1. Plan the product (if new project)
-/cellm:plan "my app"
-
-# 2. Shape the feature (in plan mode)
-/cellm:shape
-
-# 3. Create tasks from spec
-/create-tasks
-
-# 4. Implement the code
-/implement
-
-# 5. Verify quality
-/verify
-
-# 6. Check status anytime
-/cellm:status
+/cellm:plan "my app"          # 1. Product foundation
+/cellm:shape                   # 2. Shape the feature (plan mode)
+/cellm:write-spec              # 3. Technical specification
+/cellm:create-tasks            # 4. Task breakdown
+/cellm:orchestrate             # 5. Execute tasks
+/cellm:verify                  # 6. Quality gate
+/cellm:status                  # 7. Check status anytime
 ```
 
-### Quick Fix Workflow
+### Quick Fix
 
 ```bash
-# 1. Implement directly
-/implement "fix the login bug"
-
-# 2. Verify
-/verify
+/cellm:implement "fix the login bug"
+/cellm:verify
 ```
 
 ### Pattern Discovery
 
 ```bash
-# 1. Find patterns in codebase
-/cellm:discover
+/cellm:discover                # Find patterns in codebase
+/cellm:index                   # Rebuild pattern index
+/cellm:inject                  # Load patterns into context
+```
 
-# 2. Search for specific pattern
-/cellm:index "authentication"
+### Quality Checks
 
-# 3. Apply patterns to code
-/cellm:inject
+```bash
+/cellm:arena all               # Full test + typecheck + health
+/cellm:arena labs              # Strategy labs only
+/cellm:arena-debug "error"    # Automated debugging
 ```
 
 ---
 
-## Command Quick Reference
+## Skill Architecture
 
-| Command | Agent | Purpose | Output |
-|---------|-------|---------|--------|
-| `/cellm:init` | - | Oracle setup & maintenance | Interactive installation/config |
-| `/cellm:plan` | Architect | Product foundation | mission.md, roadmap.md, tech-stack.md |
-| `/cellm:shape` | Architect | Feature research | spec folder with plan, shape, patterns |
-| `/write-spec` | Architect | Technical spec | spec.md |
-| `/create-tasks` | PM | Task breakdown | tasks.md |
-| `/orchestrate-tasks` | PM | Execute tasks | Updated tasks.md |
-| `/implement` | Implementer | Code generation | Working code |
-| `/verify` | Reviewer | Quality check | verification report |
-| `/cellm:status` | PM | Progress check | Status display |
-| `/cellm:discover` | - | Pattern search | Pattern list |
-| `/cellm:inject` | - | Apply patterns | Updated code |
-| `/cellm:index` | - | Search patterns | Pattern index |
+Each skill is a directory under `skills/` containing a `SKILL.md` file:
+
+```
+cellm/
+  skills/
+    plan/SKILL.md
+    shape/SKILL.md
+    ...
+```
+
+The `SKILL.md` frontmatter defines behavior:
+
+```yaml
+---
+name: plan                           # Skill identifier
+description: ...                     # Trigger description
+argument-hint: "[product name]"      # Usage hint
+allowed-tools: Read, Write, ...      # Sandboxed tool access
+paths:                               # Auto-load file patterns (context skills)
+  - "**/*.vue"
+user-invocable: false                # Disable explicit invocation (context skills)
+context: fork                        # Run in isolated context
+agent: Explore                       # Delegate to specific agent
+---
+```
 
 ---
 
 ## Related Documentation
 
-- [Getting Started](getting-started.md) - Quick setup
-- [Agents Guide](agents.md) - Agent details
+- [Skills Deep Dive](skills.md) - Framework skill details
+- [Agents Guide](agents.md) - Agent specifications
 - [Features Overview](features.md) - All capabilities
 
 [Back to Docs](README.md) | [Back to Home](../README.md)

@@ -9,9 +9,7 @@ paths:
   - "**/reference/conveyor-gaps.md"
 ---
 
-Manage the complete documentation lifecycle: **draft -> active -> deprecated -> archived**, with **undeprecate** and **restore** reverse paths.
-
-## State Transitions
+## State Machine
 
 ```
 [draft] -> [active] -> [deprecated] -> [archived]
@@ -20,36 +18,28 @@ Manage the complete documentation lifecycle: **draft -> active -> deprecated -> 
               +--------------+---------------+
 ```
 
-| From | To | Command | Automatic |
-|------|-----|---------|-----------|
-| active | deprecated | `/docops:deprecate` | No |
-| deprecated | active | `/docops:undeprecate` | No |
-| deprecated | archived | `/docops:prune` | Yes (after grace) |
-| archived | active | `/docops:restore` | No |
+| Transition | Command | Auto |
+|-----------|---------|------|
+| active → deprecated | `/docops:deprecate` | No |
+| deprecated → active | `/docops:undeprecate` | No |
+| deprecated → archived | `/docops:prune` | Yes (after grace) |
+| archived → active | `/docops:restore` | No |
 
-## Archive Structure
+## Conflict Resolution
 
-```
-{docRoot}/archive/
-  2026-01/             # Monthly folders
-    auth.spec.md
-  index.md             # Archive index with metadata
-```
+On restore, check original path:
+- Empty: restore to original
+- Same content: skip, remove archive
+- Different: ask user
+- Structure changed: restore to closest match
 
-## Restoration Conflict Resolution
+Log all transitions to `.claude/docops:deprecations.log`.
 
-| Scenario | Action |
-|----------|--------|
-| Original path empty | Restore to original |
-| Same content exists | Skip, remove archive |
-| Different content exists | Ask user |
-| Structure changed | Restore to closest match |
-
-All transitions logged to `.claude/docops:deprecations.log`.
+Archive structure: `{docRoot}/archive/{YYYY-MM}/{filename}` + `index.md`.
 
 ## NEVER
 
-- **Auto-archive ADRs** — historical record, archive only manually
-- **Skip transition logging** — every state change must be logged
-- **Hard delete before 90 days** — keep archive minimum 90 days
-- **Restore without preserving history** — keep all lifecycle metadata in frontmatter
+- **Auto-archive ADRs** — manual only (historical record)
+- **Skip transition logging** — log every state change
+- **Hard delete before 90 days** — keep archive minimum 90d
+- **Restore without preserving history** — keep all lifecycle metadata

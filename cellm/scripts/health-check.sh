@@ -22,8 +22,6 @@ cleanup() {
 trap cleanup EXIT
 
 # Configuration
-CELLM_DIR="${HOME}/.cellm"
-WORKER_JSON="${CELLM_DIR}/worker.json"
 DEFAULT_PORT=31415
 READINESS_TIMEOUT=5
 

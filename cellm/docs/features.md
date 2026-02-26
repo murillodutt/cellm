@@ -70,7 +70,7 @@ Compass provides real-time insights into your development process with an intuit
 
 ---
 
-## 10 Workflow Commands
+## 18 Workflow Skills
 
 **Structured development from planning to deployment.**
 
@@ -211,7 +211,7 @@ CELLM includes specialized agents that handle different aspects of development.
 
 ---
 
-## 7 Framework Skills
+## 7 Context Skills (Auto-Loaded)
 
 **Deep expertise in your stack.**
 

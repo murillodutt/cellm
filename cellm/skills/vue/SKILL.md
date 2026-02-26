@@ -7,49 +7,22 @@ paths:
 user-invocable: false
 ---
 
-Every Vue component uses **`<script setup lang="ts">`** with sections in this exact order: imports, props/emits, state, computed, methods, watchers, lifecycle.
+`<script setup lang="ts">` with section order: imports → props/emits → state → computed → methods → watchers → lifecycle.
 
-```vue
-<script setup lang="ts">
-import { ref, computed, watch, onMounted } from 'vue'
-import type { User } from '~/shared/types'
+**Props** — generic typed: `defineProps<{ name: Type }>()`.
 
-const props = defineProps<{
-  user: User
-  loading?: boolean
-}>()
+**Emits** — typed: `defineEmits<{ event: [payload: Type] }>()`.
 
-const emit = defineEmits<{
-  update: [user: User]
-  delete: [id: string]
-}>()
+**v-model** — `defineModel<T>()`, never manual prop+emit pair.
 
-const count = ref(0)
-const fullName = computed(() => `${props.user.firstName} ${props.user.lastName}`)
+**Composables** — `use` prefix, return reactive refs.
 
-function increment() { count.value++ }
-
-watch(() => props.user, (v) => console.log('changed:', v), { deep: true })
-onMounted(() => { /* init */ })
-</script>
-```
-
-**Props** — always generic typed: `defineProps<{ name: Type }>()`. No runtime props object.
-
-**Emits** — always typed: `defineEmits<{ event: [payload: Type] }>()`.
-
-**Composables** — `use` prefix, return reactive refs: `export function useCounter(initial = 0) { ... }`.
-
-**v-model** — use `defineModel<T>()`, never manual prop+emit pair.
-
-**Provide/Inject** — typed injection key: `provide('key', value)` / `inject<Type>('key')`.
-
-**storeToRefs** — always destructure store state through `storeToRefs(store)`, never `store.someRef`.
+**Store destructuring** — `storeToRefs(store)` for state, `store.action()` for actions.
 
 ## NEVER
 
-- **Options API** — no `data()`, `methods:`, `computed:`, `watch:` objects
-- **Untyped props/emits** — no `defineProps(['name'])` or `defineEmits(['click'])`
-- **`any` type** — use `unknown` then narrow with type guards
-- **`<script>` without `setup`** — every component is `<script setup lang="ts">`
-- **Reactive destructuring** without `toRefs`/`storeToRefs` — loses reactivity
+- **Options API** — no `data()`, `methods:`, `computed:`, `watch:`
+- **Untyped props/emits** — no `defineProps(['name'])`
+- **`any`** — use `unknown` + type guards
+- **`<script>` without `setup`** — always `<script setup lang="ts">`
+- **Destructure store without `storeToRefs`** — loses reactivity

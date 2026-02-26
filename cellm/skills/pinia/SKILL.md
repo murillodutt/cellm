@@ -7,45 +7,20 @@ paths:
 user-invocable: false
 ---
 
-Every store uses **Setup Store syntax** (function-based `defineStore`). State is destructured with **`storeToRefs()`** to preserve reactivity. Each store owns **one domain** — never a god store.
+Setup Store syntax only. `storeToRefs()` for state destructuring. One domain per store.
 
-```typescript
-export const useUserStore = defineStore('user', () => {
-  const user = ref<User | null>(null)
-  const isLoading = ref(false)
+**Naming** — `use` + domain + `Store`: `useUserStore`, `useCartStore`.
 
-  const isAuthenticated = computed(() => !!user.value)
+**Components** — `const { user } = storeToRefs(store)` for state, `store.login()` for actions.
 
-  async function login(credentials: LoginCredentials) {
-    isLoading.value = true
-    try {
-      user.value = await $fetch('/api/auth/login', { method: 'POST', body: credentials })
-    } finally {
-      isLoading.value = false
-    }
-  }
+**Async** — always `try/finally` to reset loading state.
 
-  function logout() {
-    user.value = null
-    navigateTo('/login')
-  }
-
-  return { user, isLoading, isAuthenticated, login, logout }
-})
-```
-
-**In components** — `const store = useUserStore()`, then `const { user, isLoading } = storeToRefs(store)` for state, `store.login(...)` for actions.
-
-**Naming** — `use` prefix + domain + `Store` suffix: `useUserStore`, `useCartStore`.
-
-**Async actions** — always `try/finally` to reset loading state even on error.
-
-**Persist** — `{ persist: true }` as third argument (requires `pinia-plugin-persistedstate`).
+**Persist** — `{ persist: true }` third argument.
 
 ## NEVER
 
-- **Options Store syntax** — no `state()`, `getters:`, `actions:` objects
-- **Destructure without `storeToRefs`** — `const { count } = store` loses reactivity
-- **God stores** — one store per domain, not one store for everything
-- **Direct `store.$state` mutation** — use actions for state changes
-- **`any` in store types** — fully type all state, getters, and action parameters
+- **Options Store** — no `state()`, `getters:`, `actions:`
+- **Destructure without `storeToRefs`** — loses reactivity
+- **God stores** — one domain per store
+- **Direct `$state` mutation** — use actions
+- **`any` in stores** — fully typed

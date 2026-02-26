@@ -1,531 +1,475 @@
-# Commands Reference
+# Skills Reference
 
-> [Home](../README.md) > [Docs](INDEX.md) > **Commands**
+> [Home](../README.md) > [Docs](INDEX.md) > **Skills Reference**
 
-Complete reference for all CELLM workflow commands.
+Complete reference for all CELLM skills and workflow invocations. CELLM uses a skills-only architecture—all functionality is accessed via skills invoked with `/cellm:`, `/docops:`, or `/dse:` prefixes.
 
 ---
 
 ## Overview
 
-CELLM provides 10 workflow commands organized into phases:
+CELLM provides **25 workflow skills** (18 workflow + 7 context), **12 DocOps skills**, and **1 DSE skill**.
 
-| Phase | Commands |
-|-------|----------|
-| **Planning** | `/plan-product`, `/shape-spec`, `/write-spec` |
-| **Execution** | `/create-tasks`, `/orchestrate-tasks`, `/implement` |
-| **Validation** | `/verify`, `/status` |
-| **Pattern Management** | `/discover-patterns`, `/inject-patterns`, `/index-patterns` |
-| **Setup & Monitoring** | `/cellm-init`, `/oracle-status` |
+**Context Skills** (auto-loaded): nuxt, vue, typescript, tailwind, pinia, drizzle, dse
 
----
+**Workflow Skills** organized by phase:
 
-## Optional Plugin Commands (DocOps)
+| Phase | Skills |
+|-------|--------|
+| **Planning** | `/cellm:plan`, `/cellm:shape`, `/cellm:write-spec`, `/cellm:spec` |
+| **Execution** | `/cellm:create-tasks`, `/cellm:orchestrate`, `/cellm:implement` |
+| **Validation** | `/cellm:verify`, `/cellm:status` |
+| **Pattern Management** | `/cellm:discover`, `/cellm:inject`, `/cellm:index` |
+| **Quality & Arena** | `/cellm:arena`, `/cellm:arena-debug`, `/cellm:spec-treat` |
+| **Discovery** | `/cellm:dse-discover` |
+| **Setup & Monitoring** | `/cellm:init`, `/cellm:oracle-search` |
 
-DocOps is an optional plugin focused on documentation maintenance.
+**DocOps Skills**: `/docops:init`, `/docops:sync`, `/docops:verify`, plus 9 additional skills
 
-| Command | Purpose |
-|---------|---------|
-| `/docops-init` | Initialize doc structure and templates |
-| `/docops-sync` | Refresh code evidence and gaps |
-| `/docops-verify` | Validate structure and normative vocabulary |
-
-See [DocOps Plugin](../docops/README.md) for details.
+**DSE Skills**: `/dse:frontend-ui`
 
 ---
 
-## Planning Commands
+## Context Skills (Auto-Loaded)
 
-### /plan-product
+Context skills are automatically available and provide framework/language awareness. They are NOT invoked directly.
+
+| Skill | Purpose |
+|-------|---------|
+| **nuxt** | Nuxt 3 framework context and patterns |
+| **vue** | Vue 3 component and composition API patterns |
+| **typescript** | TypeScript type system and best practices |
+| **tailwind** | Tailwind CSS utility and design system |
+| **pinia** | Pinia state management patterns |
+| **drizzle** | Drizzle ORM schema and query patterns |
+| **dse** | Domain-Specific Engine patterns and utilities |
+
+---
+
+## CELLM Workflow Skills
+
+### Planning Phase
+
+#### /cellm:plan
 
 **Purpose:** Establish foundational product documentation
 
-**Agent:** Architect
-
-**What it does:**
-- Creates mission, roadmap, and tech stack documentation
-- Interactive conversation to gather product vision
-- Checks for existing patterns to inform tech stack
-
-**Output:**
-```
-cellm-core/project/product/
-├── mission.md      # Core purpose and vision
-├── roadmap.md      # Feature timeline (MVP + future)
-└── tech-stack.md   # Technology choices
-```
+**Description:** Creates mission, roadmap, and tech stack documentation through interactive conversation to gather product vision.
 
 **Usage:**
 ```bash
-claude /plan-product "my SaaS product"
+/cellm:plan "my SaaS product"
 ```
-
-**Process:**
-1. Check for existing product docs
-2. Gather product vision (problem, users, solution)
-3. Define roadmap (MVP features, future features)
-4. Establish tech stack
-5. Generate documentation files
 
 ---
 
-### /shape-spec
+#### /cellm:shape
 
 **Purpose:** Research and define requirements for a feature
 
-**Agent:** Architect
-
-**Prerequisites:** Must be run in plan mode
-
-**What it does:**
-- Clarifies what's being built through Q&A
-- Gathers visual references (mockups, screenshots)
-- Identifies similar code in codebase
-- Surfaces relevant patterns
-- Creates spec folder with documentation
-
-**Output:**
-```
-cellm-core/specs/{YYYY-MM-DD-HHMM-feature-slug}/
-├── plan.md         # Full implementation plan
-├── shape.md        # Shaping notes and decisions
-├── patterns.md     # Applicable patterns
-├── references.md   # Similar code references
-└── visuals/        # Mockups, screenshots
-```
+**Description:** Clarifies scope through Q&A, gathers visual references, identifies similar code, surfaces relevant patterns, and creates spec folder with documentation.
 
 **Usage:**
 ```bash
-# Enter plan mode first
-claude /shape-spec
+/cellm:shape
 ```
-
-**Process:**
-1. Clarify scope (what are we building?)
-2. Gather visuals (mockups, examples)
-3. Identify reference implementations
-4. Check product context alignment
-5. Surface relevant patterns
-6. Generate spec folder
-7. Structure the plan
 
 ---
 
-### /write-spec
+#### /cellm:write-spec
 
 **Purpose:** Create detailed technical specification
 
-**Agent:** Architect
+**Description:** Formalizes requirements from shaping with technical design, data models, API contracts, and component structure documentation.
 
-**What it does:**
-- Formalizes requirements from shaping
-- Creates technical design document
-- Defines data models and API contracts
-- Documents component structure
-
-**Output:**
-- Detailed spec.md with technical design
-- Data models
-- API contracts
-- Component structure
+**Usage:**
+```bash
+/cellm:write-spec
+```
 
 ---
 
-## Execution Commands
+#### /cellm:spec
 
-### /create-tasks
+**Purpose:** Full specification generation workflow
+
+**Description:** Combines shaping and spec writing into a single orchestrated workflow for rapid feature specification.
+
+**Usage:**
+```bash
+/cellm:spec
+```
+
+---
+
+### Execution Phase
+
+#### /cellm:create-tasks
 
 **Purpose:** Break specification into actionable tasks
 
-**Agent:** Project Manager
-
-**What it does:**
-- Reads spec.md for requirements
-- Decomposes into logical task groups
-- Sorts by dependencies (critical path first)
-- Creates tasks.md
-
-**Output:**
-```markdown
-# Tasks for [Feature Name]
-
-## Group 1: Foundation
-- [ ] Task 1.1 - Description
-- [ ] Task 1.2 - Description
-
-## Group 2: Core Features (depends on Group 1)
-- [ ] Task 2.1 - Description
-- [ ] Task 2.2 - Description
-
-## Group 3: Polish (depends on Group 2)
-- [ ] Task 3.1 - Description
-```
+**Description:** Reads spec.md, decomposes into logical task groups, sorts by dependencies (critical path first), and creates tasks.md.
 
 **Usage:**
 ```bash
-claude /create-tasks
+/cellm:create-tasks
 ```
 
 ---
 
-### /orchestrate-tasks
+#### /cellm:orchestrate
 
 **Purpose:** Execute tasks systematically
 
-**Agent:** Project Manager
-
-**What it does:**
-- Reads tasks.md
-- Identifies next executable group
-- Delegates to implementer agent
-- Updates task status
-- Reports completion
+**Description:** Reads tasks.md, identifies next executable group, delegates to implementer, updates task status, and reports completion.
 
 **Usage:**
 ```bash
-claude /orchestrate-tasks
+/cellm:orchestrate
 ```
 
 ---
 
-### /implement
+#### /cellm:implement
 
 **Purpose:** Generate code from specification
 
-**Agent:** Implementer
-
-**What it does:**
-- Reads spec.md requirements
-- Checks for reusable code
-- Implements following patterns and rules
-- Updates tasks.md with progress
-- Self-reviews for rule compliance
-
-**Rules enforced:**
-- No `any` types
-- No hardcoded colors (semantic tokens only)
-- No sync I/O
-- Composition API always
-- Code limits (1000 lines/file, 50/function)
-- Error handling required
+**Description:** Reads spec.md, checks for reusable code, implements following patterns and rules, updates task progress, and self-reviews for compliance.
 
 **Usage:**
 ```bash
-claude /implement
+/cellm:implement
 ```
 
 ---
 
-## Validation Commands
+### Validation Phase
 
-### /verify
+#### /cellm:verify
 
 **Purpose:** Quality gate validation
 
-**Agent:** Reviewer
-
-**What it does:**
-- Reviews code against checklist
-- Validates spec compliance
-- Checks for security vulnerabilities
-- Documents findings with file:line references
-
-**Review Checklist:**
-
-| Category | Checks |
-|----------|--------|
-| **Quality** | No TS errors, no `any`, no console.log, code limits |
-| **Spec Compliance** | User stories, requirements, acceptance criteria |
-| **Standards** | Naming, imports, file structure, comments |
-| **Patterns** | Anti-patterns avoided, stack patterns followed |
-| **Security** | Input validation, SQL injection, XSS, data protection |
-
-**Output:**
-```markdown
-# Verification Report
-
-## Summary
-- Files reviewed: X
-- Issues found: Y
-- Status: PASS/FAIL
-
-## Findings
-
-### [CRITICAL] Issue Title
-- File: path/to/file.ts:42
-- Description: ...
-- Recommendation: ...
-```
+**Description:** Reviews code against checklist, validates spec compliance, checks for security vulnerabilities, and documents findings with file:line references.
 
 **Severity Levels:**
-- **CRITICAL** - Blocks deployment, must fix
+- **CRITICAL** - Blocks deployment
 - **WARNING** - Should fix before merge
 - **INFO** - Improvement suggestion
 
 **Usage:**
 ```bash
-claude /verify
+/cellm:verify
 ```
 
 ---
 
-### /status
+#### /cellm:status
 
 **Purpose:** Display current project status
 
-**Agent:** Project Manager
-
-**Output:**
-```
-Project: [Name]
-Phase: [Planning|Implementation|Review]
-
-Active Spec: spec-name.md
-Progress: 8/15 tasks (53%)
-
-Completed:
-  [x] Group 1: Foundation (4/4)
-  [x] Group 2: Data Layer (4/4)
-
-In Progress:
-  [ ] Group 3: API Layer (0/4)
-
-Pending:
-  [ ] Group 4: UI Components
-  [ ] Group 5: Integration
-```
-
-**Task Status Symbols:**
-```
-[ ] Pending
-[~] In Progress
-[x] Completed
-[!] Blocked
-[-] Cancelled
-```
+**Description:** Shows phase, active spec, task progress, completion breakdown, and task status symbols.
 
 **Usage:**
 ```bash
-claude /status
+/cellm:status
 ```
 
 ---
 
-## Pattern Management Commands
+### Pattern Management Phase
 
-### /discover-patterns
+#### /cellm:discover
 
 **Purpose:** Find patterns in your codebase
 
-**What it does:**
-- Searches for code patterns
-- Identifies reusable structures
-- Reports pattern usage
+**Description:** Searches for code patterns, identifies reusable structures, and reports pattern usage.
 
 **Usage:**
 ```bash
-claude /discover-patterns
+/cellm:discover
 ```
 
 ---
 
-### /inject-patterns
+#### /cellm:inject
 
 **Purpose:** Apply patterns consistently to code
 
-**What it does:**
-- Reads pattern definitions
-- Applies to new or existing code
-- Ensures consistency
+**Description:** Reads pattern definitions and applies to new or existing code to ensure consistency.
 
 **Usage:**
 ```bash
-claude /inject-patterns
+/cellm:inject
 ```
 
 ---
 
-### /index-patterns
+#### /cellm:index
 
 **Purpose:** Search available patterns
 
-**What it does:**
-- Lists all available patterns
-- Searches by keyword
-- Shows pattern details
+**Description:** Lists all available patterns, searches by keyword, and shows pattern details.
 
 **Usage:**
 ```bash
-claude /index-patterns
+/cellm:index
 ```
 
 ---
 
-## Setup & Monitoring Commands
+### Quality & Arena Phase
 
-### /cellm-init
+#### /cellm:arena
 
-**Purpose:** Interactive Oracle setup and maintenance
+**Purpose:** Interactive development sandbox
 
-**What it does:**
-- Guided Oracle installation with visual feedback
-- Interactive menu with 8 main options
-- Doctor mode with 6 diagnostic checks
-- Advanced configuration (port, data directory, logs)
-- Update and maintenance tools
-
-**Interactive Menu:**
-```
-1. Install Oracle (first time setup)
-2. Check Status (view current state)
-3. Update (upgrade to latest version)
-4. Doctor (diagnose and fix issues)
-5. Restart Worker (if stuck or slow)
-6. Uninstall (remove Oracle completely)
-7. Advanced Options
-8. Exit
-```
+**Description:** Creates isolated sandbox environment for experimenting with features, patterns, or approaches without affecting main codebase.
 
 **Usage:**
 ```bash
-# Interactive mode (recommended)
-claude /cellm-init
-
-# Direct command-line modes
-claude /cellm-init install   # First-time installation
-claude /cellm-init status    # Check current state
-claude /cellm-init update    # Upgrade to latest
-claude /cellm-init doctor    # Run diagnostics
-claude /cellm-init restart   # Restart worker
-claude /cellm-init uninstall # Remove Oracle
-```
-
-**Doctor Mode:**
-Runs 6 automatic checks:
-1. Dependencies (Node.js, npx, Bun)
-2. Installation verification
-3. Worker status test
-4. Port availability check
-5. Database integrity
-6. MCP configuration
-
-Each issue found is automatically fixed with user confirmation.
-
-**Advanced Options:**
-- Change worker port (1024-65535)
-- Change data directory
-- View logs (last 50 lines)
-- Clear cache (preserves observations)
-- Reset configuration (preserves database)
-
----
-
-### /oracle-status
-
-**Purpose:** Check Oracle worker daemon status
-
-**Agent:** Project Manager
-
-**What it does:**
-- Reads worker configuration
-- Calls health endpoint
-- Reports status in table format
-
-**Output:**
-```
-[+] Oracle Worker: Running
-[+] MCP Server: Connected
-[+] Database: Ready
-[+] Embeddings: Loaded
-
-| Field    | Value          |
-|----------|----------------|
-| Status   | online         |
-| Port     | 31415          |
-| Uptime   | 2h 34m         |
-| Database | ~/.cellm/oracle.db |
-```
-
-**Usage:**
-```bash
-claude /oracle-status
+/cellm:arena
 ```
 
 ---
 
-## Typical Workflow
+#### /cellm:arena-debug
+
+**Purpose:** Debug and diagnose arena issues
+
+**Description:** Provides diagnostic tools and debugging context for arena sandbox environments.
+
+**Usage:**
+```bash
+/cellm:arena-debug
+```
+
+---
+
+#### /cellm:spec-treat
+
+**Purpose:** Refine and validate specifications
+
+**Description:** Applies quality checks to specifications, validates completeness, and suggests improvements.
+
+**Usage:**
+```bash
+/cellm:spec-treat
+```
+
+---
+
+### Discovery Phase
+
+#### /cellm:dse-discover
+
+**Purpose:** Discover DSE (Domain-Specific Engine) patterns
+
+**Description:** Identifies and catalogs domain-specific engine patterns available in your codebase.
+
+**Usage:**
+```bash
+/cellm:dse-discover
+```
+
+---
+
+### Setup & Monitoring Phase
+
+#### /cellm:init
+
+**Purpose:** CELLM setup and maintenance
+
+**Description:** Guided setup with interactive menu for installation, status checks, diagnostics, configuration, and updates.
+
+**Usage:**
+```bash
+/cellm:init
+```
+
+---
+
+#### /cellm:oracle-search
+
+**Purpose:** Search Oracle knowledge base
+
+**Description:** Queries the Oracle worker daemon for patterns, observations, and cached knowledge relevant to your project.
+
+**Usage:**
+```bash
+/cellm:oracle-search "query terms"
+```
+
+---
+
+## DocOps Skills
+
+DocOps is an optional plugin focused on documentation maintenance and synchronization.
+
+| Skill | Purpose |
+|-------|---------|
+| `/docops:init` | Initialize doc structure and templates |
+| `/docops:sync` | Refresh code evidence and gaps |
+| `/docops:verify` | Validate structure and normative vocabulary |
+| `/docops:auto-sync` | Automatic documentation synchronization |
+| `/docops:template-gen` | Generate documentation templates |
+| `/docops:evidence-scan` | Scan code for documentation evidence |
+| `/docops:gap-report` | Generate documentation gap analysis |
+| `/docops:normalize` | Normalize vocabulary across docs |
+| `/docops:validate-schema` | Validate documentation schema |
+| `/docops:link-check` | Check and repair documentation links |
+| `/docops:audit` | Audit documentation completeness |
+| `/docops:metrics` | Generate documentation metrics |
+
+See [DocOps Plugin](../docops/README.md) for detailed documentation.
+
+---
+
+## DSE Skills
+
+DSE (Domain-Specific Engine) provides specialized frontend capabilities.
+
+| Skill | Purpose |
+|-------|---------|
+| `/dse:frontend-ui` | Generate and refine frontend UI components using DSE patterns |
+
+See [DSE Plugin](../dse/README.md) for detailed documentation.
+
+---
+
+## Typical Workflows
 
 ### Full Feature Development
 
 ```bash
 # 1. Plan the product (if new project)
-claude /plan-product "my app"
+/cellm:plan "my app"
 
-# 2. Shape the feature (in plan mode)
-claude /shape-spec
+# 2. Shape the feature
+/cellm:shape
 
-# 3. Create tasks from spec
-claude /create-tasks
+# 3. Write detailed spec
+/cellm:write-spec
 
-# 4. Implement the code
-claude /implement
+# 4. Create tasks from spec
+/cellm:create-tasks
 
-# 5. Verify quality
-claude /verify
+# 5. Implement the code
+/cellm:implement
 
-# 6. Check status anytime
-claude /status
+# 6. Verify quality
+/cellm:verify
+
+# 7. Check status anytime
+/cellm:status
+```
+
+### Quick Spec Workflow
+
+```bash
+# 1. Combined shape and spec in one workflow
+/cellm:spec
+
+# 2. Create tasks
+/cellm:create-tasks
+
+# 3. Implement
+/cellm:implement
 ```
 
 ### Quick Fix Workflow
 
 ```bash
 # 1. Implement directly
-claude /implement "fix the login bug"
+/cellm:implement "fix the login bug"
 
 # 2. Verify
-claude /verify
+/cellm:verify
 ```
 
-### Pattern Discovery
+### Pattern Discovery & Application
 
 ```bash
 # 1. Find patterns in codebase
-claude /discover-patterns
+/cellm:discover
 
 # 2. Search for specific pattern
-claude /index-patterns "authentication"
+/cellm:index "authentication"
 
 # 3. Apply patterns to code
-claude /inject-patterns
+/cellm:inject
+```
+
+### Arena Experimentation
+
+```bash
+# 1. Start sandbox environment
+/cellm:arena
+
+# 2. Debug if needed
+/cellm:arena-debug
+
+# 3. Test ideas before implementing in main codebase
 ```
 
 ---
 
-## Command Quick Reference
+## Skills Quick Reference
 
-| Command | Agent | Purpose | Output |
-|---------|-------|---------|--------|
-| `/cellm-init` | - | Oracle setup & maintenance | Interactive installation/config |
-| `/plan-product` | Architect | Product foundation | mission.md, roadmap.md, tech-stack.md |
-| `/shape-spec` | Architect | Feature research | spec folder with plan, shape, patterns |
-| `/write-spec` | Architect | Technical spec | spec.md |
-| `/create-tasks` | PM | Task breakdown | tasks.md |
-| `/orchestrate-tasks` | PM | Execute tasks | Updated tasks.md |
-| `/implement` | Implementer | Code generation | Working code |
-| `/verify` | Reviewer | Quality check | verification report |
-| `/status` | PM | Progress check | Status display |
-| `/discover-patterns` | - | Pattern search | Pattern list |
-| `/inject-patterns` | - | Apply patterns | Updated code |
-| `/index-patterns` | - | Search patterns | Pattern index |
-| `/oracle-status` | PM | Health check | Status table |
+| Skill | Phase | Purpose |
+|-------|-------|---------|
+| `/cellm:plan` | Planning | Product foundation |
+| `/cellm:shape` | Planning | Feature research & requirements |
+| `/cellm:write-spec` | Planning | Technical specification |
+| `/cellm:spec` | Planning | Combined shape + spec workflow |
+| `/cellm:create-tasks` | Execution | Break spec into tasks |
+| `/cellm:orchestrate` | Execution | Execute tasks systematically |
+| `/cellm:implement` | Execution | Code generation from spec |
+| `/cellm:verify` | Validation | Quality gate & security checks |
+| `/cellm:status` | Validation | Progress reporting |
+| `/cellm:discover` | Pattern Mgmt | Find codebase patterns |
+| `/cellm:inject` | Pattern Mgmt | Apply patterns to code |
+| `/cellm:index` | Pattern Mgmt | Search available patterns |
+| `/cellm:arena` | Quality | Sandbox experimentation |
+| `/cellm:arena-debug` | Quality | Debug arena environment |
+| `/cellm:spec-treat` | Quality | Refine specifications |
+| `/cellm:dse-discover` | Discovery | Find DSE patterns |
+| `/cellm:init` | Setup | CELLM setup & maintenance |
+| `/cellm:oracle-search` | Setup | Query Oracle knowledge base |
+
+---
+
+## DocOps Quick Reference
+
+| Skill | Purpose |
+|-------|---------|
+| `/docops:init` | Initialize doc structure and templates |
+| `/docops:sync` | Refresh code evidence and gaps |
+| `/docops:verify` | Validate structure and vocabulary |
+| `/docops:auto-sync` | Automatic synchronization |
+| `/docops:template-gen` | Generate documentation templates |
+| `/docops:evidence-scan` | Scan code for evidence |
+| `/docops:gap-report` | Generate gap analysis |
+| `/docops:normalize` | Normalize vocabulary |
+| `/docops:validate-schema` | Validate doc schema |
+| `/docops:link-check` | Check documentation links |
+| `/docops:audit` | Audit completeness |
+| `/docops:metrics` | Generate metrics |
+
+---
+
+## DSE Quick Reference
+
+| Skill | Purpose |
+|-------|---------|
+| `/dse:frontend-ui` | Generate frontend UI components |
 
 ---
 
 ## Related Documentation
 
 - [Getting Started](GETTING-STARTED.md) - Quick setup
-- [Agents Guide](AGENTS.md) - Agent details
 - [Features Overview](FEATURES.md) - All capabilities
+- [DocOps Plugin](../docops/README.md) - Documentation automation
+- [DSE Plugin](../dse/README.md) - Domain-Specific Engine
 
 [Back to Docs](INDEX.md) | [Back to Home](../README.md)

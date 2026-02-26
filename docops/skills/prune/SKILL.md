@@ -9,26 +9,25 @@ paths:
   - "**/archive/**"
 ---
 
-Find **deprecated docs**, **broken references**, and **orphaned files** — then archive or remove them with user confirmation.
-
 ## Detection
 
-- **Deprecated** — frontmatter `status: deprecated` or `status: obsolete`
-- **Broken references** — internal `[text](path.md)` links pointing to non-existent files
-- **Orphaned files** — evidence files not referenced by any SPEC/REF, specs not linked from index.md
+- **Deprecated**: `status: deprecated` or `status: obsolete` in frontmatter
+- **Broken references**: `[text](path.md)` pointing to non-existent files
+- **Orphaned files**: evidence not referenced by any SPEC/REF; specs not linked from index.md
 
 ## Workflow
 
-1. **Scan** — find all candidates
-2. **Classify** — deprecated, broken, orphaned
-3. **Preview** — show dry-run results
-4. **Confirm** — ask user for approval
-5. **Execute** — archive (default) or delete (explicit)
-6. **Report** — summary, log actions in conveyor-gaps.md
+1. Scan all candidates
+2. Show dry-run preview (always first)
+3. Ask user confirmation
+4. Archive deprecated files; update all broken links
+5. Log actions to conveyor-gaps.md
+
+Archive is default. Delete only if explicitly requested.
 
 ## NEVER
 
-- **Execute without preview** — always show dry-run first, then confirm
-- **Delete by default** — archive is the default, delete only when explicitly requested
-- **Leave dangling references** — update all links after moving files
-- **Skip logging** — log all actions in conveyor-gaps.md
+- **Execute without preview** — always dry-run first
+- **Delete by default** — archive only; delete on explicit request
+- **Leave dangling references** — update all links when moving files
+- **Skip logging** — log all actions to conveyor-gaps.md

@@ -22,7 +22,6 @@ trap cleanup EXIT
 
 # Configuration
 CELLM_DIR="${HOME}/.cellm"
-WORKER_JSON="${CELLM_DIR}/worker.json"
 LOG_FILE="${CELLM_DIR}/oracle-hook.log"
 PID_FILE="${CELLM_DIR}/worker.pid"
 DEFAULT_PORT=31415

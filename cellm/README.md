@@ -1,6 +1,6 @@
 # CELLM Plugin
 
-Context engineering for LLM-driven development. 18 skills, 4 agents, 6 hook events, Oracle integration.
+Context engineering for LLM-driven development. 25 skills, 4 agents, 6 hook events, Oracle integration.
 
 See [../README.md](../README.md) for full reference.
 
@@ -19,12 +19,20 @@ Optional Oracle setup:
 
 ```
 .claude-plugin/plugin.json   # Manifest
-skills/                      # 18 domain skills (auto-activated by path)
+skills/                      # 25 skills (18 workflow + 7 context, auto-loaded by path)
 agents/                      # architect, implementer, reviewer, project-manager
 hooks/hooks.json             # 6 event hooks
-scripts/                     # 24 hook scripts
+scripts/                     # Hook scripts
 .mcp.json                    # Oracle MCP server config
 ```
+
+## Skills Architecture
+
+Two types of skills coexist in the flat `skills/` directory:
+
+**Context skills** (7) have `user-invocable: false` and `paths` in frontmatter. They auto-load when the Claude touches matching files. Multiple context skills stack: editing a `.vue` file loads vue + tailwind + dse simultaneously.
+
+**Workflow skills** (18) are invoked manually as `/cellm:{name}`. They cover the full development lifecycle: plan, shape, write-spec, create-tasks, orchestrate, implement, verify.
 
 ## Requirements
 

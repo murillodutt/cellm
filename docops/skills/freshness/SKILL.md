@@ -8,28 +8,23 @@ paths:
   - "**/technical/reference/**"
 ---
 
-Scan code evidence files for **freshness status** based on `last_verified` frontmatter. Transition status and create gaps for expired evidence.
-
 ## Status Transitions
 
-```
-[fresh] ---(30 days)---> [stale] ---(30 days)---> [expired]
-   ^                                                  |
-   +-------------(re-verification)--------------------+
-```
+- Fresh: 0-30d old
+- Stale: 31-60d old (add `stale_since`)
+- Expired: 61d+ old (add `expired_since`, create GAP entry)
+- No `last_verified`: expired by default
 
-| Current | New | Action |
-|---------|-----|--------|
-| fresh | stale | Add `stale_since` to frontmatter |
-| stale | expired | Add `expired_since`, create GAP entry |
-| expired | fresh | Remove stale/expired fields, update `last_verified` |
-| (none) | expired | Add all fields, create GAP entry |
+## Process
 
-Files without `last_verified` are **expired by default**.
+1. Scan all evidence files
+2. Transition status based on `last_verified` date
+3. For expired: add field, create conveyor-gaps.md entry
+4. For re-verified: remove stale/expired fields, update `last_verified`
 
 ## NEVER
 
-- **Auto-verify** — only update status, never mark as verified without re-scanning source code
-- **Delete expired evidence** — flag it, don't remove it
-- **Override human verification** — human verification takes precedence over agent verification
-- **Skip gap creation** — every expired evidence must have a GAP entry in conveyor-gaps.md
+- **Auto-verify** — only change status, never mark verified without re-scanning code
+- **Delete expired evidence** — flag it
+- **Override human verification** — human takes precedence
+- **Skip gap creation** — expired evidence gets GAP entry

@@ -91,7 +91,7 @@ docs/
 
 ## Version
 
-**Current Version:** 2.0.5
+**Current Version:** 3.3.0
 
 See [CHANGELOG](../CHANGELOG.md) for version history.
 

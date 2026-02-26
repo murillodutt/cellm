@@ -70,70 +70,74 @@ Compass provides real-time insights into your development process with an intuit
 
 ---
 
-## 10 Workflow Commands
+## 25 Skills - CELLM Plugin
 
-**Structured development from planning to deployment.**
+**18 workflow + 7 context skills for complete development coverage.**
 
-CELLM provides commands that guide you through a complete development workflow.
+CELLM skills are loaded automatically based on your project files. Skills use the `/cellm:name` namespace and work seamlessly with context skills that load based on file detection.
 
-### Planning Phase
+### Workflow Skills (18)
 
-| Command | Purpose | Use When |
-|---------|---------|----------|
-| `/plan-product` | High-level product planning | Starting a new feature or product |
-| `/shape-spec` | Requirements refinement | You have an idea but need to clarify details |
-| `/write-spec` | Specification documentation | Ready to formalize requirements |
+| Skill | Purpose | Use When |
+|-------|---------|----------|
+| `/cellm:plan-product` | High-level product planning | Starting a new feature or product |
+| `/cellm:shape-spec` | Requirements refinement | You have an idea but need to clarify details |
+| `/cellm:write-spec` | Specification documentation | Ready to formalize requirements |
+| `/cellm:create-tasks` | Task breakdown | Spec is ready, need actionable tasks |
+| `/cellm:implement` | Code generation | Tasks defined, ready to code |
+| `/cellm:verify` | Quality gate validation | Code complete, need validation |
+| `/cellm:discover-patterns` | Find patterns in your code | Exploring existing patterns |
+| `/cellm:inject-patterns` | Apply patterns consistently | Want to apply patterns to new code |
+| `/cellm:index-patterns` | Search available patterns | Looking for a specific pattern |
+| `/cellm:oracle-status` | Check Oracle health | Troubleshooting or verification |
+| `/cellm:architecture` | Technical design and planning | Designing systems or features |
+| `/cellm:refactor` | Code refactoring | Improving code structure |
+| `/cellm:debug` | Error diagnosis and fixing | Troubleshooting issues |
+| `/cellm:optimize` | Performance enhancement | Improving speed/efficiency |
+| `/cellm:test` | Test generation | Building test coverage |
+| `/cellm:document` | Auto-documentation | Generating docs from code |
+| `/cellm:migrate` | Data migration workflows | Upgrading schemas/versions |
+| `/cellm:deploy` | Deployment automation | Moving code to production |
 
-### Execution Phase
+### Context Skills (7)
 
-| Command | Purpose | Use When |
-|---------|---------|----------|
-| `/create-tasks` | Task breakdown | Spec is ready, need actionable tasks |
-| `/implement` | Code generation | Tasks defined, ready to code |
+Context skills auto-load by file path. Multiple stacks load simultaneously when editing:
 
-### Validation Phase
+| Skill | Files | Purpose |
+|-------|-------|---------|
+| `/cellm:nuxt` | `*.vue`, `nuxt.config.ts`, `server/**` | Nuxt 4 patterns and SSR/composables |
+| `/cellm:vue` | `*.vue` | Vue 3 Composition API |
+| `/cellm:typescript` | `*.ts`, `*.tsx` | Type-safe patterns and utilities |
+| `/cellm:tailwind` | Tailwind classes | Tailwind v4 styling system |
+| `/cellm:pinia` | `stores/**`, pinia imports | State management |
+| `/cellm:drizzle` | `db/**`, drizzle imports | Database ORM patterns |
+| `/cellm:oracle` | Always available | Semantic search integration |
 
-| Command | Purpose | Use When |
-|---------|---------|----------|
-| `/verify` | Quality gate validation | Code complete, need validation |
-
-### Pattern Management
-
-| Command | Purpose | Use When |
-|---------|---------|----------|
-| `/discover-patterns` | Find patterns in your code | Exploring existing patterns |
-| `/inject-patterns` | Apply patterns consistently | Want to apply patterns to new code |
-| `/index-patterns` | Search available patterns | Looking for a specific pattern |
-
-### Monitoring
-
-| Command | Purpose | Use When |
-|---------|---------|----------|
-| `/oracle-status` | Check Oracle health | Troubleshooting or verification |
+**Example:** Editing `.vue` files loads `/cellm:vue`, `/cellm:tailwind`, and `/cellm:typescript` simultaneously. Editing `stores/` loads `/cellm:pinia`.
 
 ### Example Workflow
 
 ```bash
 # 1. Plan a new feature
-claude /plan-product "user authentication with OAuth"
+claude /cellm:plan-product "user authentication with OAuth"
 
 # 2. Refine requirements
-claude /shape-spec
+claude /cellm:shape-spec
 
 # 3. Write formal spec
-claude /write-spec
+claude /cellm:write-spec
 
 # 4. Break into tasks
-claude /create-tasks
+claude /cellm:create-tasks
 
 # 5. Implement
-claude /implement
+claude /cellm:implement
 
 # 6. Validate
-claude /verify
+claude /cellm:verify
 ```
 
-[Full commands reference](COMMANDS.md)
+[Full skills reference](SKILLS.md)
 
 ---
 
@@ -211,111 +215,62 @@ CELLM includes specialized agents that handle different aspects of development.
 
 ---
 
-## 7 Framework Skills
-
-**Deep expertise in your stack.**
-
-Skills are loaded automatically based on your project files and provide framework-specific guidance.
-
-### sk-nuxt
-
-**Nuxt 4 patterns and best practices**
-
-- SSR/SSG configuration
-- Composables (`useAsyncData`, `useFetch`, `useState`)
-- Auto-imports and conventions
-- Server routes and API endpoints
-- Nitro server patterns
-
-**Triggered by:** `*.vue`, `nuxt.config.ts`, `server/**`
-
-### sk-vue
-
-**Vue 3 Composition API patterns**
-
-- Component structure
-- Reactive refs and computed
-- Lifecycle hooks
-- Props and emits
-- Template syntax
-
-**Triggered by:** `*.vue` files
-
-### sk-typescript
-
-**Type-safe patterns and utilities**
-
-- Type definitions and interfaces
-- Generics usage
-- Utility types
-- Type guards
-- Strict mode patterns
-
-**Triggered by:** `*.ts`, `*.tsx` files
-
-### sk-tailwind
-
-**Tailwind v4 styling system**
-
-- CSS utility classes
-- Responsive design
-- Dark mode patterns
-- Custom theme configuration
-- Component styling
-
-**Triggered by:** Files with Tailwind classes
-
-### sk-pinia
-
-**State management patterns**
-
-- Store definition
-- State, getters, actions
-- Store composition
-- TypeScript integration
-- Persistence patterns
-
-**Triggered by:** `stores/**`, `pinia` imports
-
-### sk-drizzle
-
-**Database ORM patterns**
-
-- Schema definition
-- Queries and relations
-- Migrations
-- Type safety
-- Connection management
-
-**Triggered by:** `db/**`, `drizzle` imports
-
-### oracle-search
-
-**Semantic search integration**
-
-- Pattern discovery
-- Context retrieval
-- Similar code finding
-- Cross-reference search
-
-**Triggered by:** Always available
-
-[Full skills guide](SKILLS.md)
 
 ---
 
-## DocOps Plugin (Optional)
+## 3 Plugins
+
+### CELLM Plugin - 25 Skills
+
+The core plugin providing 18 workflow skills and 7 context skills for complete development automation. Integrated into the Claude Code environment.
+
+[Learn more about CELLM Skills](SKILLS.md)
+
+### DocOps Plugin - 12 Skills
 
 **Documentation maintenance and drift control.**
 
 DocOps provides LLM-first templates, code evidence, and gap tracking to keep docs accurate over time.
 
-### Features
-- **LLM-first templates** for conveyor, specs, refs, howto, runbooks, ADRs
-- **Code evidence first**: facts are sourced from code before writing docs
-- **Drift control** with `conveyor-gaps.md`
+**Skills include:**
+- `/docops:conveyor` - Documentation conveyor system
+- `/docops:spec` - Specification templates
+- `/docops:refs` - Reference documentation
+- `/docops:howto` - How-to guides
+- `/docops:runbook` - Operational runbooks
+- `/docops:adr` - Architecture Decision Records
+- `/docops:gap-analysis` - Drift detection
+- `/docops:audit` - Documentation audit
+- `/docops:sync` - Code-to-docs sync
+- `/docops:template` - Custom templates
+- `/docops:publish` - Doc publishing
+- `/docops:validate` - Quality validation
+
+**Features:**
+- **LLM-first templates** for all documentation types
+- **Code evidence first**: facts sourced from code before writing
+- **Drift control** with gap tracking
+- **Automated sync** between code and docs
 
 [Learn more about DocOps](../docops/README.md)
+
+### DSE Plugin - 1 Skill
+
+**Design Thinking Framework for structured problem-solving.**
+
+The Design Systems Engineering plugin brings proven design thinking methodologies to your development workflow.
+
+**Skills include:**
+- `/dse:design-sprint` - Rapid design and validation cycles
+
+**Framework includes:**
+- Empathy and discovery phase
+- Problem definition and reframing
+- Ideation and prototyping
+- Testing and validation
+- Implementation planning
+
+[Learn more about DSE](../dse/README.md)
 
 ---
 
@@ -376,9 +331,9 @@ CELLM underwent comprehensive security review to ensure production-grade quality
 ## Related Documentation
 
 - [Installation Guide](INSTALLATION.md) - Setup and configuration
-- [Commands Reference](COMMANDS.md) - All workflow commands
+- [Skills Reference](SKILLS.md) - All 25 skills (18 workflow + 7 context)
 - [Agents Guide](AGENTS.md) - Specialized agents
-- [Skills Guide](SKILLS.md) - Framework skills
-- [DocOps Plugin](../docops/README.md) - Documentation maintenance (optional)
+- [DocOps Plugin](../docops/README.md) - Documentation maintenance
+- [DSE Plugin](../dse/README.md) - Design thinking framework
 
 [Back to Docs](INDEX.md) | [Back to Home](../README.md)

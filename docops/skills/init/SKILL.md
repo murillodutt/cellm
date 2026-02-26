@@ -8,36 +8,35 @@ paths:
   - "**/technical/**"
 ---
 
-Create a predictable documentation base using DocOps templates from `${CLAUDE_PLUGIN_ROOT}/templates/<language>/`. Read `docRoot` from argument or `.claude/docops.json`.
+## Decision Framework
 
-## Directory Structure
+- If `.claude/docops.json` exists, use it as docRoot
+- If not, read docRoot from argument (required)
+- Copy only where files don't exist (no overwrites)
+- Use templates from `${CLAUDE_PLUGIN_ROOT}/templates/<language>/`
+
+## Structure
+
+Create this hierarchy (skip existing directories):
 
 ```
 {docRoot}/
   index.md              # Entry point
   glossary.md           # Terms and definitions
   project-conveyor.md   # Source of truth
-  specs/                # Specifications (.spec.md)
-  reference/            # Reference docs (.ref.md)
-    code-evidence/      # Auto-extracted from code
+  specs/                # .spec.md files
+  reference/            # .ref.md files
+    code-evidence/      # Auto-extracted code
     conveyor-gaps.md    # Drift tracking
-  howto/                # How-to guides (.howto.md)
-  runbooks/             # Operational runbooks (.runbook.md)
-  decisions/            # ADRs (ADR-YYYYMMDD-slug.md)
+  howto/                # .howto.md files
+  runbooks/             # .runbook.md files
+  decisions/            # ADR-YYYYMMDD-slug.md files
 ```
 
-## Naming Convention
-
-| Type | Suffix | Example |
-|------|--------|---------|
-| Specification | `.spec.md` | `auth.spec.md` |
-| Reference | `.ref.md` | `env-vars.ref.md` |
-| How-to | `.howto.md` | `deploy.howto.md` |
-| Runbook | `.runbook.md` | `incident.runbook.md` |
-| Decision | `ADR-YYYYMMDD-<slug>.md` | `ADR-20260203-auth-method.md` |
+Naming: `<name>.spec.md`, `<name>.ref.md`, `<name>.howto.md`, `<name>.runbook.md`, `ADR-YYYYMMDD-slug.md`
 
 ## NEVER
 
-- **Overwrite existing files** — copy templates only where files don't exist
-- **Invent behavior** — if evidence is missing, write "Not found by evidence"
-- **Skip docops.json** — always check for existing config before creating structure
+- **Overwrite existing files** — templates go only where nothing exists
+- **Invent behavior** — write "Not found by evidence" for missing data
+- **Skip docops.json** — check existing config before building structure

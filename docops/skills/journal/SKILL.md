@@ -8,30 +8,18 @@ paths:
   - "**/project-conveyor.md"
 ---
 
-Generate a **JOURNAL.md** that documents the project structure and architecture from code evidence. Default output: project root. Custom: `/docops:journal docs/JOURNAL.md`.
+## Process
 
-## Workflow
+1. Detect project type (Nuxt/Next/Claude plugin/etc.) from config files
+2. Extract: package.json (name, version, deps, scripts), project-conveyor.md (purpose, components, invariants), directory structure
+3. Generate sections: Overview, Tech Stack, Directory Structure, Key Components, APIs/Routes, Configuration, Scripts
+4. Write JOURNAL.md with YAML header (Version, Generated date)
 
-1. **Detect project type** — nuxt.config.ts (Nuxt), next.config.js (Next), plugin.json (Claude Code plugin), etc.
-2. **Extract metadata** — from package.json (name, version, deps, scripts), project-conveyor.md (purpose, components, invariants), directory structure
-3. **Generate sections** — Overview, Tech Stack, Directory Structure, Key Components, APIs/Routes, Configuration, Scripts
-4. **Write** — JOURNAL.md with YAML header (`Version`, `Generated` date)
-
-## Sections
-
-| Section | Source |
-|---------|--------|
-| Overview | project-conveyor.md Section 1, or package.json description |
-| Tech Stack | dependencies + devDependencies |
-| Directory Structure | tree view of main directories (max depth 2) |
-| Key Components | project-conveyor.md Section 4, or auto-detected |
-| APIs / Routes | server/api/, pages/ directories |
-| Configuration | config files found |
-| Scripts | package.json scripts |
+Output defaults to project root. Use `/docops:journal docs/JOURNAL.md` for custom path.
 
 ## NEVER
 
-- **Guess purpose** — if unsure, mark as "TODO: describe"
-- **Invent content** — only document what exists in code evidence
-- **Skip conveyor** — reference project-conveyor.md when available
-- **Include node_modules** — always exclude node_modules, .git, .nuxt from directory scans
+- **Guess purpose** — mark uncertain sections as "TODO: describe"
+- **Invent content** — document only what exists in code
+- **Skip conveyor** — reference it when available
+- **Include node_modules** — exclude node_modules, .git, .nuxt

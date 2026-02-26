@@ -1,37 +1,10 @@
 ---
 name: status
 description: Check CELLM Oracle Worker daemon status. Reads worker.json for port config, calls health endpoint, and reports online/offline state with uptime and database info.
+argument-hint: "[verbose]"
 allowed-tools: Bash(curl *), Bash(cat *), Read
 ---
 
-# Oracle Status
+Read `~/.cellm/worker.json` for port → call health endpoint → report status/port/uptime/DB.
 
-Check CELLM Oracle Worker daemon status.
-
-## Process
-
-1. Read `~/.cellm/worker.json` for port config
-2. Call health endpoint if worker file exists
-3. Report status in table format
-
-## Execution
-
-```bash
-if [ -f ~/.cellm/worker.json ]; then
-  PORT=$(grep -o '"port"[[:space:]]*:[[:space:]]*[0-9]*' ~/.cellm/worker.json | grep -o '[0-9]*')
-  curl -sf "http://127.0.0.1:${PORT}/health" && \
-    curl -sf "http://127.0.0.1:${PORT}/api/status" | jq . || \
-    echo "[-] Worker offline at port ${PORT}"
-else
-  echo "[-] No ~/.cellm/worker.json found"
-fi
-```
-
-## Output
-
-| Field | Description |
-|-------|-------------|
-| Status | online/offline |
-| Port | Worker port (31415) |
-| Uptime | Time since start |
-| Database | DB path and version |
+No worker.json → `[-] No ~/.cellm/worker.json found`. Health fails → `[-] Worker offline at port {PORT}`.

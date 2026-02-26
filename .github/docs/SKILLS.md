@@ -2,485 +2,170 @@
 
 > [Home](../README.md) > [Docs](INDEX.md) > **Skills**
 
-Complete guide to CELLM's 7 framework skills.
+Complete guide to CELLM's 25 skills: 7 context skills and 18 workflow skills.
 
 ---
 
 ## Overview
 
-Skills are specialized knowledge modules that load automatically based on your project files. They provide framework-specific patterns, best practices, and guidance.
+CELLM uses two types of skills to structure work:
 
-| Skill | Technology | Trigger Patterns |
-|-------|------------|------------------|
-| `sk-nuxt` | Nuxt 4 | `*.vue`, `nuxt.config.ts`, `server/**` |
-| `sk-vue` | Vue 3 | `*.vue` files |
-| `sk-typescript` | TypeScript | `*.ts`, `*.tsx` files |
-| `sk-tailwind` | Tailwind CSS v4 | Files with Tailwind classes |
-| `sk-pinia` | Pinia | `stores/**`, `pinia` imports |
-| `sk-drizzle` | Drizzle ORM | `db/**`, `drizzle` imports |
-| `oracle-search` | Semantic Search | Always available |
+- **Context Skills** (7): Framework and language expertise auto-loaded by file patterns. User-invocable: false. Always present during relevant work.
+- **Workflow Skills** (18): Task orchestration patterns invoked explicitly as `/cellm:{name}`. Guide phases of development from planning through verification.
+
+Skills provide frameworks for thinking, not tutorials. They inject patterns, rules, and decision-making structures.
 
 ---
 
-## How Skills Work
+## Context Skills
 
-### Automatic Loading
+Context skills auto-load based on file patterns. They provide framework-specific expertise without explicit invocation.
 
-Skills load based on file patterns:
+### nuxt
 
-```
-You open: src/components/Button.vue
-Loaded:   sk-vue, sk-nuxt, sk-tailwind
-```
+**Nuxt 4 full-stack patterns**
 
-```
-You open: server/api/users.get.ts
-Loaded:   sk-nuxt, sk-typescript
-```
+Auto-loads: `*.vue`, `nuxt.config.ts`, `server/**`
 
-```
-You open: db/schema.ts
-Loaded:   sk-drizzle, sk-typescript
-```
+SSR/SSG rendering modes, hydration, composables (`useAsyncData`, `useFetch`, `useState`), auto-imports, server routes, Nitro engine, file structure patterns.
 
-### What Skills Provide
-
-1. **Patterns** - Best practices for the technology
-2. **Rules** - What to do and avoid
-3. **Examples** - Code snippets
-4. **Context** - Framework-specific guidance
-
----
-
-## sk-nuxt
-
-**Nuxt 4 full-stack patterns and best practices**
-
-### Trigger Patterns
-
-- `*.vue` files
-- `nuxt.config.ts`
-- `server/**` directories
-
-### Knowledge Covered
-
-| Area | Topics |
-|------|--------|
-| **SSR/SSG** | Rendering modes, hydration |
-| **Composables** | `useAsyncData`, `useFetch`, `useState` |
-| **Auto-imports** | Components, composables, utils |
-| **Server Routes** | API endpoints, middleware |
-| **Nitro** | Server engine patterns |
-| **File Structure** | app/, server/, shared/ |
-
-### Key Patterns
-
-**Data Fetching:**
-```typescript
-// Correct: useAsyncData for SSR
-const { data } = await useAsyncData('users', () =>
-  $fetch('/api/users')
-)
-
-// Avoid: direct fetch (no SSR benefits)
-const data = await fetch('/api/users')
-```
-
-**API Routes:**
-```typescript
-// server/api/users.get.ts
-export default defineEventHandler(async (event) => {
-  const users = await db.select().from(usersTable)
-  return users
-})
-```
-
----
-
-## sk-vue
+### vue
 
 **Vue 3 Composition API patterns**
 
-### Trigger Patterns
+Auto-loads: `*.vue` files
 
-- `*.vue` files
+Component structure with `<script setup>`, reactivity (ref, computed, watch), lifecycle hooks, props and emits, template syntax, slot patterns.
 
-### Knowledge Covered
-
-| Area | Topics |
-|------|--------|
-| **Composition API** | `<script setup>`, refs, computed |
-| **Reactivity** | ref, reactive, computed, watch |
-| **Lifecycle** | onMounted, onUnmounted, etc. |
-| **Props & Emits** | defineProps, defineEmits |
-| **Template** | v-if, v-for, slots |
-
-### Key Patterns
-
-**Component Structure:**
-```vue
-<script setup lang="ts">
-// 1. Imports (auto-imported in Nuxt)
-
-// 2. Props & Emits
-const props = defineProps<{
-  title: string
-  count?: number
-}>()
-
-const emit = defineEmits<{
-  update: [value: string]
-}>()
-
-// 3. Reactive State
-const isOpen = ref(false)
-
-// 4. Computed
-const displayTitle = computed(() =>
-  props.title.toUpperCase()
-)
-
-// 5. Methods
-function toggle() {
-  isOpen.value = !isOpen.value
-}
-
-// 6. Lifecycle
-onMounted(() => {
-  console.log('Component mounted')
-})
-</script>
-
-<template>
-  <div>
-    <h1>{{ displayTitle }}</h1>
-    <button @click="toggle">Toggle</button>
-  </div>
-</template>
-```
-
-### Rules
-
-- **Always** use `<script setup lang="ts">`
-- **Never** use Options API
-- **Always** type props with TypeScript
-- **Avoid** `any` types
-
----
-
-## sk-typescript
+### typescript
 
 **Type-safe patterns and utilities**
 
-### Trigger Patterns
+Auto-loads: `*.ts`, `*.tsx` files
 
-- `*.ts` files
-- `*.tsx` files
+Interfaces, generics with constraints, utility types (Pick, Omit, Partial), type guards and narrowing, strict mode enforcement, avoiding `any` types.
 
-### Knowledge Covered
-
-| Area | Topics |
-|------|--------|
-| **Types** | Interfaces, types, enums |
-| **Generics** | Generic functions, constraints |
-| **Utilities** | Pick, Omit, Partial, Required |
-| **Type Guards** | is, asserts, narrowing |
-| **Strict Mode** | null checks, no implicit any |
-
-### Key Patterns
-
-**Type Definitions:**
-```typescript
-// Prefer interfaces for objects
-interface User {
-  id: string
-  name: string
-  email: string
-  role: 'admin' | 'user'
-}
-
-// Use types for unions/utilities
-type UserRole = User['role']
-type PartialUser = Partial<User>
-```
-
-**Type Guards:**
-```typescript
-function isUser(obj: unknown): obj is User {
-  return (
-    typeof obj === 'object' &&
-    obj !== null &&
-    'id' in obj &&
-    'name' in obj
-  )
-}
-```
-
-### Rules
-
-- **Never** use `any` - use `unknown` instead
-- **Always** enable strict mode
-- **Always** type function parameters
-- **Prefer** interfaces over types for objects
-
----
-
-## sk-tailwind
+### tailwind
 
 **Tailwind CSS v4 with semantic tokens**
 
-### Trigger Patterns
+Auto-loads: Files with Tailwind classes, `tailwind.config.ts`
 
-- Files with Tailwind classes
-- `tailwind.config.ts`
+Semantic tokens (primary, neutral, error, warning, success), responsive design breakpoints, dark mode variants, Nuxt UI component integration, spacing and layout utilities.
 
-### Knowledge Covered
-
-| Area | Topics |
-|------|--------|
-| **Utilities** | Flex, grid, spacing, typography |
-| **Responsive** | sm:, md:, lg:, xl: breakpoints |
-| **Dark Mode** | dark: variants |
-| **Semantic Tokens** | primary, neutral, error, warning, success |
-| **Components** | Nuxt UI integration |
-
-### Key Patterns
-
-**Semantic Colors (Nuxt UI):**
-```vue
-<!-- Correct: semantic tokens -->
-<button class="bg-primary text-primary-foreground">
-  Primary Action
-</button>
-
-<div class="text-neutral-600 dark:text-neutral-400">
-  Secondary text
-</div>
-
-<!-- Avoid: hardcoded colors -->
-<button class="bg-blue-500 text-white">
-  Wrong
-</button>
-```
-
-**Responsive Design:**
-```vue
-<div class="
-  flex flex-col
-  md:flex-row
-  gap-4
-  p-4 md:p-6 lg:p-8
-">
-  <!-- Content -->
-</div>
-```
-
-### Rules
-
-- **Never** hardcode colors - use semantic tokens
-- **Always** consider dark mode
-- **Use** responsive prefixes for layouts
-
----
-
-## sk-pinia
+### pinia
 
 **State management patterns**
 
-### Trigger Patterns
+Auto-loads: `stores/**`, files with `pinia` imports
 
-- `stores/**` directories
-- Files with `pinia` imports
+Setup stores, reactive state, computed getters, async actions, store composition, persistence patterns, SSR considerations, loading and error state handling.
 
-### Knowledge Covered
-
-| Area | Topics |
-|------|--------|
-| **Stores** | Setup stores, defineStore |
-| **State** | Reactive state management |
-| **Getters** | Computed values |
-| **Actions** | State mutations, async |
-| **Composition** | Store composition |
-| **Persistence** | Local storage, SSR |
-
-### Key Patterns
-
-**Setup Store (Preferred):**
-```typescript
-// stores/user.ts
-export const useUserStore = defineStore('user', () => {
-  // State
-  const user = ref<User | null>(null)
-  const isLoading = ref(false)
-
-  // Getters
-  const isAuthenticated = computed(() => !!user.value)
-  const displayName = computed(() =>
-    user.value?.name ?? 'Guest'
-  )
-
-  // Actions
-  async function login(credentials: Credentials) {
-    isLoading.value = true
-    try {
-      user.value = await $fetch('/api/auth/login', {
-        method: 'POST',
-        body: credentials
-      })
-    } finally {
-      isLoading.value = false
-    }
-  }
-
-  function logout() {
-    user.value = null
-  }
-
-  return {
-    // State
-    user,
-    isLoading,
-    // Getters
-    isAuthenticated,
-    displayName,
-    // Actions
-    login,
-    logout
-  }
-})
-```
-
-### Rules
-
-- **Always** use Setup Stores (not Options)
-- **Always** type state with TypeScript
-- **Use** computed for derived state
-- **Handle** loading and error states
-
----
-
-## sk-drizzle
+### drizzle
 
 **Database ORM patterns**
 
-### Trigger Patterns
+Auto-loads: `db/**`, files with `drizzle` imports
 
-- `db/**` directories
-- Files with `drizzle` imports
+Schema definition with type inference, select/insert/update/delete queries, relations (one-to-one, one-to-many, many-to-many), migrations, transaction patterns, error handling.
 
-### Knowledge Covered
+### dse
 
-| Area | Topics |
-|------|--------|
-| **Schema** | Tables, columns, relations |
-| **Queries** | Select, insert, update, delete |
-| **Relations** | One-to-one, one-to-many, many-to-many |
-| **Migrations** | Schema changes |
-| **Type Safety** | Inferred types |
+**DSE (Data Search Engine) patterns**
 
-### Key Patterns
+Auto-loads: Files with `dse` imports, when editing `.vue` with semantic search features
 
-**Schema Definition:**
-```typescript
-// db/schema.ts
-import { pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core'
-
-export const users = pgTable('users', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  name: text('name').notNull(),
-  email: text('email').notNull().unique(),
-  createdAt: timestamp('created_at').defaultNow()
-})
-
-// Infer types
-export type User = typeof users.$inferSelect
-export type NewUser = typeof users.$inferInsert
-```
-
-**Queries:**
-```typescript
-// Select with filter
-const activeUsers = await db
-  .select()
-  .from(users)
-  .where(eq(users.status, 'active'))
-
-// Insert
-const newUser = await db
-  .insert(users)
-  .values({ name: 'John', email: 'john@example.com' })
-  .returning()
-
-// Update
-await db
-  .update(users)
-  .set({ name: 'Jane' })
-  .where(eq(users.id, userId))
-```
-
-### Rules
-
-- **Always** define schema in dedicated files
-- **Use** inferred types (`$inferSelect`, `$inferInsert`)
-- **Handle** errors in database operations
-- **Use** transactions for multiple operations
+Semantic indexing, vector-based queries, embedding models, similarity search, context retrieval, indexing strategies for full-text and semantic search.
 
 ---
 
-## oracle-search
+## Workflow Skills
 
-**Semantic search integration**
+Workflow skills guide phases of development. Invoked explicitly as `/cellm:{name}`.
 
-### Trigger Patterns
+### Discovery Phase
 
-- Always available
+| Skill | Purpose |
+|-------|---------|
+| `/cellm:discover` | Map existing codebase, find patterns, establish baseline |
+| `/cellm:dse-discover` | Semantic search analysis of project structure and context |
 
-### Knowledge Covered
+### Planning Phase
 
-| Area | Topics |
-|------|--------|
-| **Search** | Natural language queries |
-| **Patterns** | Pattern discovery |
-| **Context** | Session context |
-| **Memory** | Persistent observations |
+| Skill | Purpose |
+|-------|---------|
+| `/cellm:init` | Initialize project or feature, set up structure |
+| `/cellm:plan` | Create task breakdown, timeline, dependencies |
+| `/cellm:shape` | Define technical approach, architecture decisions |
 
-### Capabilities
+### Specification Phase
 
-- Find similar code across project
-- Discover where patterns are used
-- Get context-aware suggestions
-- Track pattern usage over time
+| Skill | Purpose |
+|-------|---------|
+| `/cellm:write-spec` | Write formal specification with requirements and constraints |
+| `/cellm:spec` | Quick specification for component or feature |
+| `/cellm:spec-treat` | Edge case and error handling specification |
 
-### Usage
+### Task Phase
 
-Oracle search is used internally by CELLM to:
-1. Find relevant patterns for current work
-2. Suggest similar implementations
-3. Track what has been built
+| Skill | Purpose |
+|-------|---------|
+| `/cellm:create-tasks` | Break down plan into granular, executable tasks |
+| `/cellm:orchestrate` | Coordinate multi-part implementation across files |
+
+### Implementation Phase
+
+| Skill | Purpose |
+|-------|---------|
+| `/cellm:implement` | Execute implementation following specifications |
+| `/cellm:inject` | Inject patterns or frameworks into existing code |
+
+### Verification Phase
+
+| Skill | Purpose |
+|-------|---------|
+| `/cellm:verify` | Test, validate, and verify against spec |
+| `/cellm:arena` | Interactive testing and validation environment |
+| `/cellm:arena-debug` | Debug failures in arena with detailed analysis |
+
+### Search Phase
+
+| Skill | Purpose |
+|-------|---------|
+| `/cellm:index` | Index and catalog patterns in codebase |
+| `/cellm:oracle-search` | Semantic search for patterns, implementations, context |
+
+### Status Phase
+
+| Skill | Purpose |
+|-------|---------|
+| `/cellm:status` | Report progress, identify blockers, next steps |
 
 ---
 
 ## Skill Combinations
 
-When working on different file types, multiple skills load together:
+Context skills load together based on file type, providing integrated expertise:
 
-| File Type | Skills Loaded |
-|-----------|---------------|
-| `*.vue` | sk-vue, sk-nuxt, sk-tailwind |
-| `server/**/*.ts` | sk-nuxt, sk-typescript |
-| `stores/*.ts` | sk-pinia, sk-typescript |
-| `db/*.ts` | sk-drizzle, sk-typescript |
-| `*.ts` (general) | sk-typescript |
+| File Type | Context Skills |
+|-----------|----------------|
+| `*.vue` | vue, nuxt, tailwind, dse |
+| `server/**/*.ts` | nuxt, typescript |
+| `stores/*.ts` | pinia, typescript |
+| `db/*.ts` | drizzle, typescript |
+| `*.ts` (general) | typescript |
+
+Workflow skills are invoked explicitly to guide specific phases of work.
 
 ---
 
 ## Skill Priority
 
-When skills have conflicting guidance, priority order is:
+When guidance conflicts, follow this priority:
 
 1. **Anti-patterns** (always enforced)
 2. **Project-specific** rules
-3. **Framework-specific** skills
+3. **Framework-specific** context skills
 4. **General** patterns
 
 ---

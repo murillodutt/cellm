@@ -10,35 +10,24 @@ paths:
   - "**/reference/**"
 ---
 
-Identify **redundant, duplicate, or overlapping** documentation by comparing heading structures, topic keywords, and content hashes. Report consolidation opportunities without auto-merging.
-
 ## Detection
 
-- **Structural similarity** — Jaccard index on normalized headings: `|A intersect B| / |A union B|`
-- **Topic detection** — extract keywords from titles, metadata, first paragraphs; group by topic
-- **Content hashing** — hash normalized paragraphs to find exact duplicates across files
+- **Structural similarity**: Jaccard index on normalized headings (>70% = flag)
+- **Topic keywords**: extract from titles, metadata, first paragraphs
+- **Content hashing**: find exact duplicates across files
 
-## Severity
-
-| Level | Similarity | Action |
-|-------|------------|--------|
-| Critical | >90% | Must consolidate |
-| High | 70-90% | Should consolidate |
-| Medium | 50-70% | Review recommended |
-| Low | <50% | No action |
+Severity: >90% critical, 70-90% high, 50-70% medium, <50% none.
 
 ## Consolidation Strategies
 
-| Finding | Strategy |
-|---------|----------|
-| Near-duplicate SPECs | Merge into one |
-| SPEC overlaps REF | Keep both, clear boundaries (what vs how) |
-| HOWTO overlaps RUNBOOK | Keep both, different purpose (learn vs operate) |
-| Duplicated paragraph | Replace with link to source |
+- Near-duplicate SPECs: merge
+- SPEC overlaps REF: keep both, clarify (what vs how)
+- HOWTO overlaps RUNBOOK: keep both (learn vs operate)
+- Duplicated paragraphs: replace with link
 
 ## NEVER
 
-- **Auto-merge** — report only, never auto-merge documents
-- **Discard information** — preserve all content, consolidate structure
-- **Mandate consolidation** — suggest, don't mandate
-- **Ignore document purpose** — SPEC vs REF vs HOWTO serve different audiences
+- **Auto-merge** — report only
+- **Discard content** — preserve all, consolidate structure
+- **Mandate consolidation** — suggest only
+- **Ignore document purpose** — SPEC/REF/HOWTO have different audiences

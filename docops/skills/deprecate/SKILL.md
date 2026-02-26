@@ -10,43 +10,26 @@ paths:
   - "**/reference/**"
 ---
 
-Mark a document as **deprecated** with a grace period before automatic archival. Add deprecation banner, update `status: deprecated` in frontmatter, and mark references with `[DEPRECATED]`.
+## Decision Framework
 
-## Lifecycle
+- Determine doc type (SPEC/REF/HOWTO/RUNBOOK/ADR) from filename suffix
+- Use grace period based on type, override with `--days N`
+- ADRs: manual-only, never auto-archive
+- Require replacement path if available
 
-```
-         /deprecate                    grace period
-[active] ──────────> [deprecated] ──────────────> [archived]
-    ^                     │                            │
-    │   /undeprecate      │         /restore           │
-    └─────────────────────┘────────────────────────────┘
-```
+## Process
 
-## Frontmatter
+1. Add `> [!WARNING]` deprecation banner at top
+2. Set frontmatter: `status: deprecated`, `deprecated_on`, `deprecated_by`, `deprecation_reason`, `archive_on`, `replacement`
+3. Update all linking documents: add `[DEPRECATED]` marker next to links
+4. Calculate archive_on: today + grace period
 
-```yaml
-status: deprecated
-deprecated_on: 2026-02-03
-deprecated_by: agent | human
-deprecation_reason: "Reason"
-archive_on: 2026-03-05
-replacement: "path/to/replacement.md"
-```
-
-## Grace Period Defaults
-
-| Document Type | Grace Period |
-|---------------|-------------|
-| SPEC | 30 days |
-| REF | 30 days |
-| HOWTO | 14 days |
-| RUNBOOK | 7 days |
-| ADR | Never (manual only) |
+Grace periods: SPEC 30d, REF 30d, HOWTO 14d, RUNBOOK 7d, ADR never.
 
 ## NEVER
 
-- **Skip the deprecation banner** — always add `> [!WARNING]` block at top
-- **Auto-archive ADRs** — ADRs are historical record, archive only manually
-- **Grace period < 7 days** — minimum grace period is 7 days
-- **Deprecate without replacement** — always provide replacement path when available
-- **Forget references** — update all linking documents with `[DEPRECATED]` marker
+- **Skip the banner** — always add `> [!WARNING]` at top
+- **Auto-archive ADRs** — manual only
+- **Grace period < 7 days** — 7d minimum
+- **Deprecate without replacement** — provide path when available
+- **Forget reference updates** — mark all links with `[DEPRECATED]`

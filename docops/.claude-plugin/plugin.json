@@ -17,6 +17,5 @@
     "drift-control",
     "code-evidence"
   ],
-  "commands": "./commands",
   "skills": "./skills"
 }

@@ -8,18 +8,20 @@ paths:
   - "**/technical/**"
 ---
 
-Validate documentation **structure**, **required sections**, and **drift control artifacts**.
+## Validation Checks
 
-## Checks
+Run these in order:
 
-1. Required folders and files exist (specs/, reference/, howto/, index.md, glossary.md)
-2. Source of truth (project-conveyor.md) referenced by specs/refs
-3. Evidence links present in derived documents
-4. Normative vocabulary usage (DEVE, NAO DEVE, DEVERIA, PODE)
-5. Gaps file (conveyor-gaps.md) exists and is current
+1. **Structure exists**: specs/, reference/, howto/, index.md, glossary.md
+2. **Source of truth**: project-conveyor.md referenced by SPECs/REFs
+3. **Evidence links**: all derived docs link to evidence files
+4. **Vocabulary**: correct normative language (DEVE, NAO DEVE, DEVERIA, PODE)
+5. **Gaps file**: conveyor-gaps.md present and dated
+
+Report what's missing. Stop on source-of-truth failure.
 
 ## NEVER
 
-- **Pass with missing source of truth** — project-conveyor.md must exist
-- **Skip evidence link validation** — SPECs/REFs must link to evidence
-- **Ignore normative vocabulary violations** — flag non-standard language
+- **Pass without project-conveyor.md** — it's mandatory
+- **Skip evidence link validation** — SPECs/REFs must link evidence
+- **Ignore vocabulary violations** — flag non-standard language

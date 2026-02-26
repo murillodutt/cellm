@@ -2,27 +2,22 @@
 
 > [Home](../README.md) | **Documentation Index**
 
-Welcome to the official CELLM Plugin documentation.
-
----
-
 ## Quick Navigation
 
 ### Getting Started
 
-| Guide | Description | Time |
-|-------|-------------|------|
-| [Getting Started](getting-started.md) | Quick start in 5 minutes | 5 min |
-| [Installation](installation.md) | Complete setup guide | 10 min |
-| [Features](features.md) | Overview of all features | 15 min |
+| Guide | Description |
+|-------|-------------|
+| [Getting Started](getting-started.md) | Quick start in 5 minutes |
+| [Installation](installation.md) | Complete setup guide |
+| [Features](features.md) | Overview of all features |
 
 ### Core Documentation
 
 | Guide | Description |
 |-------|-------------|
-| [Commands](commands.md) | All workflow commands reference |
+| [Skills Reference](commands.md) | All 25 skills (workflow + context) |
 | [Agents](agents.md) | 4 specialized agents guide |
-| [Skills](skills.md) | 7 framework skills guide |
 
 ### Components
 
@@ -48,35 +43,13 @@ Welcome to the official CELLM Plugin documentation.
 
 ---
 
-## Documentation Structure
-
-```
-docs/
-├── README.md           # This index (you are here)
-├── getting-started.md  # Quick 5-minute setup
-├── installation.md     # Complete installation guide
-├── features.md         # Feature overview
-├── commands.md         # Command reference
-├── agents.md           # Agents guide
-├── skills.md           # Skills guide
-├── oracle.md           # Oracle package docs
-├── compass.md          # Dashboard docs
-├── api-reference.md    # API documentation
-├── configuration.md    # Configuration guide
-├── troubleshooting.md  # Problem solving
-├── faq.md              # FAQ
-└── contributing.md     # Contribution guide
-```
-
----
-
 ## By Audience
 
 ### New Users
 
-1. Start with [Getting Started](getting-started.md) (5 min)
+1. Start with [Getting Started](getting-started.md)
 2. Read [Features](features.md) to understand capabilities
-3. Explore [Commands](commands.md) as you work
+3. Explore [Skills Reference](commands.md) as you work
 
 ### Experienced Users
 
@@ -84,27 +57,8 @@ docs/
 - [Configuration](configuration.md) for customization
 - [Troubleshooting](troubleshooting.md) for issues
 
-### Contributors
-
-- [Contributing](contributing.md) for guidelines
-- [Technical Specs](technical-specs.md) for architecture
-
 ---
 
-## Version
-
-**Current Version:** 2.0.5
-
-See [CHANGELOG](../CHANGELOG.md) for version history.
-
----
-
-## Support
-
-- [GitHub Issues](https://github.com/murillodutt/cellm/issues) - Bug reports
-- [GitHub Discussions](https://github.com/murillodutt/cellm/discussions) - Questions
-- [Website](https://cellm.ai) - Official site
-
----
+**Current Version:** 3.3.0
 
 [Back to Plugin Home](../README.md)

@@ -21,7 +21,6 @@ cleanup() {
 
 # Configuration
 CELLM_DIR="${HOME}/.cellm"
-WORKER_JSON="${CELLM_DIR}/worker.json"
 BUFFER_FILE="${CELLM_DIR}/buffer.jsonl"
 LOG_FILE="${CELLM_DIR}/oracle-hook.log"
 LOCK_FILE="${CELLM_DIR}/spawn.lock"

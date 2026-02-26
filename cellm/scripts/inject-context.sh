@@ -17,8 +17,8 @@ trap cleanup EXIT
 
 # Configuration
 CELLM_DIR="${HOME}/.cellm"
-WORKER_JSON="${CELLM_DIR}/worker.json"
 LOG_FILE="${CELLM_DIR}/oracle-hook.log"
+# shellcheck disable=SC2034 # used by sourced _get-port.sh
 DEFAULT_PORT=31415
 
 # Logging

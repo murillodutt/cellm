@@ -8,43 +8,21 @@ paths:
 user-invocable: false
 ---
 
-Every function has an **explicit return type**. Every object shape is an **interface**. Every union/primitive alias is a **type**. Runtime validation uses **Zod schemas** with `z.infer<typeof schema>` for type derivation.
+Explicit return types on every function. Interfaces for objects. Types for unions/intersections. Zod for runtime validation with `z.infer<typeof schema>`.
 
-```typescript
-interface User {
-  id: string
-  email: string
-  name: string
-  createdAt: Date
-}
-
-type Status = 'pending' | 'active' | 'inactive'
-
-const userSchema = z.object({
-  email: z.string().email(),
-  name: z.string().min(2),
-  age: z.number().optional()
-})
-type UserInput = z.infer<typeof userSchema>
-```
-
-**Interfaces** — objects and API contracts. **Types** — unions, intersections, mapped types.
-
-**Utility types** — `Partial<T>`, `Pick<T, K>`, `Omit<T, K>`, `Record<K, V>` — use instead of manual redefinition.
+**Utility types** — `Partial<T>`, `Pick<T, K>`, `Omit<T, K>`, `Record<K, V>` over manual redefinition.
 
 **Type guards** — `function isUser(v: unknown): v is User` with runtime checks, not assertions.
 
-**Generics** — `ApiResponse<T>` for reusable contracts. Constrain with `extends` when needed.
+**Zod** — `safeParse` for external input, access `.data` only after `.success`.
 
-**Zod** — `safeParse` for external input, access `result.data` only after `result.success` check.
-
-**$fetch typing** — `$fetch<User>('/api/user/1')` or `useFetch<User>(...)`.
+**$fetch** — `$fetch<User>('/api/user/1')` or `useFetch<User>(...)`.
 
 ## NEVER
 
-- **`any`** — use `unknown` then narrow with type guards or Zod
-- **Type assertions (`as`)** — fix the type at the source, don't cast
-- **Untyped function returns** — every function declares its return type
-- **Manual type redefinition** — use utility types (`Partial`, `Pick`, `Omit`)
-- **`// @ts-ignore`** — fix the type error, don't suppress it
-- **Runtime props without Zod** — external input must be validated, not trusted
+- **`any`** — use `unknown` + type guards or Zod
+- **Type assertions (`as`)** — fix at source, don't cast
+- **Untyped returns** — explicit on every function
+- **Manual type redefinition** — use utility types
+- **`// @ts-ignore`** — fix the error
+- **Unvalidated external input** — Zod required

@@ -1,37 +1,50 @@
 # CELLM Plugins
 
-Two Claude Code plugins: **cellm** (core) and **docops** (documentation).
+Marketplace with 3 plugins for Claude Code: **cellm** (core), **docops** (documentation), **dse** (design).
+
+Architecture: skills-only. No `commands/` directories. Every capability is a `skills/{name}/SKILL.md`.
+
+---
 
 ## cellm
 
-Context engineering for LLM-driven development. Provides skills, agents, hooks, and Oracle integration.
+Context engineering for LLM-driven development. 25 skills, 4 agents, 6 hook events, Oracle integration.
 
-### Skills (18)
-
-Auto-activated by file path. No manual invocation needed.
+### Context Skills (7) — auto-loaded by file path
 
 | Skill | Activates on | What it enforces |
 |-------|-------------|-----------------|
+| **nuxt** | `nuxt.config.ts`, `app/`, `server/`, `pages/` | useFetch/useAsyncData, server/client separation, Nitro patterns |
 | **vue** | `*.vue`, `composables/*.ts` | Script setup, typed props/emits, section ordering, storeToRefs |
-| **nuxt** | `nuxt.config`, `app/`, `server/`, `pages/` | useFetch/useAsyncData, server/client separation, method suffixes |
 | **typescript** | `*.ts`, `*.tsx`, `types/` | Strict typing, Zod validation, no `any`, explicit return types |
+| **tailwind** | `*.vue`, `*.css`, `tailwind.config.ts` | Semantic tokens only, no hardcoded colors, mobile-first, dark mode |
+| **pinia** | `stores/`, `store/` | Setup Store syntax, storeToRefs, single-domain stores |
 | **drizzle** | `db/`, `schema.ts`, `drizzle.config` | Typed schemas, `.returning()`, relations, transactions |
-| **pinia** | `stores/` | Setup Store syntax, storeToRefs, single-domain stores |
-| **tailwind** | `*.vue`, `*.css` | Semantic tokens only, no hardcoded colors, mobile-first, dark mode |
 | **dse** | `*.vue` | Project-specific design tokens via `dse_search` before any UI work |
+
+Context skills stack: editing a `.vue` file loads **vue** + **tailwind** + **dse** simultaneously. Editing `server/api/*.ts` loads **nuxt** + **typescript**.
+
+### Workflow Skills (18) — invoked manually
 
 | Skill | Invocation | What it does |
 |-------|-----------|-------------|
 | **init** | `/cellm:init [mode]` | Interactive Oracle setup: install, status, update, doctor, restart, uninstall |
-| **status** | `/cellm:status` | Quick Oracle worker health check |
-| **arena** | `/cellm:arena [scope]` | Run test suites, typecheck, health checks with trend reporting |
-| **arena-debug** | `/cellm:arena-debug <error>` | Iterative log-and-restart debugging (max 3 iterations, auto/interactive/observe modes) |
-| **discover** | `/cellm:discover` | Extract tribal knowledge from codebase into pattern files |
+| **plan** | `/cellm:plan [product]` | Create mission.md, roadmap.md, tech-stack.md via guided Q&A |
+| **shape** | `/cellm:shape [feature]` | Gather context and structure specs (requires plan mode) |
+| **write-spec** | `/cellm:write-spec [path]` | Formalize shaping into technical spec (spec.md) |
+| **create-tasks** | `/cellm:create-tasks [path]` | Break spec into task groups with dependencies |
+| **orchestrate** | `/cellm:orchestrate [path]` | Execute tasks systematically, delegate to agents |
+| **implement** | `/cellm:implement [path]` | Generate code from spec following patterns |
+| **verify** | `/cellm:verify [path]` | Quality gate: spec compliance, security, patterns |
+| **spec** | `/cellm:spec [path]` | Quick-create spec folder structure |
+| **spec-treat** | `/cellm:spec-treat [path]` | Analyze spec for edge cases and inconsistencies |
+| **discover** | `/cellm:discover [focus]` | Extract tribal knowledge into pattern files |
 | **inject** | `/cellm:inject [paths]` | Inject relevant patterns into current context |
-| **index** | `/cellm:index` | Rebuild patterns index.yml |
-| **plan** | `/cellm:plan` | Create mission.md, roadmap.md, tech-stack.md via guided Q&A |
-| **shape** | `/cellm:shape` | Gather context and structure specs (requires plan mode) |
+| **index** | `/cellm:index [query]` | Rebuild patterns index.yml |
+| **arena** | `/cellm:arena [scope]` | Run test suites, typecheck, health checks with trend reporting |
+| **arena-debug** | `/cellm:arena-debug <error>` | Iterative log-and-restart debugging (max 3 iterations) |
 | **oracle-search** | `/cellm:oracle-search <query>` | Semantic search across Oracle observations |
+| **status** | `/cellm:status [verbose]` | Quick Oracle worker health check |
 | **dse-discover** | `/cellm:dse-discover [path]` | Bootstrap design system for a project |
 
 ### Agents (4)
@@ -69,7 +82,7 @@ Data: `~/.cellm/` (never in repo).
 
 Documentation maintenance with LLM-first templates, code evidence, and drift control.
 
-### Skills (10)
+### Skills (12)
 
 | Skill | Invocation | What it does |
 |-------|-----------|-------------|
@@ -78,11 +91,13 @@ Documentation maintenance with LLM-first templates, code evidence, and drift con
 | **verify** | `/docops:verify [docRoot]` | Validate structure, links, evidence, normative vocabulary |
 | **journal** | `/docops:journal [path]` | Generate JOURNAL.md from code evidence and project structure |
 | **deprecate** | `/docops:deprecate <file>` | Mark doc for deprecation with grace period |
-| **lifecycle** | `/docops:undeprecate`, `/docops:restore` | Undeprecate or restore archived documents |
+| **undeprecate** | `/docops:undeprecate <file>` | Reverse deprecation, restore active status |
+| **restore** | `/docops:restore <file>` | Restore archived document to active state |
 | **prune** | `/docops:prune [docRoot]` | Archive deprecated docs, fix broken references |
 | **gc** | `/docops:gc [docRoot]` | Clean resolved gaps, flag stale evidence, detect redundancy |
 | **freshness** | `/docops:freshness [docRoot]` | Check/update evidence freshness (fresh/stale/expired) |
 | **redundancy** | `/docops:redundancy [docRoot]` | Detect duplicate content across documentation |
+| **lifecycle** | `/docops:lifecycle [action]` | Unified document lifecycle management |
 
 ### Agent (1)
 
@@ -117,3 +132,42 @@ Documentation maintenance with LLM-first templates, code evidence, and drift con
 | How-to | `.howto.md` | Step-by-step guide |
 | Runbook | `.runbook.md` | Operational procedure |
 | Decision | `ADR-YYYYMMDD-slug.md` | Architecture decision record |
+
+---
+
+## dse
+
+Design System Engine. Visual design skills for distinctive, production-grade frontend interfaces.
+
+### Skills (1)
+
+| Skill | Invocation | What it does |
+|-------|-----------|-------------|
+| **frontend-ui** | `/dse:frontend-ui [description]` | Design thinking framework before code: tone, typography, color, motion, composition |
+
+---
+
+## Architecture
+
+```
+.claude-plugin/marketplace.json    # Plugin registry
+cellm/                             # Core plugin (25 skills, 4 agents)
+  .claude-plugin/plugin.json
+  skills/                          # Flat: skills/{name}/SKILL.md
+  agents/
+  hooks/
+  scripts/
+  .mcp.json
+docops/                            # Documentation plugin (12 skills, 1 agent)
+  .claude-plugin/plugin.json
+  skills/
+  agents/
+  hooks/
+  scripts/
+  templates/
+dse/                               # Design plugin (1 skill)
+  .claude-plugin/plugin.json
+  skills/
+```
+
+Skills-only: every capability is `skills/{name}/SKILL.md` with frontmatter (`name`, `description`, `argument-hint`, `allowed-tools`). Context skills add `paths` and `user-invocable: false` for auto-loading.
