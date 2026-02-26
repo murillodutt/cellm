@@ -1,5 +1,4 @@
 ---
-name: tailwind
 description: Tailwind CSS v4 patterns with semantic design tokens. Activates on .vue and .css files to enforce semantic colors, consistent spacing, mobile-first responsive, and dark mode support.
 paths:
   - "**/*.vue"

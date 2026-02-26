@@ -1,5 +1,4 @@
 ---
-name: implement
 description: Generate code from a specification or direct instruction. Reads spec context, checks for reusable code, implements following project patterns, and self-reviews for rule compliance.
 argument-hint: "[task description or spec-folder-path]"
 allowed-tools: Read, Grep, Glob, Write, Edit, Bash(npx *), Bash(bun *), AskUserQuestion

@@ -1,5 +1,4 @@
 ---
-name: oracle-search
 description: Search Oracle context and observations using semantic vector search. Uses a 3-layer retrieval pattern (search index, timeline context, full observations) to minimize token usage.
 argument-hint: "query: your search query"
 allowed-tools: mcp__cellm-oracle__search, mcp__cellm-oracle__timeline, mcp__cellm-oracle__get_observations

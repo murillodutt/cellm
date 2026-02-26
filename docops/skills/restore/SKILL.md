@@ -1,5 +1,4 @@
 ---
-name: restore
 description: Restore an archived document back to active status. Handles conflict resolution when the original path is occupied, preserves lifecycle metadata.
 argument-hint: "<file>"
 paths:

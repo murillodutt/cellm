@@ -1,5 +1,4 @@
 ---
-name: discover
 description: Extract tribal knowledge from your codebase into documented patterns. Analyzes code for unusual, opinionated, or tribal conventions and writes them as concise, scannable pattern files.
 argument-hint: "[focus area]"
 allowed-tools: Read, Grep, Glob, Write, Edit, AskUserQuestion

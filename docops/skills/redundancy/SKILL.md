@@ -1,5 +1,4 @@
 ---
-name: redundancy
 description: Detect redundant and duplicate content across documentation files. Compares heading structures (Jaccard similarity), extracts topic keywords, and reports consolidation opportunities ranked by severity.
 argument-hint: "[docRoot] [--threshold N]"
 paths:

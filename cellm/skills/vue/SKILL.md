@@ -1,5 +1,4 @@
 ---
-name: vue
 description: Vue 3 Composition API patterns for components and composables. Activates when editing .vue files or composables to enforce script setup, typed props/emits, and canonical section ordering.
 paths:
   - "**/*.vue"

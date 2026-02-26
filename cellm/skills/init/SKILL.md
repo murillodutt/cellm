@@ -1,5 +1,4 @@
 ---
-name: init
 description: Interactive Oracle setup with menus and guided troubleshooting. Manages installation, status, updates, diagnostics, and uninstall of the Oracle worker daemon.
 argument-hint: "[install|status|update|doctor|restart|uninstall]"
 allowed-tools: Bash(curl *), Bash(bun *), Bash(npm *), Bash(brew *), Bash(apt *), Bash(jq *), Bash(lsof *), Bash(kill *), Bash(mkdir *), Bash(cat *), Bash(tail *), Bash(rm *), Read, Grep, Glob, AskUserQuestion

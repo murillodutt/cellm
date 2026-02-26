@@ -1,5 +1,4 @@
 ---
-name: prune
 description: Archive or remove deprecated documentation, broken references, and orphaned files. Scans for deprecated frontmatter, validates internal links, and identifies unreferenced files.
 argument-hint: "[docRoot] [--dry-run]"
 paths:

@@ -1,5 +1,4 @@
 ---
-name: orchestrate
 description: Execute tasks systematically from tasks.md. Identifies the next executable group, delegates to the implementer agent, updates task status, and reports progress.
 argument-hint: "[spec-folder-path]"
 allowed-tools: Read, Grep, Glob, Write, Edit, AskUserQuestion, Task

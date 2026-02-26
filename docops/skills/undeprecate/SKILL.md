@@ -1,5 +1,4 @@
 ---
-name: undeprecate
 description: Reverse a deprecation, restoring a document from deprecated status back to active. Removes deprecation banner, clears deprecation frontmatter, and updates references.
 argument-hint: "<file>"
 paths:

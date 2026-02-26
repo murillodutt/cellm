@@ -1,5 +1,4 @@
 ---
-name: arena
 description: Run ARENA quality checks for any Node.js/Bun project. Detects test runner, runs test suites, typecheck, and health verification with trend reporting via Oracle.
 argument-hint: "[scope]: all | labs | typecheck | health | file <path> | debug <error>"
 allowed-tools: Bash(bun test *), Bash(npx *), Bash(curl *), Bash(cd *), Bash(timeout *), Bash(find *), Read, Grep

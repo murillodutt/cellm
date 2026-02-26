@@ -1,5 +1,4 @@
 ---
-name: frontend-ui
 description: Create distinctive, production-grade frontend interfaces. Injects a design thinking framework before code generation to avoid generic AI aesthetics. Works with HTML/CSS/JS, React, Vue, or any frontend stack.
 argument-hint: "[component or page description]"
 allowed-tools: Read, Grep, Glob, Write, Edit, AskUserQuestion

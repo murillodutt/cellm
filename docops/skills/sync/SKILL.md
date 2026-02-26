@@ -1,5 +1,4 @@
 ---
-name: sync
 description: Refresh code evidence, gaps, and derived documentation. Updates evidence files first, then conveyor-gaps with conflicts, then propagates to SPECs/REFs/HOWTOs/RUNBOOKs.
 argument-hint: "[docRoot]"
 paths:

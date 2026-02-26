@@ -1,5 +1,4 @@
 ---
-name: write-spec
 description: Create a detailed technical specification from shaping output. Formalizes requirements into data models, API contracts, component structure, and acceptance criteria.
 argument-hint: "[spec-folder-path]"
 allowed-tools: Read, Grep, Glob, Write, Edit, AskUserQuestion

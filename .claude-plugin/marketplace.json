@@ -11,19 +11,19 @@
   "plugins": [
     {
       "name": "cellm",
-      "version": "3.3.0",
+      "version": "3.3.1",
       "source": "./cellm",
       "description": "Context Engineering for LLM-driven development"
     },
     {
       "name": "docops",
-      "version": "0.5.5",
+      "version": "0.5.6",
       "source": "./docops",
       "description": "Documentation maintenance with LLM-first templates, drift control, and cleanup"
     },
     {
       "name": "dse",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "source": "./dse",
       "description": "Design System Engine — visual design skills for distinctive, production-grade frontend interfaces"
     }

@@ -1,5 +1,4 @@
 ---
-name: dse
 description: Design System Engine — routes UI decisions to project-specific tokens, patterns, and compositions. Activates on .vue files to ensure project design decisions override generic framework defaults.
 paths:
   - "**/*.vue"

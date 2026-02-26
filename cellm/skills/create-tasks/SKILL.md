@@ -1,5 +1,4 @@
 ---
-name: create-tasks
 description: Break a technical specification into actionable task groups sorted by dependency order. Reads spec.md and produces tasks.md with numbered groups and critical path.
 argument-hint: "[spec-folder-path]"
 allowed-tools: Read, Grep, Glob, Write, Edit, AskUserQuestion

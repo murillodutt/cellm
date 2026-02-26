@@ -1,5 +1,4 @@
 ---
-name: inject
 description: Inject relevant patterns into the current context. Analyzes work context to suggest matching patterns, or directly injects specified pattern files.
 argument-hint: "[pattern-path...]"
 allowed-tools: Read, Grep, Glob, AskUserQuestion

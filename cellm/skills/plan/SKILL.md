@@ -1,5 +1,4 @@
 ---
-name: plan
 description: Establish foundational product documentation through interactive conversation. Creates mission.md, roadmap.md, and tech-stack.md in cellm-core/project/product/ via guided Q&A.
 argument-hint: "[product name]"
 allowed-tools: Read, Grep, Glob, Write, Edit, AskUserQuestion

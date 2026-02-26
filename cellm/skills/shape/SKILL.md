@@ -1,5 +1,4 @@
 ---
-name: shape
 description: Gather context and structure planning for significant work. Must run in plan mode. Collects scope, visuals, references, patterns, and produces a timestamped spec folder with plan, shape, and references docs.
 argument-hint: "[feature description]"
 allowed-tools: Read, Grep, Glob, Write, Edit, AskUserQuestion

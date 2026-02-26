@@ -1,5 +1,4 @@
 ---
-name: verify
 description: Validate documentation structure, required sections, evidence links, normative vocabulary, and drift control artifacts. Reports missing files, broken references, and vocabulary violations.
 argument-hint: "[docRoot]"
 paths:

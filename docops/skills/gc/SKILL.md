@@ -1,5 +1,4 @@
 ---
-name: gc
 description: Garbage collection for resolved gaps, stale evidence, and redundant content. Scans conveyor-gaps.md for resolved entries, validates evidence freshness, detects structural duplicates, and archives cleaned items.
 argument-hint: "[docRoot] [--dry-run]"
 paths:

@@ -1,5 +1,4 @@
 ---
-name: pinia
 description: Pinia state management for Vue/Nuxt applications. Activates on store files to enforce Setup Store syntax, storeToRefs destructuring, and focused single-domain stores.
 paths:
   - "**/stores/**/*.ts"

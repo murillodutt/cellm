@@ -1,5 +1,4 @@
 ---
-name: drizzle
 description: Drizzle ORM patterns for type-safe database operations. Activates on schema files, db directories, and drizzle config to enforce proper schema definitions, relations, and query patterns.
 paths:
   - "**/db/**/*.ts"
