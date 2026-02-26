@@ -62,10 +62,11 @@ main() {
   fi
 
   # Parse JSON input from Claude Code hook
-  local session_id stop_reason hook_event
+  local session_id stop_reason hook_event transcript_path
   session_id=$(echo "${input}" | jq -r '.session_id // "unknown"')
   stop_reason=$(echo "${input}" | jq -r '.stop_hook_reason // "unknown"')
   hook_event=$(echo "${input}" | jq -r '.hook_event_name // "Stop"')
+  transcript_path=$(echo "${input}" | jq -r '.transcript_path // ""')
 
   log "Hook triggered (event: ${hook_event}, session: ${session_id}, reason: ${stop_reason})"
 
@@ -116,6 +117,28 @@ main() {
       "${url}" >/dev/null 2>&1 || true
 
     log "Session stop sent (summary queued)"
+
+    # Knowledge Funnel safety net: extract knowledge from transcript (background)
+    if [[ -n "${transcript_path}" && -f "${transcript_path}" ]]; then
+      local kf_url="http://127.0.0.1:${port}/api/session/extract-knowledge"
+      local kf_payload
+      kf_payload=$(jq -n \
+        --arg sid "${session_id}" \
+        --arg tp "${transcript_path}" \
+        '{
+          sessionId: $sid,
+          transcriptPath: $tp
+        }')
+
+      # Run in background with longer timeout (transcript analysis is heavier)
+      (curl -sf --max-time 120 --connect-timeout 1 \
+        -X POST \
+        -H "Content-Type: application/json" \
+        -d "${kf_payload}" \
+        "${kf_url}" >/dev/null 2>&1 || true) &
+
+      log "Knowledge extraction triggered (background)"
+    fi
   fi
 
   exit 0

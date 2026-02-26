@@ -59,6 +59,6 @@
 
 ---
 
-**Current Version:** 0.35.0
+**Current Version:** 0.35.1
 
 [Back to Plugin Home](../README.md)

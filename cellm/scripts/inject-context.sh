@@ -86,6 +86,9 @@ main() {
   # Specs: Inject active spec summary (non-critical)
   inject_specs "${port}" "${project}"
 
+  # Knowledge health: Inject gap indicator (non-critical)
+  inject_knowledge_health "${port}" "${project}"
+
   exit 0
 }
 
@@ -200,6 +203,33 @@ inject_specs() {
     echo ""
     echo "${response}"
     log "Specs: injected active summary for ${project}"
+  fi
+}
+
+# Fetch knowledge health indicator for capture gap awareness
+inject_knowledge_health() {
+  local port="$1"
+  local project="$2"
+
+  local response
+  response=$(curl -sf --max-time 1 --connect-timeout 0.5 \
+    "http://127.0.0.1:${port}/api/metrics/knowledge-health?project=${project}&window=10" 2>/dev/null) || return 0
+
+  if [[ -z "${response}" ]]; then
+    return 0
+  fi
+
+  if ! command -v jq &> /dev/null; then
+    return 0
+  fi
+
+  local indicator
+  indicator=$(echo "${response}" | jq -r '.indicator // empty' 2>/dev/null) || return 0
+
+  if [[ -n "${indicator}" ]]; then
+    echo ""
+    echo "${indicator}"
+    log "Knowledge health: indicator injected"
   fi
 }
 

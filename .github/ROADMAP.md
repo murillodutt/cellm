@@ -4,7 +4,7 @@
 
 ---
 
-## Current Version: 0.35.0
+## Current Version: 0.35.1
 
 **Released:** 2026-02-26
 **Status:** Production Ready
@@ -98,7 +98,7 @@ This roadmap focuses on **direct value to developers**, not technical infrastruc
 
 | Version | Date | Highlights |
 |---------|------|------------|
-| **0.35.0** | 2026-02-26 | Version de-inflation (EffVer), 42 skills, CELLM OS |
+| **0.35.1** | 2026-02-26 | Version de-inflation (EffVer), 42 skills, CELLM OS |
 | 3.3.1 | 2026-02-26 | Simplified manifests, auto-discovery, namespace fix |
 | 3.3.0 | 2026-02-25 | Skills-only architecture, 3 plugins, 38 skills total |
 | 2.0.5 | 2026-01-27 | Security audit, Oracle NPM, Compass UI |
