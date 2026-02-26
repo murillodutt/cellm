@@ -337,6 +337,24 @@ frontend-ui
 
 ---
 
+## Decisao 15: Fix Trailing Slash em plugin.json do cellm
+
+**Decisao:** Corrigir `"skills": "./skills/"` para `"skills": "./skills"` no `cellm/.claude-plugin/plugin.json`.
+
+**Problema:** A trailing slash causava dois efeitos:
+1. Skills registrados sem namespace — apareciam como `/status` ao inves de `/cellm:status`
+2. MCP server possivelmente nao inicializado corretamente junto com o plugin
+
+**Causa raiz:** O docops usava `"skills": "./skills"` (sem slash) e funcionava. O cellm usava `"skills": "./skills/"` (com slash) e quebrava. A trailing slash impede o Claude Code de resolver corretamente o namespace do plugin.
+
+**Correcao:** Alterada linha 24 de `plugin.json`:
+- Antes: `"skills": "./skills/"`
+- Depois: `"skills": "./skills"`
+
+**Cache stale:** A correcao no fonte nao propaga automaticamente. O cache em `~/.claude/plugins/cache/cellm/cellm/3.3.0/` mantem a versao antiga. Necessario reinstalar os plugins para atualizar o cache.
+
+---
+
 ## Proximos Passos
 
 1. Bump de versao no cellm plugin.json (3.2.2 → 3.3.0)
