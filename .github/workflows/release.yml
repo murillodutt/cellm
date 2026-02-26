@@ -35,7 +35,7 @@ jobs:
               echo "::error::Missing ${manifest}"
               exit 1
             fi
-            python3 -c "import json; d=json.load(open('${manifest}')); assert 'skills' in d" || exit 1
+            python3 -c "import json; d=json.load(open('${manifest}')); assert 'name' in d" || exit 1
             echo "[+] ${manifest} valid"
           done
 

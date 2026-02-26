@@ -4,9 +4,9 @@
 
 ---
 
-## Current Version: 3.3.0
+## Current Version: 3.3.1
 
-**Released:** 2026-02-25
+**Released:** 2026-02-26
 **Status:** Production Ready
 **Cost:** Free Forever (MIT License)
 
@@ -98,7 +98,8 @@ This roadmap focuses on **direct value to developers**, not technical infrastruc
 
 | Version | Date | Highlights |
 |---------|------|------------|
-| **3.3.0** | 2026-02-25 | Skills-only architecture, 3 plugins, 38 skills total |
+| **3.3.1** | 2026-02-26 | Simplified manifests, auto-discovery, namespace fix |
+| 3.3.0 | 2026-02-25 | Skills-only architecture, 3 plugins, 38 skills total |
 | 2.0.5 | 2026-01-27 | Security audit, Oracle NPM, Compass UI |
 | 2.0.0 | 2026-01-23 | Claude Code Plugin distribution |
 | 1.1.0 | 2026-01-20 | Legacy: Oracle dashboard, MCP integration |

@@ -20,7 +20,7 @@ Welcome to the official CELLM Plugin documentation.
 
 | Guide | Description |
 |-------|-------------|
-| [Commands](COMMANDS.md) | All workflow commands reference |
+| [Skills Reference](COMMANDS.md) | All workflow skills reference |
 | [Agents](AGENTS.md) | 4 specialized agents guide |
 | [Skills](SKILLS.md) | 7 framework skills guide |
 
@@ -91,7 +91,7 @@ docs/
 
 ## Version
 
-**Current Version:** 3.3.0
+**Current Version:** 3.3.1
 
 See [CHANGELOG](../CHANGELOG.md) for version history.
 

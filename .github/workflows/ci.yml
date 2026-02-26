@@ -43,7 +43,7 @@ jobs:
               echo "::error::Missing ${manifest}"
               exit 1
             fi
-            if ! python3 -c "import json; d=json.load(open('${manifest}')); assert 'skills' in d, 'missing skills key'"; then
+            if ! python3 -c "import json; d=json.load(open('${manifest}')); assert 'name' in d, 'missing name key'"; then
               echo "::error::Invalid or incomplete ${manifest}"
               exit 1
             fi

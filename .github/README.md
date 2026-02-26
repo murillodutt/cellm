@@ -13,7 +13,7 @@
 **The Result:** 3-5x faster development. Consistent code. Zero repetition.
 
 [![Install](https://img.shields.io/badge/Install-Now-blue.svg)](#quick-start)
-[![Version](https://img.shields.io/badge/version-3.3.0-blue.svg)](https://github.com/murillodutt/cellm/releases)
+[![Version](https://img.shields.io/badge/version-3.3.1-blue.svg)](https://github.com/murillodutt/cellm/releases)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](../LICENSE)
 [![Free](https://img.shields.io/badge/100%25-Free_Forever-brightgreen.svg)](#)
 
@@ -120,6 +120,6 @@
 
 We're developers who got tired of repeating ourselves to AI. So we built this.
 
-**Version:** 3.3.0 | **License:** MIT | **Cost:** Free Forever
+**Version:** 3.3.1 | **License:** MIT | **Cost:** Free Forever
 
 [Website](https://cellm.ai) | [GitHub](https://github.com/murillodutt/cellm) | [NPM](https://www.npmjs.com/package/@cellm/oracle)
