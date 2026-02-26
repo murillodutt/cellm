@@ -1,36 +1,24 @@
 ---
-description: Generate code from a specification or direct instruction. Reads spec context, checks for reusable code, implements following project patterns, and self-reviews for rule compliance.
-argument-hint: "[task description or spec-folder-path]"
-allowed-tools: Read, Grep, Glob, Write, Edit, Bash(npx *), Bash(bun *), AskUserQuestion
+description: Implement code from spec context in the database. Loads spec tree, picks next pending task, writes code, transitions state on completion.
+argument-hint: "[task description or check title]"
+allowed-tools: mcp__cellm-oracle__spec_get_tree, mcp__cellm-oracle__spec_search, mcp__cellm-oracle__spec_transition, mcp__cellm-oracle__spec_create_node, Read, Grep, Glob, Write, Edit, Bash(npx *), Bash(bun *), AskUserQuestion
 ---
 
-Spec folder path → implement next pending task. Direct description → implement directly. No argument → ask.
+# Implementation Thinking — Before Writing Code
 
-## Thinking Framework
+Context lives in the database. Load it before touching any file.
 
-1. **Absorb** — Read spec.md + tasks.md + patterns.md, or parse description + search codebase.
-2. **Reuse** — Search shared/, composables/, components/, server/utils/. >= 70% match = reuse/extend.
-3. **Constrain** — Load `cellm-core/patterns/core/` + `anti/` (always).
-4. **Implement** — Write code.
-5. **Self-review** — Typecheck: `npx tsc --noEmit` or `npx nuxt typecheck`. Update tasks.md if applicable.
+## Framework
 
-## Mandatory Rules
-
-| Rule | Constraint |
-|------|-----------|
-| No `any` | Use specific type or `unknown` |
-| No hardcoded colors | Semantic tokens only |
-| No sync I/O | async/await |
-| Composition API | `<script setup lang="ts">` |
-| Code limits | 1000 lines/file, 50/function |
-| Error handling | try/catch on every async op |
-| Return types | Explicit on every function |
+1. **Load** — `spec_get_tree` for the check. Absorb briefing (context/problem/principle), phases, tasks.
+2. **Pick** — First pending task in dependency order. Transition to `started`.
+3. **Reuse** — Search codebase first. >= 70% match = extend, don't duplicate.
+4. **Implement** — Write code. Follow project patterns and rules.
+5. **Close** — Typecheck passes → `spec_transition(completed)`. Fails → fix or `spec_transition(failed)`. Discovery → `spec_create_node(nodeType: "gap")`.
 
 ## NEVER
 
-- **`any` type** — use specific types or `unknown` with guards
-- **Hardcode colors** — semantic tokens only
-- **Create without reuse check** — search first, >= 70% = reuse
-- **Exceed limits** — 1000 lines/file, 50/function
-- **Skip error handling** — every async op needs try/catch
-- **Options API** — always `<script setup lang="ts">`
+- **Code without spec context** — always `spec_get_tree` first
+- **Forget state transitions** — started before, completed/failed after
+- **Swallow discoveries** — unexpected findings become gap nodes
+- **Skip typecheck** — `npx tsc --noEmit` or `npx nuxt typecheck` before completing

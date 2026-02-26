@@ -1,25 +1,31 @@
 ---
-description: Break a technical specification into actionable task groups sorted by dependency order. Reads spec.md and produces tasks.md with numbered groups and critical path.
-argument-hint: "[spec-folder-path]"
-allowed-tools: Read, Grep, Glob, Write, Edit, AskUserQuestion
+description: Break a requirement into dependency-ordered task groups in the spec database. Decomposes checks into phases and tasks with DAG ordering.
+argument-hint: "[check title or search term]"
+allowed-tools: mcp__cellm-oracle__spec_create_node, mcp__cellm-oracle__spec_get_tree, mcp__cellm-oracle__spec_add_edge, mcp__cellm-oracle__spec_search, mcp__cellm-oracle__spec_get_counters, AskUserQuestion
 ---
 
-Break spec.md into dependency-ordered task groups. Write `tasks.md` in the spec folder.
+# Decomposition Thinking — Before Splitting
 
-## Thinking Framework
+Find or create the check, then decompose into the database.
 
-1. **Locate** — Argument or most recent spec folder. Ask if ambiguous.
-2. **Read** — spec.md + plan.md for scope and order hints.
-3. **Decompose** — Groups follow dependency DAG:
-   - Foundation (schema, types, utils) → Data Layer (DB ops, API) → State (stores, composables) → UI (components, pages) → Integration (wiring, routing) → Polish (a11y, responsive, dark mode)
-   - Skip irrelevant groups. Add custom groups if needed.
-4. **Define** — Each task is atomic, testable, traceable to spec.
-5. **Present** — Show breakdown via AskUserQuestion. Allow adjustments.
-6. **Write** — `tasks.md` with status symbols: `[ ]` pending, `[~]` in progress, `[x]` done, `[!]` blocked, `[-]` cancelled.
+## Framework
+
+1. **Locate** — `spec_search` for existing check, or create one via `/cellm:spec create`.
+2. **Decompose** — Groups follow dependency DAG:
+   - Foundation (schema, types) → Data Layer (DB, API) → State (stores, composables) → UI (components, pages) → Integration (wiring) → Polish (a11y, responsive)
+   - Skip irrelevant layers. Add domain-specific groups.
+3. **Define** — Each task is atomic, testable, traceable. One imperative action per task.
+4. **Present** — Show breakdown. Allow adjustments via AskUserQuestion.
+5. **Create** — `spec_create_node` for each phase and task. `spec_add_edge` for cross-phase dependencies.
+
+## Atomicity Test
+
+Can this task be completed in one focused session? If no, split it.
+Can you verify it passed without running the whole system? If no, refine the action.
 
 ## NEVER
 
-- **Tasks without spec** — always read spec.md first
-- **Circular dependencies** — groups form a DAG
-- **Vague tasks** — every task has clear scope and done criteria
-- **God tasks** — if it takes more than one session, split it
+- **Markdown files** — tasks are `spec_create_node(nodeType: "task")`, not tasks.md
+- **Circular dependencies** — phases form a DAG, edges enforce it
+- **Vague tasks** — "implement feature" is not a task. "Create POST /api/x endpoint" is.
+- **God tasks** — if it crosses multiple files AND multiple concerns, split it

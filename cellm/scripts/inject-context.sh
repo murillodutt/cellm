@@ -83,6 +83,9 @@ main() {
   # DSE: Inject design system summary (non-critical)
   inject_design_system "${port}"
 
+  # Specs: Inject active spec summary (non-critical)
+  inject_specs "${port}" "${project}"
+
   exit 0
 }
 
@@ -182,6 +185,22 @@ inject_design_system() {
   echo "| Patterns | ${pattern_count} |"
 
   log "DSE: injected summary for ${theme} (${component_count} components, ${pattern_count} patterns)"
+}
+
+# Fetch active spec summary for session awareness
+inject_specs() {
+  local port="$1"
+  local project="$2"
+
+  local response
+  response=$(curl -sf --max-time 1 --connect-timeout 0.5 \
+    "http://127.0.0.1:${port}/api/spec/active-summary?project=${project}" 2>/dev/null) || return 0
+
+  if [[ -n "${response}" ]]; then
+    echo ""
+    echo "${response}"
+    log "Specs: injected active summary for ${project}"
+  fi
 }
 
 main "$@"
