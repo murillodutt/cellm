@@ -68,18 +68,14 @@ Thumbs.db
 # -----------------------------------------------------------------------------
 # CELLM Specific
 # -----------------------------------------------------------------------------
-# Instruções de desenvolvimento (local only)
+# Claude Code local config (never versioned)
 CLAUDE.md
-.claude
-# Logs e métricas locais (não versionados)
-~/.cellm/logs/
-~/.cellm/metrics/
+.claude/
 
-# Backup de profiles
-~/.cellm/profiles/*.backup.*
+# Development journal (local only)
+JORNAL.md
 
-# Documentação de desenvolvimento (privado, em cellm-private/)
-# Bloqueia /docs/ mas permite .github/docs/
+# Private docs (blocks /docs/ but allows .github/docs/)
 /docs/
 !/docs/.gitkeep
 

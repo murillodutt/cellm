@@ -20,6 +20,12 @@
       "version": "0.5.5",
       "source": "./docops",
       "description": "Documentation maintenance with LLM-first templates, drift control, and cleanup"
+    },
+    {
+      "name": "dse",
+      "version": "0.1.0",
+      "source": "./dse",
+      "description": "Design System Engine — visual design skills for distinctive, production-grade frontend interfaces"
     }
   ]
 }
