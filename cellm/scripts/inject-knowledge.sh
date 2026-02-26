@@ -7,12 +7,13 @@
 
 set -euo pipefail
 
-# Error handling
+# Error handling: log to file, never write stderr (causes "hook error" in Claude Code)
 cleanup() {
   local exit_code=$?
   if [[ $exit_code -ne 0 ]]; then
-    echo "[!] Script failed with exit code $exit_code" >&2
+    echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] [Knowledge] Script failed with exit code $exit_code" >> "${HOME}/.cellm/oracle-hook.log" 2>/dev/null || true
   fi
+  exit 0
 }
 
 trap cleanup EXIT

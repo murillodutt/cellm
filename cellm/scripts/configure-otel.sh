@@ -10,12 +10,13 @@
 
 set -euo pipefail
 
-# Error handling and cleanup
+# Error handling: log to file, never write stderr (causes "hook error" in Claude Code)
 cleanup() {
   local exit_code=$?
   if [[ $exit_code -ne 0 ]]; then
-    echo "[!] configure-otel.sh failed with exit code $exit_code" >&2
+    echo "[$(date -Iseconds)] configure-otel.sh failed with exit code $exit_code" >> "${HOME}/.cellm/otel-config.log" 2>/dev/null || true
   fi
+  exit 0
 }
 trap cleanup EXIT
 
@@ -31,8 +32,7 @@ log "configure-otel.sh called"
 # Check if OTEL is configured in the environment
 if [ -z "${OTEL_EXPORTER_OTLP_ENDPOINT:-}" ]; then
   log "OTEL not configured in environment"
-  # This message appears in Claude Code output on session start
-  echo "[!] OTEL telemetry not configured. Run '/cellm-init' option 7 > 6 to enable." >&2
+  log "OTEL not configured — user should run /cellm-init option 7 > 6"
 else
   log "OTEL configured: $OTEL_EXPORTER_OTLP_ENDPOINT"
 fi
