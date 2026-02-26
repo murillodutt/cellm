@@ -24,7 +24,7 @@ When you use Claude Code to develop software, it needs to understand your projec
 
 1. **Layered Knowledge**: Global rules + project-specific context
 2. **Stack-Optimized**: Surgically designed for Nuxt 4 + Vue + TypeScript + Tailwind + Drizzle
-3. **Skills-Only Architecture**: 38 skills across 3 plugins — context skills auto-load, workflow skills guide the full lifecycle
+3. **Skills-Only Architecture**: 42 skills across 3 plugins — context skills auto-load, workflow skills guide the full lifecycle
 4. **Specialized Agents**: Architect, Implementer, Reviewer, PM working in concert
 
 ---

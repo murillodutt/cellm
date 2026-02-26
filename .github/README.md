@@ -13,7 +13,7 @@
 **The Result:** 3-5x faster development. Consistent code. Zero repetition.
 
 [![Install](https://img.shields.io/badge/Install-Now-blue.svg)](#quick-start)
-[![Version](https://img.shields.io/badge/version-3.3.1-blue.svg)](https://github.com/murillodutt/cellm/releases)
+[![Version](https://img.shields.io/badge/version-0.35.0-blue.svg)](https://github.com/murillodutt/cellm/releases)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](../LICENSE)
 [![Free](https://img.shields.io/badge/100%25-Free_Forever-brightgreen.svg)](#)
 
@@ -23,7 +23,7 @@
 
 **3-5x Faster Development** — AI already knows your stack (Nuxt 4, Vue 3, TypeScript, Tailwind)
 
-**Consistent Quality** — 25 skills loaded automatically based on what you're editing
+**Consistent Quality** — 29 skills loaded automatically based on what you're editing
 
 **Zero Configuration** — Install once, works immediately
 
@@ -71,7 +71,7 @@
 
 | Guide | Description |
 |-------|-------------|
-| **[Skills](docs/SKILLS.md)** | 25 skills (7 auto-loaded + 18 workflow) |
+| **[Skills](docs/SKILLS.md)** | 29 skills (7 auto-loaded + 22 workflow) |
 | **[Agents](docs/AGENTS.md)** | 4 specialized agents |
 | **[Oracle](docs/ORACLE.md)** | Semantic search and memory |
 | **[Compass](docs/COMPASS.md)** | Visual dashboard |
@@ -91,7 +91,7 @@
 
 - **Oracle NPM Package** — Semantic search and memory ([details](docs/FEATURES.md#oracle---npm-package))
 - **Compass Dashboard** — Visual project navigation ([details](docs/FEATURES.md#compass-dashboard))
-- **25 Skills** — 7 auto-loaded context skills + 18 workflow skills ([details](docs/FEATURES.md#skills))
+- **42 Skills** — 7 auto-loaded context skills + 22 workflow skills + 12 docops + 1 dse ([details](docs/FEATURES.md#skills))
 - **4 Specialized Agents** — Architect, Implementer, Reviewer, PM ([details](docs/FEATURES.md#4-specialized-agents))
 - **DocOps Plugin (optional)** — 12 documentation maintenance skills ([details](../docops/README.md))
 - **DSE Plugin (optional)** — Visual design thinking framework ([details](../dse/README.md))
@@ -120,6 +120,6 @@
 
 We're developers who got tired of repeating ourselves to AI. So we built this.
 
-**Version:** 3.3.1 | **License:** MIT | **Cost:** Free Forever
+**Version:** 0.35.0 | **License:** MIT | **Cost:** Free Forever
 
 [Website](https://cellm.ai) | [GitHub](https://github.com/murillodutt/cellm) | [NPM](https://www.npmjs.com/package/@cellm/oracle)

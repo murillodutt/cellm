@@ -8,7 +8,7 @@ Complete reference for all CELLM skills and workflow invocations. CELLM uses a s
 
 ## Overview
 
-CELLM provides **25 workflow skills** (18 workflow + 7 context), **12 DocOps skills**, and **1 DSE skill**.
+CELLM provides **29 skills** (22 workflow + 7 context), **12 DocOps skills**, and **1 DSE skill**.
 
 **Context Skills** (auto-loaded): nuxt, vue, typescript, tailwind, pinia, drizzle, dse
 

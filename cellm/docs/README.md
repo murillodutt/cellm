@@ -16,7 +16,7 @@
 
 | Guide | Description |
 |-------|-------------|
-| [Skills Reference](commands.md) | All 25 skills (workflow + context) |
+| [Skills Reference](commands.md) | All 29 skills (workflow + context) |
 | [Agents](agents.md) | 4 specialized agents guide |
 
 ### Components
@@ -59,6 +59,6 @@
 
 ---
 
-**Current Version:** 3.3.1
+**Current Version:** 0.35.0
 
 [Back to Plugin Home](../README.md)

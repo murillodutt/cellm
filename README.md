@@ -8,7 +8,7 @@ Architecture: skills-only. No `commands/` directories. Every capability is a `sk
 
 ## cellm
 
-Context engineering for LLM-driven development. 25 skills, 4 agents, 6 hook events, Oracle integration.
+Context engineering for LLM-driven development. 29 skills, 4 agents, 6 hook events, Oracle integration.
 
 ### Context Skills (7) — auto-loaded by file path
 
@@ -24,7 +24,7 @@ Context engineering for LLM-driven development. 25 skills, 4 agents, 6 hook even
 
 Context skills stack: editing a `.vue` file loads **vue** + **tailwind** + **dse** simultaneously. Editing `server/api/*.ts` loads **nuxt** + **typescript**.
 
-### Workflow Skills (18) — invoked manually
+### Workflow Skills (22) — invoked manually
 
 | Skill | Invocation | What it does |
 |-------|-----------|-------------|
@@ -151,7 +151,7 @@ Design System Engine. Visual design skills for distinctive, production-grade fro
 
 ```
 .claude-plugin/marketplace.json    # Plugin registry
-cellm/                             # Core plugin (25 skills, 4 agents)
+cellm/                             # Core plugin (29 skills, 4 agents)
   .claude-plugin/plugin.json
   skills/                          # Flat: skills/{name}/SKILL.md
   agents/

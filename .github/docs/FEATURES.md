@@ -70,13 +70,13 @@ Compass provides real-time insights into your development process with an intuit
 
 ---
 
-## 25 Skills - CELLM Plugin
+## 29 Skills - CELLM Plugin
 
-**18 workflow + 7 context skills for complete development coverage.**
+**22 workflow + 7 context skills for complete development coverage.**
 
 CELLM skills are loaded automatically based on your project files. Skills use the `/cellm:name` namespace and work seamlessly with context skills that load based on file detection.
 
-### Workflow Skills (18)
+### Workflow Skills (22)
 
 | Skill | Purpose | Use When |
 |-------|---------|----------|
@@ -220,9 +220,9 @@ CELLM includes specialized agents that handle different aspects of development.
 
 ## 3 Plugins
 
-### CELLM Plugin - 25 Skills
+### CELLM Plugin - 29 Skills
 
-The core plugin providing 18 workflow skills and 7 context skills for complete development automation. Integrated into the Claude Code environment.
+The core plugin providing 22 workflow skills and 7 context skills for complete development automation. Integrated into the Claude Code environment.
 
 [Learn more about CELLM Skills](SKILLS.md)
 
@@ -331,7 +331,7 @@ CELLM underwent comprehensive security review to ensure production-grade quality
 ## Related Documentation
 
 - [Installation Guide](INSTALLATION.md) - Setup and configuration
-- [Skills Reference](SKILLS.md) - All 25 skills (18 workflow + 7 context)
+- [Skills Reference](SKILLS.md) - All 29 skills (22 workflow + 7 context)
 - [Agents Guide](AGENTS.md) - Specialized agents
 - [DocOps Plugin](../docops/README.md) - Documentation maintenance
 - [DSE Plugin](../dse/README.md) - Design thinking framework

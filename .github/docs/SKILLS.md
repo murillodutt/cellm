@@ -2,7 +2,7 @@
 
 > [Home](../README.md) > [Docs](INDEX.md) > **Skills**
 
-Complete guide to CELLM's 25 skills: 7 context skills and 18 workflow skills.
+Complete guide to CELLM's 29 skills: 7 context skills and 22 workflow skills.
 
 ---
 

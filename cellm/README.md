@@ -1,6 +1,6 @@
 # CELLM Plugin
 
-Context engineering for LLM-driven development. 25 skills, 4 agents, 6 hook events, Oracle integration.
+Context engineering for LLM-driven development. 29 skills, 4 agents, 6 hook events, Oracle integration.
 
 See [../README.md](../README.md) for full reference.
 
@@ -19,7 +19,7 @@ Optional Oracle setup:
 
 ```
 .claude-plugin/plugin.json   # Manifest
-skills/                      # 25 skills (18 workflow + 7 context, auto-loaded by path)
+skills/                      # 29 skills (22 workflow + 7 context, auto-loaded by path)
 agents/                      # architect, implementer, reviewer, project-manager
 hooks/hooks.json             # 6 event hooks
 scripts/                     # Hook scripts

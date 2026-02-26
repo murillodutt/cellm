@@ -4,7 +4,7 @@
 
 ---
 
-## Current Version: 3.3.1
+## Current Version: 0.35.0
 
 **Released:** 2026-02-26
 **Status:** Production Ready
@@ -13,7 +13,7 @@
 ### What's Delivered
 
 **3 Plugins, Skills-Only Architecture**
-- cellm: 25 skills (7 context auto-loaded + 18 workflow), 4 agents
+- cellm: 29 skills (7 context auto-loaded + 22 workflow), 4 agents
 - docops: 12 documentation maintenance skills, 1 agent
 - dse: 1 design thinking skill (frontend-ui)
 
@@ -40,17 +40,17 @@
 
 ## What's Next
 
-### v2.1.0 - Enhanced Patterns
+### v0.36.0 - Enhanced Patterns
 - Additional framework skills (Prisma, tRPC, Zod)
 - Pattern recommendation engine
 - Community pattern sharing
 
-### v2.2.0 - Oracle Intelligence
+### v0.37.0 - Oracle Intelligence
 - Improved semantic search accuracy
 - Multi-project context
 - Cross-repository pattern discovery
 
-### v3.0.0 - Community Tools
+### v1.0.0 - Community Tools
 - Build system for custom plugins
 - Test framework for skills and agents
 - Community contribution workflow
@@ -98,7 +98,8 @@ This roadmap focuses on **direct value to developers**, not technical infrastruc
 
 | Version | Date | Highlights |
 |---------|------|------------|
-| **3.3.1** | 2026-02-26 | Simplified manifests, auto-discovery, namespace fix |
+| **0.35.0** | 2026-02-26 | Version de-inflation (EffVer), 42 skills, CELLM OS |
+| 3.3.1 | 2026-02-26 | Simplified manifests, auto-discovery, namespace fix |
 | 3.3.0 | 2026-02-25 | Skills-only architecture, 3 plugins, 38 skills total |
 | 2.0.5 | 2026-01-27 | Security audit, Oracle NPM, Compass UI |
 | 2.0.0 | 2026-01-23 | Claude Code Plugin distribution |
