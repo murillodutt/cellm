@@ -1,6 +1,6 @@
 ---
 description: Interactive Oracle setup with menus and guided troubleshooting. Manages installation, status, updates, diagnostics, and uninstall of the Oracle worker daemon.
-argument-hint: "[install|status|update|doctor|restart|uninstall]"
+argument-hint: "[install|status|update|doctor|restart|uninstall|boundaries]"
 allowed-tools: Bash(curl *), Bash(bun *), Bash(npm *), Bash(brew *), Bash(apt *), Bash(jq *), Bash(lsof *), Bash(kill *), Bash(mkdir *), Bash(cat *), Bash(tail *), Bash(rm *), Read, Grep, Glob, AskUserQuestion
 ---
 
@@ -16,6 +16,7 @@ Without arguments, present interactive menu via AskUserQuestion. With argument, 
 | Doctor | 7-step diagnostic (deps, install, worker, port, DB, MCP, OTEL) — auto-fix with confirmation |
 | Restart | Kill and respawn worker |
 | Uninstall | Remove Oracle (confirm with default No) |
+| Boundaries | Scan project, generate boundary.yml for dependency enforcement |
 | Advanced | Port, data dir, logs, cache, config, OTEL |
 
 ## Install Flow
@@ -26,6 +27,15 @@ Without arguments, present interactive menu via AskUserQuestion. With argument, 
 4. Validate `/health` endpoint
 5. Create marker, offer MCP activation
 6. Offer OTEL setup (requires Claude Code restart)
+
+## Boundaries Flow
+
+1. Check if `boundary.yml` exists — skip if present
+2. Run `bootstrap-boundaries.sh` via Bash (stdin: `{"cwd":"<project_root>"}`)
+3. Read generated `boundary.yml`, show to user
+4. AskUserQuestion: keep as-is, customize, or cancel
+5. If customize: open in editor via Read + Edit
+6. Validate against `schemas/boundary.schema.json` if available
 
 ## Dev Mode
 
