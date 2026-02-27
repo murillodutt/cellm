@@ -1,5 +1,9 @@
 # Changelog
 
+> **Frozen.** Dynamic changelog is generated from specs and observations
+> in the Oracle dashboard (`/changelog`). This file preserves historical
+> entries from before the dynamic system (pre v0.35.0).
+
 All notable changes to CELLM Plugin will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
