@@ -29,3 +29,4 @@ Can you verify it passed without running the whole system? If no, refine the act
 - **Circular dependencies** — phases form a DAG, edges enforce it
 - **Vague tasks** — "implement feature" is not a task. "Create POST /api/x endpoint" is.
 - **God tasks** — if it crosses multiple files AND multiple concerns, split it
+- **Non-English content** — all phase titles, task actions, and descriptions must be in English

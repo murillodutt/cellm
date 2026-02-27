@@ -25,3 +25,4 @@ Before executing, classify:
 - **Create duplicate specs** — always `spec_search` first
 - **Force specs on trivial work** — the funnel is a filter, not a tax
 - **Create specs as markdown** — specs live in compass.db only
+- **Non-English spec content** — when creating checks, all content must be in English

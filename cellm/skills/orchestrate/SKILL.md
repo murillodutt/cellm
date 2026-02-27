@@ -27,3 +27,4 @@ Skip completed tasks. Resume from first pending. Show: "Resuming: X/Y completed.
 - **Silent failures** — blocked tasks get reason + user notification
 - **Auto-continue** — always confirm before next phase
 - **Lose progress** — every action transitions state in the DB
+- **Non-English spec content** — all status reports, gap descriptions, and new nodes must be in English

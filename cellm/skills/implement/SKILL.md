@@ -22,3 +22,4 @@ Context lives in the database. Load it before touching any file.
 - **Forget state transitions** — started before, completed/failed after
 - **Swallow discoveries** — unexpected findings become gap nodes
 - **Skip typecheck** — `npx tsc --noEmit` or `npx nuxt typecheck` before completing
+- **Non-English spec content** — gap and decision node titles/descriptions must be in English

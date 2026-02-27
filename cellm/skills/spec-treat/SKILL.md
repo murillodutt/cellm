@@ -44,3 +44,4 @@ Keep states as-is. Show progress. Suggest re-running to continue.
 - **Auto-complete tasks** — always ask user to confirm outcome
 - **Lose gaps** — every discovery creates a gap node
 - **Forget state transitions** — every action must transition via MCP
+- **Non-English spec content** — all node titles, gap descriptions, and verification notes must be in English

@@ -37,3 +37,4 @@ Project: always `git rev-parse --show-toplevel` → last segment.
 - **Create without all 3 briefing fields** — Context, Problem, Principle are mandatory
 - **Skip project detection** — always derive from git root
 - **Vague tasks** — every task action is imperative and atomic
+- **Write in any language other than English** — all titles, briefings, actions, and descriptions must be in English for optimal LLM processing and tokenization efficiency
