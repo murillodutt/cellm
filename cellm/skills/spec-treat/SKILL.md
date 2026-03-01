@@ -12,13 +12,21 @@ Find a check, work through every phase and task sequentially. Transition states 
 2. **Load** — `spec_get_tree(path, format: "json")`.
 3. **Brief** — Show Context / Problem / Principle + progress.
 4. **Activate** — If pending: `spec_transition(event: "started")`.
-5. **Per phase** — Transition to active/in_progress.
+5. **Per phase** — Transition to active/in_progress. Read phase `body.briefing` and `body.specialist`. Announce: specialist role, objective, and constraints before executing tasks.
 6. **Per task:**
    - Show task → transition to in_progress
    - Execute: fileRef → Read/Edit. Action → Bash/Grep. Evaluation → research + report.
+   - When modifying a component, also read its parent page (`grep -rn "<ComponentName" pages/`) to understand usage context.
+   - **Audit task gate**: if the task title starts with "Scan", "Audit", "Review", or "Check", it requires a verification artifact before completion:
+     - Option A: `spec_add_verification(method: "grep")` with result pass/fail proving the assertion.
+     - Option B: `record_observation` documenting findings (even if "no changes needed").
+     - Without artifact → task stays in `needs_work`. No "I looked and it was fine" without evidence.
    - AskUserQuestion: completed / needs work / blocked / skip / found gap
    - Transition accordingly. Gaps → `spec_create_node(nodeType: "gap")`.
-7. **Phase done** — All tasks complete → transition phase to completed.
+7. **Phase done (close gate)** — Before transitioning phase to completed:
+   - Run audit grep on all phase fileRefs: semantic token leaks, pattern violations.
+   - Run event gotcha check (see verify skill table) on all .vue files in the phase.
+   - All clear → transition phase to completed. Findings → create gap nodes, keep phase in_progress.
 8. **All done** — `spec_get_counters` → summary table → transition check to completed.
 
 ## Re-entry
