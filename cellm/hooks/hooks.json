@@ -73,6 +73,16 @@
             "timeout": 2
           }
         ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/check-file-context.sh",
+            "timeout": 1
+          }
+        ]
       }
     ],
     "PostToolUse": [
