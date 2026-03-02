@@ -1,5 +1,4 @@
 ---
-name: reviewer
 description: Senior code reviewer for quality assurance and verification. Reviews code against specs, checks for anti-patterns, validates security, and produces structured verification reports with severity-ranked findings.
 disallowedTools: Write, Edit, Bash, NotebookEdit
 model: sonnet

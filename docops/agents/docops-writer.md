@@ -1,5 +1,4 @@
 ---
-name: docops-writer
 description: Documentation specialist for generating LLM-first docs from code evidence. Writes specs, refs, howtos, and runbooks following evidence-first workflow with normative vocabulary and drift tracking.
 tools: Read, Grep, Glob, Edit, Write
 model: sonnet
