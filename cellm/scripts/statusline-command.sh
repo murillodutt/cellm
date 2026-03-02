@@ -4,9 +4,28 @@
 # Shows: model, context bar, cost, project, branch, duration
 # Stack alerts shown whenever pending updates > 0
 
-input=$(head -c 65536)
+set -euo pipefail
 
-MODEL=$(echo "$input" | jq -r '.model.display_name')
+cleanup() {
+  exit 0
+}
+trap cleanup EXIT
+
+input=""
+if [[ ! -t 0 ]]; then
+  input=$(head -c 65536)
+fi
+
+if [[ -z "$input" ]]; then
+  exit 0
+fi
+
+if ! command -v jq >/dev/null 2>&1; then
+  echo "jq required"
+  exit 0
+fi
+
+MODEL=$(echo "$input" | jq -r '.model.display_name // "unknown"')
 DIR=$(echo "$input" | jq -r '.workspace.current_dir')
 COST=$(echo "$input" | jq -r '.cost.total_cost_usd // 0')
 PCT=$(echo "$input" | jq -r '.context_window.used_percentage // 0' | cut -d. -f1)

@@ -6,6 +6,8 @@
 # 2. Global npm package @cellm-ai/oracle (production)
 # 3. Plugin-relative path (monorepo development)
 
+set -euo pipefail
+
 CELLM_CONFIG="$HOME/.cellm/cellm.json"
 MCP_SERVER_PATH=""
 
