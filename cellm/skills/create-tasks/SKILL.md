@@ -1,5 +1,6 @@
 ---
 description: Break a requirement into dependency-ordered task groups in the spec database. Decomposes checks into phases and tasks with DAG ordering.
+user-invocable: true
 argument-hint: "[check title or search term]"
 allowed-tools: mcp__cellm-oracle__spec_create_node, mcp__cellm-oracle__spec_get_tree, mcp__cellm-oracle__spec_add_edge, mcp__cellm-oracle__spec_search, mcp__cellm-oracle__spec_get_counters, AskUserQuestion
 ---

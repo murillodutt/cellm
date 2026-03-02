@@ -1,5 +1,6 @@
 ---
 description: Deep versioning guidance for any project. Use when deciding versioning strategy, evaluating SemVer vs EffVer vs CalVer, setting up release automation, or versioning AI artifacts (prompts, models, datasets).
+user-invocable: true
 argument-hint: "[question or project context]"
 allowed-tools: Read, Grep, Glob, AskUserQuestion
 ---

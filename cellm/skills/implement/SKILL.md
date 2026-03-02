@@ -1,5 +1,6 @@
 ---
 description: Implement code from spec context in the database. Loads spec tree, picks next pending task, writes code, transitions state on completion.
+user-invocable: true
 argument-hint: "[task description or check title]"
 allowed-tools: mcp__cellm-oracle__spec_get_tree, mcp__cellm-oracle__spec_search, mcp__cellm-oracle__spec_transition, mcp__cellm-oracle__spec_create_node, mcp__plugin_cellm_cellm-oracle__quality_gate, Read, Grep, Glob, Write, Edit, Bash(npx *), Bash(bun *), AskUserQuestion
 ---

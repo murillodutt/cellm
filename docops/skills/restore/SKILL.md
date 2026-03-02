@@ -1,5 +1,6 @@
 ---
 description: Restore an archived document back to active status. Handles conflict resolution when the original path is occupied, preserves lifecycle metadata.
+user-invocable: true
 argument-hint: "<file>"
 paths:
   - "**/.claude/docops.json"

@@ -1,5 +1,6 @@
 ---
 description: Inject relevant patterns into the current context. Analyzes work context to suggest matching patterns, or directly injects specified pattern files.
+user-invocable: true
 argument-hint: "[pattern-path...]"
 allowed-tools: Read, Grep, Glob, AskUserQuestion
 ---

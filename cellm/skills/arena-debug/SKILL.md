@@ -1,5 +1,6 @@
 ---
 description: Runtime debugging — automated iterative log-and-restart diagnostic agent. Instruments code with console.log markers, reproduces errors, analyzes output, and iterates up to 3 times before generating a diagnostic report.
+user-invocable: true
 argument-hint: "[--mode auto|interactive|observe] [--resume <id>] <error description or stack trace>"
 allowed-tools: Bash(timeout *), Bash(grep *), Bash(kill *), Bash(lsof *), Bash(git *), Bash(curl *), Bash(cd *), Bash(npx *), Bash(sleep *), Bash(rm *), Read, Grep, Glob, Edit, Write, AskUserQuestion
 context: fork

@@ -1,5 +1,6 @@
 ---
 description: Validate and maintain freshness status of code evidence files. Checks last_verified dates, transitions status between fresh/stale/expired, and creates gaps for expired evidence.
+user-invocable: true
 argument-hint: "[docRoot] [--update]"
 paths:
   - "**/.claude/docops.json"

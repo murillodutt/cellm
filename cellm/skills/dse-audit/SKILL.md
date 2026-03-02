@@ -35,3 +35,9 @@ DSE Audit Report — {project}
 | Hardcoded hex colors in .vue | high | 3 files |
 | Missing semantic tokens | low | 0 |
 ```
+
+## NEVER
+
+- **NEVER modify `.vue` files** — this is a read-only audit, do not "fix" alignment issues automatically.
+- **NEVER alter DSE decisions** — report gaps, but do not hallucinate or ingest new decisions during an audit.
+- **NEVER skip the structured table output** — always present findings in the exact format requested.

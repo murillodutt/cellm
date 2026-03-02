@@ -1,5 +1,6 @@
 ---
 description: Rebuild and maintain the patterns index file (index.yml). Scans cellm-core/patterns/ for new, deleted, or changed files and updates the index with one-line descriptions.
+user-invocable: true
 argument-hint: "[search query]"
 allowed-tools: Read, Grep, Glob, Write, Edit, AskUserQuestion
 ---

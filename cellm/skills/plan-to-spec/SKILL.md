@@ -1,5 +1,6 @@
 ---
 description: Convert a Claude Code plan file into a CellmOS spec check with phases and tasks. Reads a plan markdown, extracts structure, creates the check and decomposes into the database.
+user-invocable: true
 argument-hint: "<path-to-plan.md>"
 allowed-tools: mcp__cellm-oracle__spec_create_node, mcp__cellm-oracle__spec_transition, mcp__cellm-oracle__spec_add_edge, mcp__cellm-oracle__spec_search, mcp__cellm-oracle__spec_get_tree, mcp__cellm-oracle__spec_get_counters, Read, Grep, Glob, Bash(git rev-parse *), AskUserQuestion
 ---

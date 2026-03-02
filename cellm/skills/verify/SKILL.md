@@ -1,5 +1,6 @@
 ---
 description: Quality gate validation. Reviews code against spec compliance, mandatory rules, security checklist, and pattern adherence. Produces a verification report with findings by severity.
+user-invocable: true
 argument-hint: "[spec-folder-path or file path]"
 allowed-tools: Read, Grep, Glob, Bash(npx *), Bash(bun *), AskUserQuestion
 ---
