@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
-# CELLM - Check File Context (PreToolUse hook)
-# Detects "Related files" headers in files about to be edited.
-# If found, reminds the AI to read all related files before modifying.
+# CELLM - Check File Context (PostToolUse hook)
+# Detects "Related files" headers in files just edited.
+# If found, reminds the AI to read all related files before continuing.
 #
 # Pure local — no Oracle dependency, no network calls.
 # Designed for 1s timeout: head + grep on local filesystem.
 #
 # Related files (File Context System):
 #  - cellm-plugin/cellm/skills/file-context/SKILL.md  — passive skill teaching header format
-#  - cellm-plugin/cellm/hooks/hooks.json               — hook registration (PreToolUse)
+#  - cellm-plugin/cellm/hooks/hooks.json               — hook registration (PostToolUse)
 
 set -euo pipefail
 
@@ -56,12 +56,12 @@ if [[ -z "${related_files}" ]]; then
   exit 0
 fi
 
-# Output PreToolUse hook response with reminder
+# Output PostToolUse hook response with reminder
 jq -n \
   --arg context "[FILE-CONTEXT] This file has Related files. Read them before continuing: ${related_files}" \
   '{
     hookSpecificOutput: {
-      hookEventName: "PreToolUse",
+      hookEventName: "PostToolUse",
       additionalContext: $context
     }
   }'
