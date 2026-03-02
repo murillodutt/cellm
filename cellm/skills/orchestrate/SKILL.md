@@ -16,7 +16,7 @@ The spec tree is the execution plan. Read it, follow it, update it.
 4. **Execute (3-stage pipeline per phase):**
    - **Stage 1 — Implement**: pass phase briefing + specialist to implementation agents so they adopt the correct persona and respect constraints. Agents execute tasks → transition to completed/failed.
    - **Stage 2 — Audit**: dedicated agent scans phase output for pattern violations, semantic token leaks, type errors, and architecture drift. Findings → gap nodes or fix inline.
-   - **Stage 3 — Verify**: dedicated agent runs event gotcha grep (see verify skill table), typecheck baseline diff, and security checklist. PASS/CONDITIONAL/FAIL verdict.
+   - **Stage 3 — Verify**: dedicated agent runs `quality_gate({ scope: 'all' })`, event gotcha grep (see verify skill table), typecheck baseline diff, and security checklist. PASS/CONDITIONAL/FAIL verdict.
    - Phase transitions to completed ONLY after Stage 3 = PASS or CONDITIONAL.
    - Stage 3 FAIL → create gap nodes for findings, loop back to Stage 1 for fixes, then re-run Stage 2+3.
 5. **Checkpoint** — Phase done (all 3 stages passed) → ask "Continue to next phase?" via AskUserQuestion.
@@ -31,5 +31,5 @@ Skip completed tasks. Resume from first pending. Show: "Resuming: X/Y completed.
 - **Skip dependency order** — edges define the DAG, respect it
 - **Silent failures** — blocked tasks get reason + user notification
 - **Auto-continue** — always confirm before next phase
-- **Lose progress** — every action transitions state in the DB
+- **Lose progress** — every action transitions state in the DB. Auto-chain supported: `completed`/`failed` from `pending`/`active` resolves intermediate hops automatically.
 - **Non-English spec content** — all status reports, gap descriptions, and new nodes must be in English

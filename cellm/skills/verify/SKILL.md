@@ -8,9 +8,9 @@ Spec folder → verify all files from spec. File path → verify one file. No ar
 
 ## Verification Pipeline
 
-1. **Automated (baseline diffing)** — Run typecheck twice:
-   - `npx nuxt typecheck` (or `npx tsc --noEmit`) on HEAD → capture error list A.
-   - `git stash && npx nuxt typecheck` on HEAD~1 → capture error list B. `git stash pop`.
+1. **Automated (baseline diffing)** — Run typecheck via `quality_gate({ scope: 'typecheck' })` (Oracle offline → fallback to `npx nuxt typecheck` or `npx tsc --noEmit`):
+   - Typecheck on HEAD → capture error list A.
+   - `git stash && quality_gate({ scope: 'typecheck' })` on HEAD~1 → capture error list B. `git stash pop`.
    - Diff: errors in A but NOT in B = **NEW errors** → findings (CRITICAL).
    - Errors in both A and B = **pre-existing** → INFO ("X pre-existing typecheck errors, not introduced by this change").
    - Edge case: first commit or no HEAD~1 → all errors are findings.
