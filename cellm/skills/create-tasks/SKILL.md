@@ -18,6 +18,32 @@ Find or create the check, then decompose into the database.
 3. **Define** — Each task is atomic, testable, traceable. One imperative action per task.
 4. **Present** — Show breakdown. Allow adjustments via AskUserQuestion.
 5. **Create** — `spec_create_node` for each phase and task. `spec_add_edge` for cross-phase dependencies.
+6. **Edges** — After all phases exist, create DAG edges (see [Edge Creation](#edge-creation)).
+
+## Edge Creation
+
+Cross-phase ordering uses `spec_add_edge`. Call it **after** all phases are created.
+
+```
+spec_add_edge({
+  project: "project-name",
+  sourceId: "phase-that-blocks",   // must complete first
+  targetId: "phase-that-waits",    // cannot start until source completes
+  edgeType: "blocks"
+})
+```
+
+| edgeType | Meaning | When to use |
+|----------|---------|-------------|
+| `blocks` | source must complete before target starts | Phase ordering (P1 blocks P2) |
+| `depends_on` | source cannot start until target completes | Inverse of blocks (P2 depends_on P1) |
+| `implements` | source task implements target requirement | Task-to-requirement traceability |
+| `tests` | source verification tests target task | Verification-to-task link |
+| `related` | informational link | Cross-reference without ordering |
+
+`dependsOnPhase` in phase body = **informational context** for the specialist.
+`spec_add_edge` = **enforceable DAG constraint** in the database.
+Use both: body for human context, edge for machine enforcement.
 
 ## Phase Enrichment
 

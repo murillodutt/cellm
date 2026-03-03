@@ -9,6 +9,10 @@ allowed-tools: mcp__cellm-oracle__spec_create_node, mcp__cellm-oracle__spec_tran
 
 A plan is a dense intention document. Extract its atoms into the database.
 
+## Mantra (ALL pass)
+> "Verify before you act, take the best path — never the first, and document everything, because if it's not documented, it doesn't exist. No shortcuts. No exceptions."
+
+
 ## Framework
 
 1. **Read** — Read the plan file from the provided path. Understand scope, files, order, and verification criteria.
@@ -32,7 +36,16 @@ A plan is a dense intention document. Extract its atoms into the database.
    - `fileRef`: string, single most relevant file path (not an array — multi-file work = split into separate tasks)
    - `diffExpected`: true when modifying existing files
 9. **Create Gaps and Decisions** — Scan plan for unresolved questions → `spec_create_node(nodeType: "gap", parentId: checkId)` with `{ discovery, fix? }`. Explicit architectural choices → `spec_create_node(nodeType: "decision", parentId: checkId)` with `{ choice, rationale }`.
-10. **Edges** — `spec_add_edge` for cross-phase dependencies if needed.
+10. **Edges** — After all phases exist, create DAG edges:
+    ```
+    spec_add_edge({
+      project: "project-name",
+      sourceId: "phase-that-blocks",   // must complete first
+      targetId: "phase-that-waits",    // cannot start until source completes
+      edgeType: "blocks"
+    })
+    ```
+    Use `blocks` for "P1 must finish before P2 starts", `depends_on` for the inverse direction. `dependsOnPhase` in body is informational context; `spec_add_edge` is the enforceable constraint.
 11. **Summary** — `spec_get_counters` → show final structure to user.
 12. **Next Step** — Tell the user: "Check created and activated. Next: `/cellm:implement` to work task-by-task, `/cellm:spec-treat` for interactive step-by-step, or `/cellm:orchestrate` to execute all phases with agent delegation."
 
