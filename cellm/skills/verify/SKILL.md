@@ -2,7 +2,7 @@
 description: Quality gate validation. Reviews code against spec compliance, mandatory rules, security checklist, and pattern adherence. Produces a verification report with findings by severity.
 user-invocable: true
 argument-hint: "[spec-folder-path or file path]"
-allowed-tools: Read, Grep, Glob, Bash(npx *), Bash(bun *), AskUserQuestion
+allowed-tools: Read, Grep, Glob, Bash(npx *), Bash(bun *), mcp__plugin_cellm_cellm-oracle__dse_search, mcp__plugin_cellm_cellm-oracle__dse_get, AskUserQuestion
 ---
 
 Spec folder → verify all files from spec. File path → verify one file. No argument → verify `git diff HEAD~1`.
@@ -19,8 +19,9 @@ Spec folder → verify all files from spec. File path → verify one file. No ar
 2. **Quality** — No `any`, no `console.log`, limits (1000/file, 50/function), explicit return types.
 3. **Spec compliance (fileRef-scoped)** — Acceptance criteria, data models, API contracts, component props/emits. When the spec node has `fileRefs`, scope all greps to those specific files — never glob globally when fileRefs are available. Each fileRef gets its own verification pass.
 4. **Usage context** — When verifying a component, also check parent pages that render it: `grep -rn "<ComponentName" pages/`. A feature can be architecturally split across parent + child — verify both before claiming "missing". If a feature is found in the parent page but not the component itself, it is NOT missing.
-5. **Standards** — Composition API, semantic tokens, dark mode, mobile-first, error handling.
-6. **Framework Event Gotchas** — Grep scoped files for incorrect event bindings. These compile and render but silently fail at runtime:
+5. **DSE Compliance** — `dse_search` for decisions relevant to modified files. Verify: components match DSE `avoid` rules (e.g., no DsKpiCard when MiniKpiGrid is mandated), breakpoints follow mobile-first pattern, SearchInline used instead of inline inputs, readonly props for option arrays. DSE violation = WARNING.
+6. **Standards** — Composition API, semantic tokens, dark mode, mobile-first, error handling.
+7. **Framework Event Gotchas** — Grep scoped files for incorrect event bindings. These compile and render but silently fail at runtime:
 
 | Component | Wrong event | Correct event |
 |-----------|-------------|---------------|
@@ -31,8 +32,8 @@ Spec folder → verify all files from spec. File path → verify one file. No ar
 | UModal | `@close` | `@update:open` |
 
    For each entry: grep the wrong event in scoped files. Match = CRITICAL finding ("silent behavioral bug — handler never fires").
-7. **Patterns** — Anti-patterns avoided (`patterns/anti/`), project patterns followed (`patterns/core/`), no duplicated shared logic.
-8. **Security** — Zod on external input, no raw SQL, no unsanitized v-html, no client-exposed secrets, auth on protected endpoints.
+8. **Patterns** — Anti-patterns avoided (`patterns/anti/`), project patterns followed (`patterns/core/`), no duplicated shared logic.
+9. **Security** — Zod on external input, no raw SQL, no unsanitized v-html, no client-exposed secrets, auth on protected endpoints.
 
 ## Report Format
 
@@ -54,6 +55,7 @@ Spec folder → verify all files from spec. File path → verify one file. No ar
 
 ## NEVER
 
+- **Skip DSE compliance check** — always `dse_search` for design decisions relevant to modified files
 - **Pass with CRITICAL** — CRITICAL always means FAIL
 - **Skip typecheck** — automated first, manual second
 - **Invent findings** — every finding has file:line reference

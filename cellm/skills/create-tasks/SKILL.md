@@ -2,7 +2,7 @@
 description: Break a requirement into dependency-ordered task groups in the spec database. Decomposes checks into phases and tasks with DAG ordering.
 user-invocable: true
 argument-hint: "[check title or search term]"
-allowed-tools: mcp__cellm-oracle__spec_create_node, mcp__cellm-oracle__spec_get_tree, mcp__cellm-oracle__spec_add_edge, mcp__cellm-oracle__spec_search, mcp__cellm-oracle__spec_get_counters, AskUserQuestion
+allowed-tools: mcp__cellm-oracle__spec_create_node, mcp__cellm-oracle__spec_get_tree, mcp__cellm-oracle__spec_add_edge, mcp__cellm-oracle__spec_search, mcp__cellm-oracle__spec_get_counters, mcp__plugin_cellm_cellm-oracle__dse_search, mcp__plugin_cellm_cellm-oracle__dse_get, AskUserQuestion
 ---
 
 # Decomposition Thinking — Before Splitting
@@ -53,7 +53,7 @@ When creating phases via `spec_create_node`, enrich the body with `briefing` and
 - `objective`: 1 imperative sentence — what the phase delivers concretely
 - `successCriteria`: deterministic exit — a grep, test, or typecheck command that proves completion
 - `keyFiles`: files the specialist should READ before starting (context files, not modification targets)
-- `constraints`: hard limits derived from check.principle
+- `constraints`: hard limits derived from check.principle and DSE decisions (`dse_search` for UI/component phases to surface avoid rules and existing components)
 
 **specialist** (provide for every phase):
 - `role`: inferred from work type — component/page work = "frontend", API/endpoint = "backend", schema/migration = "database", config/deploy = "infra", scan/verify = "audit"
@@ -96,5 +96,6 @@ After decomposition, if `check.principle` contains "mobile-first" or target is a
 - **Markdown files** — tasks are `spec_create_node(nodeType: "task")`, not tasks.md
 - **Circular dependencies** — phases form a DAG, edges enforce it
 - **Vague tasks** — "implement feature" is not a task. "Create POST /api/x endpoint" is.
+- **Ignore DSE for UI phases** — `dse_search` before defining constraints for component/page phases to include avoid rules and existing component mandates
 - **God tasks** — if it crosses multiple files AND multiple concerns, split it
 - **Non-English content** — all phase titles, task actions, and descriptions must be in English

@@ -2,7 +2,7 @@
 description: Treat a spec check — work through phases and tasks sequentially, transitioning states, executing actions, recording gaps, and running verifications.
 user-invocable: true
 argument-hint: "query: check title or search term"
-allowed-tools: mcp__cellm-oracle__spec_create_node, mcp__cellm-oracle__spec_transition, mcp__cellm-oracle__spec_search, mcp__cellm-oracle__spec_get_tree, mcp__cellm-oracle__spec_add_edge, mcp__cellm-oracle__spec_add_verification, mcp__cellm-oracle__spec_get_counters, AskUserQuestion, Read, Edit, Write, Bash, Grep, Glob
+allowed-tools: mcp__cellm-oracle__spec_create_node, mcp__cellm-oracle__spec_transition, mcp__cellm-oracle__spec_search, mcp__cellm-oracle__spec_get_tree, mcp__cellm-oracle__spec_add_edge, mcp__cellm-oracle__spec_add_verification, mcp__cellm-oracle__spec_get_counters, mcp__plugin_cellm_cellm-oracle__dse_search, mcp__plugin_cellm_cellm-oracle__dse_get, AskUserQuestion, Read, Edit, Write, Bash, Grep, Glob
 ---
 
 Find a check, work through every phase and task sequentially. Transition states via MCP.
@@ -13,10 +13,10 @@ Find a check, work through every phase and task sequentially. Transition states 
 2. **Load** — `spec_get_tree(path, format: "json")`.
 3. **Brief** — Show Context / Problem / Principle + progress.
 4. **Activate** — If pending: `spec_transition(event: "started")`.
-5. **Per phase** — Transition to active/in_progress. Read phase `body.briefing` and `body.specialist`. Announce: specialist role, objective, and constraints before executing tasks.
+5. **Per phase** — Transition to active/in_progress. Read phase `body.briefing` and `body.specialist`. `dse_search` for phase-relevant decisions (layout, components, patterns, breakpoints). Announce: specialist role, objective, constraints, and applicable DSE decisions before executing tasks.
 6. **Per task:**
    - Show task → `spec_transition(event: "started")` to activate, then `spec_transition(event: "started")` again for in_progress. (Or call `completed` directly when done — the service auto-chains through intermediate states.)
-   - Execute: fileRef → Read/Edit. Action → Bash/Grep. Evaluation → research + report.
+   - Execute: fileRef → Read/Edit. Action → Bash/Grep. Evaluation → research + report. For UI tasks: consult DSE `avoid` rules and `decisions[]` — use existing components, never recreate.
    - When modifying a component, also read its parent page (`grep -rn "<ComponentName" pages/`) to understand usage context.
    - **Audit task gate**: if the task title starts with "Scan", "Audit", "Review", or "Check", it requires a verification artifact before completion:
      - Option A: `spec_add_verification(method: "grep")` with result pass/fail proving the assertion.
@@ -51,6 +51,7 @@ Keep states as-is. Show progress. Suggest re-running to continue.
 ## NEVER
 
 - **Skip briefing** — always show Context/Problem/Principle before starting
+- **Skip DSE consultation** — `dse_search` per phase for relevant decisions, avoid rules, and existing components before writing UI code
 - **Auto-complete tasks** — always ask user to confirm outcome
 - **Lose gaps** — every discovery creates a gap node
 - **Forget state transitions** — every action must transition via MCP. Auto-chain supported: `completed` from `pending`/`active` resolves intermediate hops automatically.

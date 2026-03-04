@@ -2,7 +2,7 @@
 description: Convert a Claude Code plan file into a CellmOS spec check with phases and tasks. Reads a plan markdown, extracts structure, creates the check and decomposes into the database.
 user-invocable: true
 argument-hint: "<path-to-plan.md>"
-allowed-tools: mcp__cellm-oracle__spec_create_node, mcp__cellm-oracle__spec_transition, mcp__cellm-oracle__spec_add_edge, mcp__cellm-oracle__spec_search, mcp__cellm-oracle__spec_get_tree, mcp__cellm-oracle__spec_get_counters, Read, Grep, Glob, Bash(git rev-parse *), AskUserQuestion
+allowed-tools: mcp__cellm-oracle__spec_create_node, mcp__cellm-oracle__spec_transition, mcp__cellm-oracle__spec_add_edge, mcp__cellm-oracle__spec_search, mcp__cellm-oracle__spec_get_tree, mcp__cellm-oracle__spec_get_counters, mcp__plugin_cellm_cellm-oracle__dse_search, mcp__plugin_cellm_cellm-oracle__dse_get, Read, Grep, Glob, Bash(git rev-parse *), AskUserQuestion
 ---
 
 # Plan-to-Spec Thinking — Before Converting
@@ -23,20 +23,21 @@ A plan is a dense intention document. Extract its atoms into the database.
    - `problem`: what is wrong or missing, one sentence
    - `principle`: the guiding rule for all decisions, one sentence
    - If the plan is not in English, translate all extracted content to English. The DB is always English regardless of plan language.
-5. **Present** — Show the extracted briefing + proposed phase breakdown to the user via AskUserQuestion. Allow adjustments before creating anything.
-6. **Create Check** — `spec_create_node(nodeType: "check")` with the briefing body. Then `spec_transition(event: "started")` to activate it.
-7. **Create Phases** — One `spec_create_node(nodeType: "phase", parentId: checkId)` per work group. Each phase MUST include:
+5. **DSE Alignment** — `dse_search` for decisions relevant to the plan scope (layout, components, patterns, breakpoints). Validate that the extracted `principle` does not contradict existing DSE decisions. Surface applicable `avoid` rules and existing components that phases should reuse. Include relevant DSE decisions in phase `constraints`.
+6. **Present** — Show the extracted briefing + proposed phase breakdown + applicable DSE decisions to the user via AskUserQuestion. Allow adjustments before creating anything.
+7. **Create Check** — `spec_create_node(nodeType: "check")` with the briefing body. Then `spec_transition(event: "started")` to activate it.
+8. **Create Phases** — One `spec_create_node(nodeType: "phase", parentId: checkId)` per work group. Each phase MUST include:
    - `description`: 1-sentence summary of what the phase delivers (required)
-   - `briefing`: objective, successCriteria, keyFiles, constraints
+   - `briefing`: objective, successCriteria, keyFiles, constraints (include DSE decisions from step 5)
    - `specialist`: role, focus, tools
    - `dependsOnPhase` in body when ordering matters
    - DAG: Foundation → Data Layer → UI → Integration → Polish (skip irrelevant layers, add domain-specific)
-8. **Create Tasks** — One `spec_create_node(nodeType: "task", parentId: phaseId)` per atomic action. Each task has:
+9. **Create Tasks** — One `spec_create_node(nodeType: "task", parentId: phaseId)` per atomic action. Each task has:
    - `action`: imperative verb, one concern per task
    - `fileRef`: string, single most relevant file path (not an array — multi-file work = split into separate tasks)
    - `diffExpected`: true when modifying existing files
-9. **Create Gaps and Decisions** — Scan plan for unresolved questions → `spec_create_node(nodeType: "gap", parentId: checkId)` with `{ discovery, fix? }`. Explicit architectural choices → `spec_create_node(nodeType: "decision", parentId: checkId)` with `{ choice, rationale }`.
-10. **Edges** — After all phases exist, create DAG edges:
+10. **Create Gaps and Decisions** — Scan plan for unresolved questions → `spec_create_node(nodeType: "gap", parentId: checkId)` with `{ discovery, fix? }`. Explicit architectural choices → `spec_create_node(nodeType: "decision", parentId: checkId)` with `{ choice, rationale }`.
+11. **Edges** — After all phases exist, create DAG edges:
     ```
     spec_add_edge({
       project: "project-name",
@@ -46,8 +47,8 @@ A plan is a dense intention document. Extract its atoms into the database.
     })
     ```
     Use `blocks` for "P1 must finish before P2 starts", `depends_on` for the inverse direction. `dependsOnPhase` in body is informational context; `spec_add_edge` is the enforceable constraint.
-11. **Summary** — `spec_get_counters` → show final structure to user.
-12. **Next Step** — Tell the user: "Check created and activated. Next: `/cellm:implement` to work task-by-task, `/cellm:spec-treat` for interactive step-by-step, or `/cellm:orchestrate` to execute all phases with agent delegation."
+12. **Summary** — `spec_get_counters` → show final structure to user.
+13. **Next Step** — Tell the user: "Check created and activated. Next: `/cellm:implement` to work task-by-task, `/cellm:spec-treat` for interactive step-by-step, or `/cellm:orchestrate` to execute all phases with agent delegation."
 
 ## Plan Section Mapping
 
@@ -98,6 +99,7 @@ If `check.principle` contains "mobile-first" or target is a mobile PWA:
 
 ## NEVER
 
+- **Skip DSE alignment** — always `dse_search` before presenting phases to catch contradictions with existing design decisions
 - **Create without user confirmation** — always present briefing + phases before writing to DB
 - **Treat the plan file as source of truth after migration** — it is not. The DB is. Inform the user the plan file can be archived or deleted.
 - **Lose detail** — visual specs (px, colors, classes) go into task `action` field, not discarded

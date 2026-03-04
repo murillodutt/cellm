@@ -2,7 +2,7 @@
 description: Execute spec tasks systematically from the database. Identifies next executable group, delegates to implementer, transitions states, reports progress.
 user-invocable: true
 argument-hint: "[check title or search term]"
-allowed-tools: mcp__cellm-oracle__spec_get_tree, mcp__cellm-oracle__spec_get_counters, mcp__cellm-oracle__spec_transition, mcp__cellm-oracle__spec_search, Read, Grep, Glob, Write, Edit, AskUserQuestion, Task
+allowed-tools: mcp__cellm-oracle__spec_get_tree, mcp__cellm-oracle__spec_get_counters, mcp__cellm-oracle__spec_transition, mcp__cellm-oracle__spec_search, mcp__plugin_cellm_cellm-oracle__dse_search, mcp__plugin_cellm_cellm-oracle__dse_get, Read, Grep, Glob, Write, Edit, AskUserQuestion, Task
 ---
 
 # Orchestration Thinking — Before Delegating
@@ -15,8 +15,8 @@ The spec tree is the execution plan. Read it, follow it, update it.
 2. **Status** — `spec_get_counters` → show progress (completed/total per phase).
 3. **Next** — First phase with pending tasks. Respect dependency edges.
 4. **Execute (3-stage pipeline per phase):**
-   - **Stage 1 — Implement**: pass phase briefing + specialist to implementation agents so they adopt the correct persona and respect constraints. Agents execute tasks → transition to completed/failed.
-   - **Stage 2 — Audit**: dedicated agent scans phase output for pattern violations, semantic token leaks, type errors, and architecture drift. Findings → gap nodes or fix inline.
+   - **Stage 1 — Implement**: `dse_search` for phase-relevant decisions before delegating. Pass phase briefing + specialist + DSE decisions to implementation agents so they adopt the correct persona, respect constraints, and follow existing design patterns. Agents execute tasks → transition to completed/failed.
+   - **Stage 2 — Audit**: dedicated agent scans phase output for pattern violations, semantic token leaks, type errors, and **DSE decision drift** (`dse_search` to compare output against decisions[]). Findings → gap nodes or fix inline.
    - **Stage 3 — Verify**: dedicated agent runs `quality_gate({ scope: 'all' })`, event gotcha grep (see verify skill table), typecheck baseline diff, and security checklist. PASS/CONDITIONAL/FAIL verdict.
    - Phase transitions to completed ONLY after Stage 3 = PASS or CONDITIONAL.
    - Stage 3 FAIL → create gap nodes for findings, loop back to Stage 1 for fixes, then re-run Stage 2+3.
@@ -29,6 +29,7 @@ Skip completed tasks. Resume from first pending. Show: "Resuming: X/Y completed.
 
 ## NEVER
 
+- **Skip DSE consultation** — `dse_search` before each phase to surface relevant decisions, avoid rules, and existing components
 - **Skip dependency order** — edges define the DAG, respect it
 - **Silent failures** — blocked tasks get reason + user notification
 - **Auto-continue** — always confirm before next phase
