@@ -36,13 +36,13 @@
             "timeout": 1
           },
           {
-            "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/inject-knowledge.sh",
+            "type": "http",
+            "url": "http://127.0.0.1:31415/api/knowledge/inject",
             "timeout": 3
           },
           {
-            "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/inject-arena.sh",
+            "type": "http",
+            "url": "http://127.0.0.1:31415/api/arena/pending",
             "timeout": 3
           },
           {
@@ -80,8 +80,8 @@
         "matcher": "Write|Edit|Bash|Read|Grep|Glob|NotebookEdit|WebFetch|WebSearch|Task",
         "hooks": [
           {
-            "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/track-tool-use.sh",
+            "type": "http",
+            "url": "http://127.0.0.1:31415/api/hook/track-tool-use",
             "timeout": 1
           }
         ]
@@ -101,8 +101,8 @@
       {
         "hooks": [
           {
-            "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/capture-context.sh",
+            "type": "http",
+            "url": "http://127.0.0.1:31415/api/hook/capture-context",
             "timeout": 5
           }
         ]
@@ -112,8 +112,8 @@
       {
         "hooks": [
           {
-            "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/capture-context.sh",
+            "type": "http",
+            "url": "http://127.0.0.1:31415/api/hook/capture-context",
             "timeout": 5
           }
         ]

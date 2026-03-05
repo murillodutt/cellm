@@ -1,9 +1,5 @@
 ---
 description: TypeScript patterns for type-safe code. Activates on .ts/.tsx files to enforce strict typing, Zod validation, and proper use of generics and utility types.
-paths:
-  - "**/*.ts"
-  - "**/*.tsx"
-  - "**/types/**/*"
 user-invocable: false
 ---
 

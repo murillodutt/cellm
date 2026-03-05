@@ -1,0 +1,3 @@
+{
+  "allowedTools": ["Bash", "Read", "Grep", "Glob", "Write", "Edit", "NotebookEdit", "WebFetch", "WebSearch", "Task", "AskUserQuestion"]
+}

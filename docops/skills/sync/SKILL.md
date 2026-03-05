@@ -2,11 +2,6 @@
 description: Refresh code evidence, gaps, and derived documentation. Updates evidence files first, then conveyor-gaps with conflicts, then propagates to SPECs/REFs/HOWTOs/RUNBOOKs.
 user-invocable: true
 argument-hint: "[docRoot]"
-paths:
-  - "**/.claude/docops.json"
-  - "**/docs/**"
-  - "**/technical/**"
-  - "**/reference/code-evidence/**"
 ---
 
 ## Order (Evidence-First)

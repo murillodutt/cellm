@@ -2,10 +2,6 @@
 description: Initialize documentation structure and LLM-first templates for a project. Creates directory hierarchy, copies templates without overwrite, and sets up docops.json configuration.
 user-invocable: true
 argument-hint: "[docRoot]"
-paths:
-  - "**/.claude/docops.json"
-  - "**/docs/**"
-  - "**/technical/**"
 ---
 
 ## Decision Framework

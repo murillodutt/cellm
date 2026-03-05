@@ -4,6 +4,7 @@ user-invocable: true
 argument-hint: "[--mode auto|interactive|observe] [--resume <id>] <error description or stack trace>"
 allowed-tools: Bash(timeout *), Bash(grep *), Bash(kill *), Bash(lsof *), Bash(git *), Bash(curl *), Bash(cd *), Bash(npx *), Bash(sleep *), Bash(rm *), Read, Grep, Glob, Edit, Write, AskUserQuestion
 context: fork
+isolation: worktree
 ---
 
 Instrument code with `[CELLM-DBG]` markers, reproduce error, analyze, iterate. Max 3 iterations, 5 points/iteration, 3 files/iteration.

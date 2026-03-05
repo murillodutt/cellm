@@ -2,12 +2,6 @@
 description: Mark documentation for deprecation with configurable grace period before archival. Adds deprecation banner, updates references, and schedules archive date based on document type.
 user-invocable: true
 argument-hint: "<file> [--days N] [--reason 'text']"
-paths:
-  - "**/.claude/docops.json"
-  - "**/docs/**"
-  - "**/technical/**"
-  - "**/specs/**"
-  - "**/reference/**"
 ---
 
 ## Decision Framework

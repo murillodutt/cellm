@@ -2,12 +2,6 @@
 description: Garbage collection for resolved gaps, stale evidence, and redundant content. Scans conveyor-gaps.md for resolved entries, validates evidence freshness, detects structural duplicates, and archives cleaned items.
 user-invocable: true
 argument-hint: "[docRoot] [--dry-run]"
-paths:
-  - "**/.claude/docops.json"
-  - "**/docs/**"
-  - "**/technical/**"
-  - "**/reference/conveyor-gaps.md"
-  - "**/reference/code-evidence/**"
 ---
 
 ## Workflow

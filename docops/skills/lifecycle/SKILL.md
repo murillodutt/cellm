@@ -2,11 +2,6 @@
 description: Manage complete documentation lifecycle from creation to archival and restoration. Handles undeprecation, restoration from archive, conflict resolution, and state transition logging.
 user-invocable: true
 argument-hint: "<action> <file> [options]"
-paths:
-  - "**/.claude/docops.json"
-  - "**/docs/**"
-  - "**/archive/**"
-  - "**/reference/conveyor-gaps.md"
 ---
 
 ## State Machine

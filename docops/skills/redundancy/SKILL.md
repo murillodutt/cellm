@@ -2,12 +2,6 @@
 description: Detect redundant and duplicate content across documentation files. Compares heading structures (Jaccard similarity), extracts topic keywords, and reports consolidation opportunities ranked by severity.
 user-invocable: true
 argument-hint: "[docRoot] [--threshold N]"
-paths:
-  - "**/.claude/docops.json"
-  - "**/docs/**"
-  - "**/technical/**"
-  - "**/specs/**"
-  - "**/reference/**"
 ---
 
 ## Detection

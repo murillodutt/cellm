@@ -4,6 +4,7 @@ user-invocable: true
 argument-hint: "query: your search query"
 allowed-tools: mcp__cellm-oracle__search, mcp__cellm-oracle__timeline, mcp__cellm-oracle__get_observations
 context: fork
+background: true
 agent: Explore
 ---
 

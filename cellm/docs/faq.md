@@ -151,6 +151,14 @@ No. Oracle is 100% local-first:
 
 Oracle converts text to vectors using a local embedding model, then finds similar content using cosine similarity. This enables natural language queries like "find authentication code" instead of exact keyword matching.
 
+### What is the difference between Claude Auto-Memory and CELLM Knowledge?
+
+Claude Code 2.1.59+ includes a native auto-memory (`/memory`). CELLM provides its own `knowledge` system.
+- **Storage**: Claude auto-memory uses Anthropic's Cloud; CELLM Knowledge uses a local SQLite DB (`compass.db`).
+- **Scope**: Claude's memory is per-session/user across workspaces; CELLM's is strictly isolated per project.
+- **Trigger**: Claude activates automatically; CELLM is explicit via MCP tools (`knowledge_search`) ensuring precise context control.
+- **Coexistence**: They do not conflict and can be used simultaneously.
+
 ---
 
 ## Patterns & Skills
