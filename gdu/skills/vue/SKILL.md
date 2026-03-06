@@ -3,7 +3,7 @@ description: Vue 3 Composition API patterns for components and composables. Acti
 user-invocable: false
 ---
 
-`<script setup lang="ts">` with section order: imports → props/emits → state → computed → methods → watchers → lifecycle.
+`<script setup lang="ts">` with section order: imports, props/emits, state, computed, methods, watchers, lifecycle.
 
 **Props** — generic typed: `defineProps<{ name: Type }>()`.
 
@@ -15,6 +15,12 @@ user-invocable: false
 
 **Store destructuring** — `storeToRefs(store)` for state, `store.action()` for actions.
 
+## Nuxt UI Component Customization
+
+- **`ui` prop** — override component slots: `<UButton :ui="{ base: 'font-bold' }" />`
+- **`class` prop** — override root/base slot only
+- **Tailwind Variants** — components use slots (root, header, body, footer), variants (size, color), compoundVariants
+
 ## NEVER
 
 - **Options API** — no `data()`, `methods:`, `computed:`, `watch:`
@@ -22,3 +28,4 @@ user-invocable: false
 - **`any`** — use `unknown` + type guards
 - **`<script>` without `setup`** — always `<script setup lang="ts">`
 - **Destructure store without `storeToRefs`** — loses reactivity
+- **`className`** — Vue uses `class`, not React's `className`
