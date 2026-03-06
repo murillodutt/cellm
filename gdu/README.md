@@ -4,7 +4,7 @@ The **Goold Design UI (GDU)** is a rigorous **Cognitive Framework** for designin
 
 Built as an integral part of the CELLM ecosystem, GDU solves the biggest problems with current AI UI generators by shifting the focus from "writing code" to "thinking about architecture."
 
-## ⚠️ The Problem
+## The Problem
 
 Most AI tools (even the most downloaded ones) focus on syntax generation or generic "vibes". This leads to:
 1. **React-isms**: Forceful injection of React syntax (`className`, hooks) into Vue environments.
@@ -12,7 +12,7 @@ Most AI tools (even the most downloaded ones) focus on syntax generation or gene
 3. **Monoliths**: Generating 500-line single-file components, completely ignoring Atomic Design principles.
 4. **Action over Intention**: Acting immediately without verifying constraints.
 
-## 🧠 The GDU Philosophy (Framework of Thought)
+## The GDU Philosophy (Framework of Thought)
 
 GDU does not teach the AI how to code Vue—it already knows. Instead, it forces a specific mental model before execution. It enforces the CELLM mantra:
 > "Verify before you act, take the best path — never the first, and document everything, because if it's not documented, it doesn't exist. No shortcuts. No exceptions."
@@ -31,14 +31,14 @@ A Markdown Specification is drafted. This is the source of truth detailing compo
 #### 4. Surgical Execution (The Hands of the Implementer)
 Only after the Spec is defined does the Implementer agent generate the idiomatic, accessible Vue 3 code. Zero deviations.
 
-## 📦 Architecture
+## Architecture
 
 - `hooks/interceptor.js`: Passively listens to user prompts. If an intent to build UI is detected, it silently injects the GDU cognitive override. The user never has to remember to "turn on" the frontend mode.
 - `skills/gdu/SKILL.md`: The orchestrator that forces the Cognitive Model (Anchoring -> Deconstruction -> Contract -> Execution).
 - `agents/gdu-architect.md`: The planner. It verifies constraints and writes the UI Spec. It writes Intent, not code.
 - `agents/gdu-implementer.md`: The builder. It executes the Spec with absolute fidelity and contextual purity (no React-isms).
 
-## 🚀 Usage
+## Usage
 
 You don't need to do anything special. Just talk to Claude.
 

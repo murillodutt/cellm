@@ -23,7 +23,7 @@
     },
     {
       "name": "gdu",
-      "version": "1.0.0",
+      "version": "0.1.0",
       "source": "./gdu",
       "description": "Goold Design UI (GDU): The definitive Vue 3, Nuxt 4, and Tailwind architect plugin. Enforces CELLM mantra: Verify before you act, document everything."
     }
