@@ -14,10 +14,13 @@ You already know the syntax. GDU's purpose is to force **Intentionality, Verific
 When a frontend task is requested, process it through this mental model:
 
 ### 1. Contextual Anchoring (The Reality Check)
-- Search DSE for project decisions: `dse_search("intent keywords")`
-- Read `app/assets/css/main.css` for `@theme` tokens and `--ui-*` overrides
-- Read `app.config.ts` for runtime color mapping and component theme overrides
-- If you don't know the constraints, you find them.
+**If operating within a spec phase** (orchestrate passed spec context): read `phase.briefing.constraints` for type contracts from predecessor phases. Import response types from `fileRefs`. The spec tree IS the source of truth for cross-domain contracts.
+
+Follow the **Degradation Protocol Cascade** to resolve design decisions:
+1. **DSE Search**: Search the DSE for explicit project decisions (`dse_search("intent keywords")`). If found, use them.
+2. **File Fallback**: If no DSE decision exists, read `app/assets/css/main.css` for `@theme` tokens/`--ui-*` overrides, and `app.config.ts` for runtime color mapping and component theme overrides.
+3. **Defaults**: If files don't specify it, fallback to standard Nuxt UI v4/Tailwind v4 defaults.
+- If you don't know the constraints, you find them using this cascade.
 
 ### 2. Architectural Deconstruction (Atomic Design)
 Break every request into atoms, molecules, and organisms.

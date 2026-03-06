@@ -17,7 +17,7 @@ Nuxt UI v4 provides a complete semantic layer on top of Tailwind CSS v4. Use it.
 
 ## CSS Variables (`--ui-*`)
 
-Tokens live in `app/assets/css/main.css` using `@theme` directive:
+In Tailwind v4, the **primary source of tokens** is `app/assets/css/main.css` using the `@theme` directive. `tailwind.config.ts` is only maintained as a fallback for v3 compatibility:
 
 ```css
 @import "tailwindcss";
@@ -58,6 +58,6 @@ Mobile-first: `class` then `sm:` `md:` `lg:`. No arbitrary values (`w-[347px]`).
 
 - **Hardcoded colors** — no `blue-500`, `#hex`, `rgb()`
 - **Manual dark mode on Nuxt UI components** — automatic via `--ui-*`
-- **`tailwind.config.ts`** — Tailwind v4 uses `@theme` in CSS
+- **`tailwind.config.ts` as primary source** — Tailwind v4 uses `@theme` in `app/assets/css/main.css` as the primary source of tokens. `tailwind.config.ts` is just a fallback for v3.
 - **Arbitrary values** — no `w-[347px]`, `p-[13px]`
 - **Inline styles** — use Tailwind classes or CSS variables

@@ -23,6 +23,68 @@ The spec tree is the execution plan. Read it, follow it, update it.
 5. **Checkpoint** — Phase done (all 3 stages passed) → ask "Continue to next phase?" via AskUserQuestion.
 6. **Complete** — All phases done → `spec_get_counters` final summary → transition check to completed.
 
+## Guild Protocol (Domain-Specialist Routing)
+
+Before Stage 1 (Implement), check `phase.body.specialist.role` and inject the corresponding guild mindset:
+
+| Role | Guild Activation | Context to Inject |
+|------|-----------------|-------------------|
+| `frontend` | GDU Framework | DSE cascade (dse_search then file fallback then defaults), Nuxt UI MCP for component contracts, semantic tokens only, Degradation Protocol |
+| `backend` | Backend Conventions | Drizzle schema patterns, Zod validation at boundaries, H3 event handlers, server/api/ structure |
+| `database` | Database Safety | Migration strategy, index review, PRAGMA checklist, backward-compatible schema changes |
+| `audit` | Audit Army | audit-discovery for evidence, audit-mirror for judgment, findings as gap nodes |
+| `fullstack` / default | Standard implement | No additional guild context — use implement skill as-is |
+
+### Frontend Guild (GDU) Activation
+
+When `specialist.role === "frontend"`:
+1. Inject into implementer briefing: "Follow the GDU Framework. Process: Contextual Anchoring (DSE cascade), Architectural Deconstruction (Atomic Design), then Surgical Execution (semantic classes, ui prop customization, auto dark mode)."
+2. Before implementation: `dse_search` for component decisions, consult `nuxt-ui-remote` for exact props/slots.
+3. During Stage 2 (Audit): verify semantic token usage (no hardcoded colors), DSE decision compliance, Nuxt UI component contract adherence.
+
+### Backend Guild Activation
+
+When `specialist.role === "backend"`:
+1. Inject: "Follow Drizzle ORM patterns. Validate at API boundaries with Zod. Use H3 event handlers. Type API responses explicitly."
+2. Before implementation: read predecessor phase's schema types from `fileRefs`. Ensure API response types match DB schema.
+3. During Stage 2 (Audit): verify Zod schemas match Drizzle types, no `any` in API responses.
+
+### Cross-Domain Type Bridge
+
+At phase boundaries (when current phase depends on a completed predecessor):
+1. Read predecessor's output `fileRefs` — locate exported types.
+2. Inject into implementer briefing: "Import types from [predecessor fileRefs]. Your output types must be compatible."
+3. During Stage 3 (Verify): `quality_gate({ scope: 'typecheck' })` catches type mismatches across boundaries.
+
+## Context Materialization (Mandatory Before Delegation)
+
+Subagents start with an empty context window. Before delegating ANY phase to a subagent (via Agent tool), you MUST construct a Context Envelope in the agent prompt:
+
+### The Context Envelope
+
+1. **Check Briefing**: Copy the check's `context`, `problem`, and `principle` verbatim into the prompt.
+2. **Phase Briefing**: Copy the phase's `objective`, `successCriteria`, `keyFiles`, and `constraints` verbatim.
+3. **Predecessor Type Contracts**: For each completed predecessor phase (linked by `blocks`/`depends_on` edges):
+   - Read the predecessor's `fileRefs` that contain type exports (`.ts` files with `export type/interface`)
+   - **INLINE the actual type definitions** into the prompt (not just file paths)
+   - Example: "The backend phase produced these types: `export interface Comment { id: string; body: string; authorId: string; createdAt: Date }`"
+   - Maximum: 200 lines of inlined types. If more, inline the public API surface only (exported types, not internal helpers).
+4. **DSE Decisions**: Run `dse_search` for the phase domain and inline the `decisions[]` arrays.
+5. **Guild Mindset**: The role-specific instructions from the Guild Protocol table.
+
+### Why This Is Non-Negotiable
+
+The subagent cannot access the orchestrator's context window. File paths alone are insufficient — the subagent would need to Read each file, parse types, and reconstruct the contract. By inlining types directly, we guarantee the subagent starts with full cross-domain awareness.
+
+### Materialization Limits
+
+| Predecessor Output | Inline Strategy |
+|-------------------|-----------------|
+| < 50 lines of types | Inline everything |
+| 50-200 lines | Inline exported types/interfaces only (skip internal helpers) |
+| > 200 lines | Inline public API surface + add fileRef paths for deep dive |
+| Non-type files (CSS, config) | Reference path only — subagent can Read |
+
 ## Re-entry
 
 Skip completed tasks. Resume from first pending. Show: "Resuming: X/Y completed."

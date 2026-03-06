@@ -21,10 +21,14 @@ Universal design token extractor. Auto-detect input type and bootstrap DSE.
 
 1. **Detect source** — Match input against table above. Default: `directory`.
 2. **Scan** — Call `dse_discover({ source, ... })` with appropriate params → show summary table.
-3. **Preset** — Confirm via AskUserQuestion → `POST /api/design-system/presets`.
-4. **Colors** — Hex colors detected? → `dse_import_palette({ input, project })`. Named colors only → report as hints.
-5. **Reindex** — `dse_reindex({ project })`.
-6. **Confirm** — Report: preset applied, colors imported, chunks indexed.
+3. **Check active preset** — Call `dse_get` or Read `~/.cellm/dse/dse-{project}.json`. If it exists AND has decisions[], warn the user:
+   - Show: version, entity count, decisions count of the ACTIVE preset
+   - AskUserQuestion: **"Overwrite"** (full replace via `POST /api/design-system/presets`) or **"Merge"** (deep-merge via `POST /api/design-system/update` with scan results as patch)
+   - If no active preset exists → proceed with Overwrite (safe, nothing to lose)
+4. **Apply** — Based on user choice: `presets` (overwrite) or `update` (merge).
+5. **Colors** — Hex colors detected? → `dse_import_palette({ input, project })`. Named colors only → report as hints.
+6. **Reindex** — `dse_reindex({ project })`.
+7. **Confirm** — Report: preset applied/merged, colors imported, chunks indexed.
 
 ## Source-Specific Calls
 
@@ -69,6 +73,7 @@ When user provides a `figma.com` URL:
 ## NEVER
 
 - **Apply without confirmation** — always show scan results first
+- **Overwrite without warning** — if active preset has decisions[], ALWAYS show count and ask Overwrite vs Merge
 - **Guess colors** — only import what was actually detected
 - **Skip empty projects** — still apply minimal preset if no signals found
 - **Call Figma MCP from the endpoint** — orchestrate in this skill, pass result to endpoint

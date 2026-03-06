@@ -45,6 +45,20 @@ spec_add_edge({
 `spec_add_edge` = **enforceable DAG constraint** in the database.
 Use both: body for human context, edge for machine enforcement.
 
+## Interface Contract Enforcement
+
+When a check spans multiple domains (DB + API + UI), enforce type contracts across phase boundaries:
+
+1. **Database phase** outputs: schema types, migration files. `fileRefs` must include type export paths.
+2. **Backend phase** inputs: schema types. Outputs: API response types, Zod schemas. `fileRefs` must include both input schema paths and output type paths.
+3. **Frontend phase** inputs: API response types. Outputs: typed components. `fileRefs` must include response type paths from predecessor.
+
+Each phase's `briefing.constraints` must reference the output types of its predecessor:
+- "API response must match CommentSchema from server/db/schema.ts"
+- "Component props must type-check against GET /api/comments response"
+
+This ensures the DAG is not just ordering but also **type-safe across boundaries**.
+
 ## Phase Enrichment
 
 When creating phases via `spec_create_node`, enrich the body with `briefing` and `specialist`:

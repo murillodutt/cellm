@@ -13,6 +13,7 @@ Context lives in the database. Load it before touching any file.
 
 1. **Load** — `spec_get_tree` for the check. Absorb check briefing (context/problem/principle), phases, tasks.
    For the current phase: read `body.briefing` (objective, successCriteria, keyFiles, constraints) and `body.specialist` (role, focus, tools). Adopt the specialist persona and respect phase constraints throughout.
+   **Guild adoption**: If `specialist.role` is `"frontend"`, engage GDU Framework (DSE cascade, semantic tokens, Nuxt UI MCP contracts). If `"backend"`, enforce Drizzle patterns and Zod boundary validation. If `"database"`, enforce migration safety and index strategy.
 2. **DSE** — `dse_search` for task-relevant design decisions (layout, components, patterns, breakpoints). Absorb `avoid` rules and `decisions[]` before writing any code. If DSE has an existing component for what the task describes, use it — do not create a new one.
 3. **Pick** — First pending task in dependency order. `spec_transition(event: "started")` to activate.
 4. **Start** — `spec_transition(event: "started")` again to mark in_progress. (Or call `completed` directly — the service auto-chains through intermediate states.)

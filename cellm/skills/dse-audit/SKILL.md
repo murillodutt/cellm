@@ -19,8 +19,10 @@ Review the design system for decision quality, coverage gaps, and code alignment
 
 | Check | Method | Pass Criteria |
 |-------|--------|---------------|
-| Decision coverage | Count entities with empty decisions[] | > 50% have decisions |
-| Decision quality | Review text for specificity | No generic "use X" without context |
+| Decision coverage | Count entities with empty decisions[] | Zero empty decisions |
+| ATOM format | Verify intent readable without parenthetical | Each decision expresses intent, not just implementation |
+| Vocabulary | Grep decisions for raw Tailwind (text-gray-*, bg-gray-*) | Zero raw Tailwind in decisions — use semantic (text-dimmed, bg-muted) |
+| L2 purity | Check decisions don't duplicate framework docs | No "UButton accepts variant prop" style L1 content |
 | Token completeness | Check semantic colors defined | All 6 core colors present |
 | Code alignment | Grep .vue files for hardcoded colors | Zero hardcoded hex in components |
 | Avoid compliance | Check .vue files against avoid rules | No violations found |
