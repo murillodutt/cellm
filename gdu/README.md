@@ -33,10 +33,21 @@ Only after the Spec is defined does the Implementer agent generate the idiomatic
 
 ## Architecture
 
-- `hooks/interceptor.js`: Passively listens to user prompts. If an intent to build UI is detected, it silently injects the GDU cognitive override. The user never has to remember to "turn on" the frontend mode.
+- `hooks/interceptor.js`: Passively listens to user prompts. If a frontend intent is detected, it injects the GDU cognitive framework as context. The user never has to remember to "turn on" the frontend mode.
 - `skills/gdu/SKILL.md`: The orchestrator that forces the Cognitive Model (Anchoring -> Deconstruction -> Contract -> Execution).
 - `agents/gdu-architect.md`: The planner. It verifies constraints and writes the UI Spec. It writes Intent, not code.
 - `agents/gdu-implementer.md`: The builder. It executes the Spec with absolute fidelity and contextual purity (no React-isms).
+
+### Context Skills (Frontend Knowledge Base)
+
+These skills are the technical knowledge of the GDU team, migrated from the core `cellm` plugin:
+
+| Skill | Domain | Activates On |
+|-------|--------|-------------|
+| `gdu:vue` | Vue 3 Composition API, typed props/emits, section ordering | `.vue` files, composables |
+| `gdu:tailwind` | Tailwind CSS v4, semantic tokens, mobile-first, dark mode | `.vue`, `.css` files |
+| `gdu:nuxt` | Nuxt 4 data fetching, routing, server/client separation | `nuxt.config`, `app/`, `server/`, `pages/` |
+| `gdu:pinia` | Pinia Setup Stores, storeToRefs, single-domain stores | Store files |
 
 ## Usage
 

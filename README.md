@@ -10,19 +10,15 @@ Architecture: skills-only. No `commands/` directories. Every capability is a `sk
 
 Context engineering for LLM-driven development. 29 skills, 4 agents, 6 hook events, Oracle integration.
 
-### Context Skills (7) — auto-loaded by file path
+### Context Skills (3) — auto-loaded by file path
 
 | Skill | Activates on | What it enforces |
 |-------|-------------|-----------------|
-| **nuxt** | `nuxt.config.ts`, `app/`, `server/`, `pages/` | useFetch/useAsyncData, server/client separation, Nitro patterns |
-| **vue** | `*.vue`, `composables/*.ts` | Script setup, typed props/emits, section ordering, storeToRefs |
 | **typescript** | `*.ts`, `*.tsx`, `types/` | Strict typing, Zod validation, no `any`, explicit return types |
-| **tailwind** | `*.vue`, `*.css`, `tailwind.config.ts` | Semantic tokens only, no hardcoded colors, mobile-first, dark mode |
-| **pinia** | `stores/`, `store/` | Setup Store syntax, storeToRefs, single-domain stores |
 | **drizzle** | `db/`, `schema.ts`, `drizzle.config` | Typed schemas, `.returning()`, relations, transactions |
 | **dse** | `*.vue` | Project-specific design tokens via `dse_search` before any UI work |
 
-Context skills stack: editing a `.vue` file loads **vue** + **tailwind** + **dse** simultaneously. Editing `server/api/*.ts` loads **nuxt** + **typescript**.
+Context skills stack: editing a `server/api/*.ts` loads **typescript**.
 
 ### Workflow Skills (22) — invoked manually
 
@@ -141,7 +137,16 @@ Goold Design UI. A rigorous Cognitive Framework for designing and architecting f
 
 It prevents "AI slop" by forcing the AI to verify architectural rules, DSE tokens, and Pinia state before writing code.
 
-### Skills (1)
+### Context Skills (4)
+
+| Skill | Activates on | What it enforces |
+|-------|-------------|-----------------|
+| **nuxt** | `nuxt.config.ts`, `app/`, `server/`, `pages/` | useFetch/useAsyncData, server/client separation, Nitro patterns |
+| **vue** | `*.vue`, `composables/*.ts` | Script setup, typed props/emits, section ordering, storeToRefs |
+| **tailwind** | `*.vue`, `*.css`, `tailwind.config.ts` | Semantic tokens only, no hardcoded colors, mobile-first, dark mode |
+| **pinia** | `stores/`, `store/` | Setup Store syntax, storeToRefs, single-domain stores |
+
+### Workflow Skills (1)
 
 | Skill | Invocation | What it does |
 |-------|-----------|-------------|

@@ -1,6 +1,6 @@
 ---
 description: Passive frontend architecture orchestrator. Triggers automatically when users request UI/Frontend components, pages, or layouts. 
-user-invocable: true
+user-invocable: false
 ---
 
 # Goold Design UI (GDU) Framework
