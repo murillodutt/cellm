@@ -1,6 +1,6 @@
 # CELLM Plugins
 
-Marketplace with 3 plugins for Claude Code: **cellm** (core), **docops** (documentation), **dse** (design).
+Marketplace with 3 plugins for Claude Code: **cellm** (core), **docops** (documentation), **gdu** (Goold Design UI).
 
 Architecture: skills-only. No `commands/` directories. Every capability is a `skills/{name}/SKILL.md`.
 
@@ -135,15 +135,30 @@ Documentation maintenance with LLM-first templates, code evidence, and drift con
 
 ---
 
-## dse
+## gdu
 
-Design System Engine. Visual design skills for distinctive, production-grade frontend interfaces.
+Goold Design UI. A rigorous Cognitive Framework for designing and architecting frontend interfaces within the Vue 3, Nuxt 4, and Tailwind ecosystem. 
+
+It prevents "AI slop" by forcing the AI to verify architectural rules, DSE tokens, and Pinia state before writing code.
 
 ### Skills (1)
 
 | Skill | Invocation | What it does |
 |-------|-----------|-------------|
-| **frontend-ui** | `/dse:frontend-ui [description]` | Design thinking framework before code: tone, typography, color, motion, composition |
+| **gdu** | `/gdu:gdu` | Passive frontend architecture orchestrator. Triggers automatically on UI intent via hook. Enforces VERIFY -> DOCUMENT -> IMPLEMENT flow. |
+
+### Agents (2)
+
+| Agent | Model | Role |
+|-------|-------|------|
+| **gdu-architect** | opus | The planner. Verifies Tailwind config, queries Nuxt UI Skill (second brain), defines Pinia state, and writes the Markdown UI Spec. |
+| **gdu-implementer** | sonnet | The builder. Executes the Spec with absolute fidelity. Blocks React-isms and strictly writes Vue 3 / Nuxt 4 code. |
+
+### Hooks
+
+| Event | What runs |
+|-------|----------|
+| **UserPromptSubmit** | interceptor.js (Detects UI intents, auto-installs Nuxt UI skill if missing, and injects GDU cognitive override) |
 
 ---
 
@@ -165,9 +180,11 @@ docops/                            # Documentation plugin (12 skills, 1 agent)
   hooks/
   scripts/
   templates/
-dse/                               # Design plugin (1 skill)
+gdu/                               # Goold Design UI plugin (1 skill, 2 agents)
   .claude-plugin/plugin.json
   skills/
+  agents/
+  hooks/
 ```
 
 Skills-only: every capability is `skills/{name}/SKILL.md` with frontmatter (`name`, `description`, `argument-hint`, `allowed-tools`). Context skills add `paths` and `user-invocable: false` for auto-loading.
