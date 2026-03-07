@@ -34,21 +34,21 @@ $ARGUMENTS
 
 On first iteration, if no checklist file exists for this target, create one automatically. The file tracks coverage targets, scores per iteration, and gaps.
 
-### Naming Convention
+### Location and Naming
 
-File name MUST reflect the target being stressed, not a generic name:
+All checklist files live in `docs/cellm/audits/` — CELLM-generated artifacts, in the repo, separate from documentation.
 
 ```
-stress-loop-{target}-{scope}.md
+docs/cellm/audits/stress-loop-{target}-{scope}.md
 ```
 
 | Target | Example File |
 |--------|-------------|
-| DSE against Nuxt UI | `stress-loop-dse-nuxt-ui.md` |
-| DSE against Figma export | `stress-loop-dse-figma-export.md` |
-| Specs for CellmOS | `stress-loop-specs-cellm-os.md` |
-| Knowledge atoms | `stress-loop-knowledge-atoms.md` |
-| Custom | `stress-loop-{user-provided-scope}.md` |
+| DSE against Nuxt UI | `docs/cellm/audits/stress-loop-dse-nuxt-ui.md` |
+| DSE against Figma export | `docs/cellm/audits/stress-loop-dse-figma-export.md` |
+| Specs for CellmOS | `docs/cellm/audits/stress-loop-specs-cellm-os.md` |
+| Knowledge atoms | `docs/cellm/audits/stress-loop-knowledge-atoms.md` |
+| Custom | `docs/cellm/audits/stress-loop-{user-provided-scope}.md` |
 
 ### Auto-Detection of Coverage Targets
 
@@ -76,6 +76,25 @@ stress-loop-{target}-{scope}.md
 >
 > **Gaps residuais**: {list or "none"}
 
+## Stack Snapshot
+
+Versions at time of convergence. Read from `package.json` / `bun.lock` — NEVER from training data.
+
+| Package | Version | Source |
+|---------|---------|--------|
+| nuxt    | x.y.z   | package.json |
+| @nuxt/ui | x.y.z | package.json |
+| vue     | x.y.z   | bun.lock |
+| pinia   | x.y.z   | bun.lock |
+| tailwindcss | x.y.z | package.json |
+| drizzle-orm | x.y.z | package.json |
+| {other relevant} | x.y.z | source |
+
+> When ANY package in this table receives a major or minor bump,
+> re-run the stress-loop to validate that ATOM snapshots
+> (the "currently [IMPL]" part of decisions) are still accurate.
+> Outdated snapshots = snapshot drift = L2-FIX.
+
 ## {Category} [{covered}/{total}]
 - [x] Item — covered by {entity-id}
 - [ ] Item — N/A (L1)
@@ -87,6 +106,22 @@ stress-loop-{target}-{scope}.md
 - Update the checklist file AFTER each iteration with new scores and coverage marks
 - On convergence, change status to `CONVERGED` and record final metrics
 - The checklist file is the **single source of truth** for loop progress across sessions
+- Populate the Stack Snapshot table from `package.json` and `bun.lock` — never from memory
+
+### Re-Run Triggers
+
+The checklist file enables drift detection. When re-invoked on a CONVERGED target:
+
+1. Read the Stack Snapshot from the existing checklist file
+2. Compare against current `package.json` / `bun.lock`
+3. If any major or minor version changed: set status back to `RE-VALIDATING`, run the loop focusing on snapshot drift
+
+| Change | Action |
+|--------|--------|
+| Major bump (e.g., Nuxt 4→5) | Full re-run — all scenarios, all phases |
+| Minor bump (e.g., Nuxt UI 4.4→4.5) | Targeted re-run — scenarios touching changed package |
+| Patch bump only | Skip — patches don't change API surface |
+| No version changes | Skip — report "Stack unchanged, checklist still valid" |
 
 ## Target Detection
 
@@ -273,3 +308,5 @@ Commit:    <hash>
 - Launch fix agents without writing the pre-launch checklist — no checklist = no agents
 - Skip post-fix validation — quality gate runs BEFORE every commit, no exceptions
 - Start a stress-loop without a checklist file — auto-generate on first iteration
+- Populate Stack Snapshot from training data — read `package.json` and `bun.lock` only
+- Declare CONVERGED without a Stack Snapshot — versions are required for drift detection
