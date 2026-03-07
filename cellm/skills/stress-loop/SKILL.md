@@ -22,13 +22,71 @@ $ARGUMENTS
 
 ## Framework
 
-1. **Scope** — identify target system, scenario pool, and archetype set
-2. **Simulate** — parallel agents consume target, each rates coverage using the scoring rubric
+1. **Scope** — identify target system, generate checklist file, build scenario pool
+2. **Simulate** — parallel agents consume target using the simulation prompt template
 3. **Triage** — classify each finding: L2-FIX (project, actionable) | L1-SKIP (framework handles) | ACCEPT (by design)
-4. **Fix** — apply L2 fixes sequentially (one agent per file), reindex if applicable, then commit
+4. **Fix** — apply L2 fixes following fix phase checklist, reindex if applicable, run post-fix validation, then commit
 5. **Audit** — dedicated agent checks format compliance, broken references, vocabulary, schema
 6. **Adversarial** — agent attempts contradictions, snapshot drift, edge cases
 7. **Converge** — BLOCKED until audit AND adversarial return clean in the SAME iteration as simulation
+
+## Checklist File — Auto-Generation
+
+On first iteration, if no checklist file exists for this target, create one automatically. The file tracks coverage targets, scores per iteration, and gaps.
+
+### Naming Convention
+
+File name MUST reflect the target being stressed, not a generic name:
+
+```
+stress-loop-{target}-{scope}.md
+```
+
+| Target | Example File |
+|--------|-------------|
+| DSE against Nuxt UI | `stress-loop-dse-nuxt-ui.md` |
+| DSE against Figma export | `stress-loop-dse-figma-export.md` |
+| Specs for CellmOS | `stress-loop-specs-cellm-os.md` |
+| Knowledge atoms | `stress-loop-knowledge-atoms.md` |
+| Custom | `stress-loop-{user-provided-scope}.md` |
+
+### Auto-Detection of Coverage Targets
+
+| Target | How to detect coverage items | Source |
+|--------|------------------------------|--------|
+| DSE | List all components from the UI framework being used | Nuxt UI MCP `list-components`, or user-provided component list |
+| Specs | List all nodes in spec tree | `spec_get_tree` |
+| Knowledge | List all categories/tags | `knowledge_list` |
+
+### Checklist File Structure
+
+```markdown
+# Stress Loop: {Target} — {Scope}
+
+> **Purpose**: Coverage checklist for stress-loop against {scope}.
+> **Created**: {date}
+>
+> **Status**: IN_PROGRESS | CONVERGED
+> **Iterations**: {N}
+> **Entities**: {count} | **Decisions**: {count} | **Chunks**: {count}
+>
+> | Scenario | Score | Verdict |
+> |----------|-------|---------|
+> | {name}   | X/10  | PASS    |
+>
+> **Gaps residuais**: {list or "none"}
+
+## {Category} [{covered}/{total}]
+- [x] Item — covered by {entity-id}
+- [ ] Item — N/A (L1)
+- [ ] Item — gap
+```
+
+### Update Rules
+
+- Update the checklist file AFTER each iteration with new scores and coverage marks
+- On convergence, change status to `CONVERGED` and record final metrics
+- The checklist file is the **single source of truth** for loop progress across sessions
 
 ## Target Detection
 
@@ -56,45 +114,87 @@ Iteration N:   "Build a pricing page with 3 tiers and toggle for monthly/annual"
 Iteration N+1: "I need to create a subscription pricing section with plan comparison"
 ```
 
-## Simulation Agents
+## Simulation Prompt Template
 
-Each agent receives:
-- **Scenario**: A realistic task description (e.g., "Build a KPI card with semantic colors")
-- **Constraint**: Consume ONLY the target system — no file reads, no external docs
-- **Output**: `{ score: number, gaps: string[], verdict: "PASS"|"GAP"|"BLOCKED" }`
+When spawning simulation agents, use this EXACT prompt structure. Do NOT improvise — the table IS the enforcement.
 
-Score uses the **Scoring Rubric** below — not subjective judgment.
+```
+You are a stress-test agent. Use ONLY {TARGET_TOOLS} MCP tools. Do NOT read files.
+
+Scenario: {SCENARIO}
+
+For EACH requirement, search the target and fill this table:
+
+| # | Requirement | Entity Found | Entity ID | Has ATOM Decisions | In Top-3 Search | Points |
+|---|-------------|-------------|-----------|-------------------|-----------------|--------|
+| 1 | {REQ}       |             |           |                   |                 |        |
+
+Scoring:
+- Entity exists with ATOM decisions (intent + snapshot): +1
+- Entity exists but thin or no ATOM: +0.5
+- Search returns entity in top-3 results: +0.5
+- Requirement completely missing from target: -2
+
+FINAL = (sum / max_possible) * 10, capped at 10
+
+You MUST show the filled table and calculation. No table = invalid score.
+
+Output:
+SCORE: X/10 (show calculation)
+VERDICT: PASS|GAP|BLOCKED
+GAPS:
+- [gap description]
+```
 
 Spawn 3-5 agents per batch. Batch size adapts: first batch = 5 broad scenarios, subsequent batches = 3 focused on prior gaps.
 
-## Scoring Rubric
+## Fix Phase — Pre-Launch Checklist
 
-Scores must be reproducible. Two agents evaluating the same state produce the same number.
-
-| Criteria | Points |
-|----------|--------|
-| Each stated requirement has a matching entity in target | +1 per requirement |
-| Entity has ATOM decisions (intent + snapshot, not just a name) | +1 per entity |
-| Cross-references between entities are valid and resolvable | +0.5 per valid ref |
-| Search query returns the needed entity in top-3 results | +0.5 per query |
-| Critical requirement missing entirely from target | -2 per missing |
+Before spawning ANY fix agent, the operator MUST write this in the response:
 
 ```
-score = (sum / max_possible) * 10, capped at 10
+FILES TO EDIT: {list all files}
+STRATEGY: SEQUENTIAL | PARTITIONED
+PARTITION PLAN: {if partitioned, which agent owns which file}
 ```
 
-The agent MUST show the calculation, not just the final number.
+| Rule | Enforcement |
+|------|-------------|
+| Multiple agents, SAME file | SEQUENTIAL only — agent 1 finishes, then agent 2 starts |
+| Multiple agents, DIFFERENT files | Parallel OK — each agent owns its file exclusively |
+| No checklist written | Protocol violation — do NOT launch agents |
 
-## Fix Phase — Concurrency Rules
+After ALL fixes in an iteration complete: **commit changes immediately**. State must survive context compaction — a lost fix means wasted work.
 
-Fix agents MUST NOT edit the same file in parallel — concurrent edits to overlapping regions cause silent corruption. Choose one strategy per iteration:
+## Post-Fix Validation
 
-| Strategy | When to use |
-|----------|-------------|
-| **Sequential** | Default. Agent 1 finishes, then agent 2 starts. Safest. |
-| **File partitioning** | Multiple fix agents each own different files (e.g., agent 1 = tokens, agent 2 = patterns). Only when target has separate files. |
+After fix agent completes, BEFORE committing, run this quality gate:
 
-After ALL fixes in an iteration complete: **commit changes immediately**. State must survive context compaction — a lost fix means wasted work. Do not batch commits to the end of the loop.
+```bash
+python3 -c "
+import json, sys
+d = json.load(open('{TARGET_FILE}'))
+issues = []
+for s in ('components','patterns','compositions'):
+    for k,v in d.get(s,{}).items():
+        decs = v.get('decisions',[])
+        for dec in decs:
+            if '(currently' not in dec.lower():
+                issues.append(f'ATOM FAIL: {s}.{k}: {dec[:60]}')
+            if dec.lower().strip().startswith('(currently'):
+                issues.append(f'NO INTENT: {s}.{k}: {dec[:60]}')
+        if len(decs) < 2:
+            issues.append(f'THIN: {s}.{k}: {len(decs)} decisions')
+if issues:
+    print(f'{len(issues)} issues found:')
+    for i in issues: print(f'  {i}')
+    sys.exit(1)
+else:
+    print('Quality gate PASSED')
+"
+```
+
+If the gate fails: fix issues BEFORE committing. Do NOT skip.
 
 ## Quality Gate — Entity Inflation
 
@@ -129,6 +229,8 @@ All three must hold in the SAME iteration — skipping audit or adversarial bloc
 3. **Adversarial**: Zero contradictions, zero snapshot drift
 
 If operator skips audit or adversarial, convergence cannot be declared. Status remains FIX.
+
+On convergence: update checklist file status to `CONVERGED`, commit, and report final metrics.
 
 ## Reporting
 
@@ -165,6 +267,9 @@ Commit:    <hash>
 - Declare convergence with open L2 gaps — all three criteria must pass simultaneously
 - Skip adversarial phase — contradictions hide in clean audits
 - Allow parallel fix agents to edit the same file — sequential or partitioned only
-- Accept scores without visible rubric calculation — "vibes" scores are invalid
+- Accept scores without visible rubric table — "vibes" scores are invalid
 - Commit only at the end — commit after EVERY fix phase
 - Run more than 6 iterations without user checkpoint — ask if scope needs narrowing
+- Launch fix agents without writing the pre-launch checklist — no checklist = no agents
+- Skip post-fix validation — quality gate runs BEFORE every commit, no exceptions
+- Start a stress-loop without a checklist file — auto-generate on first iteration
