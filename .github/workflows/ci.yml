@@ -118,7 +118,7 @@ jobs:
 
       - name: Check shell scripts exist and are executable
         run: |
-          REQUIRED_SCRIPTS="cellm/scripts/spawn-worker.sh cellm/scripts/health-check.sh cellm/scripts/configure-otel.sh cellm/scripts/capture-prompt.sh cellm/scripts/capture-context.sh cellm/scripts/inject-context.sh cellm/scripts/track-tool-use.sh cellm/scripts/auto-recovery.sh cellm/scripts/log-rotate.sh cellm/scripts/check-dependencies.sh cellm/scripts/check-worker-health.sh cellm/scripts/init-oracle.sh"
+          REQUIRED_SCRIPTS="cellm/scripts/ensure-oracle.sh cellm/scripts/capture-prompt.sh cellm/scripts/capture-context.sh cellm/scripts/track-tool-use.sh cellm/scripts/version-guard.sh cellm/scripts/check-file-context.sh cellm/scripts/init-oracle.sh cellm/scripts/health-check.sh cellm/scripts/statusline-command.sh cellm/scripts/mcp-launcher.sh"
           for script in $REQUIRED_SCRIPTS; do
             if [ ! -f "$script" ]; then
               echo "::error::Missing shell script: $script"

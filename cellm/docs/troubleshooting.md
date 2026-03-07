@@ -114,7 +114,7 @@ bun --version
 2. **Start manually**
    ```bash
    cd ~/.claude/plugins/cellm
-   bun scripts/spawn-worker.sh
+   bun scripts/ensure-oracle.sh
    ```
 
 3. **Check logs**
@@ -143,7 +143,7 @@ bun --version
 2. **Restart server**
    ```bash
    pkill -f oracle-mcp
-   bun scripts/spawn-worker.sh
+   bun scripts/ensure-oracle.sh
    ```
 
 3. **Check firewall**
@@ -338,7 +338,7 @@ bun --version
 2. **Restart Oracle**
    ```bash
    pkill -f oracle
-   bun scripts/spawn-worker.sh
+   bun scripts/ensure-oracle.sh
    ```
 
 3. **Refresh page**
@@ -395,7 +395,7 @@ bun --version
 3. **Restart worker**
    ```bash
    pkill -f oracle
-   bun scripts/spawn-worker.sh
+   bun scripts/ensure-oracle.sh
    ```
 
 ---

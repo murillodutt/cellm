@@ -198,7 +198,7 @@ lsof -i :3000
 ```bash
 # Restart Oracle worker
 pkill -f oracle
-bun scripts/spawn-worker.sh
+bun scripts/ensure-oracle.sh
 ```
 
 ### Slow Performance

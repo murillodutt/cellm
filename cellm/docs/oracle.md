@@ -406,7 +406,7 @@ bun --version
 
 # Manually start
 cd ~/.claude/plugins/cellm
-bun scripts/spawn-worker.sh
+bun scripts/ensure-oracle.sh
 
 # Check logs
 tail -f ~/.cellm/logs/oracle-worker.log

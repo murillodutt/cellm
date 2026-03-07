@@ -22,8 +22,19 @@ command -v jq &>/dev/null || exit 0
 port=$(get_port)
 session_id=$(echo "${input}" | jq -r '.session_id // "unknown"')
 stop_reason=$(echo "${input}" | jq -r '.stop_hook_reason // "unknown"')
-hook_event=$(echo "${input}" | jq -r '.hook_event_name // "Stop"')
+hook_event=$(echo "${input}" | jq -r '.hook_event_name // empty')
 transcript_path=$(echo "${input}" | jq -r '.transcript_path // ""')
+
+# Discriminate Stop vs PreCompact: hook_event_name may not exist in input.
+# Fallback: Stop events have stop_hook_active field, PreCompact does not.
+if [[ -z "${hook_event}" ]]; then
+  has_stop_field=$(echo "${input}" | jq -r 'has("stop_hook_active") // false')
+  if [[ "${has_stop_field}" == "true" ]]; then
+    hook_event="Stop"
+  else
+    hook_event="PreCompact"
+  fi
+fi
 
 [[ "${session_id}" == "unknown" || "${session_id}" == "null" || -z "${session_id}" ]] && exit 0
 

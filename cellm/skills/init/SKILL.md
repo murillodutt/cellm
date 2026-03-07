@@ -32,7 +32,7 @@ Without arguments, present interactive menu via AskUserQuestion. With argument, 
 ## Boundaries Flow
 
 1. Check if `boundary.yml` exists — skip if present
-2. Run `bootstrap-boundaries.sh` via Bash (stdin: `{"cwd":"<project_root>"}`)
+2. Use `boundary_check` MCP tool to bootstrap boundaries for the project
 3. Read generated `boundary.yml`, show to user
 4. AskUserQuestion: keep as-is, customize, or cancel
 5. If customize: open in editor via Read + Edit

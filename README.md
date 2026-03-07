@@ -56,9 +56,9 @@ Context skills stack: editing a `server/api/*.ts` loads **typescript**.
 
 | Event | What runs |
 |-------|----------|
-| **SessionStart** | ensure-oracle, configure-otel, init-session, inject-context |
-| **UserPromptSubmit** | capture-prompt, inject-knowledge, inject-arena |
-| **PreToolUse** `Edit\|Write` | check-node-tags (workflow node lock detection) |
+| **SessionStart** | ensure-oracle, /api/hooks/init, /api/hooks/context |
+| **UserPromptSubmit** | capture-prompt, /api/knowledge/inject, /api/hooks/specs |
+| **PreToolUse** `Edit\|Write` | /api/hooks/check-tags (workflow node lock detection) |
 | **PreToolUse** `Write\|Edit\|Bash` | version-guard (dependency version warning) |
 | **PostToolUse** `Write\|Edit\|Bash\|...` | track-tool-use |
 | **PreCompact** | capture-context |
