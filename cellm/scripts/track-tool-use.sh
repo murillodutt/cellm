@@ -1,118 +1,52 @@
 #!/usr/bin/env bash
-# CELLM Oracle - Track Tool Use (PostToolUse hook)
-# Captures tool usage for AI analysis
-# Phase 7: Independent AI Analysis System
-#
-# Claude Code hooks receive data via stdin as JSON, not environment variables.
-# See: https://docs.anthropic.com/en/docs/claude-code/hooks
+# CELLM Oracle - Track Tool Use v2 (PostToolUse hook, async)
+# Captures tool usage for AI analysis.
+# Runs with "async": true — non-blocking, errors are non-visible.
 
 set -euo pipefail
 
-# Error handling: log to file, never write stderr (causes "hook error" in Claude Code)
-cleanup() {
-  local exit_code=$?
-  if [[ $exit_code -ne 0 ]]; then
-    echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] [ToolUse] Script failed with exit code $exit_code" >> "${HOME}/.cellm/oracle-hook.log" 2>/dev/null || true
-  fi
-  exit 0
-}
-
-trap cleanup EXIT
-
-# Configuration
 CELLM_DIR="${HOME}/.cellm"
 LOG_FILE="${CELLM_DIR}/oracle-hook.log"
-# shellcheck disable=SC2034 # used by sourced _get-port.sh
 DEFAULT_PORT=31415
 
-# Logging
-log() {
-  echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] [ToolUse] $1" >> "${LOG_FILE}" 2>/dev/null || true
-}
+log() { echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] [ToolUse] $1" >> "${LOG_FILE}" 2>/dev/null || true; }
 
-# Shared port extraction (jq with grep fallback + range validation)
 source "$(dirname "${BASH_SOURCE[0]}")/_get-port.sh"
 
-# Main
-main() {
-  # Source health gate
-  source "$(dirname "${BASH_SOURCE[0]}")/_health-gate.sh"
+input=""
+[[ ! -t 0 ]] && input=$(head -c 65536)
+[[ -z "${input}" ]] && exit 0
 
-  local port
-  port=$(get_port)
-  local url="http://127.0.0.1:${port}/api/session/observation"
+command -v jq &>/dev/null || exit 0
 
-  # Health gate (non-critical hook - exits silently if offline)
-  health_gate "non-critical"
+port=$(get_port)
+session_id=$(echo "${input}" | jq -r '.session_id // "unknown"')
+tool_name=$(echo "${input}" | jq -r '.tool_name // "unknown"')
+tool_input=$(echo "${input}" | jq -c '.tool_input // {}')
+tool_response=$(echo "${input}" | jq -c '.tool_response // ""')
+cwd=$(echo "${input}" | jq -r '.cwd // ""')
 
-  # Read JSON from stdin (Claude Code hook format)
-  local input=""
-  if [[ ! -t 0 ]]; then
-    input=$(head -c 65536)
-  fi
+[[ "${session_id}" == "unknown" || "${session_id}" == "null" || -z "${session_id}" ]] && exit 0
 
-  if [[ -z "${input}" ]]; then
-    log "No input received"
-    exit 0
-  fi
+# Truncate large responses
+[[ ${#tool_response} -gt 8000 ]] && tool_response="${tool_response:0:8000}[... truncated]"
 
-  # Check if jq is available
-  if ! command -v jq &> /dev/null; then
-    log "jq not found, skipping"
-    exit 0
-  fi
+# Project detection
+source "$(dirname "${BASH_SOURCE[0]}")/_detect-project.sh"
+project=$(detect_project "${cwd:-${PWD}}")
 
-  # Parse JSON input from Claude Code hook
-  local session_id tool_name tool_input tool_response cwd project
-  session_id=$(echo "${input}" | jq -r '.session_id // "unknown"')
-  tool_name=$(echo "${input}" | jq -r '.tool_name // "unknown"')
-  tool_input=$(echo "${input}" | jq -c '.tool_input // {}')
-  tool_response=$(echo "${input}" | jq -c '.tool_response // ""')
-  if [[ ${#tool_response} -gt 8000 ]]; then
-    log "Truncating response from ${#tool_response} to 8000 chars"
-    tool_response="${tool_response:0:8000}[... truncated]"
-  fi
-  cwd=$(echo "${input}" | jq -r '.cwd // ""')
+payload=$(jq -n \
+  --arg sid "${session_id}" \
+  --arg proj "${project}" \
+  --arg tn "${tool_name}" \
+  --argjson ti "${tool_input}" \
+  --arg tr "${tool_response}" \
+  --arg cwd "${cwd}" \
+  '{ sessionId: $sid, project: $proj, toolName: $tn, toolInput: $ti, toolOutput: $tr, cwd: $cwd }')
 
-  # Shared project detection (5 priority levels)
-  source "$(dirname "${BASH_SOURCE[0]}")/_detect-project.sh"
-  project=$(detect_project "${cwd:-${PWD}}")
+curl -sf --max-time 2 --connect-timeout 0.5 \
+  -X POST -H "Content-Type: application/json" \
+  -d "${payload}" \
+  "http://127.0.0.1:${port}/api/session/observation" >/dev/null 2>&1 || true
 
-  # Skip if no valid session
-  if [[ "${session_id}" == "unknown" || "${session_id}" == "null" || -z "${session_id}" ]]; then
-    log "No valid session_id, skipping"
-    exit 0
-  fi
-
-  # Build JSON payload for Oracle API
-  local payload
-  payload=$(jq -n \
-    --arg sid "${session_id}" \
-    --arg proj "${project}" \
-    --arg tn "${tool_name}" \
-    --argjson ti "${tool_input}" \
-    --arg tr "${tool_response}" \
-    --arg cwd "${cwd}" \
-    '{
-      sessionId: $sid,
-      project: $proj,
-      toolName: $tn,
-      toolInput: $ti,
-      toolOutput: $tr,
-      cwd: $cwd
-    }')
-
-  # Send observation request (async, don't wait)
-  curl -sf --max-time 1 --connect-timeout 0.3 \
-    -X POST \
-    -H "Content-Type: application/json" \
-    -d "${payload}" \
-    "${url}" >/dev/null 2>&1 &
-
-  log "Queued observation: ${tool_name} (session: ${session_id})"
-
-  # Always exit 0 - never break CLI
-  exit 0
-}
-
-main "$@"
+log "Observation: ${tool_name} (session: ${session_id})"

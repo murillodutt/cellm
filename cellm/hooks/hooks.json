@@ -10,19 +10,14 @@
             "timeout": 15
           },
           {
-            "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/configure-otel.sh",
-            "timeout": 1
-          },
-          {
-            "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/init-session.sh",
-            "timeout": 3
-          },
-          {
-            "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/inject-context.sh",
+            "type": "http",
+            "url": "http://127.0.0.1:31415/api/hooks/init",
             "timeout": 5
+          },
+          {
+            "type": "http",
+            "url": "http://127.0.0.1:31415/api/hooks/context",
+            "timeout": 8
           }
         ]
       }
@@ -33,7 +28,8 @@
           {
             "type": "command",
             "command": "${CLAUDE_PLUGIN_ROOT}/scripts/capture-prompt.sh",
-            "timeout": 1
+            "timeout": 3,
+            "async": true
           },
           {
             "type": "http",
@@ -42,12 +38,7 @@
           },
           {
             "type": "http",
-            "url": "http://127.0.0.1:31415/api/arena/pending",
-            "timeout": 3
-          },
-          {
-            "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/inject-specs.sh",
+            "url": "http://127.0.0.1:31415/api/hooks/specs",
             "timeout": 3
           }
         ]
@@ -58,8 +49,8 @@
         "matcher": "Edit|Write",
         "hooks": [
           {
-            "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/check-node-tags.sh",
+            "type": "http",
+            "url": "http://127.0.0.1:31415/api/hooks/check-tags",
             "timeout": 2
           }
         ]
@@ -80,9 +71,10 @@
         "matcher": "Write|Edit|Bash|Read|Grep|Glob|NotebookEdit|WebFetch|WebSearch|Task",
         "hooks": [
           {
-            "type": "http",
-            "url": "http://127.0.0.1:31415/api/hook/track-tool-use",
-            "timeout": 1
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/track-tool-use.sh",
+            "timeout": 3,
+            "async": true
           }
         ]
       },
@@ -101,9 +93,10 @@
       {
         "hooks": [
           {
-            "type": "http",
-            "url": "http://127.0.0.1:31415/api/hook/capture-context",
-            "timeout": 5
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/capture-context.sh",
+            "timeout": 10,
+            "async": true
           }
         ]
       }
@@ -112,9 +105,10 @@
       {
         "hooks": [
           {
-            "type": "http",
-            "url": "http://127.0.0.1:31415/api/hook/capture-context",
-            "timeout": 5
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/capture-context.sh",
+            "timeout": 10,
+            "async": true
           }
         ]
       }

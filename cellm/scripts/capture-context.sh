@@ -1,147 +1,65 @@
 #!/usr/bin/env bash
-# CELLM Oracle - Capture Context (Stop hook)
-# Ends session and triggers AI summary generation
-# Phase 7: Independent AI Analysis System
-#
-# Claude Code hooks receive data via stdin as JSON, not environment variables.
-# See: https://docs.anthropic.com/en/docs/claude-code/hooks
+# CELLM Oracle - Capture Context v2 (Stop/PreCompact hook, async)
+# Ends session and triggers AI summary generation.
+# Runs with "async": true — non-blocking, errors are non-visible.
 
 set -euo pipefail
 
-# Error handling: log to file, never write stderr (causes "hook error" in Claude Code)
-cleanup() {
-  local exit_code=$?
-  if [[ $exit_code -ne 0 ]]; then
-    echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] [Stop] Script failed with exit code $exit_code" >> "${HOME}/.cellm/oracle-hook.log" 2>/dev/null || true
-  fi
-  exit 0
-}
-
-trap cleanup EXIT
-
-# Configuration
 CELLM_DIR="${HOME}/.cellm"
 LOG_FILE="${CELLM_DIR}/oracle-hook.log"
-# shellcheck disable=SC2034 # used by sourced _get-port.sh
 DEFAULT_PORT=31415
 
-# Logging
-log() {
-  echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] [Stop] $1" >> "${LOG_FILE}" 2>/dev/null || true
-}
+log() { echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] [Stop] $1" >> "${LOG_FILE}" 2>/dev/null || true; }
 
-# Shared port extraction (jq with grep fallback + range validation)
 source "$(dirname "${BASH_SOURCE[0]}")/_get-port.sh"
 
-# Main
-main() {
-  # Source health gate
-  source "$(dirname "${BASH_SOURCE[0]}")/_health-gate.sh"
+input=""
+[[ ! -t 0 ]] && input=$(head -c 65536)
+[[ -z "${input}" ]] && exit 0
 
-  local port
-  port=$(get_port)
+command -v jq &>/dev/null || exit 0
 
-  # Health gate (non-critical: skip silently if worker offline)
-  health_gate "non-critical"
+port=$(get_port)
+session_id=$(echo "${input}" | jq -r '.session_id // "unknown"')
+stop_reason=$(echo "${input}" | jq -r '.stop_hook_reason // "unknown"')
+hook_event=$(echo "${input}" | jq -r '.hook_event_name // "Stop"')
+transcript_path=$(echo "${input}" | jq -r '.transcript_path // ""')
 
-  # Read JSON from stdin (Claude Code hook format)
-  local input=""
-  if [[ ! -t 0 ]]; then
-    input=$(head -c 65536)
+[[ "${session_id}" == "unknown" || "${session_id}" == "null" || -z "${session_id}" ]] && exit 0
+
+log "Hook triggered (event: ${hook_event}, session: ${session_id}, reason: ${stop_reason})"
+
+if [[ "${hook_event}" == "PreCompact" ]]; then
+  payload=$(jq -n --arg sid "${session_id}" --arg reason "${stop_reason}" \
+    '{ sessionId: $sid, reason: $reason }')
+
+  curl -sf --max-time 3 --connect-timeout 0.5 \
+    -X POST -H "Content-Type: application/json" \
+    -d "${payload}" \
+    "http://127.0.0.1:${port}/api/session/compact" >/dev/null 2>&1 || true
+
+  log "Compaction snapshot sent"
+else
+  payload=$(jq -n --arg sid "${session_id}" --arg reason "${stop_reason}" \
+    '{ sessionId: $sid, stopReason: $reason }')
+
+  curl -sf --max-time 3 --connect-timeout 0.5 \
+    -X POST -H "Content-Type: application/json" \
+    -d "${payload}" \
+    "http://127.0.0.1:${port}/api/session/stop" >/dev/null 2>&1 || true
+
+  log "Session stop sent (summary queued)"
+
+  # Knowledge extraction from transcript (background, longer timeout)
+  if [[ -n "${transcript_path}" && -f "${transcript_path}" ]]; then
+    kf_payload=$(jq -n --arg sid "${session_id}" --arg tp "${transcript_path}" \
+      '{ sessionId: $sid, transcriptPath: $tp }')
+
+    (curl -sf --max-time 120 --connect-timeout 1 \
+      -X POST -H "Content-Type: application/json" \
+      -d "${kf_payload}" \
+      "http://127.0.0.1:${port}/api/session/extract-knowledge" >/dev/null 2>&1 || true) &
+
+    log "Knowledge extraction triggered (background)"
   fi
-
-  if [[ -z "${input}" ]]; then
-    log "No input received"
-    exit 0
-  fi
-
-  # Check if jq is available
-  if ! command -v jq &> /dev/null; then
-    log "jq not found, skipping"
-    exit 0
-  fi
-
-  # Parse JSON input from Claude Code hook
-  local session_id stop_reason hook_event transcript_path
-  session_id=$(echo "${input}" | jq -r '.session_id // "unknown"')
-  stop_reason=$(echo "${input}" | jq -r '.stop_hook_reason // "unknown"')
-  hook_event=$(echo "${input}" | jq -r '.hook_event_name // "Stop"')
-  transcript_path=$(echo "${input}" | jq -r '.transcript_path // ""')
-
-  log "Hook triggered (event: ${hook_event}, session: ${session_id}, reason: ${stop_reason})"
-
-  # Skip if no valid session
-  if [[ "${session_id}" == "unknown" || "${session_id}" == "null" || -z "${session_id}" ]]; then
-    log "No valid session_id, skipping"
-    exit 0
-  fi
-
-  log "Worker online at port ${port}"
-
-  # Route based on hook event: PreCompact = snapshot, Stop = summary
-  if [[ "${hook_event}" == "PreCompact" ]]; then
-    # PreCompact: lightweight snapshot, does NOT end session
-    local url="http://127.0.0.1:${port}/api/session/compact"
-    local payload
-    payload=$(jq -n \
-      --arg sid "${session_id}" \
-      --arg reason "${stop_reason}" \
-      '{
-        sessionId: $sid,
-        reason: $reason
-      }')
-
-    curl -sf --max-time 3 --connect-timeout 0.5 \
-      -X POST \
-      -H "Content-Type: application/json" \
-      -d "${payload}" \
-      "${url}" >/dev/null 2>&1 || true
-
-    log "Compaction snapshot sent"
-  else
-    # Stop: full session end + summary generation
-    local url="http://127.0.0.1:${port}/api/session/stop"
-    local payload
-    payload=$(jq -n \
-      --arg sid "${session_id}" \
-      --arg reason "${stop_reason}" \
-      '{
-        sessionId: $sid,
-        stopReason: $reason
-      }')
-
-    curl -sf --max-time 3 --connect-timeout 0.5 \
-      -X POST \
-      -H "Content-Type: application/json" \
-      -d "${payload}" \
-      "${url}" >/dev/null 2>&1 || true
-
-    log "Session stop sent (summary queued)"
-
-    # Knowledge Funnel safety net: extract knowledge from transcript (background)
-    if [[ -n "${transcript_path}" && -f "${transcript_path}" ]]; then
-      local kf_url="http://127.0.0.1:${port}/api/session/extract-knowledge"
-      local kf_payload
-      kf_payload=$(jq -n \
-        --arg sid "${session_id}" \
-        --arg tp "${transcript_path}" \
-        '{
-          sessionId: $sid,
-          transcriptPath: $tp
-        }')
-
-      # Run in background with longer timeout (transcript analysis is heavier)
-      (curl -sf --max-time 120 --connect-timeout 1 \
-        -X POST \
-        -H "Content-Type: application/json" \
-        -d "${kf_payload}" \
-        "${kf_url}" >/dev/null 2>&1 || true) &
-
-      log "Knowledge extraction triggered (background)"
-    fi
-  fi
-
-  exit 0
-}
-
-main "$@"
+fi

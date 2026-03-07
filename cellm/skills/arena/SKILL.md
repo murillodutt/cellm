@@ -25,7 +25,7 @@ Quality checks for Node.js/Bun projects. Detect tooling automatically from `pack
 | (empty) / `all` | Tests + typecheck + health (sequential) |
 | `labs` | Find `*-arena.test.ts` files, run only those |
 | `typecheck` | TypeScript only |
-| `health` | Oracle endpoints: `/health`, `/api/ai-status`, `/api/arena/pending` |
+| `health` | Oracle endpoints: `/health`, `/api/ai-status` |
 | `file <path>` | Grep for test files referencing basename, run matches |
 | `pre-commit` | Run pre-commit pipeline: validate.sh + lint:md + quality_gate(typecheck) + quality_gate(tests) |
 | `debug <error>` | Delegate to `/cellm:arena-debug` — stop here |

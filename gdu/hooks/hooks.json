@@ -5,8 +5,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node ${CLAUDE_PLUGIN_ROOT}/hooks/interceptor.js",
-            "timeout": 3
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/interceptor.sh",
+            "timeout": 2
           }
         ]
       }

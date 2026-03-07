@@ -26,9 +26,8 @@ if [[ ! -d "${PROJECT_DIR}/${doc_root}" ]]; then
   exit 0
 fi
 
-if git -C "${PROJECT_DIR}" status --porcelain "${doc_root}" | grep -q '.'; then
-  timestamp="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-  echo "[${timestamp}] DocOps: docs changed under ${doc_root}. Run /docops:sync." >> "${LOG_PATH}" 2>/dev/null || true
+if git -C "${PROJECT_DIR}" status --porcelain "${doc_root}" 2>/dev/null | grep -q '.'; then
+  echo "[DOCOPS] Documentation changed under ${doc_root}. Consider running /docops:sync to update derived docs."
 fi
 
 exit 0
