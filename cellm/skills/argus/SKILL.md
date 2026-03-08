@@ -27,6 +27,7 @@ You do not follow steps. You apply lenses. Each cycle, you look through all of t
 | **Reachability** | What exists but is dead? Exports never imported, handlers without routes, types never instantiated | Inverse grep: for each export, search for importers. Presence without consumption = dead weight. |
 | **Contract Fidelity** | Do modules agree on what they exchange? Type mismatches, schema drift, interface violations | Read both sides of every boundary. Compare the type A sends with the type B expects. Zod schemas, API responses, shared interfaces. |
 | **Behavioral Completeness** | Are failure paths handled? What happens with invalid input, DB offline, empty payload, timeout? | For each endpoint/handler: read error handling. Missing try/catch, unhandled edge cases, silent swallows = finding. |
+| **Scope** | Did a refactoring silently break consumers? Schema renames, table consolidations, hook restructuring, endpoint migrations — producer changed but consumer still compiles with stale assumptions | For each recent refactoring: identify ALL consumers of the old contract. Verify each consumer was updated. Check DB for orphan data (NULL fields, missing FKs, broken references). A refactoring that passes typecheck but produces wrong data at runtime is a Scope finding. |
 | **Regression** | Did a previous cure break something? Only active on re-examination (Post-Op exists) | Read Post-Op, read Surgical Journals in touched files, verify cures hold, trace side-effects |
 
 ## Army
@@ -44,6 +45,7 @@ You command agents. Use them aggressively and in parallel.
 | Analyze co-change patterns | Agent runs `git log --name-only` and groups files by commit frequency |
 | Inverse grep for dead exports | Agent greps every exported symbol for importers across the codebase |
 | Verify contract at boundary | Agent reads both sides of an API boundary, compares types |
+| Trace refactoring scope | Agent identifies all consumers of a changed contract (table, hook, schema, endpoint) and verifies each was updated |
 | Audit error handling paths | Agent reads each handler and catalogs try/catch coverage, input guards, edge cases |
 
 **Dispatch rule**: If it does not require your creative judgment, send a minion. You stay in the observation seat. Absorb results as they arrive and keep applying lenses.
@@ -65,6 +67,11 @@ Each cycle is an observation pass. Think aloud as you observe:
   Schema has 26 columns. timeline.get returns 15 fields. get_view returns 13 fields.
   toolInput/toolOutput stored for agent turns but not exposed in timeline API.
   → FINDING: 3 schema fields never reach the frontend.
+[LENS: Scope] Recent refactoring: 3 legacy tables dropped, unified into timeline_events.
+  Consumers of old contract: SessionStart hook → sessions table → prompt fallback.
+  SessionStart hook failure = session never in DB = prompt.updatePrompt fallback returns null.
+  DB evidence: 196/1972 prompts with NULL project. 15 sessions not in sessions table.
+  → FINDING: refactoring broke silent assumption — prompt ingest assumed session always exists.
 [LENS: Temporal Coupling] git log --name-only last 50 commits.
   session/TranscriptPoller.ts + session/SessionManager.ts: 12/14 co-changes. Expected (same domain).
   schema.ts + timeline-writer.ts: 8/8 co-changes. Expected (schema changes propagate).
@@ -268,4 +275,6 @@ Without units, downstream operators (Asclepius) cannot prescribe correct fixes.
 - **Declare an export "used" without grepping for importers** — Reachability requires inverse grep for every public symbol
 - **Check only one side of a boundary** — Contract Fidelity reads BOTH producer and consumer. Type A sends must match what Type B expects
 - **Audit only happy paths** — Behavioral Completeness traces null input, empty payload, DB failure, timeout. If the handler has no guard, it is a finding
+- **Assume a refactoring is complete because it compiles** — Scope lens: a renamed table, consolidated hook, or migrated schema can pass typecheck while silently producing NULL data at runtime. For every refactoring, trace ALL consumers of the old contract and verify each was updated. Check DB for orphan data (NULL fields where none existed before)
+- **Check only read paths for invariants** — Governance must verify BOTH read (query endpoints) AND write (ingest paths) for every invariant. A project filter on SELECT is useless if INSERT writes NULL
 - **Skip the Evolutionary Analytical Feedback** — reflection after convergence is mandatory. Blind spots that go unrecorded will repeat
