@@ -2,7 +2,7 @@
 description: Iterative optimization engine for any artifact — UI, landing pages, dashboards, prompts, functions, pipelines. Activates when the user wants to build or improve anything to its maximum quality through research, measurement, and relentless iteration. Use when you hear "iterate", "optimize", "maximize", "make it perfect", "best version", "improve until done".
 user-invocable: true
 argument-hint: "[what to optimize] — e.g. 'landing page', 'search function', 'dashboard layout', 'ollama prompts'"
-allowed-tools: Agent, Read, Edit, Write, Glob, Grep, Bash, WebSearch, WebFetch, mcp__context7__resolve-library-id, mcp__context7__query-docs, mcp__nuxt-remote__get-documentation-page, mcp__nuxt-remote__list-documentation-pages, mcp__nuxt-ui-remote__get-component, mcp__nuxt-ui-remote__list-components, mcp__plugin_cellm_cellm-oracle__search, mcp__plugin_cellm_cellm-oracle__knowledge_search, mcp__plugin_cellm_cellm-oracle__record_observation
+allowed-tools: Agent, Read, Edit, Write, Glob, Grep, Bash, WebSearch, WebFetch, mcp__context7__resolve-library-id, mcp__context7__query-docs, mcp__nuxt-remote__get-documentation-page, mcp__nuxt-remote__list-documentation-pages, mcp__nuxt-ui-remote__get-component, mcp__nuxt-ui-remote__list-components, mcp__plugin_cellm_cellm-oracle__search, mcp__plugin_cellm_cellm-oracle__knowledge_search, mcp__plugin_cellm_cellm-oracle__record_observation, mcp__plugin_playwright_playwright__browser_navigate, mcp__plugin_playwright_playwright__browser_snapshot, mcp__plugin_playwright_playwright__browser_take_screenshot, mcp__plugin_playwright_playwright__browser_evaluate, mcp__plugin_playwright_playwright__browser_console_messages, mcp__plugin_playwright_playwright__browser_network_requests, mcp__plugin_playwright_playwright__browser_click, mcp__plugin_playwright_playwright__browser_run_code, mcp__plugin_playwright_playwright__browser_tabs, mcp__plugin_playwright_playwright__browser_close
 ---
 
 # Iterate — War Room
@@ -34,8 +34,9 @@ You command agents. Use them.
 | Research 5 sources simultaneously | Launch 5 parallel agents — WebSearch, Grep local repos, MCP docs, codebase patterns, Oracle knowledge. Do not wait for one before launching the next. |
 | Validate a hypothesis | Spawn an agent to test while you prepare the next hypothesis. |
 | Explore a codebase for patterns | Agent with `subagent_type: Explore` — faster than doing it yourself. |
-| Build or improve in isolation | Agent with `isolation: "worktree"` — changes in a clean copy, merge only if successful. |
+| Build or improve in isolation | Agent with `isolation: "worktree"` — changes in a clean copy, merge only if successful. **Default for risky changes** — if a change could break the build, it goes in a worktree first. |
 | Side-fix without breaking flow | Lint error? Type mismatch? Doc gap? Dispatch a background agent (`run_in_background: true`). It fixes, you keep moving. Absorb the result when it returns. |
+| Record what you learned | When an iteration reveals a reusable insight (gotcha, pattern, decision), call `record_observation` immediately. The knowledge compounds — future iterations (yours and others) inherit what you found. |
 
 You are the strategist. The agents are your minions. The dispatch rule is simple: if it does not require your creative judgment, it does not deserve your attention. Send a minion. Stay in flow.
 
@@ -84,9 +85,81 @@ Before declaring done, verify the battlefield is clean:
 - All commits made with proper messages
 - All docs written or updated
 - All side-fixes resolved — no TODOs, no "fix later"
-- Technical report written to `docs/technical/reports/` — every iteration, every number, every source
+- Technical report written to `docs/cellm/reports/` — every iteration, every number, every source
 
 Undocumented work did not happen. Unresolved debris means the loop is not done.
+
+## DevTools — Five Instruments
+
+You have five ways to reach the web. Each exists because it solves something the others cannot. Pick the right one — or you waste cycles and get worse data.
+
+### Routing
+
+| Need | Instrument | Why this one |
+|------|-----------|-------------|
+| Rendered page, DOM, JS state | **Playwright MCP** | Headless, autonomous, full browser engine. Default for UI work. |
+| API latency, headers, raw HTTP | **cURL** (via Bash) | Fastest. No browser overhead. `curl -w '%{time_total}' -o /dev/null -s` for pure timing. |
+| Read and summarize web content | **WebFetch** | Converts HTML to markdown + AI summary in one call. Best for docs, articles, references. |
+| Discover sources you don't have | **WebSearch** | Search engine. Use when you need to find something, not fetch something you already know. |
+| Authenticated pages, user session | **Chrome Plugin** | Only option when the page requires the user's cookies (logged-in dashboards, private repos). Needs their Chrome open. Ask before using — it is their browser. |
+
+The decision is about **what you need to see**: rendered DOM → Playwright. Raw HTTP → cURL. Content to read → WebFetch. Something to find → WebSearch. Authenticated state → Chrome Plugin.
+
+### Playwright MCP — Primary
+
+| Mission | Tool | Why |
+|---------|------|-----|
+| See the current state | `browser_snapshot` | Accessibility tree — structure, roles, text. Faster than screenshot, richer than HTML. |
+| Visual proof | `browser_take_screenshot` | Viewport, fullpage, or single element. Attach to iteration reports. |
+| Measure runtime perf | `browser_evaluate` | Run `performance.getEntriesByType('navigation')`, `PerformanceObserver`, CLS/LCP/FID. Real numbers. |
+| Extract computed state | `browser_evaluate` | `getComputedStyle()`, DOM dimensions, scroll positions, CSS variable values. |
+| Audit network | `browser_network_requests` | API calls, payload sizes, failed requests, redirect chains. |
+| Catch errors | `browser_console_messages` | JS errors, warnings, deprecations — filter by level. |
+| Test interaction flows | `browser_click` + `browser_snapshot` | Click, then snapshot. Did the state change? Did the modal open? Did the error clear? |
+| Run arbitrary Playwright | `browser_run_code` | Full `page` object — cookies, localStorage, custom wait conditions, multi-step flows. |
+
+The pattern: **navigate → snapshot → measure → change → navigate → snapshot → compare**. Same loop as the Engine, but with a browser as the measuring instrument.
+
+### Detect the Dev Server
+
+Before using any instrument against a local app, find what is running:
+
+```bash
+lsof -i -P -n | grep -E 'node|bun' | grep LISTEN
+```
+
+This gives you the port. Cross-check with `nuxt.config.ts`, `vite.config.ts`, or `package.json` scripts to confirm. Never hardcode a port — detect it every time.
+
+### cURL — When You Need Raw Speed
+
+```bash
+# API response time (no browser overhead)
+curl -s -o /dev/null -w '%{time_total}\n' http://localhost:$PORT/api/health
+
+# Response headers + status
+curl -sI http://localhost:$PORT/api/metrics
+
+# POST with payload, capture timing
+curl -s -w '\n%{time_total}s' -X POST -H 'Content-Type: application/json' \
+  -d '{"query":"test"}' http://localhost:$PORT/api/search
+```
+
+Playwright adds ~200ms browser overhead per request. For API-only iterations where you measure latency across 10+ endpoints, cURL in a loop is 10x faster and the numbers are cleaner.
+
+### Playwright CLI — When MCP Is Not Enough
+
+The MCP tools cover 90% of cases. Use `npx playwright` directly via Bash when you need:
+
+```bash
+# Generate a trace file for deep debugging
+npx playwright test --trace on --headed
+
+# Screenshot across multiple viewports in one pass
+npx playwright screenshot --full-page --viewport-size 1280,720 http://localhost:$PORT desktop.png
+npx playwright screenshot --full-page --viewport-size 375,812 http://localhost:$PORT mobile.png
+```
+
+Playwright sees exactly what the user sees — SSR content, hydrated state, API responses. Use it to validate that UI iterations actually work, not just compile.
 
 ## NEVER
 
