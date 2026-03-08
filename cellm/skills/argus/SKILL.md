@@ -22,6 +22,7 @@ You do not follow steps. You apply lenses. Each cycle, you look through all of t
 | **Gaps** | What should exist but doesn't? Dead types, missing paths, unreachable code, untested branches | What the census found vs what the classifier uses vs what the DB contains. |
 | **Redundancy** | What is said twice? Sections that overlap, tables that repeat, information scattered | Same fact in two places = one must go. Pick the better home. |
 | **Relations** | How does this block connect to others? Dependencies, events, shared tables, cross-block flows | Trace integration points. Events subscribed, tables shared, APIs consumed. |
+| **Regression** | Did a previous cure break something? Only active on re-examination (Post-Op exists) | Read Post-Op, read Surgical Journals in touched files, verify cures hold, trace side-effects |
 
 ## Army
 
@@ -75,6 +76,57 @@ The output is a technical block reference document. It has no fixed template —
 7. **How does it connect?** — Integration with other blocks
 
 The document lives in `docs/technical/blocks/{block-name}.md`. If a previous version exists, it becomes `{block-name}-legacy.md`.
+
+## Re-examination Mode
+
+Argus operates in two modes. The mode is detected automatically — never configured manually.
+
+| Signal | Mode | Focus |
+|--------|------|-------|
+| No Post-Op section in `{target}-report.md` | **Virgin exam** | Map everything. Full 9 lenses. Discover the block's shape. |
+| Post-Op section exists in `{target}-report.md` | **Re-examination** | Verify cures hold. Detect regressions. Full lenses PLUS Regression lens. |
+
+### Virgin Exam
+
+Standard Argus behavior. All lenses, iterative cycles, convergence when flat.
+
+### Re-examination (post-Asclepius)
+
+When a Post-Op note exists, Asclepius has operated. The block has changed. Your job shifts:
+
+**Step 1: Read the Post-Op note.** Extract:
+- Which findings were CURED (and their spec IDs)
+- Which files were touched (from specs and commit history)
+- Which findings were BLOCKED (these need fresh eyes)
+
+**Step 2: Read Surgical Journals.** Every file Asclepius touched has a comment block at the top documenting what changed, who calls it, and what risks were considered. Read each journal. These are the surgeon's notes — they tell you exactly where to look for side-effects.
+
+```
+[LENS: Regression] Reading Surgical Journal in cleanup.delete.ts
+  Journal says: "Added cascade delete for entity_observations + dot23_classifications.
+    Callers: cleanup.delete.ts (3 sites). Risk: none identified."
+  Verification: grep confirms both DELETE statements present.
+  Side-effect check: entity_observations read by entity-extractor.ts — still works?
+    → entity-extractor reads by timeline_event_id, not by own ID. No impact. OK.
+  Side-effect check: dot23_classifications read by sweep.ts — still works?
+    → sweep reads by project + unclassified status. Deletes only affect classified rows. OK.
+  → Cure holds. No regression detected.
+```
+
+**Step 3: Verify CURED findings.** For each cured finding, re-run the same evidence query Argus originally used. The finding should no longer appear.
+
+```
+[LENS: Regression] B3 — cascade delete incompleto (CURED by Asclepius)
+  Original evidence: grep confirms 0 deletes for entity_observations → NOW shows DELETE present
+  DB check: orphan count for entity_observations → was N, now 0 after cleanup
+  → Cure CONFIRMED
+```
+
+**Step 4: Detect new findings.** Cures can introduce new bugs. Apply all standard lenses to the touched files and their immediate neighbors (callers, consumers). Any new finding gets a new ID in the existing series (e.g., if B4 was the last bug, a regression becomes B5).
+
+**Step 5: Re-evaluate BLOCKED findings.** Asclepius flagged these as `[NEED EYES]`. Examine with fresh perspective. Reclassify if needed.
+
+After the Regression lens, continue with all other lenses as normal. The re-examination converges the same way — two flat cycles with zero discoveries.
 
 ## Convergence
 
@@ -131,3 +183,7 @@ The tone is that of a specialist writing a detailed report after thorough examin
 - **Work sequentially when you can work in parallel** — dispatch the army
 - **Polish prose when facts are wrong** — accuracy before aesthetics
 - **Leave redundancy** — same fact in two places means the document is not done
+- **Skip the Regression lens on re-examination** — if Post-Op exists, cures MUST be verified
+- **Ignore Surgical Journals** — they are the surgeon's notes, read them on re-exam
+- **Assume cures hold** — verify every CURED finding with the original evidence query
+- **Skip BLOCKED findings** — Asclepius flagged them for you. Re-evaluate with fresh eyes
