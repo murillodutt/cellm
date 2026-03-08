@@ -50,7 +50,22 @@ Think aloud:
   Risk zones: cascadeDeleteTimelineAux (already known incomplete), COMPASS type rules (22 regexes, tight coupling).
 ```
 
-### 0.2 Safety Gate
+### 0.2 Finding Verification (mandatory)
+
+Before creating ANY spec, verify that the finding STILL EXISTS in the current codebase. Argus reports can be stale — code may have changed since examination.
+
+For each finding, run the same evidence query Argus used (grep, DB query, code read). If the evidence no longer supports the finding:
+
+```
+[RECON] T5 — project inconsistency in ingest paths
+  Argus evidence: "prompts lack project field"
+  Verification: grep shows all 6 ingest paths propagate project correctly
+  → FALSE POSITIVE. Mark MONITOR with evidence. Do not create spec.
+```
+
+**Never create specs in batch.** Verify one finding → create one spec → cure → next. Batch spec creation risks wasting specs on false positives.
+
+### 0.3 Safety Gate
 
 Before any operation begins:
 
@@ -63,7 +78,7 @@ If working tree is dirty: `[!] Working tree dirty. Commit or stash before operat
 
 This gate runs ONCE at the start AND before each individual cure. A dirty tree means something changed outside the cure loop — investigate, do not ignore.
 
-### 0.3 File Tracking Gate
+### 0.4 File Tracking Gate
 
 Before editing ANY file during a cure, confirm it is tracked:
 
@@ -140,6 +155,27 @@ Map the dependency graph for the fix target. Think aloud:
 ```
 
 If impact analysis reveals consumers you did not expect: STOP. Re-evaluate the finding disposition. What looked like OPERATE may actually be CONSTRUCT.
+
+### Mock Impact Mapping (when fix adds/removes queries)
+
+If the cure adds, removes, or reorders database queries in a function, identify ALL tests that mock that function with `mockResolvedValueOnce` chains. Sequential mocks break when call order changes.
+
+```
+[IMPACT] T2 — adding auto-heal UPDATE at top of calibrateThresholds
+  Tests with sequential mocks: dot23-learner.test.ts (6 test cases)
+  Each test uses mockResolvedValueOnce chain — new query shifts ALL positions.
+  → Must prepend one mock result to each chain.
+```
+
+### Config Semantics (when fix changes config values)
+
+When a finding involves configuration values, Reconnaissance MUST clarify units and semantics before prescribing:
+
+```
+[RECON] T4 — WriteGate window "is 5"
+  What is "5"? → 5 items (most recent observations), NOT 5 seconds/minutes.
+  Implication: increasing to 10 means comparing against 10 recent observations.
+```
 
 ### Think aloud — enumerate approaches
 
@@ -291,6 +327,26 @@ The Verify phase re-checks the specific finding. The same evidence that Argus us
 
 If verification fails: one retry via new task in the same spec. If the retry fails, transition spec to `blocked`, flag `[NEED EYES]`, and move to the next finding.
 
+### Oracle Resilience
+
+If `spec_transition` or any CellmOS MCP call fails (Oracle offline, timeout):
+
+1. Retry once after 5 seconds
+2. If still failing: commit the code fix anyway, annotate the pending transition in the Post-Op note
+3. Continue the cure loop — do not block on Oracle availability
+4. When Oracle comes back, reconcile all pending transitions before Post-Op
+
+The cure takes priority over the spec bookkeeping. Lost fixes are worse than untracked specs.
+
+### False Positive Protocol
+
+If Reconnaissance proves a finding does not exist in current code:
+
+1. Do NOT create a spec
+2. Mark as `FALSE POSITIVE` in the triage table with evidence
+3. Document the verification query that disproved the finding
+4. Include in Post-Op under a dedicated "False Positive" section
+
 ## Army
 
 Dispatch agents for mechanical work:
@@ -360,3 +416,7 @@ Asclepius does NOT re-examine. If your partner requests re-examination, invoke A
 - **Write non-English content to specs** — DB is always English
 - **Create vague tasks** — "fix the bug" is not a task. "Add cascade delete for entity_observations in cascadeDeleteTimelineAux" is
 - **Skip project detection** — always derive from git root
+- **Create specs before verifying findings** — Reconnaissance verification is mandatory. Stale findings waste specs
+- **Create specs in batch** — one finding verified, one spec created, one cure executed. Sequential, not parallel
+- **Assume config values without units** — "window is 5" means nothing. 5 items? 5 seconds? Clarify before prescribing
+- **Block the cure loop on Oracle failures** — commit the fix, annotate pending transitions, reconcile later

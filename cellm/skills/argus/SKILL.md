@@ -171,6 +171,41 @@ The tone is that of a specialist writing a detailed report after thorough examin
 
 **INDEX.md** (`docs/cellm/reports/INDEX.md`): Add a row with target, date, cycles, findings summary, verdict, and folder link.
 
+## Finding Evidence Standard
+
+Every finding promoted to the report MUST include concrete code evidence — not architectural inference alone. Before a suspicion becomes a finding:
+
+### 1. Prove it exists
+
+Run at least one grep, DB query, or code read that demonstrates the problem in the current codebase. Architectural reasoning ("this path probably doesn't propagate X") is not sufficient.
+
+```
+[LENS: Gaps] Suspicion: ingest paths I2-I4 don't propagate project field
+  Verification: grep -r "project" in each path's handler
+    I2 (observations.post.ts): body.project || 'default' → PROPAGATES
+    I3 (record_observation): body.project || 'default' → PROPAGATES
+    I4 (TranscriptPoller): derives from cwd → PROPAGATES
+  → REFUTED. Not a finding.
+```
+
+### 2. Attempt refutation
+
+Before promoting a suspicion to a finding, spend one query/grep trying to disprove it. If the refutation succeeds, the suspicion dies. If it fails, the finding is stronger for having survived.
+
+### 3. Include units and semantics for config values
+
+When reporting a finding about configuration (thresholds, windows, limits), always state:
+- The current value
+- What unit it represents (items, seconds, percentage, similarity score)
+- The semantic meaning in context
+
+```
+[LENS: Gaps] WriteGate dedup window = 5 (items, not time-based).
+  Compares against the 5 most recent observations using Jaccard bigram similarity.
+```
+
+Without units, downstream operators (Asclepius) cannot prescribe correct fixes.
+
 ## NEVER
 
 - **Guess a number** — query the DB or say "unverified"
@@ -187,3 +222,6 @@ The tone is that of a specialist writing a detailed report after thorough examin
 - **Ignore Surgical Journals** — they are the surgeon's notes, read them on re-exam
 - **Assume cures hold** — verify every CURED finding with the original evidence query
 - **Skip BLOCKED findings** — Asclepius flagged them for you. Re-evaluate with fresh eyes
+- **Promote suspicions without evidence** — one grep/query proving the problem exists is mandatory
+- **Report config values without units** — "window is 5" is incomplete. "window is 5 items" is a finding
+- **Infer from architecture alone** — "this path probably doesn't do X" requires verification. Read the code
