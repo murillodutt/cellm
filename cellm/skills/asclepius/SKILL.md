@@ -224,6 +224,13 @@ Every operable finding becomes a CellmOS spec. The pipeline follows the same mec
 
 `git rev-parse --show-toplevel` → last path segment = project name.
 
+**Validation:** The detected name must match the actual repository name. If the path contains `/tmp/`, worktree artifacts, or sandbox directories, the last segment may be garbage (e.g., "tmp", "worktree-1"). Always verify the detected project exists in `spec_search` results or `timeline_events` before using it. If suspicious, fall back to the repo name from `.git/config` or ask.
+
+```
+[RECON] Project detection: git root = /Users/murillo/Dev/cellm-private → "cellm-private" [+]
+[RECON] Project detection: git root = /tmp/worktree-abc123 → "worktree-abc123" [!] Suspicious. Falling back to remote origin name.
+```
+
 ### 2. Deduplicate
 
 `spec_search(query: finding description, nodeType: "check", limit: 5)`. If a matching check exists, show it — do not create duplicates.
@@ -271,6 +278,8 @@ Phase 3: Verify
 ### 5. Cure Loop (spec-treat)
 
 Execute tasks sequentially. Each task transitions: `pending → in_progress → completed`.
+
+**Decomposition is mandatory.** A check without phases and tasks is an empty shell — the 0/0 progress in the UI means the spec was never decomposed. NEVER proceed to the cure without decomposing first. The pipeline is: `spec_create_node` → decompose (phases + tasks via `spec_create_node` with parentId) → `spec_add_edge` → THEN cure. If you skip decomposition, the spec is useless.
 
 **Before each cure:** Re-run the safety gate. `git status --porcelain` must return clean. If dirty, something happened outside the loop — stop, investigate.
 
@@ -420,3 +429,5 @@ Asclepius does NOT re-examine. If your partner requests re-examination, invoke A
 - **Create specs in batch** — one finding verified, one spec created, one cure executed. Sequential, not parallel
 - **Assume config values without units** — "window is 5" means nothing. 5 items? 5 seconds? Clarify before prescribing
 - **Block the cure loop on Oracle failures** — commit the fix, annotate pending transitions, reconcile later
+- **Skip decomposition** — a check without phases/tasks shows 0/0 in the UI. Decompose BEFORE curing. Always.
+- **Use a project name from /tmp/ or worktree paths** — validate the detected project name against the actual repository
