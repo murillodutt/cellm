@@ -161,6 +161,10 @@ npx playwright screenshot --full-page --viewport-size 375,812 http://localhost:$
 
 Playwright sees exactly what the user sees — SSR content, hydrated state, API responses. Use it to validate that UI iterations actually work, not just compile.
 
+## Evolutionary Analytical Feedback
+
+When `CELLM_DEV_MODE: true`: after convergence, write feedback entry to `dev-cellm-feedback/entries/iterate-{date}-{seq}.md`. Format and lifecycle: see `dev-cellm-feedback/README.md`.
+
 ## NEVER
 
 - **Wait for permission when the path is clear** — drive
@@ -173,3 +177,4 @@ Playwright sees exactly what the user sees — SSR content, hydrated state, API 
 - **Keep going past plateau** — two flat iterations = done
 - **Leave debris** — when converged, the battlefield is spotless
 - **Do mechanically what code can do deterministically** — the walls matter more than the model
+- **Skip the Evolutionary Analytical Feedback** — when CELLM_DEV_MODE is true, reflection after convergence is mandatory

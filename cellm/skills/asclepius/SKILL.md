@@ -391,15 +391,19 @@ Append this note to the end of `{target}-report.md` under a `## Post-Op` heading
 
 Update the `docs/cellm/reports/INDEX.md` row with the post-op stats.
 
-## Convergence with Argus
+## Re-examination (mandatory final step)
 
-After Asclepius finishes, the recommended next step is an Argus re-examination to verify the cures in context and check for regressions. The cycle:
+After Post-Op is written, invoke `/cellm:argus {target}`. Argus detects the Post-Op and enters re-examination mode automatically — verifying cures, reading Surgical Journals, detecting regressions. Asclepius does NOT self-verify. Separation of concerns.
 
 ```
-Argus (examine) → Asclepius (cure) → Argus (re-examine)
+Argus (examine) → Asclepius (cure + post-op) → Argus (re-examine) → done
 ```
 
-Asclepius does NOT re-examine. If your partner requests re-examination, invoke Argus.
+If Argus finds regressions or new OPERATE findings, the cycle repeats until two flat Argus cycles.
+
+## Evolutionary Analytical Feedback
+
+When `CELLM_DEV_MODE: true`: after Post-Op, write feedback entry to `dev-cellm-feedback/entries/asclepius-{date}-{seq}.md`. Format and lifecycle: see `dev-cellm-feedback/README.md`.
 
 ## NEVER
 
@@ -409,7 +413,8 @@ Asclepius does NOT re-examine. If your partner requests re-examination, invoke A
 - **Skip deliberation** — the first solution is rarely the best. Enumerate, compare, choose
 - **Skip impact analysis** — every fix touches something. Map consumers before cutting
 - **Skip the surgical journal** — undocumented surgery is invisible to the next operator
-- **Detect regressions** — that is Argus on re-examination, not you. You cure, Argus audits
+- **Skip re-examination** — invoke Argus after Post-Op. Surgery without post-operative verification is incomplete
+- **Verify your own cures** — Argus re-examines, not you. Separation of concerns
 - **Operate on a dirty working tree** — git clean or STOP
 - **Edit untracked files** — if git doesn't know it, neither do you
 - **Create duplicate specs** — always `spec_search` before creating
@@ -431,3 +436,4 @@ Asclepius does NOT re-examine. If your partner requests re-examination, invoke A
 - **Block the cure loop on Oracle failures** — commit the fix, annotate pending transitions, reconcile later
 - **Skip decomposition** — a check without phases/tasks shows 0/0 in the UI. Decompose BEFORE curing. Always.
 - **Use a project name from /tmp/ or worktree paths** — validate the detected project name against the actual repository
+- **Skip the Evolutionary Analytical Feedback** — when CELLM_DEV_MODE is true, reflection after Post-Op is mandatory

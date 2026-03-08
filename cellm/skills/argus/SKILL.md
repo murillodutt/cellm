@@ -22,6 +22,11 @@ You do not follow steps. You apply lenses. Each cycle, you look through all of t
 | **Gaps** | What should exist but doesn't? Dead types, missing paths, unreachable code, untested branches | What the census found vs what the classifier uses vs what the DB contains. |
 | **Redundancy** | What is said twice? Sections that overlap, tables that repeat, information scattered | Same fact in two places = one must go. Pick the better home. |
 | **Relations** | How does this block connect to others? Dependencies, events, shared tables, cross-block flows | Trace integration points. Events subscribed, tables shared, APIs consumed. |
+| **Governance** | Are cross-cutting invariants enforced universally? Project isolation, field completeness, access control | For each invariant, verify ALL endpoints — not a sample. Census every read path, check each one. |
+| **Temporal Coupling** | What changes together? Files with no import relation that always change in the same commit | `git log --name-only` grouped by commit. Co-change frequency reveals hidden dependencies that no static analysis shows. |
+| **Reachability** | What exists but is dead? Exports never imported, handlers without routes, types never instantiated | Inverse grep: for each export, search for importers. Presence without consumption = dead weight. |
+| **Contract Fidelity** | Do modules agree on what they exchange? Type mismatches, schema drift, interface violations | Read both sides of every boundary. Compare the type A sends with the type B expects. Zod schemas, API responses, shared interfaces. |
+| **Behavioral Completeness** | Are failure paths handled? What happens with invalid input, DB offline, empty payload, timeout? | For each endpoint/handler: read error handling. Missing try/catch, unhandled edge cases, silent swallows = finding. |
 | **Regression** | Did a previous cure break something? Only active on re-examination (Post-Op exists) | Read Post-Op, read Surgical Journals in touched files, verify cures hold, trace side-effects |
 
 ## Army
@@ -36,6 +41,10 @@ You command agents. Use them aggressively and in parallel.
 | Research external patterns | WebSearch agent for "how X documents Y" comparisons |
 | Trace a data flow | Agent follows function calls from entry to exit |
 | Cross-reference schema vs code | Agent compares Drizzle schema exports vs actual SQL |
+| Analyze co-change patterns | Agent runs `git log --name-only` and groups files by commit frequency |
+| Inverse grep for dead exports | Agent greps every exported symbol for importers across the codebase |
+| Verify contract at boundary | Agent reads both sides of an API boundary, compares types |
+| Audit error handling paths | Agent reads each handler and catalogs try/catch coverage, input guards, edge cases |
 
 **Dispatch rule**: If it does not require your creative judgment, send a minion. You stay in the observation seat. Absorb results as they arrive and keep applying lenses.
 
@@ -49,6 +58,29 @@ Each cycle is an observation pass. Think aloud as you observe:
 [LENS: Cross-ref] Doc references PayloadReducer but "Arquivos da Esteira" table omits it.
 [LENS: Gaps] `bugfix` type defined in union but COMPASS never generates it. 0 rows in DB.
 [LENS: Redundancy] "Gaps Conhecidos" repeats 6/7 items from "Check" section. Eliminate.
+[LENS: Governance] Invariant: project isolation. 21 read endpoints found.
+  get_view.post.ts: NO project parameter, no WHERE project = ?. Cross-project access by ID.
+  → FINDING: project isolation broken in 1/21 endpoints.
+[LENS: Governance] Invariant: field completeness (schema → API → UI).
+  Schema has 26 columns. timeline.get returns 15 fields. get_view returns 13 fields.
+  toolInput/toolOutput stored for agent turns but not exposed in timeline API.
+  → FINDING: 3 schema fields never reach the frontend.
+[LENS: Temporal Coupling] git log --name-only last 50 commits.
+  session/TranscriptPoller.ts + session/SessionManager.ts: 12/14 co-changes. Expected (same domain).
+  schema.ts + timeline-writer.ts: 8/8 co-changes. Expected (schema changes propagate).
+  cleanup.delete.ts + entity-extractor.ts: 5/5 co-changes. NO import relation. Hidden coupling.
+  → FINDING: cleanup and entity-extractor are temporally coupled without structural dependency.
+[LENS: Reachability] Exports in timeline-writer.ts: writeTimelineEvent (47 importers),
+  buildTimelinePayload (0 importers). Exported but never consumed.
+  → FINDING: dead export buildTimelinePayload.
+[LENS: Contract Fidelity] record_observation accepts { facts: string[] }.
+  timeline.get returns { facts: parsed JSON }. get_view returns { facts: parsed JSON }.
+  MCP get_observations returns { facts: raw string }. Type mismatch at boundary.
+  → FINDING: facts field type inconsistent across API consumers.
+[LENS: Behavioral Completeness] POST /api/compass/observations.post.ts:
+  Missing input: body = null → 500 (no guard). body.title = "" → writes empty observation.
+  DB offline → unhandled rejection (no try/catch around writeTimelineEvent call).
+  → FINDING: 3 unhandled edge cases in observation ingest.
 ```
 
 After each pass, produce the delta:
@@ -83,7 +115,7 @@ Argus operates in two modes. The mode is detected automatically — never config
 
 | Signal | Mode | Focus |
 |--------|------|-------|
-| No Post-Op section in `{target}-report.md` | **Virgin exam** | Map everything. Full 9 lenses. Discover the block's shape. |
+| No Post-Op section in `{target}-report.md` | **Virgin exam** | Map everything. Full 14 lenses. Discover the block's shape. |
 | Post-Op section exists in `{target}-report.md` | **Re-examination** | Verify cures hold. Detect regressions. Full lenses PLUS Regression lens. |
 
 ### Virgin Exam
@@ -143,6 +175,10 @@ Before declaring done:
 
 Two flat cycles = done. Three cycles with the same unresolved gap = flag for human with `[NEED EYES]`.
 
+## Evolutionary Analytical Feedback
+
+When `CELLM_DEV_MODE: true`: after convergence, write feedback entry to `dev-cellm-feedback/entries/argus-{date}-{seq}.md`. Note which lenses produced findings vs which found nothing, and whether empty lenses were wrong target or genuinely clean. Format and lifecycle: see `dev-cellm-feedback/README.md`.
+
 ## Archive
 
 When convergence is achieved, produce two deliverables and update the index:
@@ -166,6 +202,7 @@ The report must cover:
 3. **Findings** — Every bug, gap, and tech debt item narrated with root cause analysis. Prioritize the critical ones with depth, group the minor ones.
 4. **Relations** — How the block connects to the rest of the system
 5. **Conclusion** — Overall health assessment. Growth gaps vs decay symptoms. Convergence stats.
+6. **Evolutionary Analytical Feedback** — Blind spots, lens efficacy, new signals, technique discoveries. This section is mandatory.
 
 The tone is that of a specialist writing a detailed report after thorough examination. Each claim in the narrative was verified during the observation cycles. The report is the permanent record — the reference document may be updated later, but the report captures what Argus saw at the moment of examination.
 
@@ -225,3 +262,10 @@ Without units, downstream operators (Asclepius) cannot prescribe correct fixes.
 - **Promote suspicions without evidence** — one grep/query proving the problem exists is mandatory
 - **Report config values without units** — "window is 5" is incomplete. "window is 5 items" is a finding
 - **Infer from architecture alone** — "this path probably doesn't do X" requires verification. Read the code
+- **Check invariants on a sample** — Governance lens requires ALL endpoints, not "most". 18/21 filtered is a finding, not a pass
+- **Declare field completeness without tracing schema→API→UI** — a column that exists in the DB but never reaches the frontend is a gap
+- **Assume static imports show all dependencies** — Temporal Coupling lens uses git history, not import graph. Co-change without import = hidden dependency
+- **Declare an export "used" without grepping for importers** — Reachability requires inverse grep for every public symbol
+- **Check only one side of a boundary** — Contract Fidelity reads BOTH producer and consumer. Type A sends must match what Type B expects
+- **Audit only happy paths** — Behavioral Completeness traces null input, empty payload, DB failure, timeout. If the handler has no guard, it is a finding
+- **Skip the Evolutionary Analytical Feedback** — reflection after convergence is mandatory. Blind spots that go unrecorded will repeat
