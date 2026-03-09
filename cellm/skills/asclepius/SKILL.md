@@ -177,6 +177,32 @@ When a finding involves configuration values, Reconnaissance MUST clarify units 
   Implication: increasing to 10 means comparing against 10 recent observations.
 ```
 
+### Anti-Pattern Consultation (mandatory before prescribing)
+
+Before writing any fix, consult known anti-patterns to avoid introducing new defects. The project's pattern catalog contains documented traps — fixes that look correct but break production.
+
+For each operable finding, identify the **domain** the fix touches (DB schema, event system, API, UI, etc.) and search for relevant bans:
+
+```bash
+# Read project anti-patterns for the affected domain
+Read cellm-core/patterns/anti/prohibited-code.md   # DB, TS, Vue, Nuxt bans
+Read cellm-core/patterns/anti/prohibited-patterns.md # Architecture bans
+
+# If Oracle is available, search for related patterns
+search_patterns({ query: "{domain of the fix} common mistakes" })
+```
+
+Think aloud:
+
+```
+[ANTI-CHECK] B3 — fix touches DB schema migration in client.ts
+  Relevant bans: DB-001 (migration before index), DB-002 (no logger.warn in diagnostic catch)
+  Applying: will place addColumnIfMissing BEFORE CREATE INDEX.
+  → No violations.
+```
+
+If no relevant anti-patterns exist, say so explicitly — the absence is also a signal.
+
 ### Think aloud — enumerate approaches
 
 List at least two possible approaches. For each:
@@ -457,3 +483,4 @@ When `CELLM_DEV_MODE: true`: after Post-Op, write feedback entry to `dev-cellm-f
 - **Use a project name from /tmp/ or worktree paths** — validate the detected project name against the actual repository
 - **Skip the Evolutionary Analytical Feedback** — when CELLM_DEV_MODE is true, reflection after Post-Op is mandatory
 - **Use `replace_all` on function names when a local definition exists** — replace call sites first with targeted edits, then remove the local definition. `replace_all` on `functionName(` also renames the definition itself, causing friction when you try to delete the old function
+- **Prescribe a fix without consulting anti-patterns** — read `cellm-core/patterns/anti/` before deliberation. Known traps exist (DB migration order, recursive event loops, etc.). A cure that introduces a documented anti-pattern is worse than the original finding

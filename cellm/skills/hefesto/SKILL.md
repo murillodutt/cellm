@@ -317,6 +317,7 @@ Every file Hefesto creates or modifies must meet these standards:
 | Error handling | Every external call (DB, network, LLM) has explicit error handling |
 | Edge cases | Every scenario from the Edge Case Matrix is implemented |
 | Existing patterns | Follow the conventions of neighboring code. Don't invent new patterns when one exists |
+| Anti-pattern check | Read `cellm-core/patterns/anti/` before writing code. Known traps (DB migration order, recursive events, etc.) must be avoided |
 | Current APIs | Verified via MCP docs, not training data |
 
 ### 3.3 Shadow Verification
@@ -544,3 +545,4 @@ Format and lifecycle: see `dev-cellm-feedback/README.md`.
 - **Force through a broken design** — 2 failed attempts = block, flag NEED EYES, move on
 - **Block on Oracle failures** — commit the code, annotate pending transitions, reconcile later
 - **Skip task decomposition** — phases without tasks show 0/0 in the UI. Every phase MUST contain tasks before construction begins. The pipeline is: check → phases → tasks → edges → THEN construct. Never skip the task layer
+- **Write code without consulting anti-patterns** — read `cellm-core/patterns/anti/` before each construction phase. Known traps (DB migration order, recursive event loops, etc.) are documented. Introducing a cataloged anti-pattern in new code is a construction defect
