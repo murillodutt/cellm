@@ -214,6 +214,14 @@ Pick the best approach. Say WHY it is better than the alternatives. The justific
     C creates split responsibility — worse than A in every dimension.
 ```
 
+### Batch Cure Recognition
+
+When 3+ findings share identical cure shape (same pattern of code change across different files — e.g., "add optional project param + backwards-compatible WHERE clause" repeated across 5 endpoints), deliberate ONCE and create a single spec with one phase per instance. This avoids redundant deliberation while maintaining per-file traceability. The first instance gets full deliberation; subsequent instances reference it.
+
+### Fail-Open Systems
+
+When the cure target must remain fail-open (e.g., hook adapters that cannot block the host process), prescribe defense-in-depth: (1) log the failure with enough context to diagnose, (2) add downstream self-heal so the next write path recovers the missing data. Logging alone is insufficient — the error will be visible but the data gap persists.
+
 **Deliberation is NOT optional.** A fix without deliberation is a guess with commit access.
 
 ## Spec Pipeline
@@ -448,3 +456,4 @@ When `CELLM_DEV_MODE: true`: after Post-Op, write feedback entry to `dev-cellm-f
 - **Skip decomposition** — a check without phases/tasks shows 0/0 in the UI. Decompose BEFORE curing. Always.
 - **Use a project name from /tmp/ or worktree paths** — validate the detected project name against the actual repository
 - **Skip the Evolutionary Analytical Feedback** — when CELLM_DEV_MODE is true, reflection after Post-Op is mandatory
+- **Use `replace_all` on function names when a local definition exists** — replace call sites first with targeted edits, then remove the local definition. `replace_all` on `functionName(` also renames the definition itself, causing friction when you try to delete the old function
