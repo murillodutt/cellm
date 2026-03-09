@@ -266,6 +266,8 @@ Skip irrelevant layers. Each phase gets:
 
 Create `blocks` edges between phases.
 
+**Decomposition is mandatory.** A check with phases but no tasks is an empty shell — the 0/0 progress in the UI means the spec was never decomposed. NEVER proceed to Construction (Phase 3) without creating tasks inside each phase first. The pipeline is: `spec_create_node(check)` → `spec_create_node(phase, parentId)` → `spec_create_node(task, parentId=phase)` → `spec_add_edge` → THEN construct. If you skip task creation, the spec is useless and progress tracking is invisible.
+
 ### 2.3 Contract Bridges at Phase Boundaries
 
 At every phase boundary, the output and input types must be explicitly declared in the phase constraints. This is the contract bridge — it prevents the most common class of Argus findings.
@@ -289,9 +291,11 @@ Execute the spec tree. This is the forge at full heat.
 
 ### 3.1 Execution Model
 
+**Pre-construction gate:** Before executing ANY phase, call `spec_get_tree` and verify every phase contains at least one task. If any phase shows `progress: 0/0`, STOP — go back to Phase 2.2 and decompose tasks first. Construction without tasks is blind execution with no traceability.
+
 Autonomous, phase-by-phase:
 
-1. Load spec tree: `spec_get_tree`
+1. Load spec tree: `spec_get_tree` — verify all phases have tasks (progress N/M where M > 0)
 2. For each phase in dependency order:
    a. `spec_transition(event: "started")` on phase
    b. DSE consultation: `dse_search` for relevant decisions
@@ -539,3 +543,4 @@ Format and lifecycle: see `dev-cellm-feedback/README.md`.
 - **Edit untracked files** — if git doesn't know it, neither do you. `git ls-files --error-unmatch` before editing
 - **Force through a broken design** — 2 failed attempts = block, flag NEED EYES, move on
 - **Block on Oracle failures** — commit the code, annotate pending transitions, reconcile later
+- **Skip task decomposition** — phases without tasks show 0/0 in the UI. Every phase MUST contain tasks before construction begins. The pipeline is: check → phases → tasks → edges → THEN construct. Never skip the task layer
