@@ -277,7 +277,7 @@ Phase 3: Verify
 
 ### 5. Cure Loop (spec-treat)
 
-Execute tasks sequentially. Each task transitions: `pending → in_progress → completed`.
+Execute tasks sequentially. After completing each task's fix + commit, **immediately call `spec_transition(event: "completed")` on that task node**. Do NOT defer transitions to a later step — the auto-rollup mechanism propagates completion upward (task→phase→check) but only triggers when leaf tasks are explicitly transitioned. A committed fix without `spec_transition("completed")` is an invisible cure — the UI will show 0/N forever.
 
 **Decomposition is mandatory.** A check without phases and tasks is an empty shell — the 0/0 progress in the UI means the spec was never decomposed. NEVER proceed to the cure without decomposing first. The pipeline is: `spec_create_node` → decompose (phases + tasks via `spec_create_node` with parentId) → `spec_add_edge` → THEN cure. If you skip decomposition, the spec is useless.
 
@@ -390,6 +390,17 @@ COMMITS:    {list of commit hashes}
 Append this note to the end of `{target}-report.md` under a `## Post-Op` heading.
 
 Update the `docs/cellm/reports/INDEX.md` row with the post-op stats.
+
+### Spec Reconciliation (mandatory before leaving)
+
+Before writing the Post-Op note, reconcile all specs created during this session:
+
+1. For each spec ID in the SPECS list, call `spec_get_tree(path, format: "yaml")`.
+2. If any task shows `[ ]` (not completed), call `spec_transition(event: "completed")` on it.
+3. Verify the check shows `state: completed` with `progress: N/N` (all tasks done).
+4. If a check is still not completed after all tasks are done, call `spec_transition(event: "completed")` on the check directly.
+
+**This step exists because the cure loop can succeed (fix committed, tests pass) while the spec transition is silently skipped.** A completed cure with an open spec is the most common Asclepius failure mode — this reconciliation gate catches it.
 
 ## Re-examination (mandatory final step)
 

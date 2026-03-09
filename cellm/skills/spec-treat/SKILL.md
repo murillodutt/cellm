@@ -23,7 +23,7 @@ Find a check, work through every phase and task sequentially. Transition states 
      - Option B: `record_observation` documenting findings (even if "no changes needed").
      - Without artifact → task stays in `needs_work`. No "I looked and it was fine" without evidence.
    - AskUserQuestion: completed / needs work / blocked / skip / found gap
-   - Transition accordingly. Gaps → `spec_create_node(nodeType: "gap")`.
+   - Transition explicitly: completed → `spec_transition(event: "completed")`. Blocked → `spec_transition(event: "blocked")`. Failed → `spec_transition(event: "failed")`. Gaps → `spec_create_node(nodeType: "gap")`. **Auto-rollup propagates**: when all tasks in a phase complete, the phase auto-completes; when all phases complete, the check auto-completes. But YOU must call `spec_transition` on each leaf task — rollup does not trigger without it.
 7. **Phase done (close gate)** — Before transitioning phase to completed:
    - Run `quality_gate({ scope: 'all' })` — typecheck + tests must pass. Oracle offline → fallback to `npx nuxt typecheck` and `npx vitest run`.
    - Run audit grep on all phase fileRefs: semantic token leaks, pattern violations.

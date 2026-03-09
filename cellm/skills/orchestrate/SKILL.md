@@ -21,7 +21,7 @@ The spec tree is the execution plan. Read it, follow it, update it.
    - Phase transitions to completed ONLY after Stage 3 = PASS or CONDITIONAL.
    - Stage 3 FAIL → create gap nodes for findings, loop back to Stage 1 for fixes, then re-run Stage 2+3.
 5. **Checkpoint** — Phase done (all 3 stages passed) → ask "Continue to next phase?" via AskUserQuestion.
-6. **Complete** — All phases done → `spec_get_counters` final summary → transition check to completed.
+6. **Complete** — All phases done → `spec_get_counters` final summary → `spec_transition(event: "completed")` on the check. **Mandatory**: verify the check state is `completed` after transition. If any task was missed, transition it first — auto-rollup propagates upward only when all leaf nodes are completed.
 
 ## Guild Protocol (Domain-Specialist Routing)
 
