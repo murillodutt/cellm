@@ -124,9 +124,7 @@ Workflow skills guide phases of development. Invoked explicitly as `/cellm:{name
 
 | Skill | Purpose |
 |-------|---------|
-| `/cellm:verify` | Test, validate, and verify against spec |
-| `/cellm:arena` | Interactive testing and validation environment |
-| `/cellm:arena-debug` | Debug failures in arena with detailed analysis |
+| `/cellm:arena` | Quality proving ground: prove, debug, gate, stress |
 
 ### Search Phase
 

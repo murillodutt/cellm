@@ -20,7 +20,7 @@ CELLM provides **29 skills** (22 workflow + 7 context), **12 DocOps skills**, an
 | **Execution** | `/cellm:create-tasks`, `/cellm:orchestrate`, `/cellm:implement` |
 | **Validation** | `/cellm:verify`, `/cellm:status` |
 | **Pattern Management** | `/cellm:discover`, `/cellm:inject`, `/cellm:index` |
-| **Quality & Arena** | `/cellm:arena`, `/cellm:arena-debug`, `/cellm:spec-treat` |
+| **Quality & Arena** | `/cellm:arena`, `/cellm:spec-treat` |
 | **Discovery** | `/cellm:dse-discover` |
 | **Setup & Monitoring** | `/cellm:init`, `/cellm:oracle-search` |
 
@@ -399,16 +399,17 @@ See [DSE Plugin](../dse/README.md) for detailed documentation.
 /cellm:inject
 ```
 
-### Arena Experimentation
+### Arena Quality Checks
 
 ```bash
-# 1. Start sandbox environment
-/cellm:arena
+# 1. Run full quality checks
+/cellm:arena prove
 
-# 2. Debug if needed
-/cellm:arena-debug
+# 2. Debug a failing test
+/cellm:arena debug "TypeError: cannot read property"
 
-# 3. Test ideas before implementing in main codebase
+# 3. Quality gate before commit
+/cellm:arena gate
 ```
 
 ---
@@ -429,8 +430,7 @@ See [DSE Plugin](../dse/README.md) for detailed documentation.
 | `/cellm:discover` | Pattern Mgmt | Find codebase patterns |
 | `/cellm:inject` | Pattern Mgmt | Apply patterns to code |
 | `/cellm:index` | Pattern Mgmt | Search available patterns |
-| `/cellm:arena` | Quality | Sandbox experimentation |
-| `/cellm:arena-debug` | Quality | Debug arena environment |
+| `/cellm:arena` | Quality | Quality proving ground (prove/debug/gate/stress) |
 | `/cellm:spec-treat` | Quality | Refine specifications |
 | `/cellm:dse-discover` | Discovery | Find DSE patterns |
 | `/cellm:init` | Setup | CELLM setup & maintenance |

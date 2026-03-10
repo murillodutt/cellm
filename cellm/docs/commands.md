@@ -36,9 +36,7 @@ Skills are organized in two categories: **workflow skills** (invoked explicitly 
 
 | Skill | Purpose | Usage |
 |-------|---------|-------|
-| `/cellm:verify` | Quality gate — rules, security, spec compliance | `/cellm:verify` |
-| `/cellm:arena` | Run test suites, typecheck, health checks | `/cellm:arena all` |
-| `/cellm:arena-debug` | Automated runtime debugging with instrumentation | `/cellm:arena-debug "error message"` |
+| `/cellm:arena` | Quality proving ground: prove, debug, gate, stress | `/cellm:arena prove` |
 
 ### Spec OS (Atomic Spec System)
 

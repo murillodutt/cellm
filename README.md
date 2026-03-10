@@ -37,8 +37,7 @@ Context skills stack: editing a `server/api/*.ts` loads **typescript**.
 | **discover** | `/cellm:discover [focus]` | Extract tribal knowledge into pattern files |
 | **inject** | `/cellm:inject [paths]` | Inject relevant patterns into current context |
 | **index** | `/cellm:index [query]` | Rebuild patterns index.yml |
-| **arena** | `/cellm:arena [scope]` | Run test suites, typecheck, health checks with trend reporting |
-| **arena-debug** | `/cellm:arena-debug <error>` | Iterative log-and-restart debugging (max 3 iterations) |
+| **arena** | `/cellm:arena [mode]` | Quality proving ground: prove, debug, gate, stress |
 | **oracle-search** | `/cellm:oracle-search <query>` | Semantic search across Oracle observations |
 | **status** | `/cellm:status [verbose]` | Quick Oracle worker health check |
 | **dse-discover** | `/cellm:dse-discover [path]` | Bootstrap design system for a project |

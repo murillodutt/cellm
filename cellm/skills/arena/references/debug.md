@@ -16,7 +16,7 @@ Iterative instrumentation and diagnosis. Instruments code with `[CELLM-DBG]` mar
 GATHER → HYPOTHESIZE → INSTRUMENT → REPRODUCE → ANALYZE → [ITERATE?] → REPORT → CLEANUP
 ```
 
-CLEANUP always executes (try/finally).
+CLEANUP is best-effort — the skill execution model has no try/finally mechanism. If interrupted, recover manually (see CLEANUP section).
 
 ### GATHER
 Parse error, recent logs (`~/.cellm/logs/` if exists, skip silently otherwise), recent git (`log -10`, `diff --stat HEAD~3`), grep codebase, process info (`lsof`), Oracle similar errors (2s timeout, skip if offline).
@@ -42,7 +42,14 @@ If inconclusive AND iterations < 3 AND elapsed < 8min: clean instrumentation, re
 Session ID, mode, error summary, iterations taken, root cause + fix. Persist to Oracle if online.
 
 ### CLEANUP
-Remove all `CELLM-DBG` lines via Edit tool, verify removal with Grep tool (pattern `CELLM-DBG`), restore stash with `git stash pop <stash-ref>` (using the ref saved in INSTRUMENT phase), clean temp files.
+1. Remove all `CELLM-DBG` lines via Edit tool
+2. Verify removal with Grep tool (pattern `CELLM-DBG`). If markers survive: re-run Edit on each file:line, then re-verify. If still present after 2 attempts: warn developer with file:line list
+3. Restore stash with `git stash pop <stash-ref>` (using the ref saved in INSTRUMENT phase)
+4. Clean temp files
+
+**Recovery (if session interrupted before CLEANUP):**
+- Stash: `git stash list` — look for `arena-debug-*` entries, pop with `git stash pop stash@{N}`
+- Markers: `grep -rn "CELLM-DBG" .` — remove manually or re-invoke `/cellm:arena debug` which detects and cleans existing markers
 
 ## Hard Limits
 
