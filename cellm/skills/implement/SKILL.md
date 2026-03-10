@@ -11,15 +11,17 @@ Context lives in the database. Load it before touching any file.
 
 ## Framework
 
-1. **Load** — `spec_get_tree` for the check. Absorb check briefing (context/problem/principle), phases, tasks.
+1. **Detect Project** — `git rev-parse --show-toplevel` → last segment = project name.
+2. **Load** — `spec_get_tree` for the check. Absorb check briefing (context/problem/principle), phases, tasks.
    For the current phase: read `body.briefing` (objective, successCriteria, keyFiles, constraints) and `body.specialist` (role, focus, tools). Adopt the specialist persona and respect phase constraints throughout.
    **Guild adoption**: If `specialist.role` is `"frontend"`, engage GDU Framework (DSE cascade, semantic tokens, Nuxt UI MCP contracts). If `"backend"`, enforce Drizzle patterns and Zod boundary validation. If `"database"`, enforce migration safety and index strategy.
 2. **DSE** — `dse_search` for task-relevant design decisions (layout, components, patterns, breakpoints). Absorb `avoid` rules and `decisions[]` before writing any code. If DSE has an existing component for what the task describes, use it — do not create a new one.
-3. **Pick** — First pending task in dependency order. `spec_transition(event: "started")` to activate.
-4. **Start** — `spec_transition(event: "started")` again to mark in_progress. (Or call `completed` directly — the service auto-chains through intermediate states.)
+3. **Pick** — First pending task in dependency order. `spec_transition(event: "started", project: "<project>")` to activate. Always pass `project` for isolation validation.
+4. **Start** — `spec_transition(event: "started", project: "<project>")` again to mark in_progress. (Or call `completed` directly — the service auto-chains through intermediate states.)
+   > **B1 dependency enforcement**: `spec_transition(event: "started")` will fail with `BLOCKED_BY_DEPENDENCY` if upstream `depends_on` edges are not satisfied. The orchestrator ensures correct ordering — if you hit this error, check predecessor phase status.
 5. **Reuse** — Search codebase first. >= 70% match = extend, don't duplicate.
 6. **Implement** — Write code. Follow project patterns, rules, and DSE decisions.
-7. **Close** — `quality_gate({ scope: 'typecheck' })` passes → `spec_transition(event: "completed")`. Fails → fix errors and re-run. Still failing → `spec_transition(event: "failed")`. Discovery → `spec_create_node(nodeType: "gap")`.
+8. **Close** — `quality_gate({ scope: 'typecheck' })` passes → `spec_transition(event: "completed", project: "<project>")`. Fails → fix errors and re-run. Still failing → `spec_transition(event: "failed", project: "<project>")`. Discovery → `spec_create_node(nodeType: "gap", sessionId: <current-session-id>)`. **Auto-rollup**: when all tasks in a phase complete, the phase auto-completes — but YOU must call `spec_transition` on each leaf task for rollup to trigger.
 
 ## Framework Conventions (Nuxt)
 
@@ -28,11 +30,18 @@ Context lives in the database. Load it before touching any file.
 - Same applies to Vue APIs (`ref`, `computed`, `watch`) — auto-imported by Nuxt.
 - If unsure whether a module is auto-imported, check `nuxt.config.ts` imports section or `.nuxt/types/imports.d.ts`.
 
+## Evolutionary Analytical Feedback
+
+When `CELLM_DEV_MODE: true`: after implementation, write feedback entry to `dev-cellm-feedback/entries/implement-{date}-{seq}.md`. Note which DSE decisions influenced code, whether reuse search found matches, and which quality gate failures required iteration. Format and lifecycle: see `dev-cellm-feedback/README.md`.
+
 ## NEVER
 
 - **Code without spec context** — always `spec_get_tree` first
 - **Code without DSE context** — always `dse_search` for relevant decisions before creating UI components, choosing layout, or picking breakpoints
-- **Forget state transitions** — `started` to activate, `started` again for in_progress, `completed`/`failed` to close. Auto-chain supported: calling `completed` from `pending` or `active` resolves intermediate hops automatically.
+- **Forget state transitions** — `started` to activate, `started` again for in_progress, `completed`/`failed` to close. Always pass `project` param. Auto-chain supported: calling `completed` from `pending` or `active` resolves intermediate hops automatically.
 - **Swallow discoveries** — unexpected findings become gap nodes
 - **Skip typecheck** — `quality_gate({ scope: 'typecheck' })` before completing (fallback: `npx nuxt typecheck` or `npx tsc --noEmit` if Oracle offline)
 - **Non-English spec content** — gap and decision node titles/descriptions must be in English
+- **Omit sessionId** — always pass `sessionId` to `spec_create_node` for audit trail
+- **Invalid parent-child hierarchies** — check→phase/task/gap/decision/requirement/verification, phase→task/gap/decision/verification, task→gap/verification. Service rejects violations with INVALID_CHILD_TYPE.
+- **Skip the Evolutionary Analytical Feedback** — when CELLM_DEV_MODE is true, reflection after implementation is mandatory

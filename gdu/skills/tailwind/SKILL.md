@@ -54,6 +54,10 @@ Nuxt UI uses Tailwind Variants with slots, variants, and compoundVariants.
 
 Mobile-first: `class` then `sm:` `md:` `lg:`. No arbitrary values (`w-[347px]`).
 
+## Evolutionary Analytical Feedback
+
+When `CELLM_DEV_MODE: true`: after styling implementation, write feedback entry to `dev-cellm-feedback/entries/tailwind-{date}-{seq}.md`. Note which semantic tokens were missing, whether Tailwind v4 conventions were followed, and which hardcoded values leaked through. Format and lifecycle: see `dev-cellm-feedback/README.md`.
+
 ## NEVER
 
 - **Hardcoded colors** — no `blue-500`, `#hex`, `rgb()`
@@ -61,3 +65,4 @@ Mobile-first: `class` then `sm:` `md:` `lg:`. No arbitrary values (`w-[347px]`).
 - **`tailwind.config.ts` as primary source** — Tailwind v4 uses `@theme` in `app/assets/css/main.css` as the primary source of tokens. `tailwind.config.ts` is just a fallback for v3.
 - **Arbitrary values** — no `w-[347px]`, `p-[13px]`
 - **Inline styles** — use Tailwind classes or CSS variables
+- **Skip the Evolutionary Analytical Feedback** — when CELLM_DEV_MODE is true, reflection after styling implementation is mandatory

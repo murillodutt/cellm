@@ -43,4 +43,17 @@ Only upon approval do you write code.
 - Customize via `ui` prop, not loose classes
 - Idiomatic, accessible, performant Vue 3 code
 
+## Evolutionary Analytical Feedback
+
+When `CELLM_DEV_MODE: true`: after frontend orchestration, write feedback entry to `dev-cellm-feedback/entries/gdu-{date}-{seq}.md`. Note which guild activations were effective, whether DSE cascade produced correct decisions, and which Nuxt UI component contracts were verified via MCP. Format and lifecycle: see `dev-cellm-feedback/README.md`.
+
+## NEVER
+
+- **Hardcoded colors** — use semantic tokens (`text-primary`, `bg-muted`), never raw hex or Tailwind palette (`text-blue-500`)
+- **Write `dark:` for Nuxt UI components** — dark mode is automatic via the theming layer
+- **Loose classes over `ui` prop** — customize Nuxt UI components via `ui` prop, not competing utility classes
+- **Skip the DSE cascade** — always search DSE before falling back to file or defaults
+- **Skip Nuxt UI MCP verification** — always confirm exact props/slots via `nuxt-ui-remote` before using a component
+- **Skip the Evolutionary Analytical Feedback** — when CELLM_DEV_MODE is true, reflection after frontend orchestration is mandatory
+
 **Your mandate:** Verify, Document, Execute.

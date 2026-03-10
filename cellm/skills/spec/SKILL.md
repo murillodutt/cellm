@@ -30,7 +30,11 @@ These three sentences ARE the spec. Everything else is decomposition.
 
 After the check: decompose into phases (work groups) and tasks (atomic actions). Each task has an imperative `action`, optional `fileRef`, optional `diffExpected`. Phases form the dependency DAG.
 
-Project: always `git rev-parse --show-toplevel` → last segment.
+Project: always `git rev-parse --show-toplevel` → last segment. Pass `sessionId` (current session) to `spec_create_node` for audit trail. Auto-chain supported: calling `completed` from `pending`/`active` resolves intermediate states automatically. Auto-rollup: when all child tasks complete, the parent phase auto-completes — but YOU must call `spec_transition` on each leaf task for rollup to trigger.
+
+## Evolutionary Analytical Feedback
+
+When `CELLM_DEV_MODE: true`: after spec creation or transition, write feedback entry to `dev-cellm-feedback/entries/spec-{date}-{seq}.md`. Note which nodeTypes and transitions caused friction, which body schemas were unclear, and whether deduplication caught real duplicates. Format and lifecycle: see `dev-cellm-feedback/README.md`.
 
 ## NEVER
 
@@ -39,3 +43,7 @@ Project: always `git rev-parse --show-toplevel` → last segment.
 - **Skip project detection** — always derive from git root
 - **Vague tasks** — every task action is imperative and atomic
 - **Write in any language other than English** — all titles, briefings, actions, and descriptions must be in English for optimal LLM processing and tokenization efficiency
+- **Omit sessionId** — always pass `sessionId` (current session) to `spec_create_node` and `spec_add_verification` for audit trail
+- **Ignore BLOCKED_BY_DEPENDENCY** — if `spec_transition` returns this error, check predecessor phase status before proceeding
+- **Invalid parent-child hierarchies** — check→phase/task/gap/decision/requirement/verification, phase→task/gap/decision/verification, task→gap/verification. Service rejects violations with INVALID_CHILD_TYPE.
+- **Skip the Evolutionary Analytical Feedback** — when CELLM_DEV_MODE is true, reflection after spec creation or transition is mandatory

@@ -11,14 +11,15 @@ Find or create the check, then decompose into the database.
 
 ## Framework
 
-1. **Locate** — `spec_search` for existing check, or create one via `/cellm:spec create`.
+1. **Detect Project** — `git rev-parse --show-toplevel` → last segment = project name.
+2. **Locate** — `spec_search` for existing check, or create one via `/cellm:spec create`.
 2. **Decompose** — Groups follow dependency DAG:
    - Foundation (schema, types) → Data Layer (DB, API) → State (stores, composables) → UI (components, pages) → Integration (wiring) → Polish (a11y, responsive)
    - Skip irrelevant layers. Add domain-specific groups.
 3. **Define** — Each task is atomic, testable, traceable. One imperative action per task.
 4. **Present** — Show breakdown. Allow adjustments via AskUserQuestion.
-5. **Create** — `spec_create_node` for each phase and task. `spec_add_edge` for cross-phase dependencies.
-6. **Edges** — After all phases exist, create DAG edges (see [Edge Creation](#edge-creation)).
+6. **Create** — `spec_create_node(project, nodeType, sessionId: <current-session-id>, ...)` for each phase and task — `project` and `sessionId` params on every call for isolation and audit trail. `spec_add_edge` for cross-phase dependencies.
+7. **Edges** — After all phases exist, create DAG edges (see [Edge Creation](#edge-creation)). Auto-chain supported: calling `completed` from `pending`/`active` resolves intermediate states automatically. Auto-rollup: when all child tasks complete, the parent phase auto-completes — but each leaf task must be explicitly transitioned.
 
 ## Edge Creation
 
@@ -105,6 +106,10 @@ After decomposition, if `check.principle` contains "mobile-first" or target is a
 2. Flag for review or create a replacement task in the Polish phase.
 3. Preferred mobile alternatives: card lists over tables, vertical stacks over multi-column grids, swipeable carousels over horizontal overflow.
 
+## Evolutionary Analytical Feedback
+
+When `CELLM_DEV_MODE: true`: after decomposition, write feedback entry to `dev-cellm-feedback/entries/create-tasks-{date}-{seq}.md`. Note which composite actions were split, whether atomicity tests failed on first pass, and how interface contracts across phases were defined. Format and lifecycle: see `dev-cellm-feedback/README.md`.
+
 ## NEVER
 
 - **Markdown files** — tasks are `spec_create_node(nodeType: "task")`, not tasks.md
@@ -113,3 +118,7 @@ After decomposition, if `check.principle` contains "mobile-first" or target is a
 - **Ignore DSE for UI phases** — `dse_search` before defining constraints for component/page phases to include avoid rules and existing component mandates
 - **God tasks** — if it crosses multiple files AND multiple concerns, split it
 - **Non-English content** — all phase titles, task actions, and descriptions must be in English
+- **Omit sessionId** — always pass `sessionId` to `spec_create_node` for audit trail
+- **Ignore BLOCKED_BY_DEPENDENCY** — if `spec_transition` returns this error, check predecessor phase status before proceeding
+- **Invalid parent-child hierarchies** — check→phase/task/gap/decision/requirement/verification, phase→task/gap/decision/verification, task→gap/verification. Service rejects violations with INVALID_CHILD_TYPE.
+- **Skip the Evolutionary Analytical Feedback** — when CELLM_DEV_MODE is true, reflection after decomposition is mandatory

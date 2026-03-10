@@ -225,7 +225,7 @@ docs/cellm/reports/
     {target}-report.md                <- expert narrative (prose, no tables)
 ```
 
-**Exam** (`{target}-exam.md`): Copy the reference document at convergence. Add a snapshot line to the header: `Snapshot: {date} | Examiner: Argus Panoptes ({N} cycles) | Source: docs/technical/blocks/{target}.md`. The living reference document continues to evolve; the exam preserves what was verified.
+**Exam** (`{target}-exam.md`): Copy the reference document at convergence. Add a snapshot line to the header: `Snapshot: {date} | Examiner: Argus Panoptes ({N} cycles) | Source: docs/technical/blocks/{target}.md`. The living reference document continues to evolve; the exam preserves what was verified. **Timing rule for re-examination with inline fixes**: when re-exam discovers new findings (N1, N2...) AND fixes them in the same session, the exam snapshot MUST be taken AFTER the fixes are applied and the reference document is updated. An exam frozen between discovery and fix is born stale — it documents problems that no longer exist in the codebase, reducing the exam's reliability as a current-state snapshot.
 
 **Report** (`{target}-report.md`): The examiner's narrative. Inline prose, no tables, no code blocks. Structured as a detailed clinical examination where each finding (benign or malignant) is described in context, with cause, evidence, and severity woven into the narrative.
 
@@ -289,6 +289,34 @@ Every finding in the Check section should indicate its disposition target:
 
 This classification helps Asclepius triage faster and ensures CONSTRUCT items reach Hefesto instead of being indefinitely deferred.
 
+### 5. Calibrate severity against authority source
+
+Before assigning severity, determine whether the finding violates a **platform contract** (official Claude Code / framework specification) or a **project convention** (internal CELLM editorial standard). The distinction changes severity and wording.
+
+| Authority | Severity ceiling | Wording |
+|-----------|-----------------|---------|
+| Platform spec (Claude Code docs, framework API) | `[!!!]` or `[!!]` — proven behavioral impact | "violates", "breaks contract", "hard failure" |
+| Project convention (CELLM patterns, editorial rules) | `[!]` or `[.]` — consistency/maintenance gap | "diverges from convention", "inconsistent with project standard" |
+| Unverified — cannot determine authority | `[!]` max — flag for human | "suspected gap, authority unclear" |
+
+When uncertain, consult the official documentation before promoting. Use MCP `context7`, `claude-code-guide` agent, or `WebSearch` to verify platform behavior. A project convention treated as a platform requirement inflates severity and misleads downstream operators.
+
+```
+[SEVERITY] Suspicion: spec-treat missing quality_gate in allowed-tools
+  Authority check: Claude Code skill spec says allowed-tools "pre-approves" tools during skill activation.
+    It is NOT an exclusive blocklist — tools may still be available via user permission mode.
+  → Platform authority: allowed-tools is scope/ergonomics, not hard restriction.
+  → Severity: [!] (alignment gap), NOT [!!] (functional bug).
+  → Wording: "body instruction diverges from frontmatter scope" — not "silent failure".
+
+[SEVERITY] Suspicion: gdu/SKILL.md missing NEVER section
+  Authority check: Claude Code skill spec defines frontmatter fields (description, user-invocable, allowed-tools).
+    No mention of NEVER as a required section.
+  → Platform authority: none. This is a CELLM editorial convention (11/12 skills have it).
+  → Severity: [.] (convention consistency gap), NOT [!] (structural gap).
+  → Wording: "diverges from project SKILL.md convention" — not "structural gap".
+```
+
 ## NEVER
 
 - **Guess a number** — query the DB or say "unverified"
@@ -319,3 +347,5 @@ This classification helps Asclepius triage faster and ensures CONSTRUCT items re
 - **Accept code comments as design intent** — Comments like "exclude X by default" or "skip Y (noise)" are NOT verified design decisions. They may have been written by an LLM or a previous refactoring without owner approval. When a code comment justifies excluding, filtering, or silencing data, ALWAYS report it as a finding for joint decision. The comment itself is evidence of a potential problem, not evidence of a decision
 - **Skip the Evolutionary Analytical Feedback** — reflection after convergence is mandatory. Blind spots that go unrecorded will repeat
 - **Ignore Construction Journals** — Hefesto's notes are as important as Surgical Journals on re-examination. Read both types
+- **Treat project conventions as platform requirements** — a CELLM editorial pattern (NEVER sections, governance alignment) is not the same as a Claude Code platform contract (allowed-tools behavior, frontmatter spec). Severity and wording must reflect which authority the finding violates. Consult official docs before assigning `[!!]` or higher
+- **Freeze exam snapshot before inline fixes are applied** — when re-examination discovers AND fixes findings in the same session, the exam must be frozen AFTER fixes, not between discovery and fix. A stale-born exam erodes trust in the archive

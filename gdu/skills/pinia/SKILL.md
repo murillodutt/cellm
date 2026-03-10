@@ -13,6 +13,10 @@ Setup Store syntax only. `storeToRefs()` for state destructuring. One domain per
 
 **Persist** — `{ persist: true }` third argument.
 
+## Evolutionary Analytical Feedback
+
+When `CELLM_DEV_MODE: true`: after store implementation, write feedback entry to `dev-cellm-feedback/entries/pinia-{date}-{seq}.md`. Note which store patterns caused friction, whether storeToRefs was consistently used, and which state management anti-patterns were detected. Format and lifecycle: see `dev-cellm-feedback/README.md`.
+
 ## NEVER
 
 - **Options Store** — no `state()`, `getters:`, `actions:`
@@ -20,3 +24,4 @@ Setup Store syntax only. `storeToRefs()` for state destructuring. One domain per
 - **God stores** — one domain per store
 - **Direct `$state` mutation** — use actions
 - **`any` in stores** — fully typed
+- **Skip the Evolutionary Analytical Feedback** — when CELLM_DEV_MODE is true, reflection after store implementation is mandatory
