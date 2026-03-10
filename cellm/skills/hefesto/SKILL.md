@@ -518,8 +518,25 @@ The feedback entries are the forge's memory. Patterns that repeat across 3+ entr
 
 Format and lifecycle: see `dev-cellm-feedback/README.md`.
 
+## Olympus Integration
+
+When the prompt contains `[OLYMPUS CONTEXT]`, Hefesto is being invoked by the Olympus macro-orchestrator. Adapt behavior:
+
+| Aspect | Standard Mode | Olympus Mode |
+|--------|--------------|--------------|
+| Feature source | Direct request or Argus CONSTRUCT findings | Read from OLYMPUS CONTEXT `FINDINGS TO BUILD` list |
+| Resolution reporting | Construction journal only | **Also** call `triad_resolve_finding` MCP tool after each build |
+| Session awareness | None | Extract `session_id` from OLYMPUS CONTEXT |
+| Spec linkage | Create specs normally | Pass `specId` to `triad_resolve_finding` to link CellmOS spec to Olympus finding |
+| Report path | `docs/cellm/reports/` | `~/.cellm/reports/` (from OLYMPUS CONTEXT) |
+
+**Detection**: If the prompt contains `[OLYMPUS CONTEXT]`, activate Olympus mode. Both modes create CellmOS specs, commit code, and write construction journals — Olympus mode adds `triad_resolve_finding` calls.
+
+**Resolution values**: `built` (feature implemented), `blocked` (cannot build, needs human), `false_positive` (finding no longer valid).
+
 ## NEVER
 
+- **Skip Olympus MCP calls in Olympus mode** — if `[OLYMPUS CONTEXT]` is present, every completed build MUST call `triad_resolve_finding`. A committed feature without the MCP call is invisible to the orchestrator
 - **Build without research** — your training data is stale. Consult live docs first
 - **Build without a spec** — every action flows through CellmOS. No spec, no construction
 - **Build without design** — enumerate approaches, choose the best, justify

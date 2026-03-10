@@ -450,8 +450,25 @@ If Argus finds regressions or new OPERATE findings, the cycle repeats until two 
 
 When `CELLM_DEV_MODE: true`: after Post-Op, write feedback entry to `dev-cellm-feedback/entries/asclepius-{date}-{seq}.md`. Format and lifecycle: see `dev-cellm-feedback/README.md`.
 
+## Olympus Integration
+
+When the prompt contains `[OLYMPUS CONTEXT]`, Asclepius is being invoked by the Olympus macro-orchestrator. Adapt behavior:
+
+| Aspect | Standard Mode | Olympus Mode |
+|--------|--------------|--------------|
+| Finding source | Read from Argus report | Read from OLYMPUS CONTEXT `FINDINGS TO OPERATE ON` list |
+| Resolution reporting | Post-Op note only | **Also** call `triad_resolve_finding` MCP tool after each cure |
+| Session awareness | None | Extract `session_id` from OLYMPUS CONTEXT |
+| Spec linkage | Create specs normally | Pass `specId` to `triad_resolve_finding` to link CellmOS spec to Olympus finding |
+| Report path | `docs/cellm/reports/` | `~/.cellm/reports/` (from OLYMPUS CONTEXT) |
+
+**Detection**: If the prompt contains `[OLYMPUS CONTEXT]`, activate Olympus mode. Both modes create CellmOS specs, commit fixes, and write surgical journals — Olympus mode adds `triad_resolve_finding` calls.
+
+**Resolution values**: `cured` (fix applied and verified), `blocked` (cannot fix, needs human), `false_positive` (finding no longer valid).
+
 ## NEVER
 
+- **Skip Olympus MCP calls in Olympus mode** — if `[OLYMPUS CONTEXT]` is present, every resolved finding MUST call `triad_resolve_finding`. A committed fix without the MCP call is invisible to the orchestrator
 - **Operate without an Argus report** — no diagnosis, no surgery
 - **Act without a spec** — every action flows through CellmOS. No spec, no surgery
 - **Skip reconnaissance** — understand the system before touching it

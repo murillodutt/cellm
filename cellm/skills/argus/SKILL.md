@@ -38,6 +38,8 @@ You do not follow steps. You apply lenses. Each cycle, you look through all of t
 | **Contract Fidelity** | Do modules agree on what they exchange? Type mismatches, schema drift, interface violations | Read both sides of every boundary. Compare the type A sends with the type B expects. Zod schemas, API responses, shared interfaces. For JSON string fields crossing serialization boundaries: (1) what format does the writer produce? (2) what parser does the reader use? (3) is the parser defensive (safeJsonParse vs raw JSON.parse)? |
 | **Behavioral Completeness** | Are failure paths handled? What happens with invalid input, DB offline, empty payload, timeout? | For each endpoint/handler, check 4 failure scenarios systematically: (1) null/missing body or params, (2) malformed input (NaN, empty string, wrong type), (3) downstream failure (DB timeout, corrupt data), (4) concurrent failure (Promise.all without allSettled). Missing guard on any scenario = finding. |
 | **Scope** | Did a refactoring silently break consumers? Schema renames, table consolidations, hook restructuring, endpoint migrations — producer changed but consumer still compiles with stale assumptions | For each recent refactoring: identify ALL consumers of the old contract. Verify each consumer was updated. Check DB for orphan data (NULL fields, missing FKs, broken references). Always include cross-table referential integrity checks — JOIN tables on FK-like relationships even when no FK constraint exists. Orphan rows (ID in table A but not in table B) are invisible to single-table queries. A refactoring that passes typecheck but produces wrong data at runtime is a Scope finding. |
+| **Silent Bugs** | Do Vue templates bind events that compile but never fire? Framework components with v-model proxies silently swallow wrong event names | Grep all `.vue` files for known mismatches: `USwitch @change` (correct: `@update:model-value`), `UCheckbox @change`, `USelect @change`, `UDropdownMenu @click` on items (correct: `onSelect`), `UModal @close` (correct: `@update:open`). Each match = finding (compiles, renders, handler never fires). Maintain the table — when Nuxt UI MCP adds components, extend it. |
+| **Snapshot Drift** | Did dependency upgrades invalidate design decisions or runtime assumptions? Major/minor bumps can change component APIs, token names, or default behaviors without breaking compilation | Read `package.json` + `bun.lock` for current versions. If DSE preset exists (`dse_search`), compare ATOM snapshots ("currently [IMPL]") against actual framework version. If block doc references specific API behavior, verify it still holds. A component prop renamed in a minor bump = drift finding. |
 | **Regression** | Did a previous cure break something? Only active on re-examination (Post-Op exists) | Read Post-Op, read Surgical Journals in touched files, verify cures hold, trace side-effects |
 
 ## Army
@@ -57,6 +59,8 @@ You command agents. Use them aggressively and in parallel.
 | Verify contract at boundary | Agent reads both sides of an API boundary, compares types |
 | Trace refactoring scope | Agent identifies all consumers of a changed contract (table, hook, schema, endpoint) and verifies each was updated |
 | Audit error handling paths | Agent reads each handler and catalogs try/catch coverage, input guards, edge cases |
+| Scan silent event bugs | Agent greps all `.vue` files for wrong event bindings (Silent Bugs lens table). Each match = finding with file:line |
+| Check snapshot drift | Agent reads `package.json` + `bun.lock`, compares versions against DSE preset ATOM snapshots and block doc API references |
 
 **Dispatch rule**: If it does not require your creative judgment, send a minion. You stay in the observation seat. Absorb results as they arrive and keep applying lenses.
 
@@ -317,6 +321,22 @@ When uncertain, consult the official documentation before promoting. Use MCP `co
   → Wording: "diverges from project SKILL.md convention" — not "structural gap".
 ```
 
+## Olympus Integration
+
+When the prompt contains `[OLYMPUS CONTEXT]`, Argus is being invoked by the Olympus macro-orchestrator (not a human). Adapt behavior:
+
+| Aspect | Standard Mode | Olympus Mode |
+|--------|--------------|--------------|
+| Finding registration | Report in exam/report docs | **Also** call `triad_register_finding` MCP tool for each finding |
+| Disposition | Classify in report prose | Set via MCP: `operate`, `construct`, or `monitor` |
+| Session awareness | None | Extract `session_id` from OLYMPUS CONTEXT, pass to every MCP call |
+| Report path | `docs/cellm/reports/` | `~/.cellm/reports/` (from OLYMPUS CONTEXT) |
+| Re-examination | Detect Post-Op in report | In CERTIFICATION mode, call `triad_resolve_finding` with `resolution: "false_positive"` for disproven findings |
+
+**Detection**: If the prompt starts with `/cellm:argus` AND contains `[OLYMPUS CONTEXT]`, activate Olympus mode. Otherwise, standard mode. Both modes produce the same exam and report — Olympus mode adds structured MCP calls alongside the prose.
+
+**Critical**: `monitor` findings do NOT block certification. Only `operate` and `construct` do. Set disposition accurately — over-classifying as `operate` wastes Asclepius cycles.
+
 ## NEVER
 
 - **Guess a number** — query the DB or say "unverified"
@@ -349,3 +369,5 @@ When uncertain, consult the official documentation before promoting. Use MCP `co
 - **Ignore Construction Journals** — Hefesto's notes are as important as Surgical Journals on re-examination. Read both types
 - **Treat project conventions as platform requirements** — a CELLM editorial pattern (NEVER sections, governance alignment) is not the same as a Claude Code platform contract (allowed-tools behavior, frontmatter spec). Severity and wording must reflect which authority the finding violates. Consult official docs before assigning `[!!]` or higher
 - **Freeze exam snapshot before inline fixes are applied** — when re-examination discovers AND fixes findings in the same session, the exam must be frozen AFTER fixes, not between discovery and fix. A stale-born exam erodes trust in the archive
+- **Skip Silent Bugs lens on blocks with Vue templates** — wrong event bindings compile, render, and silently swallow handlers. One grep per known mismatch is cheap; a missed silent bug costs hours of debugging
+- **Skip Snapshot Drift lens when dependencies changed** — a major/minor bump without re-validating ATOM snapshots and API assumptions means the block doc describes a framework version that no longer exists
