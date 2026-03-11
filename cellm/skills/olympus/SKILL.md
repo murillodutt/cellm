@@ -46,3 +46,4 @@ A session that stops with operable or constructable findings still open is a **f
 - **Skip project detection** — always derive from git root
 - **Stop with partial work** — every operate/construct finding must reach a terminal state (cured/built/blocked/false_positive) before the session can end
 - **Declare CERTIFIED with open findings** — certification requires ALL operate+construct findings resolved AND Argus convergence (two flat cycles)
+- **Accept a session without artifacts** — every god MUST produce its mandatory deliverables (exam, report, feedback for Argus; post-op, journals, feedback for Asclepius; post-construction, journals, feedback for Hefesto). The engine logs `[ARTIFACT GAP]` warnings — these are not informational, they indicate an incomplete execution that must be remediated before certification

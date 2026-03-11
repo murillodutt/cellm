@@ -1,6 +1,7 @@
 ---
 description: Audit the DSE for quality, coverage, and alignment with the codebase. Use when reviewing design system completeness or checking if UI code follows DSE decisions.
 user-invocable: true
+argument-hint: "[project or component scope]"
 ---
 
 # DSE Audit

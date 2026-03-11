@@ -104,3 +104,4 @@ When `CELLM_DEV_MODE: true`: after orchestration, write feedback entry to `dev-c
 - **Non-English spec content** — all status reports, gap descriptions, and new nodes must be in English
 - **Invalid parent-child hierarchies** — check→phase/task/gap/decision/requirement/verification, phase→task/gap/decision/verification, task→gap/verification. Service rejects violations with INVALID_CHILD_TYPE.
 - **Skip the Evolutionary Analytical Feedback** — when CELLM_DEV_MODE is true, reflection after orchestration is mandatory
+- **Defer feedback generation to "later"** — there is no later. Write the feedback entry BEFORE your final message. Each orchestration session is ephemeral — if the entry is not written during this session, it will never exist
