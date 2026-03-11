@@ -2,7 +2,7 @@
 description: Break a requirement into dependency-ordered task groups in the spec database. Decomposes checks into phases and tasks with DAG ordering.
 user-invocable: true
 argument-hint: "[check title or search term]"
-allowed-tools: mcp__cellm-oracle__spec_create_node, mcp__cellm-oracle__spec_get_tree, mcp__cellm-oracle__spec_add_edge, mcp__cellm-oracle__spec_search, mcp__cellm-oracle__spec_get_counters, mcp__plugin_cellm_cellm-oracle__dse_search, mcp__plugin_cellm_cellm-oracle__dse_get, AskUserQuestion
+allowed-tools: mcp__cellm-oracle__spec_decompose, mcp__cellm-oracle__spec_create_node, mcp__cellm-oracle__spec_get_tree, mcp__cellm-oracle__spec_add_edge, mcp__cellm-oracle__spec_search, mcp__cellm-oracle__spec_get_counters, mcp__plugin_cellm_cellm-oracle__dse_search, mcp__plugin_cellm_cellm-oracle__dse_get, AskUserQuestion
 ---
 
 # Decomposition Thinking — Before Splitting
@@ -18,8 +18,9 @@ Find or create the check, then decompose into the database.
    - Skip irrelevant layers. Add domain-specific groups.
 3. **Define** — Each task is atomic, testable, traceable. One imperative action per task.
 4. **Present** — Show breakdown. Allow adjustments via AskUserQuestion.
-6. **Create** — `spec_create_node(project, nodeType, sessionId: <current-session-id>, ...)` for each phase and task — `project` and `sessionId` params on every call for isolation and audit trail. `spec_add_edge` for cross-phase dependencies.
-7. **Edges** — After all phases exist, create DAG edges (see [Edge Creation](#edge-creation)). Auto-chain supported: calling `completed` from `pending`/`active` resolves intermediate states automatically. Auto-rollup: when all child tasks complete, the parent phase auto-completes — but each leaf task must be explicitly transitioned.
+5. **Batch Create (preferred)** — If creating phases + tasks for an existing check, use `spec_decompose` to create the entire subtree atomically in one call (see plan-to-spec skill for full schema). This replaces steps 6-7 with a single call.
+6. **Fallback: Create** — If `spec_decompose` is unavailable, use `spec_create_node(project, nodeType, sessionId: <current-session-id>, ...)` for each phase and task — `project` and `sessionId` params on every call for isolation and audit trail. `spec_add_edge` for cross-phase dependencies.
+7. **Fallback: Edges** — After all phases exist, create DAG edges (see [Edge Creation](#edge-creation)). Auto-chain supported: calling `completed` from `pending`/`active` resolves intermediate states automatically. Auto-rollup: when all child tasks complete, the parent phase auto-completes — but each leaf task must be explicitly transitioned.
 
 ## Edge Creation
 
