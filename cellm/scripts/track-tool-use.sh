@@ -7,6 +7,7 @@ set -euo pipefail
 
 CELLM_DIR="${HOME}/.cellm"
 LOG_FILE="${CELLM_DIR}/oracle-hook.log"
+# shellcheck disable=SC2034  # Used by sourced _get-port.sh
 DEFAULT_PORT=31415
 
 log() { echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] [ToolUse] $1" >> "${LOG_FILE}" 2>/dev/null || true; }
