@@ -1,0 +1,129 @@
+id: line-chart-seven
+name: App Statistics Line Chart
+version: "1.1.0"
+catalogRef: line-chart-seven
+category: visualization
+tags: [line, app-stats, subscriptions, downloads, dual-series, linear, export, responsive]
+archetype: chart-heavy
+description: >
+  Dual-series line chart tracking app metrics (subscriptions vs downloads)
+  over 12 months with Linear curve type. Features header with title and
+  subtitle, nested UCard for chart, live updates indicator, and action
+  buttons for share and export. Uses color-mode-reactive computed categories
+  and reduced tick density (xNumTicks=4) for yearly data.
+
+requires:
+  components: [UCard, UButton, UIcon]
+  charts: [LineChart]
+  composables: [useResponsiveHeight, useColorMode]
+
+props:
+  interface: |
+    interface AppData {
+      date: string
+      subscriptions: number
+      downloads: number
+    }
+    interface LineChartSevenProps {
+      data: Ref<AppData[]>
+      categories: ComputedRef<Record<string, BulletLegendItemInterface>>
+      title?: string
+      subtitle?: string
+    }
+
+emits:
+  interface: |
+    interface LineChartSevenEmits {
+      'share': []
+      'export': []
+    }
+
+layout:
+  structure: |
+    card-shell (UCard)
+      content-stack (space-y-6)
+        header
+          title (text-lg, font-medium)
+          subtitle (text-muted, text-sm)
+        chart-card (UCard, nested)
+          LineChart (Linear curve, TopRight legend, both grids, 4x4 ticks)
+        footer (flex, justify-between)
+          live-indicator (flex, gap-2)
+            animated-dot (bg-primary, animate-pulse)
+            label (text-muted, text-sm, "Live Updates")
+          action-buttons (flex, gap-2)
+            share-button (UButton, sm, ghost, neutral, share-2 icon)
+            export-button (UButton, sm, ghost, neutral, download icon, "Export")
+  responsive:
+    mobile: chart height 120px, action buttons may stack
+    tablet: chart height 240px, inline footer
+    desktop: chart height 240px, spacious
+
+slots:
+  header: Override title and subtitle
+  chart: Override chart configuration
+  footer: Override live indicator and action buttons
+
+tokens:
+  card-bg: bg-default
+  title-font: text-lg font-medium
+  subtitle-color: text-muted text-sm
+  live-dot: bg-primary h-2 w-2 animate-pulse rounded-full
+  live-label: text-muted text-sm
+  button-size: sm
+  button-variant: ghost
+  button-color: neutral
+
+chartConfig:
+  type: line
+  curveType: Linear
+  xGridLine: true
+  yGridLine: true
+  xNumTicks: 4
+  yNumTicks: 4
+  legendPosition: TopRight
+  hideLegend: false
+  tooltip: true
+  xFormatter: "custom function mapping tick index to 'Mon YY' date string"
+  colorModeReactive: true
+
+atomicHint:
+  organism: AppStatisticsCard
+  molecules: [HeaderBlock, LinearLineChart, ActionFooter]
+  atoms: [LiveDot, ShareButton, ExportButton, DateFormatter]
+
+examples:
+  - context: "App store analytics"
+    data: "12-month subscriptions (2643-3490) vs downloads (1726-3848) with share/export"
+  - context: "SaaS growth tracking"
+    data: "Monthly signups vs trial activations over a year"
+  - context: "Content platform metrics"
+    data: "Posts published vs views over 12 months with export capability"
+
+composesWith:
+  - "line-chart-one (dual-axis variant for different scale metrics)"
+  - "line-chart-six (marker-differentiated variant)"
+  - "App dashboard layout (DSE composition)"
+
+avoid:
+  - "Too many x-axis ticks for 12-month data -- xNumTicks=4 keeps labels readable"
+  - "MonotoneX for linear business metrics -- Linear curve type shows actual data shape"
+  - "Omitting share/export actions -- they enable data distribution"
+  - "Static categories without colorMode reactivity -- colors must adapt to theme"
+  - "Fixed chart height -- use useResponsiveHeight"
+
+derivation:
+  source: "nuxt-charts/line-charts/linecharts-chart-seven"
+  method: "structural-abstraction"
+  what-was-kept: >
+    Dual-series app statistics concept with ref-based reactive data, computed
+    colorMode-reactive categories (subscriptions/downloads), CurveType.Linear,
+    LegendPosition.TopRight, xGridLine/yGridLine both true, xNumTicks=4,
+    yNumTicks=4, xAxisFormatter mapping tick to date string, live updates
+    animated dot, share (i-lucide-share-2) and export (i-lucide-download)
+    icon buttons (sm, ghost, neutral).
+  what-was-removed: >
+    Hardcoded 12-month app data, specific hex colors, static title text.
+  transformative-value: >
+    Reusable dual-series app metrics pattern with Linear curve, share/export
+    actions, and live indicator. Clean yearly data visualization.

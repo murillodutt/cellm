@@ -1,0 +1,116 @@
+# Block Pattern: Category Cards
+id: category-cards
+name: Category Distribution Cards with Stacked Bar
+version: "1.0.0"
+catalogRef: category-cards
+category: data
+tags: [category, distribution, stacked-bar, legend, percentage]
+archetype: layout-heavy
+description: >
+  Cards showing a hero percentage, a change indicator, a horizontal stacked
+  progress bar (segmented by category), and a color-coded legend. Each card
+  represents a distribution breakdown (e.g., traffic channels, revenue sources).
+  Uses CSS stacked bar, not DonutChart.
+
+requires:
+  components: [UCard]
+  charts: []
+  composables: []
+  note: "Stacked bar is CSS flexbox with percentage widths, not a chart component"
+
+props:
+  interface: |
+    interface CategorySegment {
+      name: string
+      value: number
+      color: string
+    }
+    interface CategoryCardItem {
+      heroPercent: number
+      change: number
+      segments: CategorySegment[]
+    }
+    interface CategoryCardsProps {
+      cards: CategoryCardItem[]
+      legendPosition?: 'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight'
+    }
+
+emits:
+  interface: |
+    interface CategoryCardsEmits {
+      'segment:click': [segmentName: string]
+      'card:click': [index: number]
+    }
+
+layout:
+  structure: |
+    card-grid (responsive columns)
+      card-shell (repeat per card)
+        hero-row
+          hero-percentage (2xl, bold)
+          change-indicator (sm, error color for negative)
+        stacked-bar (h-2, rounded-full, overflow-hidden)
+          segment (repeat, width by percentage, bg by segment.color)
+        legend-row (configurable position via legendPosition)
+          legend-item (repeat per segment)
+            color-dot (h-2, w-2, rounded-full, segment.color)
+            segment-label (muted, sm, truncated first-word)
+  responsive:
+    mobile: single column
+    tablet: 2-column grid
+    desktop: 3-column grid
+
+slots:
+  card: "Override individual card rendering"
+  legend: "Custom legend rendering"
+  stacked-bar: "Custom bar visualization"
+
+tokens:
+  card-bg: bg-default
+  hero-text: text-highlighted
+  change-negative: text-error
+  change-positive: text-success
+  bar-height: "h-2"
+  bar-radius: "rounded-full"
+  legend-text: text-muted
+  dot-size: "h-2 w-2"
+  segment-primary: bg-primary
+  segment-info: bg-info
+  segment-warning: bg-warning
+
+atomicHint:
+  organism: CategoryCardGrid
+  molecules: [CategoryCard, StackedBar, LegendRow]
+  atoms: [ColorDot, SegmentBar, ChangeIndicator]
+
+examples:
+  - context: "Traffic channel breakdown"
+    cards: ["78% overall (Organic 78%, Referral 15%, Direct 7%, -0.4% change)"]
+  - context: "Revenue source distribution"
+    cards: ["65% subscriptions (Subscriptions 65%, One-time 25%, Enterprise 10%, +2.1% change)"]
+
+composesWith:
+  - "expense-budget (category-colored progress bars)"
+  - "Dashboard Page Layout (DSE composition)"
+  - "default-cards (hero value without distribution)"
+
+derivation:
+  source: "nuxt-charts/cards/category-cards"
+  method: "structural-abstraction"
+  what-was-kept: >
+    Hero percentage + change indicator concept, CSS stacked bar with
+    category-colored segments, configurable legend position (4 positions),
+    color dot + label legend pattern, first-word truncation for labels.
+  what-was-removed: >
+    All Vue template markup, hardcoded channelPercentages ref, ExpenseCategory
+    import, v-for directives, computed getLegendClass, Tailwind classes.
+  transformative-value: >
+    Stacked bar distribution card without chart library dependency.
+    Pure CSS implementation for lightweight category breakdowns.
+
+avoid:
+  - "DonutChart for this pattern — CSS stacked bar is the correct approach"
+  - "Missing legend position — must support 4 positions via prop"
+  - "Hardcoded segment colors — colors come from segment data"
+  - "Full category names in legend — truncate to first word"
+  - "Missing change indicator — hero percentage needs context"

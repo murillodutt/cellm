@@ -1,0 +1,128 @@
+id: line-chart-five
+name: Multi-City Temperature Line Chart
+version: "1.1.0"
+catalogRef: line-chart-five
+category: visualization
+tags: [line, multi-series, temperature, basis-curve, geographic, comparison, responsive]
+archetype: chart-heavy
+description: >
+  Three-series line chart comparing geographic data (e.g., temperatures across
+  cities) using Basis curve interpolation for smooth natural curves. Features
+  TopRight legend, axis labels (x-label "Time", y-label "Temperature"),
+  minimal y-axis ticks (2), and nested subtle card layout. Designed for
+  seasonal or geographic multi-point comparisons.
+
+requires:
+  components: [UCard]
+  charts: [LineChart]
+  composables: [useResponsiveHeight]
+
+props:
+  interface: |
+    interface CityDataItem {
+      month: string
+      [cityKey: string]: string | number
+    }
+    interface LineChartFiveProps {
+      data: CityDataItem[]
+      categories: Record<string, BulletLegendItemInterface>
+      title?: string
+      xLabel?: string
+      yLabel?: string
+      yNumTicks?: number
+    }
+
+emits:
+  interface: |
+    interface LineChartFiveEmits {
+      'city:select': [cityKey: string]
+      'month:hover': [month: string, values: Record<string, number>]
+    }
+
+layout:
+  structure: |
+    card-shell (UCard)
+      title-section
+        title (text-xl, font-semibold, tracking-tight)
+      chart-card (UCard, variant=subtle, mt-4)
+        LineChart (3 series, Basis curve, TopRight legend)
+          x-axis (label="Time", formatter=monthName, numTicks=6)
+          y-axis (label="Temperature", numTicks=2, gridLine=true)
+          series-boston (line, color-1)
+          series-newyork (line, color-2)
+          series-washington (line, color-3)
+  responsive:
+    mobile: chart height 120px, legend may wrap
+    tablet: chart height 240px, legend inline
+    desktop: chart height 240px, spacious
+
+slots:
+  header: Override title section
+  chart: Override chart with custom multi-series config
+  legend: Override legend rendering for city series
+
+tokens:
+  card-bg: bg-default
+  title-font: text-xl font-semibold tracking-tight
+  chart-card-variant: subtle
+  chart-card-margin: mt-4
+  legend-position: TopRight
+  x-label-text: "Time"
+  y-label-text: "Temperature"
+  series-1-color: text-blue-500
+  series-2-color: text-amber-500
+  series-3-color: text-green-500
+
+chartConfig:
+  type: line
+  curveType: Basis
+  xLabel: "Time"
+  yLabel: "Temperature"
+  yNumTicks: 2
+  xNumTicks: 6
+  yGridLine: true
+  legendPosition: TopRight
+  hideLegend: false
+  tooltip: true
+  xFormatter: "custom function mapping tick index to month name"
+
+atomicHint:
+  organism: MultiCityLineCard
+  molecules: [TitleHeader, MultiSeriesChart]
+  atoms: [BasisCurve, AxisLabel, CityLegendItem]
+
+examples:
+  - context: "Weather comparison dashboard"
+    data: "12-month temperatures for Boston/New York/Washington DC (30-82 F)"
+  - context: "Regional performance comparison"
+    data: "Monthly metrics across 3 regions with smooth Basis curves"
+  - context: "Multi-location sensor monitoring"
+    data: "Temperature readings from 3 IoT sensors over 12 months"
+
+composesWith:
+  - "line-chart-one (dual-axis climate, single location focus)"
+  - "line-chart-eight (climate trends, dual-axis variant)"
+  - "Geographic comparison dashboard (DSE composition)"
+
+avoid:
+  - "More than 4-5 cities/series -- Basis curves overlap and become unreadable"
+  - "Linear curve for seasonal data -- Basis produces more natural temperature curves"
+  - "Omitting axis labels -- x-label and y-label clarify units"
+  - "Too many y-axis ticks -- yNumTicks=2 keeps it clean for temperature range"
+  - "Fixed chart height -- use useResponsiveHeight"
+
+derivation:
+  source: "nuxt-charts/line-charts/linecharts-chart-five"
+  method: "structural-abstraction"
+  what-was-kept: >
+    Three-series geographic comparison with static categories (Boston/NewYork/WashingtonDC),
+    CurveType.Basis for smooth natural curves, axis labels (x-label="Time",
+    y-label="Temperature"), yNumTicks=2, xNumTicks=6, LegendPosition.TopRight,
+    nested UCard (variant=subtle), xFormatter mapping tick index to month name,
+    compact title (text-xl, font-semibold).
+  what-was-removed: >
+    Hardcoded 12-month temperature data, specific hex colors (#3b82f6, #f59e42, #22c55e),
+    static city names.
+  transformative-value: >
+    Reusable multi-series comparison pattern with Basis curve interpolation,
+    ideal for geographic or seasonal data with smooth natural curves.

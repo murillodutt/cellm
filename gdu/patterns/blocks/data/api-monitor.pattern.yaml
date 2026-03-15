@@ -1,0 +1,105 @@
+# Block Pattern: API Performance Monitor
+id: api-monitor
+name: API Endpoint Performance Monitor
+version: "1.0.0"
+catalogRef: api-performance-monitor
+category: data
+tags: [api, monitor, performance, latency, status, endpoints]
+archetype: layout-heavy
+description: >
+  Table-like display of API endpoints with status code badge, latency bar,
+  and request volume. Each row shows endpoint path, HTTP status, response
+  time with visual bar, and volume count.
+
+requires:
+  components: [UCard, UBadge]
+  charts: []
+  composables: []
+
+props:
+  interface: |
+    interface APIEndpoint {
+      path: string
+      method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
+      status: number
+      latency: number
+      volume: number
+    }
+    interface APIMonitorProps {
+      endpoints: APIEndpoint[]
+      title?: string
+      maxLatency?: number
+    }
+
+emits:
+  interface: |
+    interface APIMonitorEmits {
+      'endpoint:click': [endpoint: APIEndpoint]
+    }
+
+layout:
+  structure: |
+    card-shell
+      header [title, subtitle]
+      endpoint-list (vertical stack)
+        endpoint-row (repeat per endpoint)
+          method-badge (optional, colored by HTTP method)
+          path-label (monospace)
+          status-badge (color-coded: 2xx=success, 4xx=warning, 5xx=error)
+          latency-bar (proportional width, color by severity)
+          latency-value (ms, right-aligned)
+          volume-count (right-aligned, muted)
+      footer [summary: avg latency, total volume, error rate]
+  responsive:
+    mobile: stack method+path above status+latency
+    tablet: single row per endpoint
+    desktop: same as tablet
+
+slots:
+  header: "Override header"
+  endpoint-row: "Custom row rendering"
+  footer: "Override summary"
+
+tokens:
+  card-bg: bg-default
+  path-text: text-highlighted
+  status-2xx: success
+  status-4xx: warning
+  status-5xx: error
+  latency-fast: bg-success
+  latency-medium: bg-warning
+  latency-slow: bg-error
+  volume-text: text-muted
+
+atomicHint:
+  organism: APIMonitor
+  molecules: [EndpointRow, SummaryFooter]
+  atoms: [StatusBadge, LatencyBar, MethodBadge]
+
+examples:
+  - context: "Backend health dashboard"
+    endpoints: ["GET /api/users (200, 45ms, 1.2K)", "POST /api/auth (201, 120ms, 500)"]
+  - context: "API gateway monitoring"
+    endpoints: ["GET /v1/products (200, 32ms, 5K)", "POST /v1/orders (500, 2100ms, 12)"]
+
+composesWith:
+  - "Dashboard Page Layout (DSE composition)"
+  - "server-heatmap (infrastructure-level monitoring)"
+
+derivation:
+  source: "nuxt-charts/bar-lists/api-performance-monitor"
+  method: "structural-abstraction"
+  what-was-kept: >
+    Endpoint list concept, status code badge, latency visualization,
+    volume display, severity-based coloring.
+  what-was-removed: >
+    All Vue template markup, hardcoded endpoint data, specific badge
+    props, CSS classes.
+  transformative-value: >
+    Adds HTTP method badges, configurable latency thresholds, and
+    summary footer to the base concept.
+
+avoid:
+  - "Charts for latency — simple colored bars are clearer"
+  - "Missing status code coloring — 2xx/4xx/5xx must be visually distinct"
+  - "Ignoring volume — high-volume slow endpoints are more critical"

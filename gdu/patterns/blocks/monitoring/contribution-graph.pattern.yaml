@@ -1,0 +1,110 @@
+# Block Pattern: Contribution Graph
+id: contribution-graph
+name: GitHub-style Activity Heatmap
+version: "1.0.0"
+catalogRef: contribution-graph
+category: monitoring
+tags: [heatmap, activity, contributions, github, calendar]
+archetype: layout-heavy
+description: >
+  Calendar heatmap displaying daily activity levels in a week-row x week-column
+  grid. Each cell color intensity represents activity level (0-4 scale).
+  Includes month labels, day-of-week labels, hover tooltip, and intensity legend.
+
+requires:
+  components: [UCard, UIcon]
+  charts: []
+  composables: []
+
+props:
+  interface: |
+    interface ContributionDay {
+      date: string
+      count: number
+      level: 0 | 1 | 2 | 3 | 4
+    }
+    interface ContributionGraphProps {
+      data: ContributionDay[]
+      size?: 'sm' | 'md' | 'lg'
+      showLegend?: boolean
+      year?: number
+    }
+
+emits:
+  interface: |
+    interface ContributionGraphEmits {
+      'day:hover': [day: ContributionDay]
+      'day:click': [day: ContributionDay]
+      'year:change': [year: number]
+    }
+
+layout:
+  structure: |
+    card-shell
+      header [title]
+      scrollable-container (horizontal overflow on mobile)
+        month-labels-row (positioned above columns)
+        grid-area
+          day-labels-column (Mon, Wed, Fri along left edge)
+          week-columns (52-53 columns, 7 rows each)
+            cell (colored by level, rounded, hover ring)
+      footer-row
+        legend (Less -> 5 intensity squares -> More)
+        hover-tooltip (count + formatted date, appears on hover)
+  responsive:
+    mobile: horizontal scroll, sm cell size
+    tablet: fits without scroll at md size
+    desktop: comfortable fit at md/lg size
+
+slots:
+  header: "Override card header"
+  tooltip: "Custom hover tooltip content"
+
+tokens:
+  card-bg: bg-default
+  cell-empty: bg-elevated
+  cell-level-1: "bg-primary/20"
+  cell-level-2: "bg-primary/40"
+  cell-level-3: "bg-primary/60"
+  cell-level-4: bg-primary
+  cell-border-empty: border-default
+  cell-border-filled: "border-primary at matching opacity"
+  hover-ring: "ring-primary/50"
+  label-text: text-muted
+
+atomicHint:
+  organism: ContributionGraph
+  molecules: [WeekColumn, LegendBar, HoverTooltip]
+  atoms: [ActivityCell, MonthLabel, DayLabel]
+
+examples:
+  - context: "Developer activity on a project"
+    data: "365 days of commit activity, level derived from commit count"
+  - context: "User engagement heatmap"
+    data: "365 days of login/action frequency"
+
+composesWith:
+  - "Dashboard Page Layout (DSE composition)"
+  - "server-heatmap (same heatmap rendering concept, different axis)"
+
+derivation:
+  source: "nuxt-charts/status/contribution-graph"
+  method: "structural-abstraction"
+  what-was-kept: >
+    Calendar grid concept (7 rows x 52+ columns), 5-level intensity scale,
+    month label positioning, day-of-week labels, hover interaction,
+    legend bar pattern, size variants (sm/md/lg), year selection.
+  what-was-removed: >
+    All Vue template markup, seeded random data generation, computed weekly
+    data transformation, CSS class generation functions, specific cell
+    dimensions, interval-based refresh logic.
+  transformative-value: >
+    Extracts the GitHub-contribution-graph pattern into a framework-agnostic
+    specification. Consumer provides pre-computed ContributionDay[] data
+    instead of generating it internally.
+
+avoid:
+  - "Generating data inside the component — accept pre-computed data via props"
+  - "Fixed cell sizes — support size variants"
+  - "Missing empty-cell styling — level 0 must be visually distinct"
+  - "No horizontal scroll on mobile — grid will overflow"

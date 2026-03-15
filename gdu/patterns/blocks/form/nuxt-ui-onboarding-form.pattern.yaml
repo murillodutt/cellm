@@ -1,0 +1,133 @@
+# Block Pattern: Onboarding Multi-Step Form (Reusable Component)
+# Distributable structural specification — no licensed code
+# Generated from catalog ref, not source transcription
+
+id: nuxt-ui-onboarding-form
+name: Onboarding Multi-Step Question Form
+version: "1.0.0"
+catalogRef: nuxt-ui-onboarding-form
+category: form
+tags: [onboarding, wizard, questions, options, search, multi-step]
+basePattern: onboarding-wizard
+
+archetype: form-heavy
+description: >
+  Multi-step onboarding form using a reusable Onboarding component with typed
+  Question model. Each step can be type 'option' (radio/card selection) or
+  type 'search' (searchable dropdown). Questions have title, description,
+  and options array. Component emits finish event with collected answers.
+  v-model binding for two-way question state.
+
+requires:
+  components: [UCard, UButton, URadioGroup]
+  charts: []
+  composables: []
+
+props:
+  interface: |
+    interface QuestionOption {
+      label: string
+      value: string
+    }
+    interface Question {
+      title: string
+      description?: string
+      type: 'option' | 'search'
+      options: QuestionOption[]
+      value?: string
+    }
+    interface OnboardingFormProps {
+      questions: Question[]     // v-model bound, array of steps
+    }
+
+emits:
+  interface: |
+    interface OnboardingFormEmits {
+      'update:questions': [questions: Question[]]
+      'finish': [answers: Question[]]
+      'step:change': [stepIndex: number]
+    }
+
+layout:
+  structure: |
+    onboarding-wrapper (reusable component, v-model questions)
+      step-view (one question visible at a time)
+        step-header
+          title [large, semibold]
+          description [muted, smaller text]
+        step-body (by question type)
+          option-type: radio/card selection grid
+            option-card (repeat, selectable, highlight on select)
+          search-type: searchable dropdown
+            search-input (filterable)
+            options-list (filtered results)
+        step-navigation
+          back-button (if not first step)
+          next-button / finish-button (on last step)
+      progress-indicator (step X of total)
+  responsive:
+    mobile: full-width, stacked options
+    tablet: centered, comfortable padding
+    desktop: centered, max-width constrained
+
+slots:
+  step-header: "Custom step title/description rendering"
+  option-card: "Custom option card rendering"
+  search-input: "Custom search input"
+
+tokens:
+  wrapper-bg: bg-default
+  title-text: text-highlighted
+  description-text: text-muted
+  option-default-bg: bg-elevated
+  option-selected-bg: "bg-primary/10"
+  option-selected-border: border-primary
+  search-input-border: border-default
+  nav-back-color: neutral
+  nav-next-color: primary
+
+atomicHint:
+  organism: OnboardingQuestionForm
+  molecules: [StepView, OptionSelector, SearchSelector, StepNavigation]
+  atoms: [OptionCard, SearchInput, StepTitle, StepDescription]
+
+examples:
+  - context: "SaaS onboarding (usage intent + focus + job title)"
+    questions:
+      - "How do you plan on using this? (option: myself/team/organization)"
+      - "What to focus on first? (option: analyze/visualizations/seo/sales/amazon)"
+      - "What's your job title? (search: CEO/Marketing Manager/Sales Rep/...)"
+  - context: "Product feedback survey"
+    questions:
+      - "How satisfied are you? (option)"
+      - "What feature matters most? (search)"
+
+composesWith:
+  - "onboarding-wizard (simpler radio-only alternative)"
+  - "nuxt-ui-onboarding-feed (checklist alternative to wizard)"
+  - "basic-sign-in (precedes onboarding in auth flow)"
+
+derivation:
+  source: "nuxt-charts/onboarding/nuxt-ui-onboarding-form"
+  method: "structural-abstraction"
+  what-was-kept: >
+    Reusable Onboarding component pattern with v-model binding, typed Question
+    interface with type discriminator ('option' | 'search'), title + description
+    per question, options array with label/value pairs, finish event emitting
+    collected answers, multi-step navigation through questions, search type
+    for filterable option lists (job title selection).
+  what-was-removed: >
+    All Vue template markup, specific question content (usage/focus/job title),
+    import paths, alert on finish, console.log, component file references.
+  transformative-value: >
+    Captures the "typed question model" onboarding pattern: each step defines
+    its input type (option cards vs searchable dropdown). Reusable component
+    with v-model for two-way state binding. Type discriminator drives
+    rendering strategy per step.
+
+avoid:
+  - "All questions same type — support mixed option/search types per step"
+  - "No search capability — job title lists need filtering for large option sets"
+  - "Losing answers on navigation — v-model must preserve selections across steps"
+  - "Missing finish handler — final step must emit all collected answers"
+  - "Hardcoded questions — accept as v-model prop for reusability"

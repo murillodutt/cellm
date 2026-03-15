@@ -1,0 +1,120 @@
+# Block Pattern: Server Performance Heatmap
+id: server-heatmap
+name: Server Response Time Heatmap
+version: "1.0.0"
+catalogRef: server-performance-heatmap
+category: monitoring
+tags: [heatmap, performance, server, latency, regions]
+archetype: layout-heavy
+description: >
+  Color-coded matrix showing server response times across regions (columns)
+  and server instances (rows). Cell color intensity maps to response time
+  severity. Supports click-to-select, hover tooltip, and auto-refresh.
+
+requires:
+  components: [UCard, UButton, UIcon, USwitch]
+  charts: []
+  composables: [useIntervalFn]
+
+props:
+  interface: |
+    interface ServerData {
+      region: string
+      server: string
+      responseTime: number
+      status: 'healthy' | 'warning' | 'critical'
+      uptime: number
+    }
+    interface ServerHeatmapProps {
+      data: ServerData[]
+      regions: string[]
+      servers: string[]
+      autoRefreshMs?: number
+    }
+
+emits:
+  interface: |
+    interface ServerHeatmapEmits {
+      'server:select': [server: ServerData]
+      'server:deselect': []
+      'refresh': []
+    }
+
+layout:
+  structure: |
+    card-shell
+      header
+        title-group [title, subtitle]
+        selected-server-indicator (shows when a cell is clicked, with clear button)
+      matrix-grid
+        region-labels-row (column headers)
+        server-rows (repeat per server)
+          server-label (row header, left)
+          cells (repeat per region)
+            color-cell (height fixed, bg from response-time scale, click to select)
+            status-icon-overlay (check/warning/x centered in cell)
+      legend-row
+        color-legend (Faster -> green/yellow/orange/red squares -> Slower)
+        hover-tooltip (region + server + response time on hover)
+      footer
+        avg-response-time
+        auto-refresh-toggle (USwitch)
+        action-buttons [refresh, server-logs]
+  responsive:
+    mobile: horizontal scroll for matrix
+    tablet: fits 4-5 regions
+    desktop: fits 6+ regions comfortably
+
+slots:
+  header: "Override card header"
+  cell-content: "Custom cell overlay content"
+  summary: "Override summary row"
+
+tokens:
+  card-bg: bg-default
+  cell-healthy: bg-success
+  cell-warning: bg-warning
+  cell-critical: bg-error
+  cell-selected-opacity: "1.0 (dimmed cells at 0.3)"
+  header-text: text-highlighted
+  label-text: text-muted
+  icon-color: text-inverted
+
+atomicHint:
+  organism: ServerHeatmap
+  molecules: [ServerRow, CellGrid, SummaryBar]
+  atoms: [ResponseTimeCell, StatusIcon, RegionLabel]
+
+examples:
+  - context: "Global infrastructure monitoring"
+    regions: ["US-East", "US-West", "EU-Central", "EU-West", "Asia-Pacific"]
+    servers: ["Server-01", "Server-02", "Server-03", "Server-04"]
+  - context: "Multi-tenant SaaS health"
+    regions: ["Tenant-A", "Tenant-B", "Tenant-C"]
+    servers: ["API", "Worker", "DB", "Cache"]
+
+composesWith:
+  - "Dashboard Page Layout (DSE composition)"
+  - "contribution-graph (same heatmap concept, different data)"
+
+derivation:
+  source: "nuxt-charts/status/server-performance-heatmap"
+  method: "structural-abstraction"
+  what-was-kept: >
+    Matrix layout concept (regions x servers), response-time-to-color mapping,
+    click-to-select with dimming, hover interaction, status icon overlay,
+    auto-refresh pattern, summary statistics.
+  what-was-removed: >
+    All Vue template markup, random data generation functions, computed
+    properties for color/opacity/status, specific RGB values, CSS class
+    strings, region/server hardcoded arrays.
+  transformative-value: >
+    Generalizes from server monitoring to any 2D entity-vs-dimension
+    matrix with severity coloring. Consumer provides pre-computed
+    ServerData[] instead of generating random values.
+
+avoid:
+  - "Generating fake data inside component — accept real data via props"
+  - "Fixed region/server lists — accept via props"
+  - "No click feedback — selected cell must stand out (dimmed siblings)"
+  - "Missing scroll on mobile — matrix will overflow"

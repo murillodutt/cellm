@@ -1,0 +1,89 @@
+# Template Pattern: Nuxt Dashboard 3
+id: nuxt-dashboard-3
+name: Nuxt Dashboard 3
+version: "1.0.0"
+catalogRef: nuxt-dashboard-3
+category: template
+tags: [template, dashboard, complete, starter, charts, tables]
+archetype: layout-heavy
+quality: partial
+
+description: >
+  Full-featured dashboard template with charts, data tables, KPI cards,
+  and navigation. Combines visualization blocks with data overview sections
+  for a complete admin dashboard experience.
+
+composesPatterns:
+  - navbar-variant-one
+  - default-cards
+  - area-chart-preview
+  - bar-chart-one
+  - sparkline-table
+  - donut-chart-legend
+  - stats-cards
+
+requires:
+  components: [UCard, UButton, UTable, UBadge, UIcon]
+  charts: [AreaChart, BarChart, DonutChart]
+  composables: []
+
+layout:
+  sections:
+    - name: navigation
+      patternRef: navbar-variant-one
+      slot: top
+    - name: kpi-overview
+      patternRef: default-cards
+      slot: hero
+    - name: primary-chart
+      patternRef: area-chart-preview
+      slot: main-left
+    - name: secondary-chart
+      patternRef: bar-chart-one
+      slot: main-right
+    - name: data-table
+      patternRef: sparkline-table
+      slot: content
+    - name: distribution
+      patternRef: donut-chart-legend
+      slot: sidebar
+    - name: stats-footer
+      patternRef: stats-cards
+      slot: footer
+  responsive:
+    mobile: single column, stacked sections
+    tablet: 2-column grid for charts, full-width table
+    desktop: sidebar layout with main content + distribution chart
+
+tokens:
+  page-bg: bg-default
+  section-gap: gap-6
+  card-bg: bg-default
+  card-border: border-default
+  header-bg: bg-elevated
+  content-padding: p-6
+
+atomicHint:
+  organism: DashboardPage
+  molecules: [NavigationBar, KPIRow, ChartGrid, DataTable, StatsFooter]
+  atoms: [KPICard, ChartCard, TableRow]
+
+examples:
+  - context: "Admin dashboard for SaaS product"
+    sections: ["Top nav with search", "4 KPI cards (revenue, users, orders, growth)", "Area chart (revenue trend)", "Bar chart (monthly breakdown)", "Data table with sparklines", "Donut chart (traffic sources)"]
+  - context: "Analytics dashboard"
+    sections: ["Navigation bar", "Metric cards (sessions, bounce rate, conversion)", "Time series chart", "Category breakdown chart", "Event log table"]
+
+composesWith:
+  - "ai-dashboard (alternative AI-focused landing)"
+  - "nuxt-clean-gray (simpler dashboard variant)"
+
+derivation:
+  source: "none — composition derived from catalog description and tags"
+  method: "template-composition"
+
+avoid:
+  - "Overcrowding — max 7 sections on a single page, paginate or tab the rest"
+  - "All charts same type — mix area, bar, donut for visual variety"
+  - "Missing KPI summary row — dashboard must lead with key metrics"
+  - "No responsive collapse strategy — define stacking order for mobile"

@@ -1,0 +1,88 @@
+# Template Pattern: Nuxt Shadcn UI Flat
+id: nuxt-shadcnui-flat
+name: Nuxt Shadcn UI Flat
+version: "1.0.0"
+catalogRef: nuxt-shadcnui-flat
+category: template
+tags: [template, flat, shadcn, minimal, clean-design]
+archetype: layout-heavy
+quality: partial
+
+description: >
+  Flat design dashboard template inspired by Shadcn UI aesthetics. Minimal
+  elevation, subtle borders, and clean typography. Emphasizes data density
+  with compact cards and inline charts.
+
+composesPatterns:
+  - navbar-toolbar
+  - stats-cards
+  - area-chart-data
+  - bar-chart-grouped
+  - bar-list-ranked
+  - donut-chart-interactive
+
+requires:
+  components: [UCard, UButton, UBadge, UTable, UIcon]
+  charts: [AreaChart, BarChart, DonutChart]
+  composables: []
+
+layout:
+  sections:
+    - name: toolbar
+      patternRef: navbar-toolbar
+      slot: top
+    - name: metrics
+      patternRef: stats-cards
+      slot: hero
+    - name: trend-chart
+      patternRef: area-chart-data
+      slot: main-left
+    - name: comparison-chart
+      patternRef: bar-chart-grouped
+      slot: main-right
+    - name: ranked-list
+      patternRef: bar-list-ranked
+      slot: content
+    - name: breakdown
+      patternRef: donut-chart-interactive
+      slot: sidebar
+  responsive:
+    mobile: single column, cards full-width, charts stacked
+    tablet: 2-column chart grid, full-width ranked list
+    desktop: main + sidebar layout, toolbar persistent
+
+tokens:
+  page-bg: bg-default
+  card-bg: bg-default
+  card-border: border-default
+  card-shadow: shadow-none
+  card-radius: rounded-lg
+  text-primary: text-highlighted
+  text-secondary: text-muted
+  accent: text-primary
+  divider: border-default
+
+atomicHint:
+  organism: FlatDashboardPage
+  molecules: [ToolbarNav, MetricsRow, ChartGrid, RankedList]
+  atoms: [StatCard, ChartCard, RankedItem]
+
+examples:
+  - context: "Developer analytics dashboard"
+    sections: ["Toolbar with breadcrumbs", "4 stat cards (commits, PRs, issues, deploys)", "Activity trend area chart", "Language comparison bar chart", "Top repositories ranked list", "Contribution breakdown donut"]
+  - context: "Content management dashboard"
+    sections: ["Toolbar nav", "Metrics (posts, views, engagement, subscribers)", "Traffic trend chart", "Content type comparison", "Top articles ranked", "Source breakdown"]
+
+composesWith:
+  - "nuxt-dashboard-3 (richer dashboard with more visual elements)"
+  - "nuxt-simplistic (even more minimal variant)"
+
+derivation:
+  source: "none — composition derived from catalog description and tags"
+  method: "template-composition"
+
+avoid:
+  - "Box shadows on cards — flat design means no elevation, use borders only"
+  - "Rounded corners larger than rounded-lg — keep geometric and sharp"
+  - "Colorful backgrounds — flat aesthetic uses neutral bg with accent color sparingly"
+  - "Decorative elements — every visual element must convey data"

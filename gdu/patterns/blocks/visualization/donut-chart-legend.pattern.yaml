@@ -1,0 +1,100 @@
+# Block Pattern: Donut Chart with Legend
+id: donut-chart-legend
+name: Donut Chart with Category Legend
+version: "1.0.0"
+catalogRef: donut-chart-one
+category: visualization
+tags: [donut, basic, pie, legend, distribution]
+archetype: chart-heavy
+description: >
+  Standard donut chart with colored segments and a legend listing each
+  category with its color swatch, label, and value. Card-wrapped.
+
+requires:
+  components: [UCard]
+  charts: [DonutChart]
+  composables: []
+
+props:
+  interface: |
+    interface DonutSegment {
+      label: string
+      value: number
+      color?: string
+    }
+    interface DonutChartLegendProps {
+      segments: DonutSegment[]
+      title?: string
+      showPercentage?: boolean
+    }
+
+emits:
+  interface: |
+    interface DonutChartLegendEmits {
+      'segment:click': [label: string]
+    }
+
+layout:
+  structure: |
+    card-shell
+      header [title]
+      chart-layout (flex: chart left, legend right on desktop)
+        donut-chart-container
+          DonutChart (colored segments)
+        legend-list (vertical stack)
+          legend-item (repeat per segment)
+            color-swatch (small circle)
+            label
+            value (or percentage)
+  responsive:
+    mobile: chart above, legend below (stacked)
+    tablet: chart left, legend right (side-by-side)
+    desktop: same as tablet
+
+slots:
+  header: "Override card header"
+  legend-item: "Custom legend item rendering"
+
+tokens:
+  card-bg: bg-default
+  legend-label: text-highlighted
+  legend-value: text-muted
+
+chartConfig:
+  type: donut
+  legend: false
+  tooltip: true
+  note: "Legend is rendered manually outside chart for full styling control"
+
+atomicHint:
+  organism: DonutChartCard
+  molecules: [DonutContainer, LegendList]
+  atoms: [DonutSegment, LegendItem, ColorSwatch]
+
+examples:
+  - context: "Revenue by source"
+    segments: ["Organic (45%)", "Paid (30%)", "Referral (15%)", "Direct (10%)"]
+  - context: "Storage usage"
+    segments: ["Documents (40GB)", "Images (25GB)", "Videos (20GB)", "Other (15GB)"]
+
+composesWith:
+  - "Dashboard Page Layout (DSE composition)"
+  - "donut-chart-interactive (enhanced version with click interaction)"
+
+derivation:
+  source: "nuxt-charts/donut-charts/donut-chart-one"
+  method: "structural-abstraction"
+  what-was-kept: >
+    Donut + legend combination, color swatch per category, chart/legend
+    side-by-side layout, responsive stacking.
+  what-was-removed: >
+    All Vue template markup, hardcoded data, specific DonutChart props,
+    CSS classes.
+  transformative-value: >
+    Generic donut pattern with manually rendered legend for full
+    styling control outside the chart component.
+
+avoid:
+  - "Built-in chart legend — render manually for styling control"
+  - "Too many segments (>8) — aggregate small values into 'Other'"
+  - "Missing color swatches in legend — essential for segment identification"

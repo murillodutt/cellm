@@ -1,0 +1,100 @@
+# Block Pattern: Date Picker
+id: date-picker
+name: Calendar Date Picker
+version: "1.0.0"
+catalogRef: date-picker
+category: form
+tags: [calendar, date, picker, input, popover]
+archetype: form-heavy
+description: >
+  Date picker with calendar popover triggered by an input field or button.
+  Shows a monthly calendar grid with selectable days. Supports single date,
+  date range, and multi-month views.
+
+requires:
+  components: [UCard, UButton, UPopover]
+  charts: []
+  composables: []
+
+props:
+  interface: |
+    interface DatePickerProps {
+      modelValue?: Date | null
+      mode?: 'single' | 'range'
+      placeholder?: string
+      minDate?: Date
+      maxDate?: Date
+      disabledDates?: Date[]
+      locale?: string
+    }
+
+emits:
+  interface: |
+    interface DatePickerEmits {
+      'update:modelValue': [date: Date | null]
+      'range:select': [start: Date, end: Date]
+    }
+
+layout:
+  structure: |
+    trigger-container
+      date-input-button (shows selected date or placeholder)
+    popover-panel
+      calendar-header
+        month-nav [prev-button, month-year-label, next-button]
+      weekday-labels-row (Su Mo Tu We Th Fr Sa)
+      day-grid (7 columns x 5-6 rows)
+        day-cell (clickable, today highlighted, selected filled, disabled muted)
+      footer (optional: today button, clear button)
+  responsive:
+    mobile: full-width popover
+    tablet: anchored popover
+    desktop: same as tablet
+
+slots:
+  trigger: "Custom trigger element"
+  day-cell: "Custom day cell rendering"
+  footer: "Custom footer actions"
+
+tokens:
+  trigger-bg: bg-default
+  trigger-border: border-default
+  calendar-bg: bg-default
+  day-default: text-highlighted
+  day-today: "ring-primary"
+  day-selected: "bg-primary text-inverted"
+  day-disabled: text-muted
+  day-hover: bg-elevated
+  weekday-label: text-muted
+
+atomicHint:
+  organism: DatePicker
+  molecules: [CalendarGrid, MonthNavigation]
+  atoms: [DayCell, WeekdayLabel, TriggerButton]
+
+examples:
+  - context: "Event scheduling"
+    mode: single
+  - context: "Report date range"
+    mode: range
+
+composesWith:
+  - "onboarding-wizard (date selection step)"
+
+derivation:
+  source: "nuxt-charts/calendar/date-picker"
+  method: "structural-abstraction"
+  what-was-kept: >
+    Calendar popover concept, monthly grid layout, day selection states,
+    month navigation, weekday labels.
+  what-was-removed: >
+    All Vue template markup, date computation logic, specific popover
+    positioning, CSS classes.
+  transformative-value: >
+    Adds mode support (single/range), disabled dates, locale config,
+    and min/max boundaries to base concept.
+
+avoid:
+  - "Building calendar math from scratch — use date-fns or similar"
+  - "Missing keyboard navigation — arrow keys should navigate days"
+  - "No today indicator — current date must be visually distinct"

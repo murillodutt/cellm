@@ -1,0 +1,121 @@
+# Block Pattern: AI Interface
+id: ai-interface
+name: AI Helper Interface
+version: "1.0.0"
+catalogRef: ai-interface
+category: ai
+tags: [ai, interface, helper, prompt, action-cards]
+basePattern: ai-dashboard
+archetype: layout-heavy
+description: >
+  AI helper landing page with centered branding element, 2x2 action card grid
+  for capability discovery, and bottom prompt input bar. Simpler than
+  ai-dashboard — no model selector, no greeting text, focused on quick actions.
+
+requires:
+  components: [UCard, UButton, UIcon, UTextarea]
+  charts: []
+  composables: []
+
+props:
+  interface: |
+    interface ActionCard {
+      label: string
+      icon: string
+      description: string
+    }
+    interface AIInterfaceProps {
+      actions: ActionCard[]
+      placeholder?: string
+      brandIcon?: string
+      heading?: string
+    }
+
+emits:
+  interface: |
+    interface AIInterfaceEmits {
+      'submit': [prompt: string]
+      'action:click': [action: ActionCard]
+    }
+
+layout:
+  structure: |
+    page-container (centered, max-width ~1024px, padded)
+      card-shell (bg-default)
+        content-wrapper (centered, max-width ~896px, flex-col)
+          brand-header (centered, margin-bottom large)
+            brand-icon (circular, layered opacity rings, primary color)
+              icon-backdrop (absolute, full size, rounded-full, primary, opacity-20)
+              icon-circle (absolute, smaller, rounded-full, primary, solid)
+              icon (centered on circles)
+            heading (text-2xl, semibold, tracking-tight)
+          actions-grid (2-col on lg, 1-col on mobile, gap-4)
+            action-card (repeat, UCard)
+              card-header (flex, icon + label)
+                icon (text-primary, mr-2)
+                label (font-semibold)
+              card-description (text-muted)
+          prompt-bar (mt-12, full-width, bg-elevated, rounded-2xl, shadow)
+            text-input (UTextarea, variant-none, auto-resize)
+  responsive:
+    mobile: single column action cards, full-width prompt bar
+    tablet: single column, comfortable padding
+    desktop: 2-column action grid, max-width ~1024px outer, ~896px inner
+
+slots:
+  brand: "Override the brand icon and heading section"
+  actions: "Override the action cards grid"
+  prompt: "Override the bottom prompt input bar"
+
+tokens:
+  page-bg: bg-default
+  card-bg: bg-default
+  brand-icon-bg: bg-primary
+  brand-icon-opacity: opacity-20
+  heading-text: text-highlighted
+  action-card-bg: bg-default
+  action-icon: text-primary
+  action-label: text-highlighted
+  action-description: text-muted
+  prompt-bar-bg: bg-elevated
+  prompt-bar-shadow: shadow
+
+atomicHint:
+  organism: AIInterface
+  molecules: [BrandHeader, ActionGrid, PromptBar]
+  atoms: [ActionCard, BrandIcon, TextInput]
+
+examples:
+  - context: "AI coding assistant landing"
+    heading: "How can I help you?"
+    actions: ["Color Palette — Generate from image", "Generate Image — From text prompt", "Vue component — Generate from prompt", "Voice Component — Create from voice"]
+  - context: "AI design assistant"
+    heading: "What would you like to create?"
+    actions: ["Layout — Generate page layout", "Icons — Create icon set", "Theme — Design color system", "Prototype — Build interactive mock"]
+
+composesWith:
+  - "ai-dashboard (richer variant with model selector and greeting)"
+  - "chat-interface (transitions to chat after prompt submission)"
+
+derivation:
+  source: "nuxt-charts/ai/ai-interface-1"
+  method: "structural-abstraction"
+  what-was-kept: >
+    Centered brand element with layered circular icon (opacity rings),
+    2x2 action card grid with icon + label + description, bottom prompt
+    input bar with elevated background and rounded corners, centered
+    max-width constrained layout.
+  what-was-removed: >
+    All Vue template markup, specific action labels (Color Palette,
+    Generate Image, etc.), CSS utility classes, hardcoded icon names
+    (i-lucide-palette, i-lucide-image, etc.), specific dimensions.
+  transformative-value: >
+    Generic AI helper landing applicable to any AI product. Simpler than
+    ai-dashboard — no model selector or greeting, focused on capability
+    discovery through action cards.
+
+avoid:
+  - "Too many action cards (>6) — keep grid scannable, use categories instead"
+  - "Missing brand element — the layered icon is the visual anchor"
+  - "Inline prompt without visual separation — prompt bar needs distinct bg"
+  - "Hardcoded action labels — must be configurable via props"

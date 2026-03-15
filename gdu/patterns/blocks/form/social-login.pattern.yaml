@@ -1,0 +1,138 @@
+# Block Pattern: Social Login
+# Distributable structural specification — no licensed code
+# Generated from catalog ref, not source transcription
+
+id: social-login
+name: Social OAuth Login Form
+version: "1.0.0"
+catalogRef: social-login
+category: form
+tags: [auth, social, oauth, sign-in, providers, login]
+basePattern: basic-sign-in
+
+archetype: form-heavy
+description: >
+  Authentication form combining email/password credentials with social OAuth
+  provider buttons (GitHub, Google, etc.). Uses UAuthForm with providers prop
+  and custom providers slot rendering full-width branded buttons. Includes
+  terms/privacy footer and separator between social and credential sections.
+
+requires:
+  components: [UCard, UAuthForm, UButton, NuxtLink]
+  charts: []
+  composables: [useToast]
+
+props:
+  interface: |
+    interface AuthField {
+      name: string
+      type: 'email' | 'password'
+      label: string
+      placeholder: string
+      required: boolean
+      autocomplete?: string
+      size?: 'sm' | 'md' | 'lg'
+    }
+    interface SocialProvider {
+      label: string
+      icon: string              // e.g. 'i-simple-icons-github'
+      color: 'neutral' | 'primary'
+      variant: 'solid' | 'outline' | 'ghost'
+      onClick?: () => void
+    }
+    interface SocialLoginProps {
+      fields?: AuthField[]          // defaults: email + password
+      providers?: SocialProvider[]  // defaults: GitHub + Google
+      title?: string                // default "Welcome back"
+      description?: string          // default "Sign in to continue to your account"
+      submitLabel?: string          // default "Sign in"
+      termsLink?: string            // URL for Terms of Service
+      privacyLink?: string          // URL for Privacy Policy
+    }
+
+emits:
+  interface: |
+    interface SocialLoginEmits {
+      'submit': [credentials: { email: string; password: string }]
+      'provider:click': [provider: SocialProvider]
+    }
+
+layout:
+  structure: |
+    card-shell (max-width ~384px, bg-default, padded)
+      auth-form (UAuthForm driven)
+        title-slot [title text]
+        description-slot [subtitle, muted text]
+        providers-slot
+          provider-button-list (full-width column, gap-4)
+            provider-button (repeat, sm size, neutral color, icon + label, centered)
+        separator (OR divider between providers and credentials)
+        field-list (rendered from fields array)
+          email-field (email, lg size, autocomplete=email)
+          password-field (password, lg size, autocomplete=current-password)
+        submit-button (full-width, lg size)
+        footer-slot [terms + privacy, dimmed, xs text]
+  responsive:
+    mobile: full-width card, stacked provider buttons
+    tablet: centered card, max-width 384px
+    desktop: same as tablet
+
+slots:
+  description: "Override subtitle below title"
+  providers: "Override social provider button group with custom layout"
+  footer: "Override terms/privacy legal text"
+
+tokens:
+  card-bg: bg-default
+  title-text: text-highlighted
+  description-text: text-muted
+  provider-button-color: neutral
+  provider-button-variant: outline
+  separator-text: text-dimmed
+  footer-text: text-dimmed
+  link-text: text-primary
+  link-hover: "hover:underline"
+  submit-size: lg
+  field-size: lg
+
+atomicHint:
+  organism: SocialLoginPage
+  molecules: [AuthCard, SocialProviderGroup, CredentialForm, LegalFooter]
+  atoms: [ProviderButton, EmailField, PasswordField, TermsLink]
+
+examples:
+  - context: "Developer platform (GitHub + Google)"
+    providers: ["GitHub (i-simple-icons-github)", "Google (i-simple-icons-google)"]
+    fields: ["Email", "Password"]
+  - context: "Consumer app (Google + Apple + Facebook)"
+    providers: ["Google", "Apple", "Facebook"]
+    fields: ["Email", "Password"]
+
+composesWith:
+  - "basic-sign-in (credential-only alternative)"
+  - "sign-up (registration counterpart)"
+  - "password-reset (recovery flow)"
+
+derivation:
+  source: "nuxt-charts/account/social-auth"
+  method: "structural-abstraction"
+  what-was-kept: >
+    UAuthForm with providers prop and custom providers slot, full-width
+    provider buttons with icon and label, provider onClick handlers with
+    toast feedback, separator between social and credential sections,
+    terms/privacy footer pattern, lg-sized fields and submit button.
+  what-was-removed: >
+    All Vue template markup, specific provider configurations (GitHub/Google
+    icons and labels), onClick toast implementations, CSS utility classes,
+    specific placeholder values.
+  transformative-value: >
+    Converts a two-provider Vue component into a configurable pattern
+    supporting any number of OAuth providers with typed provider objects.
+    Separates social and credential flows while keeping them in one card.
+
+avoid:
+  - "Missing provider icons — each social button needs a recognizable brand icon"
+  - "No separator between methods — credential and social sections need visual separation"
+  - "Hardcoded provider list — accept as configurable array"
+  - "Missing terms/privacy — required for OAuth compliance"
+  - "Provider buttons without onClick — each must handle OAuth redirect"

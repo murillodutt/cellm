@@ -1,0 +1,163 @@
+id: donut-visitors-analytics
+name: Donut Visitors Analytics with Month Navigation
+version: 1.0.0
+catalogRef: donut-visitors-analytics
+category: visualization
+tags:
+  - donut
+  - analytics
+  - visitors
+  - month-navigation
+  - center-total
+  - paginated
+basePattern: donut-chart-legend
+archetype: chart-heavy
+description: >
+  Donut chart showing visitor source distribution with month-by-month
+  navigation. Header contains chevron left/right buttons flanking the
+  month title for cycling through data periods. Large center label shows
+  total visitor count with descriptive text. 2-column grid legend below
+  chart with color swatches and abbreviated values. Data is paginated
+  by month with animated transitions.
+
+requires:
+  components: [UCard, UButton]
+  charts: [DonutChart]
+  composables: []
+
+props:
+  interface: |
+    interface VisitorSource {
+      name: string
+      value: number
+      display: string
+      color: string
+    }
+    interface MonthData {
+      title: string
+      total: string
+      data: VisitorSource[]
+    }
+    interface DonutVisitorsAnalyticsProps {
+      months: MonthData[]
+      initialMonthIndex?: number
+    }
+
+emits:
+  interface: |
+    interface DonutVisitorsAnalyticsEmits {
+      'month:change': [index: number, title: string]
+      'source:hover': [name: string, value: number]
+    }
+
+layout:
+  structure: |
+    wrapper (p-4)
+      card-shell (max-w-sm, ring-1 ring-muted/50)
+        header (UCard #header slot)
+          navigation-row (flex justify-between items-center)
+            prev-button (UButton ghost chevron-left)
+            month-title (text-sm font-bold uppercase tracking-tight)
+            next-button (UButton ghost chevron-right)
+        content (flex-col items-center gap-10 py-6)
+          donut-container (relative)
+            DonutChart (full type, large height 220, slim arc, no legend)
+            center-overlay (flex-col items-center)
+              total-value (text-4xl font-bold tracking-tight text-highlighted)
+              description (text-sm text-dimmed mt-1 font-medium)
+          source-grid (grid cols-2 gap-x-12 gap-y-6 w-full px-4)
+            source-item (repeat per source, flex gap-2 cursor-default)
+              color-dot (size-3 rounded-full shrink-0)
+              label-value-row (flex justify-between flex-1)
+                source-name (text-sm text-dimmed font-medium)
+                source-display (text-sm font-bold text-highlighted)
+  responsive:
+    mobile: max-w-sm full width, 2-column grid legend
+    tablet: centered with comfortable padding
+    desktop: max-w-sm centered, card ring border
+
+slots:
+  header: Override month navigation header
+  center: Custom center label content
+  source-item: Override individual source legend rendering
+  footer: Add optional footer content
+
+tokens:
+  card-bg: bg-default
+  card-ring: ring-1 ring-muted/50
+  month-title: text-sm font-bold uppercase tracking-tight text-highlighted
+  nav-button: color-neutral variant-ghost size-sm
+  total-value: text-4xl font-bold tracking-tight text-highlighted
+  total-desc: text-sm text-dimmed mt-1 font-medium
+  source-dot: size-3 rounded-full
+  source-name: text-sm text-dimmed font-medium
+  source-value: text-sm font-bold text-highlighted
+  arc-width: "16"
+  pad-angle: "0.02"
+  chart-height: "220"
+
+chartConfig:
+  type: donut
+  donutType: Full
+  arcWidth: 16
+  padAngle: 0.02
+  radius: 0
+  height: 220
+  hideLegend: true
+  centerLabel: true
+  tooltip: true
+  legend: false
+  note: "Data changes on month navigation — categories recomputed per month. Legend uses grid cols-2 layout."
+
+atomicHint:
+  organism: MonthNavigableVisitorsCard
+  molecules:
+    - MonthNavigationHeader (prev/next buttons + month title)
+    - LargeDonutWithTotal (220px chart + center visitor count)
+    - SourceGrid (2-column legend with abbreviated values)
+  atoms:
+    - NavigationButton (chevron UButton)
+    - MonthTitle
+    - TotalCounter
+    - SourceDot
+    - AbbreviatedValue
+
+examples:
+  - context: Website visitor sources by month
+    data: "Google 1.9k, Facebook 2k, Twitter 1.2k, Email 15.9k — total 21,950 March 2019"
+    usage: Marketing analytics showing traffic source distribution with monthly drill
+  - context: Lead sources by month
+    data: "Organic, Paid, Referral, Direct leads with month navigation for trend analysis"
+    usage: Sales dashboard tracking lead source mix over time
+
+composesWith:
+  - donut-chart-legend (static variant without month navigation)
+  - donut-chart-two (side legend variant)
+  - Dashboard Page Layout (DSE composition)
+
+derivation:
+  source: nuxt-charts/donut-charts/visitors-analytics
+  method: structural-abstraction
+  what-was-kept: >
+    Month navigation with chevron buttons in header (prevMonth/nextMonth cycling),
+    months array data structure with title/total/data per month, large center
+    label (text-4xl total + "visitors this month" description), 2-column grid
+    legend (cols-2 gap-x-12 gap-y-6) with abbreviated display values (1.5k),
+    computed categories recalculated per month, card with ring-1 ring-muted/50,
+    large chart height 220px, slim arcWidth 16, size-3 color dots, uppercase
+    tracking-tight month title.
+  what-was-removed: >
+    All Vue template markup, hardcoded months array data, prevMonth/nextMonth
+    implementations, computed categories logic, CSS classes, cursor-default.
+  transformative-value: >
+    Paginated temporal donut pattern. Month navigation enables trend exploration
+    without leaving the card. Data-driven categories recompute per period,
+    supporting any number of months. The 2-column grid legend maximizes
+    information density in a compact card.
+
+avoid:
+  - Static data without navigation — month cycling is the defining interaction
+  - Built-in chart legend — custom 2-column grid is the layout pattern
+  - Small center label — text-4xl total is the visual anchor
+  - Linear month list — cycling (wrapping) navigation is expected
+  - Missing display abbreviations — raw numbers reduce scannability (use 1.5k format)

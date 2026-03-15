@@ -1,0 +1,129 @@
+id: line-chart-one
+name: Dual-Axis Climate Line Chart
+version: "1.1.0"
+catalogRef: line-chart-one
+category: visualization
+tags: [line, dual-axis, climate, temperature, precipitation, legend, export, responsive]
+archetype: chart-heavy
+description: >
+  Dual-axis line chart comparing two metrics with different scales (e.g.,
+  temperature in degrees vs precipitation in mm). Features dual y-axis
+  via yAxis array prop, inline legend at TopRight position, live sensor
+  data indicator with animated dot, and an "Export Dataset" action button
+  with download icon. Wrapped in nested card layout.
+
+requires:
+  components: [UCard, UButton, UIcon]
+  charts: [LineChart]
+  composables: [useResponsiveHeight]
+
+props:
+  interface: |
+    interface ClimateData {
+      month: string
+      Temperature: number
+      Precipitation: number
+    }
+    interface LineChartOneProps {
+      data: Ref<ClimateData[]>
+      categories: Record<string, BulletLegendItemInterface>
+      title?: string
+      subtitle?: string
+      yAxisKeys?: string[]
+    }
+
+emits:
+  interface: |
+    interface LineChartOneEmits {
+      'export:dataset': []
+      'data:update': [newData: ClimateData[]]
+    }
+
+layout:
+  structure: |
+    card-shell (UCard)
+      content-stack (space-y-6)
+        header
+          title (text-lg, font-medium)
+          subtitle (text-muted, text-sm)
+        chart-card (UCard, nested)
+          LineChart (dual y-axis, grid, legend TopRight, radius=3)
+        footer (flex, justify-between)
+          live-indicator (flex, gap-2)
+            animated-dot (bg-primary, animate-pulse)
+            label (text-muted, "Live Sensor Data")
+          export-button (UButton, ghost, neutral, trailing download icon)
+  responsive:
+    mobile: chart height 120px, stacked footer
+    tablet: chart height 240px, inline footer
+    desktop: chart height 240px, spacious
+
+slots:
+  header: Override title and subtitle
+  chart: Override chart with custom dual-axis config
+  footer: Override live indicator and export action
+
+tokens:
+  card-bg: bg-default
+  title-font: text-lg font-medium
+  subtitle-color: text-muted text-sm
+  live-dot: bg-primary h-2 w-2 animate-pulse rounded-full
+  live-label: text-muted
+  button-variant: ghost
+  button-color: neutral
+  export-icon: text-default size-4
+
+chartConfig:
+  type: line
+  yAxis: ["Temperature", "Precipitation"]
+  stacked: false
+  radius: 3
+  groupPadding: 0.2
+  barPadding: 0.2
+  xGridLine: true
+  yGridLine: true
+  yNumTicks: 4
+  legendPosition: TopRight
+  curveType: default
+  tooltip: true
+
+atomicHint:
+  organism: DualAxisClimateCard
+  molecules: [HeaderBlock, DualAxisChartContainer, LiveIndicatorFooter]
+  atoms: [DualYAxis, AnimatedLiveDot, ExportButton, LegendPosition]
+
+examples:
+  - context: "Weather monitoring dashboard"
+    data: "7-month temperature (4-29 C) vs precipitation (15-85 mm) with live sensor indicator"
+  - context: "Environmental IoT panel"
+    data: "Sensor data with dual scales -- humidity % on left axis, CO2 ppm on right axis"
+  - context: "Agricultural analytics"
+    data: "Soil moisture vs temperature over growing season with export capability"
+
+composesWith:
+  - "line-chart-eight (same domain, different color scheme for climate trends)"
+  - "line-chart-multi (multi-series alternative without dual axis)"
+  - "Environmental dashboard grid (DSE composition)"
+
+avoid:
+  - "Single y-axis for metrics with very different scales -- dual axis is required"
+  - "Omitting the yAxis array prop -- without it both series share one scale"
+  - "Removing the live indicator when data is real-time -- it signals freshness"
+  - "Using MonotoneX for sparse data points -- default curve preserves accuracy"
+  - "Fixed chart height -- use useResponsiveHeight"
+
+derivation:
+  source: "nuxt-charts/line-charts/linecharts-chart-one"
+  method: "structural-abstraction"
+  what-was-kept: >
+    Dual y-axis via :y-axis="['Temperature', 'Precipitation']", ref-based
+    reactive data, static categories with per-series colors, xAxisFormatter
+    extracting month labels, radius=3, groupPadding/barPadding=0.2,
+    LegendPosition.TopRight, live sensor animated dot (bg-primary),
+    Export Dataset button with trailing download icon in nested UCard.
+  what-was-removed: >
+    Hardcoded climate data array, specific hex colors (#10b981, #f59e0b),
+    static title text, icon name literals.
+  transformative-value: >
+    Reusable dual-axis line chart pattern for comparing metrics with different
+    scales, with live data indicator and export action.

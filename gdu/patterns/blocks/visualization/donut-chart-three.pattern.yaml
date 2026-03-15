@@ -1,0 +1,160 @@
+id: donut-chart-three
+name: Half-Donut Spending Summary
+version: 1.0.0
+catalogRef: donut-chart-three
+category: visualization
+tags:
+  - donut
+  - half
+  - semicircle
+  - spending
+  - center-total
+  - period-selector
+basePattern: donut-chart-legend
+archetype: chart-heavy
+description: >
+  Half-donut (semicircle) chart with center total label and period selector.
+  Uses DonutType.Half for 180-degree arc display. Center label shows "Total Spent"
+  with currency value. Grid legend below chart shows category breakdown with
+  color swatches and currency values. Header includes title, subtitle, and
+  period dropdown selector. Footer links to detailed report.
+
+requires:
+  components: [UCard, USelect, UButton]
+  charts: [DonutChart]
+  composables: []
+
+props:
+  interface: |
+    interface ExpenseCategory {
+      color: string
+      name: string
+      value: number
+    }
+    interface DonutChartThreeProps {
+      data: ExpenseCategory[]
+      title?: string
+      subtitle?: string
+      periods?: string[]
+      selectedPeriod?: string
+      valueFormatter?: (amount: number) => string
+    }
+
+emits:
+  interface: |
+    interface DonutChartThreeEmits {
+      'period:change': [period: string]
+      'view-report': []
+      'segment:hover': [index: number]
+    }
+
+layout:
+  structure: |
+    wrapper (max-w-lg p-2)
+      card-shell
+        header (UCard #header slot)
+          header-row (flex justify-between)
+            title-block
+              title (text-lg font-medium)
+              subtitle (text-muted text-sm)
+            period-selector (USelect outline neutral)
+        content (flex-col items-center)
+          half-donut-container
+            DonutChart (half type, radius 0, no legend)
+            center-overlay (mt-16 text-center)
+              label (text-muted text-xs)
+              total-value (text-2xl font-bold)
+          category-grid (grid cols-1 lg:cols-3 gap-4)
+            category-item (repeat, text-center text-sm)
+              swatch-row (flex items-center justify-center gap-2)
+                color-dot (h-2 w-2 rounded-full)
+                name (text-muted)
+              value (text-lg font-semibold)
+        footer (UCard #footer slot)
+          report-link (UButton variant=link trailing external-link icon)
+  responsive:
+    mobile: single column category grid, half donut full width
+    tablet: 3-column category grid below chart
+    desktop: max-w-lg centered, comfortable spacing
+
+slots:
+  header: Override header with title and period selector
+  center-label: Override center total label content
+  categories: Override category grid rendering
+  footer: Override report link footer
+
+tokens:
+  card-bg: bg-default
+  title-text: text-lg font-medium
+  subtitle-text: text-muted text-sm
+  center-label: text-muted text-xs
+  center-value: text-2xl font-bold
+  category-name: text-muted
+  category-value: text-lg font-semibold
+  swatch-size: h-2 w-2 rounded-full
+  select-style: variant-outline color-neutral
+  link-style: variant-link color-neutral
+  donut-height: "180"
+  donut-radius: "0"
+
+chartConfig:
+  type: donut
+  donutType: Half
+  radius: 0
+  hideLegend: true
+  height: 180
+  centerLabel: true
+  tooltip: true
+  legend: false
+  note: "Half donut uses DonutType.Half for 180-degree arc. Center overlay positioned with mt-16."
+
+atomicHint:
+  organism: HalfDonutSpendingCard
+  molecules:
+    - HeaderWithPeriodSelector (title + subtitle + USelect)
+    - HalfDonutWithCenter (semicircle chart + overlaid total)
+    - CategoryGrid (3-column breakdown below chart)
+    - FooterReportLink (UButton link to detailed report)
+  atoms:
+    - PeriodSelector
+    - CenterTotal
+    - CategorySwatch
+    - CurrencyValue
+
+examples:
+  - context: Monthly spending summary
+    data: "Food $1,245, Software $890, Travel $675 — total $2,810, period selector"
+    usage: Personal finance dashboard with expense category breakdown
+  - context: Budget allocation by department
+    data: "Engineering, Marketing, Sales spend with period filtering"
+    usage: Departmental budget dashboard with drill-down to detailed report
+
+composesWith:
+  - donut-chart-legend (full donut with side legend variant)
+  - donut-chart-two (full donut with side legend and delta)
+  - Dashboard Page Layout (DSE composition)
+
+derivation:
+  source: nuxt-charts/donut-charts/donut-chart-three
+  method: structural-abstraction
+  what-was-kept: >
+    Half-donut (DonutType.Half) semicircle display, center total overlay
+    positioned with mt-16, period selector dropdown (USelect with outline
+    variant), category grid below chart (1-col mobile, 3-col desktop),
+    currency formatter, footer report link (UButton variant=link with
+    external-link trailing icon), radius 0 for sharp arc edges,
+    computed totalSpent from data sum.
+  what-was-removed: >
+    All Vue template markup, hardcoded expense data, Intl.NumberFormat
+    formatter, specific category colors, ref/computed logic, CSS classes.
+  transformative-value: >
+    Semicircle donut pattern maximizing vertical space. The half-arc
+    creates room for the center total without overlap. Period selector
+    enables temporal filtering without page navigation.
+
+avoid:
+  - Full donut type — DonutType.Half is the defining visual trait
+  - Built-in chart legend — category grid below is the custom layout
+  - Missing period selector — temporal filtering is integral
+  - Center label without mt-16 offset — half donut needs vertical adjustment
+  - Removing footer report link — drill-down navigation completes the pattern

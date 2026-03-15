@@ -1,0 +1,131 @@
+id: area-chart-four
+name: Area Chart Nested Card Layout
+version: "1.1.0"
+catalogRef: area-chart-four
+category: visualization
+tags: [area, chart, nested-card, dual-series, info, comparison, responsive]
+basePattern: area-chart-gradient
+archetype: chart-heavy
+description: >
+  Area chart with nested card visual hierarchy. Outer subtle card provides
+  context (title, info icon, total, badge), inner soft card isolates the chart
+  with dashed grid styling. Footer provides series breakdown with animated
+  indicators and navigation CTA. Emphasizes visual depth through card nesting.
+
+requires:
+  components: [UCard, UIcon, UBadge, UButton]
+  charts: [AreaChart]
+  composables: [useResponsiveHeight, useColorMode]
+
+props:
+  interface: |
+    interface AreaChartItem {
+      month: string
+      desktop: number
+      mobile: number
+    }
+    interface AreaChartFourProps {
+      data: AreaChartItem[]
+      categories: ComputedRef<Record<string, BulletLegendItemInterface>>
+      title?: string
+      total?: string
+      percentChange?: string
+    }
+
+emits:
+  interface: |
+    interface AreaChartFourEmits {
+      'view-details': []
+      'series:hover': [seriesKey: string, dataPoint: AreaChartItem]
+    }
+
+layout:
+  structure: |
+    outer-card (UCard, variant=subtle, bg-default/60)
+      content-stack (space-y-4)
+        header-section (space-y-1)
+          info-row (flex, gap-2, align-center)
+            title (text-muted)
+            info-icon (UIcon, text-dimmed)
+          metric-row (flex, gap-4, align-center)
+            total (text-3xl, font-semibold, tracking-tight)
+            badge (UBadge, variant=soft, text-success)
+        inner-card (UCard, variant=soft)
+          AreaChart (dual-series, MonotoneX, dashed, no legend)
+        footer (flex, justify-between)
+          indicators (flex, gap-6)
+            series-item (dot + label + value) x N
+          action
+            button (UButton, ghost, trailing arrow)
+  responsive:
+    mobile: chart height 120px, stacked footer
+    tablet: chart height 240px, inline footer
+    desktop: chart height 240px, full width
+
+slots:
+  header: Override header with custom metric display
+  chart: Override inner chart card
+  footer: Override series indicators and action
+
+tokens:
+  outer-card-bg: bg-default/60
+  outer-card-variant: subtle
+  inner-card-variant: soft
+  title-color: text-muted
+  info-icon-color: text-dimmed
+  total-font: text-3xl font-semibold tracking-tight
+  badge-variant: soft
+  badge-color: text-success
+  indicator-dot: h-2 w-2 animate-pulse rounded-full
+  series-label: text-muted dark:text-dimmed
+  series-value: font-medium
+  grid-dash: "--vis-axis-grid-line-dasharray: 5 5"
+
+chartConfig:
+  type: area
+  curveType: MonotoneX
+  gradient: true
+  tooltip: true
+  xAxis: true
+  yAxis: true
+  xGridLine: true
+  xNumTicks: 6
+  yNumTicks: 4
+  hideLegend: true
+  colorModeReactive: true
+
+atomicHint:
+  organism: NestedAreaChartCard
+  molecules: [MetricHeader, NestedChartCard, SeriesFooter]
+  atoms: [CurrencyTotal, PercentBadge, AnimatedDot, InfoIcon, ActionButton]
+
+examples:
+  - context: "Financial dashboard widget"
+    data: "6-month revenue by channel in nested card with visual depth"
+  - context: "Analytics panel"
+    data: "Traffic sources with totals in elevated card layout"
+
+composesWith:
+  - "area-chart-preview (same source, preview-focused)"
+  - "area-chart-gradient (same source, gradient-focused)"
+  - "Dashboard card grid (DSE composition)"
+
+avoid:
+  - "Flat single-card layout -- nested cards are the visual differentiator"
+  - "Removing the inner soft card -- it provides chart isolation and depth"
+  - "Using the same variant for outer and inner cards -- contrast matters"
+  - "Hardcoding hex colors -- use BulletLegendItemInterface"
+  - "Fixed chart height -- use useResponsiveHeight"
+
+derivation:
+  source: "nuxt-charts/area-charts/area-chart-four"
+  method: "structural-abstraction"
+  what-was-kept: >
+    Nested card hierarchy (subtle outer + soft inner), dual-series area chart,
+    MonotoneX interpolation, dashed grid CSS custom property, currency-formatted
+    total, UBadge trend indicator, animated series dots, ghost CTA button.
+  what-was-removed: >
+    Hardcoded data, hex colors, static text, inline style bindings.
+  transformative-value: >
+    Reusable nested-card chart pattern emphasizing visual depth and content
+    hierarchy through card variant layering.

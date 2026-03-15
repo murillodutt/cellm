@@ -1,0 +1,130 @@
+id: area-chart-seven
+name: Area Chart with X-Axis Formatting
+version: "1.1.0"
+catalogRef: area-chart-seven
+category: visualization
+tags: [area, chart, x-axis, formatter, temporal, ticks, responsive]
+basePattern: area-chart-gradient
+archetype: chart-heavy
+description: >
+  Area chart card with custom x-axis tick formatting. Uses an xFormatter
+  function to abbreviate month names (slice(0,3)) and configures xNumTicks
+  for optimal label density. Features the standard dual-series layout with
+  MonotoneX curve and dashed grid lines in nested card hierarchy.
+
+requires:
+  components: [UCard, UIcon, UBadge, UButton]
+  charts: [AreaChart]
+  composables: [useResponsiveHeight, useColorMode]
+
+props:
+  interface: |
+    interface AreaChartItem {
+      month: string
+      desktop: number
+      mobile: number
+    }
+    interface AreaChartSevenProps {
+      data: AreaChartItem[]
+      categories: ComputedRef<Record<string, BulletLegendItemInterface>>
+      title?: string
+      xFormatter?: (tick: number) => string
+      xNumTicks?: number
+    }
+
+emits:
+  interface: |
+    interface AreaChartSevenEmits {
+      'view-details': []
+      'tick:click': [tickIndex: number, label: string]
+    }
+
+layout:
+  structure: |
+    card-shell (variant=subtle, bg-default/60)
+      content-stack (space-y-4)
+        header (space-y-1)
+          label-row (flex, gap-2)
+            title (text-muted)
+            info-icon (text-dimmed)
+          value-row (flex, gap-4)
+            total (text-3xl, font-semibold)
+            badge (UBadge, variant=soft)
+        chart-card (UCard, variant=soft)
+          AreaChart (xFormatter, xNumTicks=6, MonotoneX, dashed grid)
+        footer (flex, justify-between)
+          indicators (flex, gap-6)
+            series-item (dot + label + value) x N
+          action (UButton, ghost, trailing arrow)
+  responsive:
+    mobile: chart height 120px, fewer x-axis ticks recommended
+    tablet: chart height 240px, standard tick density
+    desktop: chart height 240px, all ticks visible
+
+slots:
+  header: Override metric header
+  chart: Override chart with custom axis formatting
+  footer: Override series indicators
+
+tokens:
+  card-bg: bg-default/60
+  card-variant: subtle
+  chart-variant: soft
+  title-color: text-muted
+  info-icon-color: text-dimmed
+  total-font: text-3xl font-semibold tracking-tight
+  badge-color: text-success
+  indicator-dot: h-2 w-2 animate-pulse rounded-full
+  series-label: text-muted dark:text-dimmed
+  series-value: font-medium
+  grid-dash: "--vis-axis-grid-line-dasharray: 5 5"
+
+chartConfig:
+  type: area
+  curveType: MonotoneX
+  gradient: true
+  tooltip: true
+  xAxis: true
+  yAxis: true
+  xGridLine: true
+  xNumTicks: 6
+  yNumTicks: 4
+  hideLegend: true
+  xFormatter: "custom function (tick) => abbreviated label"
+  colorModeReactive: true
+
+atomicHint:
+  organism: FormattedAxisAreaCard
+  molecules: [MetricHeader, FormattedAxisChart, SeriesFooter]
+  atoms: [XAxisFormatter, TickLabel, CurrencyTotal, AnimatedDot]
+
+examples:
+  - context: "Monthly revenue chart with abbreviated labels"
+    data: "6-month data with Jan/Feb/Mar tick labels via slice(0,3)"
+  - context: "Quarterly metrics with custom period labels"
+    data: "Q1/Q2/Q3/Q4 formatted axis with configurable tick count"
+
+composesWith:
+  - "area-chart-preview (same source, preview variant)"
+  - "area-chart-gradient (same source, gradient variant)"
+  - "Dashboard analytics panel (DSE composition)"
+
+avoid:
+  - "Using raw index numbers as x-axis labels -- always format via xFormatter"
+  - "Too many ticks on mobile -- reduce xNumTicks for narrow viewports"
+  - "Truncating labels that lose meaning -- 'Jan' is clear, 'J' is not"
+  - "Hardcoding month names -- derive from data array"
+  - "Fixed chart height -- use useResponsiveHeight"
+
+derivation:
+  source: "nuxt-charts/area-charts/area-chart-seven"
+  method: "structural-abstraction"
+  what-was-kept: >
+    Custom xFormatter function using data[tick]?.month.slice(0,3), xNumTicks=6
+    configuration, dual-series layout, MonotoneX curve, dashed grid, nested
+    card hierarchy, animated series indicators.
+  what-was-removed: >
+    Hardcoded data, specific hex colors, hardcoded month array.
+  transformative-value: >
+    Reusable area chart pattern with customizable x-axis formatting,
+    demonstrating the tick-formatter pattern for temporal labels.

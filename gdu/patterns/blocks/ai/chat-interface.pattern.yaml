@@ -1,0 +1,115 @@
+# Block Pattern: AI Chat Interface
+id: chat-interface
+name: AI Chat Interface
+version: "1.0.0"
+catalogRef: ai-chat-interface
+category: ai
+tags: [ai, chat, interface, messages, conversation]
+archetype: layout-heavy
+description: >
+  Chat interface with message bubbles showing user and AI responses.
+  Scrollable message area, input field at bottom, optional sidebar
+  for conversation history. Messages styled differently by role.
+
+requires:
+  components: [UCard, UInput, UButton, UAvatar]
+  charts: []
+  composables: []
+
+props:
+  interface: |
+    interface ChatMessage {
+      id: string
+      role: 'user' | 'assistant' | 'system'
+      content: string
+      timestamp?: Date
+    }
+    interface ChatInterfaceProps {
+      messages: ChatMessage[]
+      placeholder?: string
+      loading?: boolean
+      showSidebar?: boolean
+      conversations?: { id: string; title: string; date: string }[]
+    }
+
+emits:
+  interface: |
+    interface ChatInterfaceEmits {
+      'send': [message: string]
+      'conversation:select': [conversationId: string]
+      'conversation:new': []
+    }
+
+layout:
+  structure: |
+    chat-container (flex, full height)
+      sidebar (optional, left, conversation list)
+        new-chat-button
+        conversation-list (scrollable)
+          conversation-item (repeat, active state)
+      main-area (flex column)
+        message-area (scrollable, flex-grow)
+          message-bubble (repeat per message)
+            user-message (right-aligned, primary bg)
+            assistant-message (left-aligned, elevated bg, with avatar)
+            system-message (centered, muted)
+          typing-indicator (shown when loading)
+        input-area (sticky bottom)
+          text-input (full width)
+          send-button (icon or label)
+  responsive:
+    mobile: no sidebar, full-width messages
+    tablet: sidebar as drawer/overlay
+    desktop: sidebar visible, main area beside
+
+slots:
+  message: "Custom message bubble rendering"
+  input: "Custom input area"
+  sidebar: "Custom sidebar content"
+  typing-indicator: "Custom loading indicator"
+
+tokens:
+  container-bg: bg-default
+  sidebar-bg: bg-elevated
+  user-message-bg: bg-primary
+  user-message-text: text-inverted
+  assistant-message-bg: bg-elevated
+  assistant-message-text: text-highlighted
+  system-message-text: text-muted
+  input-bg: bg-default
+  input-border: border-default
+  send-button: bg-primary
+
+atomicHint:
+  organism: ChatInterface
+  molecules: [MessageArea, InputBar, ConversationSidebar]
+  atoms: [MessageBubble, TypingIndicator, ConversationItem]
+
+examples:
+  - context: "AI assistant chat"
+    messages: ["User: How do I deploy? -> Assistant: Here's a guide..."]
+  - context: "Customer support bot"
+    messages: ["User: Order status -> Assistant: Your order #123 is..."]
+
+composesWith:
+  - "ai-dashboard (alternative prompt-centric layout)"
+  - "Dashboard Page Layout (DSE composition)"
+
+derivation:
+  source: "nuxt-charts/ai/ai-chat-interface"
+  method: "structural-abstraction"
+  what-was-kept: >
+    Chat layout concept (message area + input bar), role-based message
+    styling (user right, assistant left), avatar for AI, scrollable
+    message area, send action.
+  what-was-removed: >
+    All Vue template markup, message rendering logic, specific avatar
+    images, CSS classes, onSend callback implementation.
+  transformative-value: >
+    Adds conversation sidebar, typing indicator, system messages,
+    and structured message interface with timestamps.
+
+avoid:
+  - "Auto-scrolling without user control — scroll to bottom on new message only"
+  - "Missing typing indicator — show during AI response generation"
+  - "Same styling for user and AI — must be visually distinct"

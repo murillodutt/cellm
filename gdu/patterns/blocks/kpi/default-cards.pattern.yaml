@@ -1,0 +1,91 @@
+# Block Pattern: Default KPI Cards
+id: default-cards
+name: Simple KPI Cards with Trend Badge
+version: "1.0.0"
+catalogRef: default-cards
+category: kpi
+tags: [kpi, cards, default, trend, badge]
+archetype: layout-heavy
+description: >
+  Minimal KPI card showing a label, large value, and a color-coded trend badge.
+  The simplest KPI pattern — no charts, no progress bars. Used in grids.
+
+requires:
+  components: [UCard, UBadge]
+  charts: []
+  composables: []
+
+props:
+  interface: |
+    interface KPICard {
+      label: string
+      value: string | number
+      change: string
+      changeType: 'positive' | 'negative' | 'neutral'
+    }
+    interface DefaultCardsProps {
+      cards: KPICard[]
+    }
+
+emits:
+  interface: |
+    interface DefaultCardsEmits {
+      'card:click': [label: string]
+    }
+
+layout:
+  structure: |
+    card-grid (responsive columns)
+      card-shell (repeat per KPI)
+        top-row
+          label (muted, small)
+          trend-badge (soft variant, success/error color)
+        value-row
+          value (2xl, bold)
+  responsive:
+    mobile: single column
+    tablet: 2-column grid
+    desktop: 3-4 column grid
+
+slots:
+  card: "Override individual card rendering"
+
+tokens:
+  card-bg: bg-default
+  label-text: text-muted
+  value-text: text-highlighted
+  badge-positive: success (soft variant)
+  badge-negative: error (soft variant)
+
+atomicHint:
+  organism: KPICardGrid
+  molecules: [KPICard]
+  atoms: [TrendBadge, ValueDisplay]
+
+examples:
+  - context: "SaaS metrics overview"
+    cards: ["Revenue ($45,231, +12.5%)", "Users (2,405, +8.2%)", "Churn (3.1%, -0.5%)"]
+  - context: "E-commerce dashboard"
+    cards: ["Orders (1,234, +15%)", "AOV ($67.50, +3%)", "Returns (2.1%, -0.8%)"]
+
+composesWith:
+  - "KPI Card (DSE composition)"
+  - "Dashboard Page Layout (DSE composition)"
+
+derivation:
+  source: "nuxt-charts/cards/default-cards"
+  method: "structural-abstraction"
+  what-was-kept: >
+    Minimal card layout (label + value + badge), UBadge soft variant for
+    trend, changeType-driven color logic, grid repetition.
+  what-was-removed: >
+    All Vue template markup, defineProps destructuring, specific prop
+    names, Tailwind utility classes.
+  transformative-value: >
+    Provides the simplest KPI card pattern as a baseline. Other KPI
+    patterns (expense-budget, mini-chart-cards) build on this foundation.
+
+avoid:
+  - "Overcomplicating — this is intentionally minimal"
+  - "Adding charts — use mini-chart-cards pattern instead"
+  - "Hardcoded grid columns — responsive via parent layout"

@@ -1,0 +1,143 @@
+id: area-chart-ten
+name: Area Chart Full-Featured Card
+version: "1.1.0"
+catalogRef: area-chart-ten
+category: visualization
+tags: [area, chart, full-featured, complete, revenue, dual-series, responsive]
+basePattern: area-chart-gradient
+archetype: chart-heavy
+description: >
+  Complete area chart card combining all key features: nested card layout
+  (subtle outer + soft inner), dual-series with computed category colors,
+  MonotoneX curve, dashed grid, currency-formatted aggregate total, percentage
+  change badge, per-series animated indicators, and ghost navigation CTA.
+  Serves as the comprehensive reference implementation for area chart blocks.
+
+requires:
+  components: [UCard, UIcon, UBadge, UButton]
+  charts: [AreaChart]
+  composables: [useResponsiveHeight, useColorMode]
+
+props:
+  interface: |
+    interface AreaChartItem {
+      month: string
+      desktop: number
+      mobile: number
+    }
+    interface AreaChartTenProps {
+      data: AreaChartItem[]
+      categories: ComputedRef<Record<string, BulletLegendItemInterface>>
+      title?: string
+      total?: string
+      percentChange?: string
+      xFormatter?: (tick: number) => string
+      showFooter?: boolean
+    }
+
+emits:
+  interface: |
+    interface AreaChartTenEmits {
+      'view-details': []
+      'series:hover': [seriesKey: string, value: number]
+      'total:computed': [total: number]
+    }
+
+layout:
+  structure: |
+    card-shell (variant=subtle, bg-default/60)
+      content-stack (space-y-4)
+        header (space-y-1)
+          label-row (flex, gap-2)
+            title (text-muted)
+            info-icon (UIcon, text-dimmed)
+          value-row (flex, gap-4)
+            total (text-3xl, font-semibold, tracking-tight)
+            badge (UBadge, variant=soft, text-success)
+        chart-card (UCard, variant=soft)
+          AreaChart (:key=colorMode, MonotoneX, dashed, xGridLine, hidden legend)
+        footer (flex, justify-between)
+          indicators (flex, gap-6)
+            series-item (animated dot + label + value) x N
+          action
+            button (UButton, ghost, neutral, trailing arrow icon)
+  responsive:
+    mobile: chart height 120px, stacked footer, compact layout
+    tablet: chart height 240px, inline footer
+    desktop: chart height 240px, spacious with full indicators
+
+slots:
+  header: Override full header (title + total + badge)
+  chart: Override chart container with custom AreaChart config
+  footer: Override series indicators and CTA action
+
+tokens:
+  card-bg: bg-default/60
+  card-variant: subtle
+  chart-card-variant: soft
+  title-color: text-muted
+  info-icon-color: text-dimmed
+  total-font: text-3xl font-semibold tracking-tight
+  badge-variant: soft
+  badge-color: text-success
+  indicator-dot: h-2 w-2 animate-pulse rounded-full
+  series-label: text-muted dark:text-dimmed
+  series-value: font-medium
+  button-color: neutral
+  button-variant: ghost
+  grid-dash: "--vis-axis-grid-line-dasharray: 5 5"
+
+chartConfig:
+  type: area
+  curveType: MonotoneX
+  gradient: true
+  tooltip: true
+  xAxis: true
+  yAxis: true
+  xGridLine: true
+  xNumTicks: 6
+  yNumTicks: 4
+  hideLegend: true
+  colorModeReactive: true
+  keyBinding: "colorMode.value"
+
+atomicHint:
+  organism: FullFeaturedAreaCard
+  molecules: [MetricHeader, NestedChartContainer, SeriesIndicatorFooter]
+  atoms: [CurrencyTotal, PercentBadge, InfoIcon, AnimatedDot, ActionButton, XAxisFormatter]
+
+examples:
+  - context: "Reference implementation for area chart patterns"
+    data: "6-month desktop/mobile revenue with all features active"
+  - context: "Premium analytics dashboard"
+    data: "Complete revenue card with KPI header, chart, and series breakdown"
+  - context: "Template for new area chart variants"
+    data: "Starting point with all 12 fields populated for derivation"
+
+composesWith:
+  - "area-chart-preview (same family, compact variant)"
+  - "area-chart-gradient (same family, gradient-focused)"
+  - "area-chart-data (same family, data-focused)"
+  - "Dashboard card grid (DSE composition)"
+
+avoid:
+  - "Removing features that make this the full reference -- use simpler variants instead"
+  - "Using this for simple use cases -- prefer area-chart-preview or area-chart-gradient"
+  - "Hardcoding any values that should be configurable via props"
+  - "Skipping useResponsiveHeight -- responsive chart height is mandatory"
+  - "Ignoring color mode reactivity -- :key binding is required"
+
+derivation:
+  source: "nuxt-charts/area-charts/area-chart-ten"
+  method: "structural-abstraction"
+  what-was-kept: >
+    Complete feature set: nested card layout (subtle+soft), dual-series with
+    computed BulletLegendItemInterface categories, MonotoneX CurveType, dashed
+    grid via CSS custom property, colorMode-reactive :key, Intl.NumberFormat
+    currency total, UBadge trend indicator, reduce()-computed series totals,
+    animated color dots, xFormatter with month abbreviation, ghost UButton CTA.
+  what-was-removed: >
+    All hardcoded data, specific hex colors, static text values, inline styles.
+  transformative-value: >
+    Comprehensive area chart reference pattern. Use as a starting point for
+    new variants or as the full-featured option when all capabilities are needed.

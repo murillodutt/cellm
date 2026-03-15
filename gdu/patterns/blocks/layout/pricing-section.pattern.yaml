@@ -1,0 +1,136 @@
+# Block Pattern: Pricing Section
+id: pricing-section
+name: Pricing Section
+version: "1.0.0"
+catalogRef: pricing-section
+category: layout
+tags: [pricing, plan, subscription, comparison, billing-toggle]
+archetype: layout-heavy
+description: >
+  Full pricing page section with headline, billing cycle toggle (monthly/annually),
+  and multi-plan comparison grid using UPricingPlans. Features save badge on annual
+  toggle, highlighted recommended plan, and feature checklists per tier.
+
+requires:
+  components: [UPageSection, UPricingPlans, UTabs, UBadge]
+  charts: []
+  composables: []
+
+props:
+  interface: |
+    interface PlanFeature {
+      title: string
+      icon: 'i-lucide-circle-check' | 'i-lucide-x' | string
+    }
+    interface PlanButton {
+      label: string
+      color: 'primary' | 'neutral'
+      variant?: 'subtle' | 'solid'
+      size?: 'xl' | 'lg'
+    }
+    interface PricingPlan {
+      title: string
+      description: string
+      price: string
+      billingCycle: string
+      badge?: string
+      highlight?: boolean
+      button: PlanButton
+      features: PlanFeature[]
+    }
+    interface PricingSectionProps {
+      headline?: string
+      title?: string
+      description?: string
+      plans: PricingPlan[]
+      billingCycle: 'monthly' | 'annually'
+      annualDiscount?: string
+    }
+
+emits:
+  interface: |
+    interface PricingSectionEmits {
+      'billing:change': [cycle: 'monthly' | 'annually']
+      'plan:select': [planTitle: string]
+    }
+
+layout:
+  structure: |
+    page-section (UPageSection, headline + title + description)
+      content-wrapper (flex-col, items-center, gap-8)
+        billing-toggle (UTabs, variant pill, w-fit, centered)
+          tab-monthly (label: Monthly)
+          tab-annually (label: Annually)
+            trailing-badge (UBadge, "Save 20%", neutral, subtle)
+        plans-grid (UPricingPlans, responsive 1/2/3 col)
+          plan-card (repeat per plan)
+            title-row (title + optional badge)
+            description (muted)
+            price (large) + billing-cycle (muted)
+            cta-button (PlanButton config)
+            features-list (repeat)
+              feature-item (icon + title, check or x)
+  responsive:
+    mobile: single column plan cards, stacked vertically
+    tablet: 2-column plan grid
+    desktop: 3-column plan grid, max-width constrained
+
+slots:
+  headline: "Override section headline area"
+  toggle: "Override billing cycle toggle"
+  plans: "Override the entire plans grid"
+
+tokens:
+  section-bg: bg-default
+  headline-text: text-muted
+  title-text: text-highlighted
+  description-text: text-muted
+  toggle-bg: bg-elevated
+  plan-card-bg: bg-default
+  plan-card-highlight-border: ring-primary
+  plan-badge: bg-primary
+  price-text: text-highlighted
+  billing-text: text-muted
+  feature-check: text-primary
+  feature-x: text-muted
+
+atomicHint:
+  organism: PricingSection
+  molecules: [BillingToggle, PricingPlansGrid]
+  atoms: [PlanCard, FeatureItem, BillingBadge]
+
+examples:
+  - context: "SaaS product pricing page"
+    plans: ["Free ($0) — 1 seat, 1 workspace", "Starter ($49/mo) — 10 seats, recommended", "Enterprise ($199/mo) — unlimited, contact sales"]
+    toggle: "Monthly / Annually (Save 20%)"
+  - context: "Developer tools pricing"
+    plans: ["Hobby (free) — personal projects", "Pro ($29/mo) — team features", "Enterprise (custom) — SSO, audit logs"]
+    toggle: "Monthly / Annually (Save 25%)"
+
+composesWith:
+  - "pricing-plan (individual plan card within this section)"
+  - "navbar-variant-one (page-level composition with navigation)"
+
+derivation:
+  source: "nuxt-charts/pricing/price-section"
+  method: "structural-abstraction"
+  what-was-kept: >
+    UPageSection wrapper with headline/title/description, billing cycle
+    toggle via UTabs (pill variant) with annual save badge, UPricingPlans
+    grid with 3 tiers (Free/Starter/Enterprise), feature checklists with
+    circle-check and x icons, highlighted recommended plan with badge,
+    appConfig customization for plan card slots.
+  what-was-removed: >
+    All Vue template markup, hardcoded plan names and prices, specific
+    feature lists, CSS utility classes, updateAppConfig call, computed
+    price logic, specific icon names.
+  transformative-value: >
+    Complete pricing section pattern with billing toggle and multi-tier
+    comparison. Uses native Nuxt UI components (UPageSection, UPricingPlans,
+    UTabs) for consistent styling. Decoupled from specific plan data.
+
+avoid:
+  - "More than 4 plans — becomes overwhelming, use feature comparison table instead"
+  - "Missing billing toggle — annual discount is a key conversion driver"
+  - "Hardcoded prices — must be driven by props for dynamic billing calculation"
+  - "No highlighted plan — always indicate a recommended tier"

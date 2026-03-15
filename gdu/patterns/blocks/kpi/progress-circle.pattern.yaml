@@ -1,0 +1,93 @@
+# Block Pattern: Progress Circle Cards
+id: progress-circle
+name: Circular Progress Indicator Cards
+version: "1.0.0"
+catalogRef: progress-circle
+category: kpi
+tags: [progress, circle, donut, percentage, score]
+archetype: layout-heavy
+description: >
+  Cards with a circular progress indicator (SVG ring) showing a score
+  out of a maximum. Label above, value + max inline, circle beside value.
+
+requires:
+  components: [UCard]
+  charts: []
+  composables: []
+  note: "Circle rendered as SVG with stroke-dasharray, not a chart component"
+
+props:
+  interface: |
+    interface ProgressItem {
+      name: string
+      value: number
+      max?: number
+    }
+    interface ProgressCircleProps {
+      items: ProgressItem[]
+      size?: number
+      strokeWidth?: number
+    }
+
+emits:
+  interface: |
+    interface ProgressCircleEmits {
+      'item:click': [name: string]
+    }
+
+layout:
+  structure: |
+    card-grid (responsive columns)
+      card-shell (repeat per item)
+        label (font-medium)
+        value-row
+          left: value + " / " + max (large bold + muted denominator)
+          right: circular-progress-svg (animated ring)
+  responsive:
+    mobile: single column
+    tablet: 2-column grid
+    desktop: 3-column grid
+
+slots:
+  card: "Override individual card"
+  circle: "Custom progress visualization"
+
+tokens:
+  card-bg: bg-default
+  label-text: text-highlighted
+  value-text: text-highlighted
+  max-text: text-muted
+  circle-track: "stroke-muted (background ring)"
+  circle-fill: "stroke-primary (progress ring)"
+
+atomicHint:
+  organism: ProgressCircleGrid
+  molecules: [ProgressCard]
+  atoms: [CircularProgressSVG, ScoreDisplay]
+
+examples:
+  - context: "Lighthouse scores"
+    items: ["Performance (91/100)", "Accessibility (65/100)", "SEO (43/100)"]
+  - context: "Goal completion"
+    items: ["Revenue (78/100%)", "Users (92/100%)", "Retention (56/100%)"]
+
+composesWith:
+  - "KPI Card (DSE composition)"
+
+derivation:
+  source: "nuxt-charts/cards/cards-with-progress-circle"
+  method: "structural-abstraction"
+  what-was-kept: >
+    Card + circular progress concept, value/max display pattern,
+    SVG ring indicator, label above value layout.
+  what-was-removed: >
+    All Vue template markup, LibProgressCircle component reference,
+    hardcoded vitals data, specific size/strokeWidth values.
+  transformative-value: >
+    Replaces library-specific ProgressCircle with SVG-based spec that
+    any agent can implement with stroke-dasharray animation.
+
+avoid:
+  - "External progress circle libraries — SVG stroke-dasharray is simpler"
+  - "Missing animation — ring should animate on mount"
+  - "Fixed size — accept size and strokeWidth via props"

@@ -1,0 +1,132 @@
+# Block Pattern: Navbar with Search
+id: navbar-with-search
+name: Dashboard Navbar with Search Toolbar
+version: "1.0.0"
+catalogRef: navbar-with-search
+category: navigation
+tags: [navbar, dashboard, search, toolbar, breadcrumb]
+archetype: layout-heavy
+description: >
+  Two-tier navigation: top navbar with sidebar toggle, breadcrumb, and
+  auth buttons; bottom toolbar (UDashboardToolbar) with page title,
+  subtitle, and search input. Toolbar stacks vertically on mobile,
+  inline on desktop.
+
+requires:
+  components: [UDashboardNavbar, UDashboardToolbar, UBreadcrumb, UInput, UButton, UIcon]
+  charts: []
+  composables: []
+
+props:
+  interface: |
+    interface BreadcrumbItem {
+      label: string
+      to?: string
+    }
+    interface NavbarWithSearchProps {
+      title: string
+      breadcrumbs: BreadcrumbItem[]
+      pageTitle: string
+      pageDescription?: string
+      searchPlaceholder?: string
+      searchValue?: string
+      showAuthButtons?: boolean
+    }
+
+emits:
+  interface: |
+    interface NavbarWithSearchEmits {
+      'sidebar:toggle': []
+      'search': [query: string]
+      'auth:register': []
+      'auth:login': []
+    }
+
+layout:
+  structure: |
+    container (bg-default, border, rounded, pb-4)
+      UDashboardNavbar (title prop, ui.right: gap-3 lg:gap-4)
+        slot #left
+          sidebar-toggle (UButton ghost neutral, i-lucide-panel-left)
+          breadcrumb (UBreadcrumb, separatorIcon size-4, hidden on mobile)
+        slot #right
+          register-button (UButton ghost neutral rounded-md, hidden lg:inline-flex)
+          login-button (UButton ghost neutral rounded-md)
+            mobile: icon-only (i-lucide-log-in), label hidden
+            desktop: label "Login" visible via hidden lg:inline
+      UDashboardToolbar (below navbar)
+        toolbar-content (flex w-full, flex-col on mobile, flex-row lg on desktop)
+          title-section (py-2)
+            page-title (text-base lg:text-lg, font-semibold)
+            page-description (text-dimmed, text-sm)
+          search-input (UInput, i-lucide-search icon, size-md, outline variant)
+            mobile: w-full
+            desktop: w-auto (lg:w-auto)
+      content-area (mx-4 lg:mx-6, my-4, border dashed)
+  responsive:
+    mobile: toolbar stacks vertically (title above, search below full-width)
+    tablet: same stacking, search still full-width
+    desktop: toolbar inline (title left, search right auto-width)
+
+slots:
+  navbar-left: "Override breadcrumb area"
+  navbar-right: "Override auth buttons"
+  toolbar: "Override entire toolbar content"
+  search: "Custom search input component"
+
+tokens:
+  container-bg: bg-default
+  container-border: border-default
+  title-text: text-highlighted
+  description-text: text-dimmed
+  search-variant: outline
+  search-icon: "i-lucide-search"
+  auth-button-color: neutral
+  auth-button-variant: ghost
+  login-icon: "i-lucide-log-in"
+
+atomicHint:
+  organism: NavbarWithSearch
+  molecules: [TopNavbar, SearchToolbar, AuthButtonGroup]
+  atoms: [SidebarToggle, SearchInput, PageTitle, PageDescription, AuthButton]
+
+examples:
+  - context: "Content management dashboard"
+    pageTitle: "Articles"
+    pageDescription: "Manage published and draft content"
+    searchPlaceholder: "Search articles..."
+  - context: "User management page"
+    pageTitle: "Page title"
+    pageDescription: "Manage Dashboard content however you need"
+    searchPlaceholder: "Search..."
+
+composesWith:
+  - "navbar-toolbar (tab toolbar alternative to search toolbar)"
+  - "navbar-variant-one (simpler single-tier with dropdown)"
+  - "Dashboard Page Layout (DSE composition)"
+
+derivation:
+  source: "nuxt-charts/dashboard-navbar/navbar-with-search"
+  method: "structural-abstraction"
+  what-was-kept: >
+    Two-tier layout (UDashboardNavbar + UDashboardToolbar), toolbar with
+    title/description + search input side by side, responsive stacking
+    (flex-col mobile, flex-row lg), search UInput with icon and outline
+    variant (size-md), auth buttons with responsive label (Register hidden
+    lg:inline-flex, Login with i-lucide-log-in icon fallback on mobile),
+    sidebar toggle with panel-left icon, breadcrumb with separatorIcon size-4.
+  what-was-removed: >
+    All Vue template markup, NavigationMenuItem type import (unused in this
+    variant), hardcoded breadcrumb paths, specific class strings (gap-4,
+    py-2), content placeholder div, UInput size="md" prop.
+  transformative-value: >
+    Captures "search in toolbar" as distinct from tab navigation (navbar-toolbar).
+    Key structural decisions: 1) Search lives in toolbar not navbar for space,
+    2) Toolbar stacks flex-col on mobile for search full-width, 3) Login button
+    shows icon on mobile via hidden lg:inline span pattern.
+
+avoid:
+  - "Search in navbar right slot — too cramped, belongs in toolbar"
+  - "Missing responsive stacking — toolbar must flex-col on mobile"
+  - "Fixed search width — w-full mobile, lg:w-auto desktop"
+  - "Login button without icon fallback — mobile needs i-lucide-log-in"

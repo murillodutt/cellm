@@ -1,0 +1,133 @@
+id: area-chart-two
+name: Area Chart Dual-Series Comparison
+version: "1.1.0"
+catalogRef: area-chart-two
+category: visualization
+tags: [area, chart, dual-series, comparison, revenue, monotone, responsive]
+basePattern: area-chart-gradient
+archetype: chart-heavy
+description: >
+  Dual-series area chart for side-by-side comparison (desktop vs mobile).
+  Features MonotoneX curve interpolation, nested soft card for chart isolation,
+  dashed grid lines, currency-formatted aggregate total, percentage change badge,
+  and per-series totals with animated color indicators in the footer.
+
+requires:
+  components: [UCard, UIcon, UBadge, UButton]
+  charts: [AreaChart]
+  composables: [useResponsiveHeight, useColorMode]
+
+props:
+  interface: |
+    interface AreaChartItem {
+      month: string
+      desktop: number
+      mobile: number
+    }
+    interface AreaChartTwoProps {
+      data: AreaChartItem[]
+      categories: ComputedRef<Record<string, BulletLegendItemInterface>>
+      title?: string
+      percentChange?: string
+      xFormatter?: (tick: number) => string
+    }
+
+emits:
+  interface: |
+    interface AreaChartTwoEmits {
+      'view-details': []
+      'series:hover': [seriesKey: string, value: number]
+    }
+
+layout:
+  structure: |
+    card-shell (variant=subtle, bg-default/60)
+      content-stack (space-y-4)
+        metric-header (space-y-1)
+          label-row (flex, gap-2, align-center)
+            title-label (text-muted)
+            info-icon (UIcon, text-dimmed)
+          value-row (flex, gap-4, align-center)
+            aggregate-total (text-3xl, font-semibold, tracking-tight)
+            change-badge (UBadge, variant=soft, text-success)
+        chart-card (UCard, variant=soft)
+          AreaChart (dual-series, MonotoneX, dashed grid, hidden legend)
+        comparison-footer (flex, justify-between)
+          series-totals (flex, gap-6)
+            series-indicator (animated dot + label + value) x 2
+          action-slot
+            view-details-button (UButton, ghost, trailing arrow)
+  responsive:
+    mobile: chart height 120px, footer stacks vertically
+    tablet: chart height 240px, inline footer
+    desktop: chart height 240px, full-width with comfortable spacing
+
+slots:
+  header: Override metric header with custom title and total
+  chart: Override chart rendering
+  footer: Override comparison footer with custom series indicators
+
+tokens:
+  card-bg: bg-default/60
+  card-variant: subtle
+  chart-card-variant: soft
+  title-color: text-muted
+  info-icon-color: text-dimmed
+  total-font: text-3xl font-semibold tracking-tight
+  badge-variant: soft
+  badge-color: text-success
+  indicator-dot: h-2 w-2 animate-pulse rounded-full
+  series-label: text-muted dark:text-dimmed
+  series-value: font-medium
+  button-variant: ghost
+  grid-dash: "--vis-axis-grid-line-dasharray: 5 5"
+
+chartConfig:
+  type: area
+  curveType: MonotoneX
+  gradient: true
+  tooltip: true
+  xAxis: true
+  yAxis: true
+  xGridLine: true
+  xNumTicks: 6
+  yNumTicks: 4
+  hideLegend: true
+  colorModeReactive: true
+
+atomicHint:
+  organism: DualSeriesAreaCard
+  molecules: [MetricHeader, ComparisonFooter, NestedChartContainer]
+  atoms: [AggregateTotal, PercentBadge, AnimatedDot, SeriesLabel]
+
+examples:
+  - context: "Platform traffic comparison"
+    data: "6-month desktop vs mobile sessions with total and trend badge"
+  - context: "Revenue channel split"
+    data: "Quarterly online vs in-store revenue with currency formatting"
+
+composesWith:
+  - "area-chart-preview (same source, preview-emphasis)"
+  - "area-chart-data (same source, data-emphasis)"
+  - "Dashboard grid layout (DSE composition)"
+
+avoid:
+  - "Showing more than 2-3 series in a comparison view -- use line-chart-multi for 4+"
+  - "Omitting the comparison footer -- the side-by-side totals are the key differentiator"
+  - "Using Linear curve when data has smooth temporal transitions -- MonotoneX preserves shape"
+  - "Hardcoding series colors -- use BulletLegendItemInterface with dynamic colors"
+  - "Fixed height chart -- use useResponsiveHeight composable"
+
+derivation:
+  source: "nuxt-charts/area-charts/area-chart-two"
+  method: "structural-abstraction"
+  what-was-kept: >
+    Dual-series comparison concept with desktop/mobile overlay, MonotoneX curve,
+    dashed grid via CSS custom property, computed aggregate total with currency
+    format, per-series totals with animated color dots in footer, nested card layout.
+  what-was-removed: >
+    Hardcoded data array, specific hex color values, static percentage text,
+    inline style bindings for indicator dots.
+  transformative-value: >
+    Reusable dual-series comparison pattern for any two-category temporal overlay
+    with aggregated and per-series metrics.

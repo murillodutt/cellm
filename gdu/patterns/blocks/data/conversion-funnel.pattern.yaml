@@ -1,0 +1,114 @@
+# Block Pattern: Conversion Funnel
+# Distributable structural specification — no licensed code
+# Generated from catalog ref, not source transcription
+
+id: conversion-funnel
+name: Step-by-step Conversion Funnel
+version: "1.0.0"
+catalogRef: conversion-funnel
+category: data
+tags: [funnel, conversion, drop-off, steps, analytics]
+
+archetype: layout-heavy
+description: >
+  Vertical funnel visualization showing sequential stages with proportional
+  horizontal bars. Each bar width represents the count relative to the first
+  stage. Conversion rate percentages appear beside each bar (except the first).
+  Wrapped in a card with header (title + timeframe selector) and footer
+  (timeframe label + detail link).
+
+requires:
+  components: [UCard, UButton, USelect]
+  charts: []
+  composables: []
+
+props:
+  interface: |
+    interface FunnelStep {
+      id: string
+      label: string
+      count: number
+    }
+    interface ConversionFunnelProps {
+      steps: FunnelStep[]
+      timeframes?: string[]        // e.g. ["Last 7 days", "Last 30 days"]
+      defaultTimeframe?: string
+    }
+
+layout:
+  structure: |
+    card-shell (max-width constrained, centered)
+      header
+        title-group [title, subtitle]
+        timeframe-selector (dropdown)
+      funnel-stack (vertical, spaced)
+        funnel-row (repeat per step)
+          proportional-bar (width = step.count / first-step.count * 100%, min 10%)
+            bar-content-overlay [step-label (left), count (right, formatted)]
+          conversion-badge (beside bar, only for index > 0: "XX%")
+      footer
+        timeframe-label (current selection)
+        detail-link (outline button)
+  responsive:
+    mobile: full-width bars, conversion badge below bar
+    tablet: inline layout with badge beside bar
+    desktop: same as tablet, max-width ~640px centered
+
+emits:
+  interface: |
+    interface ConversionFunnelEmits {
+      'step:click': [stepId: string]
+      'update:timeframe': [timeframe: string]
+    }
+
+slots:
+  funnel-row: "Override individual funnel step rendering"
+  header-actions: "Extra controls next to timeframe selector"
+  footer: "Replace default footer"
+
+tokens:
+  card-bg: bg-default
+  bar-fill: bg-primary
+  bar-text: text-inverted
+  conversion-text: text-highlighted
+  subtitle-text: text-muted
+  footer-text: text-muted
+
+atomicHint:
+  organism: ConversionFunnel
+  molecules: [FunnelRow, TimeframeSelector]
+  atoms: [ProportionalBar, ConversionBadge]
+
+examples:
+  - context: "SaaS user onboarding funnel"
+    steps: ["Website Visitors (10,000)", "Sign Up (4,250)", "Email Verified (3,615)", "Profile Complete (2,710)", "First Action (2,167)", "Converted (1,840)"]
+  - context: "E-commerce checkout funnel"
+    steps: ["Product View (50,000)", "Add to Cart (12,500)", "Checkout Start (8,750)", "Payment (6,125)", "Order Complete (5,200)"]
+
+composesWith:
+  - "Analytics Dashboard Section"
+  - "KPI Card (DSE composition) — show overall conversion rate"
+
+derivation:
+  source: "nuxt-charts/bar-lists/user-conversion-funnel"
+  method: "structural-abstraction"
+  what-was-kept: >
+    Funnel concept (vertical stack of proportional bars), width calculation
+    logic (count / first-step count), conversion rate computation between
+    adjacent steps, timeframe selector interaction, card structure
+    (header/body/footer), props shape (steps array with label + count).
+  what-was-removed: >
+    All Vue template markup, v-for directives, computed property implementations,
+    CSS class strings, hardcoded 9-step sample data, specific bar hover styles,
+    Tailwind utility classes, group hover interactions.
+  transformative-value: >
+    Converts Vue SFC with hardcoded funnel data into a framework-agnostic
+    pattern. The proportional bar concept is described semantically — any
+    agent can implement it with CSS width percentages, SVG rectangles, or
+    canvas drawing depending on target framework.
+
+avoid:
+  - "Chart libraries for simple proportional bars — CSS width is sufficient"
+  - "Hardcoded step data — always accept via props"
+  - "Missing min-width on bars — small counts become invisible without floor"
+  - "Horizontal funnel layout — vertical is more readable for 5+ steps"

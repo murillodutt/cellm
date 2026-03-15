@@ -1,0 +1,78 @@
+# Template Pattern: Nuxt Simplistic
+id: nuxt-simplistic
+name: Nuxt Simplistic
+version: "1.0.0"
+catalogRef: nuxt-simplistic
+category: template
+tags: [template, simplistic, minimal, clean, starter]
+archetype: layout-heavy
+quality: partial
+
+description: >
+  Minimalist dashboard starter with clean layout and simple components.
+  Fewest possible sections — just navigation, key metrics, one chart,
+  and one data view. Ideal as a starting point for custom dashboards.
+
+composesPatterns:
+  - navbar-variant-two
+  - mini-chart-cards
+  - area-chart-two
+  - bar-list-ranked
+
+requires:
+  components: [UCard, UButton, UIcon]
+  charts: [AreaChart]
+  composables: []
+
+layout:
+  sections:
+    - name: navigation
+      patternRef: navbar-variant-two
+      slot: top
+    - name: kpi-cards
+      patternRef: mini-chart-cards
+      slot: hero
+    - name: main-chart
+      patternRef: area-chart-two
+      slot: main
+    - name: data-list
+      patternRef: bar-list-ranked
+      slot: content
+  responsive:
+    mobile: single column, all sections stacked
+    tablet: 2-column KPI cards, full-width chart and list
+    desktop: single column max-width ~1200px, centered
+
+tokens:
+  page-bg: bg-default
+  section-gap: gap-8
+  card-bg: bg-default
+  card-border: border-default
+  text-primary: text-highlighted
+  text-secondary: text-muted
+  accent: text-primary
+
+atomicHint:
+  organism: SimpleDashboardPage
+  molecules: [NavigationBar, KPIRow, ChartSection, DataList]
+  atoms: [MiniChartCard, ChartCard, ListItem]
+
+examples:
+  - context: "Personal project dashboard"
+    sections: ["Simple nav", "3 mini-chart cards (visitors, signups, revenue)", "Area chart (weekly trend)", "Top pages ranked list"]
+  - context: "Startup MVP dashboard"
+    sections: ["Navigation", "Key metrics with sparklines", "Growth chart", "Feature adoption list"]
+
+composesWith:
+  - "nuxt-dashboard-3 (scale up to full-featured dashboard)"
+  - "nuxt-clean-gray (similar minimal but neutral-gray themed)"
+
+derivation:
+  source: "none — composition derived from catalog description and tags"
+  method: "template-composition"
+
+avoid:
+  - "Adding too many sections — simplistic means 4-5 sections max"
+  - "Complex chart types — stick to area/line for trends, bar-list for rankings"
+  - "Sidebar layouts — single column keeps it simple"
+  - "Feature creep — this is a starter, not a complete dashboard"

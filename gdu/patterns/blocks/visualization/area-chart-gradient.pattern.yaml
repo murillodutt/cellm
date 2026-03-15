@@ -1,0 +1,142 @@
+# Block Pattern: Area Chart with Gradient
+id: area-chart-gradient
+name: Area Chart with Gradient Fill
+version: "1.1.0"
+catalogRef: area-chart-one
+category: visualization
+tags: [area, chart, gradient, dual-series, revenue, monotone, dashed-grid, responsive]
+archetype: chart-heavy
+description: >
+  Area chart with gradient fill below the curve, dual-series overlay
+  (desktop/mobile), MonotoneX curve interpolation, and dashed grid lines.
+  Wrapped in nested card hierarchy (subtle outer + soft inner) with
+  currency-formatted total, percentage change badge, per-series animated
+  indicators, and ghost navigation CTA. Color-mode reactive via :key binding.
+
+requires:
+  components: [UCard, UIcon, UBadge, UButton]
+  charts: [AreaChart]
+  composables: [useResponsiveHeight, useColorMode]
+
+props:
+  interface: |
+    interface AreaChartItem {
+      month: string
+      desktop: number
+      mobile: number
+    }
+    interface AreaChartGradientProps {
+      data: AreaChartItem[]
+      categories: ComputedRef<Record<string, BulletLegendItemInterface>>
+      title?: string
+      percentChange?: string
+      currency?: string
+      locale?: string
+    }
+
+emits:
+  interface: |
+    interface AreaChartGradientEmits {
+      'view-details': []
+      'series:hover': [seriesKey: string, value: number]
+    }
+
+layout:
+  structure: |
+    card-shell (variant=subtle, bg-default/60)
+      content-stack (space-y-4)
+        metric-header (space-y-1)
+          label-row (flex, gap-2, align-center)
+            title-text (text-muted)
+            info-icon (UIcon, text-dimmed)
+          value-row (flex, gap-4, align-center)
+            total-value (text-3xl, font-semibold, tracking-tight)
+            change-badge (UBadge, variant=soft, text-success)
+        nested-chart-card (UCard, variant=soft)
+          AreaChart (:key=colorMode, class=dashed, MonotoneX, gradient, hidden legend)
+        series-footer (flex, justify-between)
+          series-indicators (flex, gap-6)
+            indicator (animated dot + label + value) x N
+          action-area
+            view-details-button (UButton, ghost, neutral, trailing arrow)
+  responsive:
+    mobile: chart height 120px, stacked footer, compact spacing
+    tablet: chart height 240px, inline footer
+    desktop: chart height 240px, spacious layout
+
+slots:
+  header: Override metric header (title + total + badge)
+  chart: Override nested chart card content
+  footer: Override series indicators and navigation CTA
+
+tokens:
+  card-bg: bg-default/60
+  card-variant: subtle
+  chart-card-variant: soft
+  title-color: text-muted
+  info-icon-color: text-dimmed
+  total-font: text-3xl font-semibold tracking-tight
+  badge-variant: soft
+  badge-color: text-success
+  indicator-dot: h-2 w-2 animate-pulse rounded-full
+  series-label: text-muted dark:text-dimmed
+  series-value: font-medium
+  grid-dash: "--vis-axis-grid-line-dasharray: 5 5"
+
+chartConfig:
+  type: area
+  curveType: MonotoneX
+  gradient: true
+  tooltip: true
+  xAxis: true
+  yAxis: true
+  xGridLine: true
+  xNumTicks: 6
+  yNumTicks: 4
+  hideLegend: true
+  colorModeReactive: true
+  keyBinding: "colorMode.value"
+
+atomicHint:
+  organism: GradientAreaChartCard
+  molecules: [MetricHeader, NestedChartContainer, SeriesIndicatorFooter]
+  atoms: [GradientFill, MonotoneCurve, CurrencyTotal, PercentBadge, AnimatedDot]
+
+examples:
+  - context: "Revenue overview dashboard"
+    data: "6-month desktop/mobile revenue with gradient fill, currency total, and +21% badge"
+  - context: "User acquisition funnel"
+    data: "Monthly signups by channel with gradient area and per-channel totals"
+  - context: "Traffic analytics"
+    data: "Quarterly sessions with gradient fill emphasizing volume over time"
+
+composesWith:
+  - "area-chart-preview (same source, preview-emphasis variant)"
+  - "area-chart-data (same source, data-summary variant)"
+  - "Dashboard card grid (DSE composition)"
+
+avoid:
+  - "Omitting gradient fill -- it is the defining visual feature of this pattern"
+  - "Using flat card instead of nested subtle+soft hierarchy"
+  - "Removing animated dots -- they signal data freshness"
+  - "Hardcoded hex colors -- use computed BulletLegendItemInterface with colorMode"
+  - "Fixed chart height -- use useResponsiveHeight(120/240)"
+
+derivation:
+  source: "nuxt-charts/area-charts/area-chart-one"
+  method: "structural-abstraction"
+  what-was-kept: >
+    Gradient fill area concept with dual-series (desktop/mobile), nested card
+    hierarchy (variant=subtle outer + variant=soft inner), CurveType.MonotoneX,
+    dashed grid via .dashed CSS class and --vis-axis-grid-line-dasharray,
+    :key="colorMode.value" for reactive re-rendering, computed categories
+    as ComputedRef<Record<string, BulletLegendItemInterface>>, xFormatter
+    with month.slice(0,3), computed totals via reduce(), Intl.NumberFormat
+    currency formatting, UBadge trend indicator, animated color dots with
+    inline style binding, ghost UButton with trailing arrow icon.
+  what-was-removed: >
+    Hardcoded data array, specific hex colors (#3b82f6, #22c55e), static
+    "+21%" text, inline style bindings for dot backgrounds.
+  transformative-value: >
+    Primary gradient area chart pattern. Gradient fill is the key visual
+    differentiator from flat area chart variants.

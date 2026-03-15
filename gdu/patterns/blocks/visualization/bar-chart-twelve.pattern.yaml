@@ -1,0 +1,152 @@
+id: bar-chart-twelve
+name: Combo Bar+Line Dual Axis Chart
+version: 1.0.0
+catalogRef: bar-chart-twelve
+category: visualization
+tags:
+  - bar
+  - combo
+  - line
+  - dual-axis
+  - mixed
+archetype: chart-heavy
+description: >
+  Combo chart overlaying bar and line series on the same axes. Bars represent
+  volume/quantity while the line represents a trend/rate. This pattern requires
+  careful dual-axis scaling when bar and line series have different value ranges.
+  Note: the source uses BarChart with two series — true dual-axis with LineChart
+  overlay requires custom composition.
+
+requires:
+  components: [UCard]
+  charts: [BarChart]
+  composables: [useResponsiveHeight]
+
+props:
+  interface: |
+    interface ComboDataPoint {
+      category: string
+      barValue: number
+      lineValue: number
+    }
+    interface BarChartTwelveProps {
+      data: ComboDataPoint[]
+      barCategories: Record<string, BulletLegendItemInterface>
+      lineCategories: Record<string, BulletLegendItemInterface>
+      title?: string
+      barYAxis?: string
+      lineYAxis?: string
+    }
+
+emits:
+  interface: |
+    interface BarChartTwelveEmits {
+      'bar:click': [category: string, value: number]
+      'line:hover': [category: string, value: number]
+      'axis:toggle': [axis: 'bar' | 'line']
+    }
+
+layout:
+  structure: |
+    card-shell
+      header
+        title
+        subtitle (dual-axis explanation)
+      chart-container (relative, layered)
+        bar-layer (BarChart, primary y-axis left)
+        line-layer (LineChart overlay, secondary y-axis right)
+        shared-x-axis (category labels)
+      legend-row
+        bar-legend (square swatch)
+        line-legend (line swatch)
+      footer [optional axis labels or toggle]
+  responsive:
+    mobile: chart height 200px, simplified legend
+    tablet: chart height 300px, dual axis labels
+    desktop: full dual-axis with clear labeling
+
+slots:
+  header: Override card header
+  chart: Override the layered chart composition
+  legend: Custom combined legend for bar+line series
+
+tokens:
+  card-bg: bg-default
+  title-text: text-lg font-semibold
+  bar-color: color-primary
+  line-color: color-accent
+  left-axis-label: bar series name
+  right-axis-label: line series name
+  grid-y: visible
+  legend-bar-swatch: square
+  legend-line-swatch: line-with-dot
+
+chartConfig:
+  type: combo
+  barConfig:
+    orientation: vertical
+    stacked: false
+    radius: 4
+    tooltip: true
+  lineConfig:
+    curveType: monotone
+    strokeWidth: 2
+    dotSize: 4
+  dualAxis: true
+  legend: true
+  tooltip: true
+  xAxis: true
+  yAxis: true
+  note: >
+    Source block uses BarChart with two numeric series. True combo requires
+    layering BarChart + LineChart components with shared x-axis and independent
+    y-axes. Implementation must handle scale synchronization.
+
+atomicHint:
+  organism: ComboChartCard
+  molecules:
+    - DualAxisContainer (layered bar + line)
+    - CombinedLegend (bar swatch + line swatch)
+    - SharedXAxis (aligned category axis)
+  atoms:
+    - BarSeries
+    - LineSeries
+    - AxisLabel
+    - DualScaleTick
+
+examples:
+  - context: Revenue (bars) vs Growth Rate (line)
+    data: "Monthly revenue bars + growth % line, left axis $, right axis %"
+    usage: Executive dashboard showing volume and rate on same timeline
+  - context: Orders (bars) vs Average Order Value (line)
+    data: "Daily order count bars + AOV trend line, different scales"
+    usage: E-commerce dashboard combining quantity and value metrics
+
+composesWith:
+  - bar-chart-one (bar-only variant without line overlay)
+  - bar-chart-six (multi-series bars without line)
+  - Dashboard Page Layout (DSE composition)
+
+derivation:
+  source: nuxt-charts/bar-charts/bar-chart-twelve
+  method: structural-abstraction
+  what-was-kept: >
+    Combo concept of bar+line on shared axes, dual-axis scaling requirement,
+    combined legend showing both series types with different swatch styles,
+    the need for layered chart composition. Source uses BarChart with two
+    numeric series as a simplified version.
+  what-was-removed: >
+    All Vue template markup, hardcoded data, specific chart component props.
+    The source does not actually implement true dual-axis — the pattern
+    specifies the ideal combo behavior.
+  transformative-value: >
+    Dual-axis combo pattern for correlating volume (bars) with rates (line).
+    Requires careful scale management to avoid misleading visual comparisons.
+    The most architecturally complex bar chart pattern.
+
+avoid:
+  - Single y-axis scale for different value ranges — dual axis is required
+  - Missing axis labels — each axis must identify which series it represents
+  - Same swatch style for bar and line — visual distinction in legend is critical
+  - More than 1 bar + 1 line series — complexity makes the chart unreadable
+  - Assuming BarChart alone handles this — true combo requires layered composition

@@ -1,0 +1,131 @@
+id: area-chart-five
+name: Area Chart with Currency Metrics
+version: "1.1.0"
+catalogRef: area-chart-five
+category: visualization
+tags: [area, chart, currency, metrics, intl, dual-series, responsive]
+basePattern: area-chart-gradient
+archetype: chart-heavy
+description: >
+  Area chart card with Intl.NumberFormat currency formatting for the aggregate
+  total. Features computed per-series totals via reduce(), dual-series
+  desktop/mobile overlay with MonotoneX curve, dashed grid lines, and
+  animated color indicators in a footer breakdown.
+
+requires:
+  components: [UCard, UIcon, UBadge, UButton]
+  charts: [AreaChart]
+  composables: [useResponsiveHeight, useColorMode]
+
+props:
+  interface: |
+    interface AreaChartItem {
+      month: string
+      desktop: number
+      mobile: number
+    }
+    interface AreaChartFiveProps {
+      data: AreaChartItem[]
+      categories: ComputedRef<Record<string, BulletLegendItemInterface>>
+      title?: string
+      currency?: string
+      locale?: string
+      percentChange?: string
+    }
+
+emits:
+  interface: |
+    interface AreaChartFiveEmits {
+      'view-details': []
+      'total:computed': [total: number, formatted: string]
+    }
+
+layout:
+  structure: |
+    card-shell (variant=subtle, bg-default/60)
+      content-stack (space-y-4)
+        header (space-y-1)
+          label-row (flex, gap-2)
+            title (text-muted)
+            info-icon (text-dimmed)
+          value-row (flex, gap-4)
+            currency-total (text-3xl, font-semibold, tracking-tight)
+            change-badge (UBadge, variant=soft, text-success)
+        chart-card (UCard, variant=soft)
+          AreaChart (MonotoneX, dashed grid, hidden legend)
+        metrics-footer (flex, justify-between)
+          series-metrics (flex, gap-6)
+            metric-item (animated dot + label + computed value) x N
+          action
+            details-button (UButton, ghost, trailing arrow)
+  responsive:
+    mobile: chart height 120px, footer stacks
+    tablet: chart height 240px, inline
+    desktop: chart height 240px, spacious
+
+slots:
+  header: Override currency header section
+  chart: Override chart container
+  metrics: Override per-series metric breakdown
+
+tokens:
+  card-bg: bg-default/60
+  card-variant: subtle
+  chart-variant: soft
+  title-color: text-muted
+  info-icon-color: text-dimmed
+  total-font: text-3xl font-semibold tracking-tight
+  badge-color: text-success
+  indicator-dot: h-2 w-2 animate-pulse rounded-full
+  metric-label: text-muted dark:text-dimmed
+  metric-value: font-medium
+  grid-dash: "--vis-axis-grid-line-dasharray: 5 5"
+
+chartConfig:
+  type: area
+  curveType: MonotoneX
+  gradient: true
+  tooltip: true
+  xAxis: true
+  yAxis: true
+  xGridLine: true
+  xNumTicks: 6
+  yNumTicks: 4
+  hideLegend: true
+  colorModeReactive: true
+
+atomicHint:
+  organism: CurrencyMetricsAreaCard
+  molecules: [CurrencyHeader, MetricsFooter, ChartContainer]
+  atoms: [IntlCurrencyTotal, PercentBadge, AnimatedDot, ComputedMetric]
+
+examples:
+  - context: "Multi-currency revenue dashboard"
+    data: "6-month revenue with USD formatting, per-channel totals via reduce()"
+  - context: "International sales tracker"
+    data: "Quarterly sales in EUR with locale-aware number formatting"
+
+composesWith:
+  - "area-chart-data (same source, data-table emphasis)"
+  - "area-chart-preview (same source, compact preview)"
+  - "Revenue dashboard grid (DSE composition)"
+
+avoid:
+  - "Raw number display without Intl.NumberFormat -- always format currency"
+  - "Omitting locale parameter -- currency formatting varies by region"
+  - "Hardcoding currency symbol -- use Intl options for portability"
+  - "Static totals -- use computed refs with reduce() for reactivity"
+  - "Fixed chart height -- use useResponsiveHeight"
+
+derivation:
+  source: "nuxt-charts/area-charts/area-chart-five"
+  method: "structural-abstraction"
+  what-was-kept: >
+    Intl.NumberFormat currency formatting with locale support, computed totals
+    via reduce(), dual-series area chart with MonotoneX, dashed grid, animated
+    color indicators, nested card layout, ghost CTA button.
+  what-was-removed: >
+    Hardcoded data, specific hex colors, static 'USD' currency, en-US locale.
+  transformative-value: >
+    Reusable currency-focused area chart pattern with proper internationalization
+    for financial data display.

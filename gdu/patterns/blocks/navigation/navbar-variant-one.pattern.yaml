@@ -1,0 +1,119 @@
+# Block Pattern: Navbar Variant One
+id: navbar-variant-one
+name: Dashboard Navbar with Breadcrumb and Actions Dropdown
+version: "1.0.0"
+catalogRef: navbar-variant-one
+category: navigation
+tags: [navbar, dashboard, breadcrumb, actions, dropdown]
+archetype: layout-heavy
+description: >
+  Dashboard top navbar with page title on mobile (truncated), breadcrumb
+  trail on desktop, and an actions dropdown menu (UDropdownMenu) on the
+  right. Dropdown shows as icon-only on mobile, label+chevron on desktop.
+
+requires:
+  components: [UDashboardNavbar, UBreadcrumb, UDropdownMenu, UButton, UIcon]
+  charts: []
+  composables: []
+
+props:
+  interface: |
+    interface BreadcrumbItem {
+      label: string
+      to?: string
+    }
+    interface DropdownAction {
+      label: string
+      icon: string
+      to?: string
+      onClick?: () => void
+    }
+    interface NavbarVariantOneProps {
+      title: string
+      breadcrumbs: BreadcrumbItem[]
+      actions: DropdownAction[][]
+    }
+
+emits:
+  interface: |
+    interface NavbarVariantOneEmits {
+      'action:select': [action: { label: string; icon: string }]
+    }
+
+layout:
+  structure: |
+    container (bg-default, border, rounded, pb-4)
+      UDashboardNavbar (title prop, ui.right: gap-3 lg:gap-4)
+        slot #left
+          page-title (truncated, base font on mobile, lg font on desktop)
+          breadcrumb (UBreadcrumb, hidden on mobile via hidden lg:flex)
+        slot #right
+          UDropdownMenu (items: grouped action arrays)
+            trigger: UButton (rounded-md, neutral ghost)
+              mobile: icon-only (i-lucide-plus), label hidden
+              desktop: label "Actions" + trailing i-lucide-chevron-down
+      content-area (mx-4 lg:mx-6, mt-4, border dashed, padded)
+  responsive:
+    mobile: title truncated, breadcrumb hidden, dropdown trigger icon-only
+    tablet: breadcrumb visible alongside title, dropdown shows label
+    desktop: full breadcrumb trail, comfortable gap-4 spacing
+
+slots:
+  left: "Override left section (title + breadcrumb)"
+  right: "Override right section (actions dropdown)"
+  content: "Main content area below navbar"
+
+tokens:
+  container-bg: bg-default
+  container-border: border-default
+  title-text: text-highlighted
+  breadcrumb-text: text-muted
+  button-color: neutral
+  button-variant: ghost
+  content-border: border-default
+  content-text: text-dimmed
+
+atomicHint:
+  organism: NavbarVariantOne
+  molecules: [BreadcrumbTrail, ActionsDropdown]
+  atoms: [PageTitle, DropdownTrigger, ActionMenuItem]
+
+examples:
+  - context: "Documentation site header"
+    title: "Home"
+    breadcrumbs: ["Docs", "Components", "Breadcrumb"]
+    actions: [["New mail (i-lucide-send)", "New customer (i-lucide-user-plus)"]]
+  - context: "Admin panel"
+    title: "Dashboard"
+    breadcrumbs: ["Admin", "Users", "Permissions"]
+    actions: [["Add User", "Export CSV"], ["Settings"]]
+
+composesWith:
+  - "navbar-toolbar (adds tab toolbar below instead of dropdown)"
+  - "navbar-with-search (adds search toolbar below)"
+  - "Dashboard Page Layout (DSE composition)"
+
+derivation:
+  source: "nuxt-charts/dashboard-navbar/navbar-variant-one"
+  method: "structural-abstraction"
+  what-was-kept: >
+    UDashboardNavbar with #left/#right slot pattern, breadcrumb hidden on mobile
+    via hidden lg:flex, DropdownMenu trigger with responsive label (i-lucide-plus
+    mobile, "Actions"+chevron desktop), grouped dropdown items satisfying
+    DropdownMenuItem[][] type, container with border and rounded corners, gap
+    responsive (gap-3 lg:gap-4).
+  what-was-removed: >
+    All Vue template markup, hardcoded breadcrumb paths (/docs/components/breadcrumb),
+    hardcoded dropdown items (New mail, New customer), specific UButton class="rounded-md",
+    satisfies type assertion, ref() for paths, content placeholder div.
+  transformative-value: >
+    Extracts the "breadcrumb + actions dropdown" navbar variant as distinct from
+    inline nav links (variant-two) and toolbar tabs (navbar-toolbar). The responsive
+    dropdown trigger pattern (icon mobile, label+chevron desktop) is a reusable
+    UX decision documented here.
+
+avoid:
+  - "Hardcoded breadcrumb paths — accept via props"
+  - "Dropdown without icon fallback on mobile — must show i-lucide-plus"
+  - "Custom navbar divs — use UDashboardNavbar component"
+  - "Breadcrumb visible on mobile — hide with hidden lg:flex"

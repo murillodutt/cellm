@@ -1,0 +1,109 @@
+# Block Pattern: Tracker Bar
+id: tracker-bar
+name: Uptime Status Tracker
+version: "1.0.0"
+catalogRef: tracker
+category: monitoring
+tags: [tracker, uptime, status, monitoring, bars]
+archetype: layout-heavy
+description: >
+  Horizontal row of thin colored bars representing daily status over a time
+  window (e.g., 90 days). Each bar is colored by status (online/offline/degraded).
+  Shows domain name, uptime percentage, and time range labels.
+
+requires:
+  components: [UCard]
+  charts: []
+  composables: []
+
+props:
+  interface: |
+    interface StatusEntry {
+      status: 'online' | 'offline' | 'degraded'
+    }
+    interface TrackerBarProps {
+      domain: string
+      uptime: string
+      operationalStatus: boolean
+      statusData: StatusEntry[]
+      barWidth?: number
+      barGap?: number
+      startLabel?: string
+      endLabel?: string
+    }
+
+emits:
+  interface: |
+    interface TrackerBarEmits {
+      'bar:hover': [index: number, status: string]
+      'bar:click': [index: number]
+    }
+
+layout:
+  structure: |
+    card-shell
+      header-row
+        domain-label (bold)
+        uptime-percentage
+        operational-status-dot (green/red)
+      bar-row (horizontal, flex, no wrap)
+        status-bar (repeat per entry, thin rectangle, colored by status)
+      footer-row
+        start-label (left-aligned, muted)
+        end-label (right-aligned, muted)
+  responsive:
+    mobile: bars shrink with container, maintain proportions
+    tablet: comfortable bar width
+    desktop: same as tablet
+
+slots:
+  header: "Override header row"
+  tooltip: "Custom hover tooltip for individual bars"
+
+tokens:
+  card-bg: bg-default
+  bar-online: bg-success
+  bar-offline: bg-error
+  bar-degraded: bg-warning
+  domain-text: text-highlighted
+  uptime-text: text-muted
+  label-text: text-muted
+  status-dot-online: bg-success
+  status-dot-offline: bg-error
+
+atomicHint:
+  organism: TrackerBar
+  molecules: [BarRow, StatusHeader]
+  atoms: [StatusBar, OperationalDot]
+
+examples:
+  - context: "API uptime monitoring"
+    domain: "api.example.com"
+    uptime: "99.9%"
+    statusData: "90 entries, mostly online with 2-3 offline"
+  - context: "Service health page"
+    domain: "cdn.example.com"
+    uptime: "99.95%"
+    statusData: "30 entries, all online"
+
+composesWith:
+  - "Status Overview Section"
+  - "Dashboard Page Layout (DSE composition)"
+
+derivation:
+  source: "nuxt-charts/status/tracker"
+  method: "structural-abstraction"
+  what-was-kept: >
+    Horizontal bar-row concept, status-to-color mapping, domain/uptime
+    header, time range labels, configurable bar width and gap.
+  what-was-removed: >
+    All Vue template markup, LibStatusTracker component reference,
+    hardcoded sample data, specific CSS classes.
+  transformative-value: >
+    Extracts the uptime-tracker visual concept into a self-contained
+    pattern. Any agent can implement with simple colored divs in a flex row.
+
+avoid:
+  - "Using chart components — simple colored divs are sufficient"
+  - "Fixed bar count — accept dynamic statusData length"
+  - "Missing tooltip on hover — each bar should show date/status"

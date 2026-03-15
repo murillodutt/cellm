@@ -1,0 +1,146 @@
+id: line-chart-nine
+name: Investment Portfolio with Data Table
+version: "1.1.0"
+catalogRef: line-chart-nine
+category: visualization
+tags: [line, portfolio, investment, data-table, toggle, legend, day-selector, responsive]
+archetype: chart-heavy
+description: >
+  Three-series investment portfolio chart with toggleable data table below.
+  Features a KPI grid header (actual, forecasted, last invoice), day-range
+  USelect dropdown, MonotoneX curve with dashed grid, custom legend bar
+  with colored line indicators, collapsible data table with formatted currency
+  values, and responsive layout. The most data-rich line chart variant.
+
+requires:
+  components: [UCard, USelect, UButton]
+  charts: [LineChart]
+  composables: [useResponsiveHeight]
+
+props:
+  interface: |
+    interface InvestmentDataItem {
+      date: string
+      [ticker: string]: string | number
+    }
+    interface LineChartNineProps {
+      data: InvestmentDataItem[]
+      categories: Record<string, BulletLegendItemInterface>
+      actual?: string
+      forecasted?: string
+      lastInvoiceDate?: string
+      dayOptions?: { label: string; value: number }[]
+    }
+
+emits:
+  interface: |
+    interface LineChartNineEmits {
+      'days:change': [days: number]
+      'table:toggle': [visible: boolean]
+    }
+
+layout:
+  structure: |
+    card-shell (UCard)
+      kpi-header (flex, col on mobile, row on sm, gap-4, pb-4, mb-4)
+        kpi-grid (grid, 1-col mobile, 3-col sm)
+          kpi-item (flex-col, items-start)
+            label (text-muted, text-sm, mb-1)
+            value (text-base sm:text-lg, font-medium, "$X,XXX.XX")
+          kpi-item x 3 (Actual, Forecasted, Last invoice)
+        day-selector (flex, justify-end)
+          USelect (neutral/outline, w-full sm:w-32, trailing chevron)
+      chart-card (UCard, variant=subtle)
+        chart-wrapper (-mx-2 sm:mx-0)
+          LineChart (3 series, MonotoneX, dashed grid, hidden built-in legend)
+      custom-legend (mt-6, flex-wrap, justify-center, gap-4 sm:gap-6)
+        legend-item x N (flex, gap-2)
+          color-line (inline-block, h-1, w-8, rounded-full, bg-color)
+          label (text-sm, text-muted)
+      table-toggle (mt-6, flex, justify-center)
+        toggle-button (UButton, neutral/outline, chevron icon, full-width sm:auto)
+      data-table (v-if=tableVisible, UCard, mt-4)
+        table (w-full, overflow-x-auto)
+          thead (border-b, font-medium headers)
+            th: Date | Ticker1 | Ticker2 | Ticker3
+          tbody (rows with formatted currency values)
+  responsive:
+    mobile: chart height 120px, KPIs stack, table scrolls, legend wraps, button full-width
+    tablet: chart height 360px, KPIs in 3-col grid, inline controls
+    desktop: chart height 360px, spacious layout, table auto-width
+
+slots:
+  kpi-header: Override KPI grid and day selector
+  chart: Override chart with custom config
+  legend: Override custom legend bar
+  table: Override data table content
+
+tokens:
+  card-bg: bg-default
+  kpi-label: text-muted text-sm mb-1
+  kpi-value: text-base sm:text-lg font-medium
+  chart-card-variant: subtle
+  chart-margin-fix: -mx-2 sm:mx-0
+  legend-line: inline-block h-1 w-8 rounded-full
+  legend-label: text-sm text-muted
+  toggle-variant: outline
+  toggle-color: neutral
+  table-header-border: "border-color: text-border"
+  table-header-text: "color: text-highlighted"
+  table-cell-text: "color: text-text-dimmed"
+  table-row-border: "border-color: text-border-muted"
+  grid-dash: "--vis-axis-grid-line-dasharray: 5 5"
+
+chartConfig:
+  type: line
+  curveType: MonotoneX
+  yNumTicks: 4
+  legendPosition: BottomRight
+  hideLegend: true
+  tooltip: true
+  gridStyle: "dashed via CSS class"
+  xFormatter: "custom function mapping index to date string"
+
+atomicHint:
+  organism: InvestmentPortfolioCard
+  molecules: [KPIHeaderGrid, DashedLineChart, CustomLegendBar, CollapsibleDataTable]
+  atoms: [KPIMetric, DaySelector, LegendColorLine, TableToggle, CurrencyCell]
+
+examples:
+  - context: "Investment tracking dashboard"
+    data: "56-day Adyen/Booking/Mollie portfolio data with toggleable table (7/14/30/60/90 day views)"
+  - context: "Stock portfolio monitoring"
+    data: "Multi-ticker price chart with KPI header (actual, forecasted, last trade)"
+  - context: "Revenue forecasting"
+    data: "3-channel revenue with collapsible detail table and day range filter"
+
+composesWith:
+  - "line-chart-multi (multi-series without data table)"
+  - "line-chart-two (budget with variance, similar KPI concept)"
+  - "Portfolio dashboard layout (DSE composition)"
+
+avoid:
+  - "Hiding the data table feature -- togglability is the defining characteristic"
+  - "Using built-in legend instead of custom legend bar -- the color-line style is unique"
+  - "Omitting the KPI grid header -- it provides context before the chart"
+  - "Loading full dataset in table -- slice to selectedDays for performance"
+  - "Using var(--ui-*) in inline styles without fallbacks"
+
+derivation:
+  source: "nuxt-charts/line-charts/linecharts-chart-nine"
+  method: "structural-abstraction"
+  what-was-kept: >
+    Three-series investment portfolio concept (Adyen/Booking/Mollie), KPI grid
+    header with actual/forecasted/lastInvoiceDate, USelect day range filter
+    (7/14/30/60/90 days with label/value objects), hideLegend=true with custom
+    legend bar using colored line indicators (h-1 w-8 rounded-full), collapsible
+    data table via tableVisible ref and toggle button, table showing sliced data
+    with toLocaleString currency formatting, MonotoneX curve, dashed grid,
+    responsive chart height (120/360), -mx-2 chart wrapper for mobile bleed.
+  what-was-removed: >
+    Hardcoded 56-day investment data, specific hex/CSS variable colors, static
+    KPI values, table column names.
+  transformative-value: >
+    Most data-rich line chart pattern combining chart visualization with
+    collapsible data table, KPI summary, and day range filtering. Reference
+    for chart+table hybrid blocks.

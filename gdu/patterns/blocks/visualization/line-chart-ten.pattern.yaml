@@ -1,0 +1,142 @@
+id: line-chart-ten
+name: Milestone Execution Tracker
+version: "1.1.0"
+catalogRef: line-chart-ten
+category: visualization
+tags: [line, milestone, pace, expected, markers, natural-curve, dash, progress, responsive]
+archetype: chart-heavy
+description: >
+  Milestone execution chart comparing current pace vs expected pace with
+  Natural curve interpolation. Features circle markers on the current pace
+  line, dashed line for expected pace, percentage y-axis formatting,
+  badge-tagged header (Weekly, v1.4), progress change indicator with
+  check-circle icon, and bottom-center legend. Uses scoped CSS for
+  stroke-width control. Supports undefined values for incomplete periods.
+
+requires:
+  components: [UCard, UBadge, UIcon]
+  charts: [LineChart]
+  composables: []
+
+props:
+  interface: |
+    interface MilestoneDataItem {
+      day: string
+      'Current pace': number | undefined
+      'Expected pace': number
+    }
+    interface LineChartTenProps {
+      data: MilestoneDataItem[]
+      categories: Record<string, BulletLegendItemInterface>
+      badgeLabels?: string[]
+      changePercent?: string
+      height?: number
+    }
+
+emits:
+  interface: |
+    interface LineChartTenEmits {
+      'milestone:select': [day: string]
+      'progress:view': []
+    }
+
+layout:
+  structure: |
+    card-shell (UCard)
+      header (flex, justify-between)
+        left (flex, gap-3)
+          title (text-default, font-semibold)
+          badge-1 (UBadge, neutral/soft, "Weekly")
+          badge-2 (UBadge, neutral/soft, "v1.4")
+        right (flex, gap-1.5, text-sm, font-medium)
+          check-icon (UIcon, size-4, text-primary)
+          change-text (text-primary, "+2%")
+      chart-area (relative, pt-4)
+        LineChart (Natural curve, circle markers on current, dashed expected,
+                   percent y-axis, 320px fixed height, bottom-center legend)
+  responsive:
+    mobile: chart height 320px (fixed for this pattern), badges may wrap
+    tablet: chart height 320px, full header inline
+    desktop: chart height 320px, spacious
+
+slots:
+  header: Override title with badges and progress indicator
+  chart: Override chart with custom milestone config
+  legend: Override bottom-center legend for pace series
+
+tokens:
+  card-bg: bg-default
+  title-font: text-default font-semibold
+  badge-color: neutral
+  badge-variant: soft
+  progress-icon: text-primary size-4
+  progress-text: text-primary text-sm font-medium
+  current-pace-color: "text-primary"
+  expected-pace-color: "text-border-accented"
+
+chartConfig:
+  type: line
+  curveType: Natural
+  height: 320
+  yNumTicks: 4
+  xNumTicks: 7
+  yGridLine: true
+  xGridLine: false
+  legendPosition: BottomCenter
+  hideLegend: false
+  yFormatter: "custom (tick) => `${tick}%`"
+  xFormatter: "custom mapping tick index to day name"
+  markerConfig:
+    'Current pace':
+      type: circle
+      size: 8
+      color: "text-primary"
+      strokeColor: "text-primary"
+      strokeWidth: 1
+  lineDashArray: [[], [5, 5]]
+  supportsUndefined: true
+  scopedCSS: true
+
+atomicHint:
+  organism: MilestoneTrackerCard
+  molecules: [BadgeHeader, ProgressIndicator, MilestoneChart]
+  atoms: [WeeklyBadge, VersionBadge, CheckCircleIcon, PaceMarker, DashExpectedLine]
+
+examples:
+  - context: "Sprint execution dashboard"
+    data: "7-day pace (Mon-Sun) with current at 96% (Sun undefined) vs expected at 100%"
+  - context: "OKR progress tracking"
+    data: "Weekly key result progress vs target with Natural curve and markers"
+  - context: "Release milestone monitoring"
+    data: "Version v1.4 daily completion % with circle markers on actual progress"
+
+composesWith:
+  - "line-chart-two (budget vs actual with similar comparison concept)"
+  - "line-chart-three (period comparison with dashed secondary)"
+  - "Progress dashboard layout (DSE composition)"
+
+avoid:
+  - "Omitting undefined support -- incomplete periods must render as gaps"
+  - "Using MonotoneX instead of Natural -- Natural curve better fits progress data"
+  - "Removing circle markers from current pace -- they mark completed checkpoints"
+  - "Solid line for expected pace -- dashed line clearly separates actual from target"
+  - "Using useResponsiveHeight here -- 320px fixed height is intentional for this card"
+
+derivation:
+  source: "nuxt-charts/line-charts/linecharts-chart-ten"
+  method: "structural-abstraction"
+  what-was-kept: >
+    Milestone execution concept with 'Current pace' vs 'Expected pace', Natural
+    CurveType, circle markers (size 8, var(--ui-primary)) on current pace only,
+    lineDashArray [[], [5,5]] for dashed expected, yFormatter producing '%' suffix,
+    xFormatter mapping to day names, fixed height 320px, LegendPosition.BottomCenter,
+    UBadge tags ('Weekly', 'v1.4') in header, check-circle-2 icon with '+2%'
+    text-primary progress indicator, xGridLine=false, undefined value support
+    for Sunday (incomplete), scoped CSS controlling vis-line-path stroke-width.
+  what-was-removed: >
+    Hardcoded 7-day data, CSS variable color values, static badge text,
+    scoped style selectors targeting specific stroke colors.
+  transformative-value: >
+    Unique milestone/progress tracking pattern with Natural curves, selective
+    markers, undefined-gap support, and badge-tagged header. Only pattern
+    supporting incomplete data visualization.

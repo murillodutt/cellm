@@ -1,0 +1,107 @@
+# Block Pattern: Progress Bar Cards
+id: progress-bar-cards
+name: KPI Cards with Progress Bar
+version: "1.0.0"
+catalogRef: progress-bar-cards
+category: kpi
+tags: [progress-bar, weekly, metrics, percentage, kpi]
+archetype: layout-heavy
+description: >
+  KPI card showing a label, large value, computed percentage, progress/total
+  breakdown, and a UProgress bar. Optional footer with a ghost action button.
+  Progress percentage is auto-computed from progress and total props.
+
+requires:
+  components: [UCard, UProgress, UButton]
+  charts: []
+  composables: []
+
+props:
+  interface: |
+    interface ProgressBarCardItem {
+      label: string
+      value: string | number
+      progress: number
+      total: number
+      button?: { label: string; icon: string }
+    }
+    interface ProgressBarCardsProps {
+      cards: ProgressBarCardItem[]
+    }
+
+emits:
+  interface: |
+    interface ProgressBarCardsEmits {
+      'card:action': [label: string]
+      'card:click': [label: string]
+    }
+
+layout:
+  structure: |
+    card-grid (responsive columns)
+      card-shell (repeat per card)
+        label (muted, small)
+        value (xl, bold)
+        progress-info-row
+          left: computed-percentage (toned, xs)
+          right: progress-of-total ("X of Y", toned, xs)
+        progress-bar (UProgress, v-model percentage)
+        footer (optional, conditional on button prop)
+          action-button (ghost, neutral, trailing icon, right-aligned)
+  responsive:
+    mobile: single column stack
+    tablet: 2-column grid
+    desktop: 3-4 column grid
+
+slots:
+  card: "Override individual card rendering"
+  footer: "Custom footer content per card"
+  progress: "Custom progress visualization"
+
+tokens:
+  card-bg: bg-default
+  label-text: text-muted
+  value-text: text-highlighted
+  progress-info: text-toned
+  progress-bar-fill: bg-primary
+  progress-bar-track: bg-elevated
+  action-text: text-muted
+  footer-padding: "pt-4"
+
+atomicHint:
+  organism: ProgressBarCardGrid
+  molecules: [ProgressBarCard, ProgressInfoRow]
+  atoms: [UProgress, PercentageLabel, ActionButton]
+
+examples:
+  - context: "Weekly sales targets"
+    cards: ["Revenue ($12,500, 85 of 100 deals, View Pipeline)", "Calls (340, 250 of 400 target, View Log)"]
+  - context: "Sprint progress tracking"
+    cards: ["Stories (18, 14 of 20 completed, View Board)", "Bugs (5, 3 of 8 resolved, View Issues)"]
+
+composesWith:
+  - "default-cards (simpler variant without progress)"
+  - "expense-budget (budget-specific progress with trend)"
+  - "Dashboard Page Layout (DSE composition)"
+
+derivation:
+  source: "nuxt-charts/cards/cards-with-progress-bar"
+  method: "structural-abstraction"
+  what-was-kept: >
+    Label + value + computed percentage + UProgress layout, progress/total
+    breakdown row, optional footer button with ghost variant, auto-computed
+    percentage from progress and total, conditional footer rendering.
+  what-was-removed: >
+    All Vue template markup, computed(() => ...) implementation, defineProps
+    destructuring, Tailwind utility classes, v-if/v-bind directives.
+  transformative-value: >
+    Generic progress-toward-goal card. Unlike expense-budget (which uses
+    category colors and inverted trend semantics), this pattern focuses on
+    simple progress tracking with optional action.
+
+avoid:
+  - "Hardcoded percentage — always compute from progress/total"
+  - "Progress exceeding 100% visually — clamp computed percentage"
+  - "Missing progress context — show 'X of Y' alongside percentage"
+  - "Footer without condition — only render when button prop exists"
+  - "Using for budgets — use expense-budget pattern instead"

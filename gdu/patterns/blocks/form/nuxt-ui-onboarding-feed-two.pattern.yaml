@@ -1,0 +1,146 @@
+# Block Pattern: Onboarding Feed Two (Numbered Steps + Progress)
+# Distributable structural specification — no licensed code
+# Generated from catalog ref, not source transcription
+
+id: nuxt-ui-onboarding-feed-two
+name: Getting Started Steps with Progress Bar
+version: "1.0.0"
+catalogRef: nuxt-ui-onboarding-feed-two
+category: form
+tags: [onboarding, progress, getting-started, steps, numbered, checklist]
+
+archetype: form-heavy
+description: >
+  Getting started onboarding with numbered step cards, global progress bar,
+  and step counter (e.g. "Step 1/4"). Each step is a bordered card with
+  completion check or step number, title, and description. Completed steps
+  show primary circle with check icon. Pending steps show numbered label.
+  Header with title + description. Footer with back/continue navigation.
+
+requires:
+  components: [UProgress, UIcon, UButton]
+  charts: []
+  composables: []
+
+props:
+  interface: |
+    interface OnboardingStepTwo {
+      title: string
+      description: string
+      status: 'completed' | 'current' | 'pending'
+    }
+    interface OnboardingFeedTwoProps {
+      steps: OnboardingStepTwo[]
+      title?: string               // default "Getting started"
+      description?: string         // default "Follow the steps to set up your workspace..."
+      backLabel?: string           // default "Back"
+      continueLabel?: string       // default "Continue"
+    }
+
+emits:
+  interface: |
+    interface OnboardingFeedTwoEmits {
+      'step:click': [stepIndex: number]
+      'continue': []
+      'back': []
+      'complete': []
+    }
+
+layout:
+  structure: |
+    container (max-width ~576px, centered, full-width)
+      header-section (mb-4)
+        title [h2, xl, semibold]
+        description [dimmed]
+      progress-section (flex, justify-end, items-center, gap-4, mb-6)
+        step-counter [small text, "Step X/Y"]
+        progress-bar (UProgress, w-48)
+      step-list (flex-col, gap-4)
+        step-card (repeat, border-2 border-default, rounded-lg, p-6, flex, gap-6)
+          indicator-column (shrink-0, mt-0.5)
+            completed: circle (w-6 h-6, bg-primary, border-3, rounded-full)
+              check-icon (white, 14px)
+            pending/current: numbered-label (w-6 h-6, centered, font-medium)
+              text: "{index + 1}."
+          content-column
+            step-title [font-medium, mb-1]
+            step-description [dimmed]
+      navigation-row (flex, justify-end, gap-4, mt-8)
+        back-button (ghost, neutral)
+        continue-button (primary)
+  responsive:
+    mobile: full-width cards, compact padding
+    tablet: centered, comfortable max-width
+    desktop: same as tablet, max-width 576px
+
+slots:
+  header: "Override title and description section"
+  step-indicator: "Custom indicator (check/number) rendering"
+  step-content: "Custom step card content"
+  navigation: "Override back/continue buttons"
+
+tokens:
+  title-text: text-highlighted
+  description-text: text-dimmed
+  step-counter-text: "text-sm"
+  progress-bar-width: w-48
+  step-card-border: "border-2 border-default"
+  step-card-radius: rounded-lg
+  step-card-padding: p-6
+  completed-bg: bg-primary
+  completed-border: "border-3 border-primary"
+  completed-check-color: text-white
+  numbered-label: "font-medium"
+  step-title: "font-medium"
+  step-description: text-dimmed
+  back-variant: ghost
+  continue-color: primary
+
+atomicHint:
+  organism: GettingStartedFeed
+  molecules: [StepCard, ProgressHeader, NavigationBar]
+  atoms: [CompletedCircle, NumberedLabel, StepTitle, StepDescription, ProgressBar, StepCounter]
+
+examples:
+  - context: "SaaS workspace onboarding"
+    steps:
+      - "Set up your organization (completed)"
+      - "Connect to data source (current)"
+      - "Create metrics (pending)"
+      - "Create report (pending)"
+  - context: "Developer getting started"
+    steps:
+      - "Install CLI (completed)"
+      - "Initialize project (current)"
+      - "Deploy to staging (pending)"
+
+composesWith:
+  - "nuxt-ui-onboarding-feed (interactive checklist alternative)"
+  - "nuxt-ui-onboarding-form (wizard alternative)"
+  - "onboarding-wizard (question-based alternative)"
+
+derivation:
+  source: "nuxt-charts/onboarding/nuxt-ui-onboarding-feed-two"
+  method: "structural-abstraction"
+  what-was-kept: >
+    Numbered step cards with status discriminator ('completed'|'current'|'pending'),
+    global UProgress bar with computed progress value, step counter text ("Step 1/4"),
+    bordered card layout (border-2 border-default rounded-lg), completed circle
+    with check icon (same visual as onboarding-feed), numbered labels for pending
+    steps ("{index + 1}."), back/continue navigation buttons, header with title
+    and description, flex gap-6 layout per step card.
+  what-was-removed: >
+    All Vue template markup, progress ref computation, specific step content,
+    v-for iteration, CSS utility classes, step status rendering logic.
+  transformative-value: >
+    Captures the "numbered steps with global progress" onboarding pattern.
+    Distinct from onboarding-feed (no action buttons, has progress bar + numbers).
+    Status discriminator ('completed'|'current'|'pending') drives visual treatment.
+    Progress bar shows overall completion percentage.
+
+avoid:
+  - "Missing progress bar — user must see overall completion progress"
+  - "No step counter text — show Step X/Y alongside progress bar"
+  - "Inconsistent indicator — completed = check circle, pending = number"
+  - "Missing navigation — back/continue buttons required"
+  - "Progress not computed — must derive from completed steps count"

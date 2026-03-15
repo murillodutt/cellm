@@ -1,0 +1,140 @@
+id: line-chart-three
+name: MAU Period Comparison Chart
+version: "1.1.0"
+catalogRef: line-chart-three
+category: visualization
+tags: [line, mau, period-comparison, dashed, metric, selectors, badge, responsive]
+archetype: chart-heavy
+description: >
+  Monthly Active Users (MAU) chart comparing current vs previous period with
+  dashed line for the previous period. Features a UCard with #header template
+  slot containing MAU badge, date label, metric type selector, and date range
+  selector. Hero metric (5.24k) with triangle trend icon and percentage change.
+  Uses MonotoneX curve with dashed grid and bottom-center legend.
+
+requires:
+  components: [UCard, UBadge, UIcon, USelect]
+  charts: [LineChart]
+  composables: [useResponsiveHeight]
+
+props:
+  interface: |
+    interface MAUDataItem {
+      day: number
+      'This period': number
+      'Previous period': number
+    }
+    interface LineChartThreeProps {
+      data: MAUDataItem[]
+      categories: Record<string, BulletLegendItemInterface>
+      metric: string
+      metricChange: string
+      metricTypeOptions?: string[]
+      dateRangeOptions?: string[]
+    }
+
+emits:
+  interface: |
+    interface LineChartThreeEmits {
+      'metricType:change': [type: string]
+      'dateRange:change': [range: string]
+    }
+
+layout:
+  structure: |
+    container (max-w-2xl, mx-auto)
+      card (UCard, rounded-2xl, overflow-hidden)
+        header-slot (#header)
+          toolbar (flex, justify-between, gap-4)
+            left-group (flex, gap-2)
+              category-badge (UBadge, indigo/subtle, sm, font-semibold)
+              date-label (text-muted, font-medium)
+            right-controls (flex, gap-2)
+              metric-select (USelect, neutral/soft, rounded-full)
+              range-select (USelect, neutral/soft, rounded-full)
+        radial-bg-overlay (absolute, pointer-events-none, radial gradient)
+        metric-hero (relative z-10, mb-6)
+          value-row (flex, align-end, gap-3)
+            metric-value (text-5xl, font-bold, tabular-nums, tracking-tight)
+            change-indicator (text-sm, font-semibold, green-400)
+              triangle-icon (UIcon, size-3)
+              change-text
+        chart-area (relative z-10)
+          LineChart (dashed grid, MonotoneX, bottom-center legend, dash array)
+  responsive:
+    mobile: chart height 140px, controls wrap, metric text scales down
+    tablet: chart height 220px, full toolbar
+    desktop: chart height 220px, max-w-2xl centered
+
+slots:
+  header: Override card header toolbar with badge and selectors
+  metric: Override hero metric display
+  chart: Override chart with custom period comparison config
+
+tokens:
+  card-radius: rounded-2xl
+  card-overflow: overflow-hidden
+  badge-color: indigo
+  badge-variant: subtle
+  date-label: text-muted font-medium
+  select-variant: soft
+  select-color: neutral
+  select-radius: rounded-full
+  metric-font: text-5xl font-bold tabular-nums tracking-tight text-default
+  change-color: text-green-400 font-semibold text-sm
+  bg-overlay: "radial-gradient(circle_at_0%_0%, rgba(255,255,255,0.03), transparent 50%)"
+  grid-dash: "--vis-axis-grid-line-dasharray: 5 5"
+
+chartConfig:
+  type: line
+  curveType: MonotoneX
+  yGridLine: true
+  xNumTicks: 6
+  yNumTicks: 4
+  legendPosition: BottomCenter
+  hideLegend: false
+  lineDashArray: [[0], [5]]
+  tooltip: true
+  gridStyle: "dashed via CSS class"
+
+atomicHint:
+  organism: MAUPeriodComparisonCard
+  molecules: [HeaderToolbar, HeroMetric, PeriodComparisonChart]
+  atoms: [CategoryBadge, MetricSelect, DateRangeSelect, TriangleIcon, DashLine]
+
+examples:
+  - context: "Product analytics dashboard"
+    data: "28-day MAU comparison (3500-6100 current vs 3200-5820 previous) with +25% change"
+  - context: "SaaS user engagement"
+    data: "Weekly active users current vs prior period with metric type toggle"
+  - context: "Community growth tracking"
+    data: "Daily active users with period selectors (7/28/90 days)"
+
+composesWith:
+  - "line-chart-two (budget comparison with similar dual-line concept)"
+  - "line-chart-ten (milestone tracking with expected vs actual)"
+  - "Analytics dashboard layout (DSE composition)"
+
+avoid:
+  - "Omitting the dashed line for previous period -- visual differentiation is essential"
+  - "Using same line style for both periods -- lineDashArray must differ"
+  - "Removing metric selectors -- user needs to switch between DAU/WAU/MAU"
+  - "Small metric text -- text-5xl hero metric is the focal point"
+  - "Max width too large -- max-w-2xl keeps the card focused"
+
+derivation:
+  source: "nuxt-charts/line-charts/linecharts-chart-three"
+  method: "structural-abstraction"
+  what-was-kept: >
+    Period comparison concept with 'This period' (solid) vs 'Previous period'
+    (dashed via lineDashArray [[0],[5]]), UCard #header template slot with
+    UBadge (indigo/subtle 'MAU'), metric type USelect and date range USelect
+    (both neutral/soft, rounded-full), hero metric (text-5xl, tabular-nums)
+    with triangle trend icon, radial gradient background overlay, MonotoneX
+    curve, BottomCenter legend, dashed grid CSS class, max-w-2xl container.
+  what-was-removed: >
+    Hardcoded 28-day data array, specific hex colors (#7c6bed, #6b7280),
+    static metric values, date strings.
+  transformative-value: >
+    Reusable period-over-period comparison pattern with hero metric, interactive
+    selectors, and visual line differentiation for analytics dashboards.

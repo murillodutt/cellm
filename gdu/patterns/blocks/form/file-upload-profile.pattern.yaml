@@ -1,0 +1,138 @@
+# Block Pattern: File Upload Profile (Writer/Author Card)
+# Distributable structural specification — no licensed code
+# Generated from catalog ref, not source transcription
+
+id: file-upload-profile
+name: Profile Image Upload with Form
+version: "1.0.0"
+catalogRef: file-upload-profile
+category: form
+tags: [upload, image, profile, avatar, author, form]
+basePattern: file-upload
+
+archetype: form-heavy
+description: >
+  Profile card combining avatar upload with author info form. Left column shows
+  UAvatar with overlay plus button, upload hint text, file size limit, hidden
+  file input, and "Add Image" button. Right column has form fields (author name,
+  title with help icon). Card header with title and close button. Footer with
+  cancel/save actions. Responsive: stacked on mobile, side-by-side on desktop.
+
+requires:
+  components: [UCard, UAvatar, UButton, UIcon, UFormField, UInput]
+  charts: []
+  composables: []
+
+props:
+  interface: |
+    interface FileUploadProfileProps {
+      authorName?: string
+      title?: string                   // job title, default ''
+      maxFileSize?: number             // bytes, default 1MB (1048576)
+      acceptTypes?: string             // default 'image/*'
+      avatarSize?: string              // UAvatar size, default '3xl'
+    }
+
+emits:
+  interface: |
+    interface FileUploadProfileEmits {
+      'file:select': [file: File]
+      'file:error': [message: string]
+      'save': [data: { authorName: string; title: string; file?: File }]
+      'cancel': []
+    }
+
+layout:
+  structure: |
+    card-shell (max-width ~512px, centered)
+      card-header (flex, justify-between)
+        title [h3, semibold, small, "Add a writer"]
+        close-button (ghost, x icon, sm, square)
+      card-body (flex, row on desktop, column on mobile, gap-6)
+        avatar-column (centered, flex-col, items-center, gap-3)
+          avatar-wrapper (relative)
+            avatar (UAvatar, user icon, 3xl size)
+            add-overlay-button (absolute top-right, plus icon, xs, neutral, rounded-full)
+          upload-hint-text
+            label ["Upload image", bold + normal mixed]
+            size-limit [dimmed, xs, "Max file size: 1MB"]
+          hidden-file-input (accept=image/*, hidden)
+          add-image-button (neutral outline, full-width, sm)
+        vertical-divider (hidden md:block, w-px)
+        form-column (flex-1, space-y-4)
+          author-name-field (UFormField, required)
+            input (UInput, placeholder "Enter author name")
+          title-field (UFormField)
+            label-with-help (flex, gap-1, label + circle-help icon)
+            input (UInput, placeholder "Marketing Manager")
+      card-footer (flex, justify-end, gap-2)
+        cancel-button (neutral outline, "Cancel")
+        save-button (primary, "Save Changes")
+  responsive:
+    mobile: stacked columns (avatar above form), full-width
+    tablet: side-by-side with vertical divider
+    desktop: same as tablet, max-width 512px
+
+slots:
+  header: "Override card header with title and close"
+  avatar: "Custom avatar rendering"
+  form-fields: "Additional form fields"
+  actions: "Override footer action buttons"
+
+tokens:
+  card-bg: bg-default
+  header-text: text-highlighted
+  avatar-size: "3xl"
+  overlay-button-position: "absolute -top-1 -right-1"
+  upload-label-bold: font-bold
+  size-limit-text: text-dimmed
+  help-icon: "i-lucide-circle-help"
+  help-icon-size: "w-3.5 h-3.5"
+  divider-display: "hidden md:block"
+  cancel-variant: outline
+  save-color: primary
+
+atomicHint:
+  organism: ProfileUploadCard
+  molecules: [AvatarUploadSection, AuthorFormSection, ActionBar]
+  atoms: [AvatarWithOverlay, UploadHint, SizeLimitText, FormField, HelpIcon]
+
+examples:
+  - context: "Blog author profile creation"
+    fields: ["Author name (required)", "Title (optional)"]
+    maxFileSize: "1MB"
+    acceptTypes: "image/*"
+  - context: "Team member card editor"
+    fields: ["Name", "Role", "Department"]
+
+composesWith:
+  - "file-upload (full drag-drop alternative)"
+  - "file-upload-profile-variant (gallery-based profile image)"
+  - "security-settings (settings page companion)"
+
+derivation:
+  source: "nuxt-charts/file-upload/nuxt-ui-file-upload-profile"
+  method: "structural-abstraction"
+  what-was-kept: >
+    UAvatar with absolute-positioned plus button overlay, hidden file input
+    triggered by click handlers (avatar button + "Add Image" button), file
+    size validation (1MB limit), two-column layout (avatar left, form right)
+    with hidden vertical divider on mobile, UFormField + UInput for author
+    name and title, title field label with circle-help icon, card header with
+    close button (ghost x icon), footer with cancel/save buttons, responsive
+    stacking (flex-col on mobile, flex-row on desktop).
+  what-was-removed: >
+    All Vue template markup, ref bindings (fileInputRef, authorName, title),
+    click handler implementations, file change event processing, console.log
+    statements, CSS utility classes.
+  transformative-value: >
+    Captures the "avatar + form" compound pattern: image upload via hidden
+    input with avatar preview overlay, paired with metadata form fields.
+    Two-column responsive layout with clean mobile stacking.
+
+avoid:
+  - "Visible file input — always hide and trigger via styled button/avatar click"
+  - "No file size validation — enforce maxFileSize before accepting"
+  - "Missing avatar preview — show current/selected image in UAvatar"
+  - "No close/cancel action — modal-style card needs dismissal mechanism"
+  - "Help icons without tooltips — circle-help icon should have accessible tooltip"

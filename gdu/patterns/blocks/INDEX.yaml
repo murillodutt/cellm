@@ -1,0 +1,598 @@
+# Block Patterns Index
+# Manifest for GDU agent discovery of distributable pattern specifications
+
+version: "1.0.0"
+lastUpdated: "2026-03-14"
+totalPatterns: 97
+
+patterns:
+  # ── Monitoring (5) ────────────────────────────────────────
+  - id: contribution-graph
+    file: monitoring/contribution-graph.pattern.yaml
+    category: monitoring
+    tags: ['heatmap', 'activity', 'contributions', 'github']
+    requires: ['UCard', 'UIcon']
+
+  - id: server-heatmap
+    file: monitoring/server-heatmap.pattern.yaml
+    category: monitoring
+    tags: ['heatmap', 'performance', 'server', 'latency']
+    requires: ['UCard', 'UButton', 'UIcon']
+
+  - id: sparkline-metrics
+    file: monitoring/sparkline-metrics.pattern.yaml
+    category: monitoring
+    tags: ['sparkline', 'metrics', 'realtime', 'monitoring']
+    requires: ['UCard', 'UButton', 'UIcon']
+
+  - id: sparkline-table
+    file: monitoring/sparkline-table.pattern.yaml
+    category: monitoring
+    tags: ['table', 'sparkline', 'activity', 'users']
+    requires: ['UCard', 'UTable', 'UAvatar']
+
+  - id: tracker-bar
+    file: monitoring/tracker-bar.pattern.yaml
+    category: monitoring
+    tags: ['tracker', 'uptime', 'status', 'monitoring']
+    requires: ['UCard']
+
+  # ── Kpi (8) ───────────────────────────────────────────────
+  - id: area-chart-cards
+    file: kpi/area-chart-cards.pattern.yaml
+    category: kpi
+    tags: ['area-chart', 'cards', 'score', 'temporal']
+    requires: ['UCard', 'AreaChart']
+
+  - id: default-cards
+    file: kpi/default-cards.pattern.yaml
+    category: kpi
+    tags: ['kpi', 'cards', 'default', 'trend']
+    requires: ['UCard', 'UBadge']
+
+  - id: expense-budget
+    file: kpi/expense-budget.pattern.yaml
+    category: kpi
+    tags: ['budget', 'expense', 'progress-bar', 'trend']
+    requires: ['UCard', 'UBadge', 'UProgress']
+
+  - id: expense-budget-cards-boxed
+    file: kpi/expense-budget-cards-boxed.pattern.yaml
+    category: kpi
+    tags: ['budget', 'expense', 'progress-bar', 'boxed']
+    requires: ['UCard', 'UBadge', 'UProgress']
+
+  - id: mini-chart-cards
+    file: kpi/mini-chart-cards.pattern.yaml
+    category: kpi
+    tags: ['mini-chart', 'sparkline', 'kpi', 'cards']
+    requires: ['UCard', 'AreaChart', 'BarChart', 'LineChart']
+
+  - id: progress-bar-cards
+    file: kpi/progress-bar-cards.pattern.yaml
+    category: kpi
+    tags: ['progress-bar', 'weekly', 'metrics', 'percentage']
+    requires: ['UCard', 'UProgress']
+
+  - id: progress-circle
+    file: kpi/progress-circle.pattern.yaml
+    category: kpi
+    tags: ['progress', 'circle', 'donut', 'percentage']
+    requires: ['UCard']
+
+  - id: stats-cards
+    file: kpi/stats-cards.pattern.yaml
+    category: kpi
+    tags: ['stats', 'hero', 'bar-chart', 'action']
+    requires: ['UCard', 'UButton', 'BarChart']
+
+  # ── Visualization (41) ─────────────────────────────────────
+  - id: area-chart-data
+    file: visualization/area-chart-data.pattern.yaml
+    category: visualization
+    tags: ['area', 'chart', 'data', 'table']
+    requires: ['UCard', 'AreaChart']
+
+  - id: area-chart-eight
+    file: visualization/area-chart-eight.pattern.yaml
+    category: visualization
+    tags: ['area', 'chart', 'sparkline']
+    requires: ['UCard', 'AreaChart']
+
+  - id: area-chart-five
+    file: visualization/area-chart-five.pattern.yaml
+    category: visualization
+    tags: ['area', 'chart', 'minimal']
+    requires: ['UCard', 'AreaChart']
+
+  - id: area-chart-four
+    file: visualization/area-chart-four.pattern.yaml
+    category: visualization
+    tags: ['area', 'chart', 'comparison']
+    requires: ['UCard', 'AreaChart']
+
+  - id: area-chart-gradient
+    file: visualization/area-chart-gradient.pattern.yaml
+    category: visualization
+    tags: ['area', 'chart', 'gradient', 'tooltip']
+    requires: ['UCard', 'AreaChart']
+
+  - id: area-chart-nine
+    file: visualization/area-chart-nine.pattern.yaml
+    category: visualization
+    tags: ['area', 'chart', 'metrics']
+    requires: ['UCard', 'AreaChart']
+
+  - id: area-chart-preview
+    file: visualization/area-chart-preview.pattern.yaml
+    category: visualization
+    tags: ['area', 'chart', 'preview', 'responsive']
+    requires: ['UCard', 'AreaChart']
+
+  - id: area-chart-seven
+    file: visualization/area-chart-seven.pattern.yaml
+    category: visualization
+    tags: ['area', 'chart', 'interactive']
+    requires: ['UCard', 'AreaChart']
+
+  - id: area-chart-six
+    file: visualization/area-chart-six.pattern.yaml
+    category: visualization
+    tags: ['area', 'chart', 'dark']
+    requires: ['UCard', 'AreaChart']
+
+  - id: area-chart-ten
+    file: visualization/area-chart-ten.pattern.yaml
+    category: visualization
+    tags: ['area', 'chart', 'custom']
+    requires: ['UCard', 'AreaChart']
+
+  - id: area-chart-three
+    file: visualization/area-chart-three.pattern.yaml
+    category: visualization
+    tags: ['area', 'chart', 'multi-series']
+    requires: ['UCard', 'AreaChart']
+
+  - id: area-chart-two
+    file: visualization/area-chart-two.pattern.yaml
+    category: visualization
+    tags: ['area', 'chart', 'stacked']
+    requires: ['UCard', 'AreaChart']
+
+  - id: bar-chart-eight
+    file: visualization/bar-chart-eight.pattern.yaml
+    category: visualization
+    tags: ['bar', 'negative', 'diverging', 'positive']
+    requires: ['UCard', 'BarChart']
+
+  - id: bar-chart-eleven
+    file: visualization/bar-chart-eleven.pattern.yaml
+    category: visualization
+    tags: ['bar', 'stacked', 'percentage', 'normalized']
+    requires: ['UCard', 'BarChart']
+
+  - id: bar-chart-five
+    file: visualization/bar-chart-five.pattern.yaml
+    category: visualization
+    tags: ['bar', 'horizontal', 'ranking', 'categories']
+    requires: ['UCard', 'BarChart']
+
+  - id: bar-chart-grouped
+    file: visualization/bar-chart-grouped.pattern.yaml
+    category: visualization
+    tags: ['bar', 'grouped', 'comparison', 'categories']
+    requires: ['UCard', 'BarChart']
+
+  - id: bar-chart-nine
+    file: visualization/bar-chart-nine.pattern.yaml
+    category: visualization
+    tags: ['bar', 'rounded', 'styled', 'vertical']
+    requires: ['UCard', 'BarChart']
+
+  - id: bar-chart-one
+    file: visualization/bar-chart-one.pattern.yaml
+    category: visualization
+    tags: ['bar', 'basic', 'single-series', 'vertical']
+    requires: ['UCard', 'BarChart']
+
+  - id: bar-chart-seven
+    file: visualization/bar-chart-seven.pattern.yaml
+    category: visualization
+    tags: ['bar', 'waterfall', 'cumulative', 'delta']
+    requires: ['UCard', 'BarChart']
+
+  - id: bar-chart-six
+    file: visualization/bar-chart-six.pattern.yaml
+    category: visualization
+    tags: ['bar', 'multi-series', 'comparison', 'legend']
+    requires: ['UCard', 'BarChart']
+
+  - id: bar-chart-stacked
+    file: visualization/bar-chart-stacked.pattern.yaml
+    category: visualization
+    tags: ['bar', 'stacked', 'multi-series', 'composition']
+    requires: ['UCard', 'BarChart']
+
+  - id: bar-chart-ten
+    file: visualization/bar-chart-ten.pattern.yaml
+    category: visualization
+    tags: ['bar', 'gradient', 'color', 'vertical']
+    requires: ['UCard', 'BarChart']
+
+  - id: bar-chart-twelve
+    file: visualization/bar-chart-twelve.pattern.yaml
+    category: visualization
+    tags: ['bar', 'mixed', 'line', 'combo']
+    requires: ['UCard', 'BarChart']
+
+  - id: bar-chart-two
+    file: visualization/bar-chart-two.pattern.yaml
+    category: visualization
+    tags: ['bar', 'progress', 'horizontal']
+    requires: ['UCard', 'BarChart']
+
+  - id: donut-chart-four
+    file: visualization/donut-chart-four.pattern.yaml
+    category: visualization
+    tags: ['donut', 'interactive', 'tooltip', 'hover']
+    requires: ['UCard', 'DonutChart']
+
+  - id: donut-chart-interactive
+    file: visualization/donut-chart-interactive.pattern.yaml
+    category: visualization
+    tags: ['donut', 'interactive', 'click', 'center-label']
+    requires: ['UCard', 'DonutChart']
+
+  - id: donut-chart-legend
+    file: visualization/donut-chart-legend.pattern.yaml
+    category: visualization
+    tags: ['donut', 'basic', 'pie', 'legend']
+    requires: ['UCard', 'DonutChart']
+
+  - id: donut-chart-three
+    file: visualization/donut-chart-three.pattern.yaml
+    category: visualization
+    tags: ['donut', 'gradient', 'colored', 'multi-segment']
+    requires: ['UCard', 'DonutChart']
+
+  - id: donut-chart-two
+    file: visualization/donut-chart-two.pattern.yaml
+    category: visualization
+    tags: ['donut', 'center-label', 'total', 'percentage']
+    requires: ['UCard', 'DonutChart']
+
+  - id: donut-visitors-analytics
+    file: visualization/donut-visitors-analytics.pattern.yaml
+    category: visualization
+    tags: ['donut', 'analytics', 'visitors', 'ratio']
+    requires: ['UCard', 'DonutChart']
+
+  - id: donut-with-radius
+    file: visualization/donut-with-radius.pattern.yaml
+    category: visualization
+    tags: ['donut', 'ring', 'radius', 'customizable']
+    requires: ['UCard', 'DonutChart']
+
+  - id: line-chart-eight
+    file: visualization/line-chart-eight.pattern.yaml
+    category: visualization
+    tags: ['line', 'dotted', 'markers', 'points']
+    requires: ['UCard', 'LineChart']
+
+  - id: line-chart-five
+    file: visualization/line-chart-five.pattern.yaml
+    category: visualization
+    tags: ['line', 'stepped', 'discrete', 'threshold']
+    requires: ['UCard', 'LineChart']
+
+  - id: line-chart-multi
+    file: visualization/line-chart-multi.pattern.yaml
+    category: visualization
+    tags: ['line', 'multi-line', 'comparison', 'overlay']
+    requires: ['UCard', 'LineChart']
+
+  - id: line-chart-nine
+    file: visualization/line-chart-nine.pattern.yaml
+    category: visualization
+    tags: ['line', 'dual-axis', 'comparison', 'secondary']
+    requires: ['UCard', 'LineChart']
+
+  - id: line-chart-one
+    file: visualization/line-chart-one.pattern.yaml
+    category: visualization
+    tags: ['line', 'basic', 'single-series', 'temporal']
+    requires: ['UCard', 'LineChart']
+
+  - id: line-chart-seven
+    file: visualization/line-chart-seven.pattern.yaml
+    category: visualization
+    tags: ['line', 'smooth', 'curved', 'trend']
+    requires: ['UCard', 'LineChart']
+
+  - id: line-chart-six
+    file: visualization/line-chart-six.pattern.yaml
+    category: visualization
+    tags: ['line', 'area', 'stacked', 'multi-series']
+    requires: ['UCard', 'LineChart']
+
+  - id: line-chart-ten
+    file: visualization/line-chart-ten.pattern.yaml
+    category: visualization
+    tags: ['line', 'realtime', 'live', 'streaming']
+    requires: ['UCard', 'LineChart']
+
+  - id: line-chart-three
+    file: visualization/line-chart-three.pattern.yaml
+    category: visualization
+    tags: ['line', 'gradient', 'area', 'color']
+    requires: ['UCard', 'LineChart']
+
+  - id: line-chart-two
+    file: visualization/line-chart-two.pattern.yaml
+    category: visualization
+    tags: ['line', 'area', 'fill', 'temporal']
+    requires: ['UCard', 'LineChart']
+
+  # ── Data (6) ──────────────────────────────────────────────
+  - id: api-monitor
+    file: data/api-monitor.pattern.yaml
+    category: data
+    tags: ['api', 'monitor', 'performance', 'latency']
+    requires: ['UCard', 'UBadge']
+
+  - id: bar-list-ranked
+    file: data/bar-list-ranked.pattern.yaml
+    category: data
+    tags: ['bar-list', 'ranking', 'top-pages', 'horizontal']
+    requires: ['UCard', 'UButton']
+
+  - id: category-cards
+    file: data/category-cards.pattern.yaml
+    category: data
+    tags: ['category', 'stacked-bar', 'distribution', 'legend']
+    requires: ['UCard']
+
+  - id: conversion-funnel
+    file: data/conversion-funnel.pattern.yaml
+    category: data
+    tags: ['funnel', 'conversion', 'drop-off', 'steps']
+    requires: ['UCard', 'UButton', 'USelect']
+
+  - id: orders-overview
+    file: data/orders-overview.pattern.yaml
+    category: data
+    tags: ['orders', 'table', 'overview', 'progress']
+    requires: ['UCard', 'UButton']
+
+  - id: progress-overview
+    file: data/progress-overview.pattern.yaml
+    category: data
+    tags: ['progress', 'overview', 'percentage', 'status-breakdown']
+    requires: ['UCard']
+
+  # ── Navigation (8) ────────────────────────────────────────
+  - id: integration-cards
+    file: navigation/integration-cards.pattern.yaml
+    category: navigation
+    tags: ['integration', 'service', 'connector', 'enable']
+    requires: ['UCard', 'UButton', 'UAvatar']
+
+  - id: integration-cards-variant
+    file: navigation/integration-cards-variant.pattern.yaml
+    category: navigation
+    tags: ['integration', 'service', 'installs', 'marketplace']
+    requires: ['UCard', 'UButton', 'UAvatar', 'UBadge']
+
+  - id: navbar-toolbar
+    file: navigation/navbar-toolbar.pattern.yaml
+    category: navigation
+    tags: ['navbar', 'dashboard', 'tabs', 'toolbar']
+    requires: ['UDashboardNavbar', 'UDashboardToolbar', 'UNavigationMenu', 'UBreadcrumb', 'UButton']
+
+  - id: navbar-variant-one
+    file: navigation/navbar-variant-one.pattern.yaml
+    category: navigation
+    tags: ['navbar', 'dashboard', 'breadcrumb', 'actions']
+    requires: ['UDashboardNavbar', 'UBreadcrumb', 'UDropdownMenu', 'UButton']
+
+  - id: navbar-variant-two
+    file: navigation/navbar-variant-two.pattern.yaml
+    category: navigation
+    tags: ['navbar', 'dashboard', 'nav-links', 'upgrade']
+    requires: ['UDashboardNavbar', 'UBreadcrumb', 'UButton']
+
+  - id: navbar-with-search
+    file: navigation/navbar-with-search.pattern.yaml
+    category: navigation
+    tags: ['navbar', 'dashboard', 'search', 'toolbar']
+    requires: ['UDashboardNavbar', 'UDashboardToolbar', 'UBreadcrumb', 'UInput', 'UButton']
+
+  - id: stepper
+    file: navigation/stepper.pattern.yaml
+    category: navigation
+    tags: ['stepper', 'progress', 'steps', 'workflow']
+    requires: ['UCard', 'UIcon']
+
+  - id: team-cards
+    file: navigation/team-cards.pattern.yaml
+    category: navigation
+    tags: ['team', 'avatars', 'members', 'organization']
+    requires: ['UCard', 'UAvatarGroup']
+
+  # ── Form (18) ──────────────────────────────────────────────
+  - id: basic-sign-in
+    file: auth/basic-sign-in.pattern.yaml
+    category: form
+    tags: ['auth', 'sign-in', 'login', 'credentials']
+    requires: ['UCard', 'UAuthForm', 'UButton']
+
+  - id: calendar-multi-month
+    file: form/calendar-multi-month.pattern.yaml
+    category: form
+    tags: ['calendar', 'multi-month', 'range', 'date']
+    requires: ['UCard']
+
+  - id: date-picker
+    file: form/date-picker.pattern.yaml
+    category: form
+    tags: ['calendar', 'date', 'picker', 'input']
+    requires: ['UCard', 'UButton', 'UPopover']
+
+  - id: date-range-picker
+    file: form/date-range-picker.pattern.yaml
+    category: form
+    tags: ['calendar', 'date', 'range', 'picker']
+    requires: ['UCard']
+
+  - id: file-upload
+    file: form/file-upload.pattern.yaml
+    category: form
+    tags: ['file', 'upload', 'drag-drop', 'gallery']
+    requires: ['UCard', 'UButton', 'UIcon', 'UProgress']
+
+  - id: file-upload-profile
+    file: form/file-upload-profile.pattern.yaml
+    category: form
+    tags: ['upload', 'image', 'profile', 'avatar']
+    requires: ['UCard']
+
+  - id: file-upload-profile-variant
+    file: form/file-upload-profile-variant.pattern.yaml
+    category: form
+    tags: ['upload', 'image', 'gallery', 'variant']
+    requires: ['UCard']
+
+  - id: nuxt-ui-onboarding-feed
+    file: form/nuxt-ui-onboarding-feed.pattern.yaml
+    category: form
+    tags: ['onboarding', 'checklist', 'steps', 'feed']
+    requires: ['UIcon', 'UButton']
+
+  - id: nuxt-ui-onboarding-feed-two
+    file: form/nuxt-ui-onboarding-feed-two.pattern.yaml
+    category: form
+    tags: ['onboarding', 'progress', 'getting-started']
+    requires: ['UCard', 'UProgress', 'UIcon', 'UButton']
+
+  - id: nuxt-ui-onboarding-form
+    file: form/nuxt-ui-onboarding-form.pattern.yaml
+    category: form
+    tags: ['onboarding', 'wizard', 'options', 'search']
+    requires: ['UCard', 'UButton']
+
+  - id: onboarding
+    file: form/onboarding.pattern.yaml
+    category: form
+    tags: ['onboarding', 'setup', 'wizard', 'steps']
+    requires: ['UCard']
+
+  - id: onboarding-wizard
+    file: form/onboarding-wizard.pattern.yaml
+    category: form
+    tags: ['onboarding', 'questions', 'stepper', 'radio']
+    requires: ['UCard', 'UProgress', 'URadioGroup', 'UButton']
+
+  - id: otp-verification
+    file: form/otp-verification.pattern.yaml
+    category: form
+    tags: ['auth', 'otp', 'verification', 'security']
+    requires: ['UCard']
+
+  - id: password-reset
+    file: form/password-reset.pattern.yaml
+    category: form
+    tags: ['auth', 'password', 'reset', 'recovery']
+    requires: ['UCard']
+
+  - id: profile-settings
+    file: form/profile-settings.pattern.yaml
+    category: form
+    tags: ['profile', 'settings', 'avatar', 'account']
+    requires: ['UCard']
+
+  - id: security-settings
+    file: form/security-settings.pattern.yaml
+    category: form
+    tags: ['security', 'settings', 'password', '2fa']
+    requires: ['UCard']
+
+  - id: sign-up
+    file: form/sign-up.pattern.yaml
+    category: form
+    tags: ['auth', 'sign-up', 'registration', 'onboarding']
+    requires: ['UCard']
+
+  - id: social-login
+    file: form/social-login.pattern.yaml
+    category: form
+    tags: ['auth', 'social', 'oauth', 'sign-in']
+    requires: ['UCard']
+
+  # ── Ai (3) ────────────────────────────────────────────────
+  - id: ai-dashboard
+    file: ai/ai-dashboard.pattern.yaml
+    category: ai
+    tags: ['ai', 'prompt', 'dashboard', 'model-selector']
+    requires: ['UCard', 'UButton', 'USelect', 'UTextarea']
+
+  - id: ai-interface
+    file: ai/ai-interface.pattern.yaml
+    category: ai
+    tags: ['ai', 'interface', 'helper', 'actions']
+    requires: ['UCard', 'UButton']
+
+  - id: chat-interface
+    file: ai/chat-interface.pattern.yaml
+    category: ai
+    tags: ['ai', 'chat', 'interface', 'messages']
+    requires: ['UCard', 'UInput', 'UButton', 'UAvatar']
+
+  # ── Layout (2) ────────────────────────────────────────────
+  - id: pricing-plan
+    file: layout/pricing-plan.pattern.yaml
+    category: layout
+    tags: ['pricing', 'plan', 'tier', 'subscription']
+    requires: ['UCard']
+
+  - id: pricing-section
+    file: layout/pricing-section.pattern.yaml
+    category: layout
+    tags: ['pricing', 'plan', 'subscription', 'comparison']
+    requires: ['UCard']
+
+  # ── Template (6) ──────────────────────────────────────────
+  - id: nuxt-clean-gray
+    file: templates/nuxt-clean-gray.pattern.yaml
+    category: template
+    tags: ['template', 'gray', 'clean', 'neutral']
+    requires: ['UCard']
+
+  - id: nuxt-dashboard-3
+    file: templates/nuxt-dashboard-3.pattern.yaml
+    category: template
+    tags: ['template', 'dashboard', 'complete', 'starter']
+    requires: ['UCard']
+
+  - id: nuxt-ecommerce
+    file: templates/nuxt-ecommerce.pattern.yaml
+    category: template
+    tags: ['template', 'ecommerce', 'shop', 'products']
+    requires: ['UCard']
+
+  - id: nuxt-planner
+    file: templates/nuxt-planner.pattern.yaml
+    category: template
+    tags: ['template', 'planner', 'task', 'calendar']
+    requires: ['UCard']
+
+  - id: nuxt-shadcnui-flat
+    file: templates/nuxt-shadcnui-flat.pattern.yaml
+    category: template
+    tags: ['template', 'flat', 'shadcn', 'minimal']
+    requires: ['UCard']
+
+  - id: nuxt-simplistic
+    file: templates/nuxt-simplistic.pattern.yaml
+    category: template
+    tags: ['template', 'simplistic', 'minimal', 'clean']
+    requires: ['UCard']

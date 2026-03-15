@@ -1,0 +1,136 @@
+id: bar-chart-six
+name: Multi-Series Bar Chart with Legend
+version: 1.0.0
+catalogRef: bar-chart-six
+category: visualization
+tags:
+  - bar
+  - multi-series
+  - comparison
+  - legend
+  - monthly
+basePattern: bar-chart-grouped
+archetype: chart-heavy
+description: >
+  Multi-series grouped vertical bar chart with built-in legend for comparing
+  two or more data series over time. Minimal card wrapper with header title,
+  zero group padding for tight bar clusters, and y-grid lines.
+
+requires:
+  components: [UCard]
+  charts: [BarChart]
+  composables: [useResponsiveHeight]
+
+props:
+  interface: |
+    interface RevenueDataPoint {
+      month: string
+      desktop: number
+      mobile: number
+    }
+    interface BarChartSixProps {
+      data: RevenueDataPoint[]
+      categories: Record<string, BulletLegendItemInterface>
+      title?: string
+      xNumTicks?: number
+      radius?: number
+      groupPadding?: number
+      barPadding?: number
+    }
+
+emits:
+  interface: |
+    interface BarChartSixEmits {
+      'bar:click': [month: string, series: string, value: number]
+      'legend:toggle': [series: string, visible: boolean]
+    }
+
+layout:
+  structure: |
+    card-shell (max-w-3xl)
+      header (UCard #header slot)
+        title (text-lg font-semibold)
+      chart-area
+        BarChart (grouped, vertical, built-in legend top-right, y-grid)
+  responsive:
+    mobile: chart height 120px, 6 x-ticks
+    tablet: chart height 240px, full legend
+    desktop: max-w-3xl centered
+
+slots:
+  header: Override card header title
+  chart: Override chart rendering
+  footer: Add optional footer content
+
+tokens:
+  card-bg: bg-default
+  title-text: text-lg font-semibold
+  series-a: color-success
+  series-b: bg-accented
+  bar-radius: radius-4
+  group-padding: "0"
+  bar-padding: "0.2"
+  y-grid: visible
+  legend-position: top-right
+
+chartConfig:
+  type: bar
+  orientation: vertical
+  stacked: false
+  radius: 4
+  groupPadding: 0
+  barPadding: 0.2
+  xNumTicks: 6
+  hideLegend: false
+  legendPosition: TopRight
+  yGridLine: true
+  tooltip: true
+  legend: true
+  xAxis: true
+  yAxis: true
+
+atomicHint:
+  organism: MultiSeriesBarChartCard
+  molecules:
+    - MinimalCardHeader (title-only in UCard header slot)
+    - GroupedBarChart (tight clusters with built-in legend)
+    - BuiltInLegend (chart-native legend top-right)
+  atoms:
+    - GroupedBarCluster
+    - LegendEntry
+    - GridLine
+
+examples:
+  - context: Desktop vs Mobile revenue by month
+    data: "12 months x desktop, mobile (grouped bars, legend toggleable)"
+    usage: Revenue comparison dashboard showing platform performance over time
+  - context: Online vs In-store sales
+    data: "Monthly channels comparison with built-in legend for quick toggling"
+    usage: Retail analytics showing channel contribution trends
+
+composesWith:
+  - bar-chart-grouped (base grouped pattern)
+  - bar-chart-stacked (alternative stacked composition view)
+  - bar-chart-two (dual-series with custom legend variant)
+
+derivation:
+  source: nuxt-charts/bar-charts/bar-chart-six
+  method: structural-abstraction
+  what-was-kept: >
+    Multi-series grouped bars with zero group padding for tight clustering,
+    built-in chart legend at TopRight (not hidden), y-grid lines, minimal
+    card header with title only, radius 4 for subtle rounding, computed
+    categories with named colors.
+  what-was-removed: >
+    All Vue template markup, hardcoded RevenueData array, specific series
+    colors, xFormatter, CSS classes.
+  transformative-value: >
+    Clean multi-series comparison with built-in legend. Zero group padding
+    creates tight visual clusters that emphasize per-category comparison.
+
+avoid:
+  - Hiding the legend — built-in legend is the defining trait vs bar-chart-two
+  - Large group padding — zero padding creates the tight cluster visual
+  - Stacking — use bar-chart-stacked for composition analysis
+  - Complex headers — this pattern uses minimal title-only header
+  - More than 3 series — clusters become too narrow to read

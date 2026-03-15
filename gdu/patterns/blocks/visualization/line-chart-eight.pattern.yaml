@@ -1,0 +1,129 @@
+id: line-chart-eight
+name: Climate Trends Dual-Axis Chart
+version: "1.1.0"
+catalogRef: line-chart-eight
+category: visualization
+tags: [line, climate, dual-axis, temperature, rainfall, sensor, regional, responsive]
+archetype: chart-heavy
+description: >
+  Climate trends dual-axis line chart comparing temperature and rainfall with
+  distinct color coding (red for temperature, blue for precipitation). Features
+  dual y-axis via yAxis array, TopRight legend, live sensor indicator with
+  blue animated dot, and "Regional Reports" action button with thermometer
+  icon. Variant of line-chart-one with different color scheme and emphasis.
+
+requires:
+  components: [UCard, UButton, UIcon]
+  charts: [LineChart]
+  composables: [useResponsiveHeight]
+
+props:
+  interface: |
+    interface ClimateData {
+      month: string
+      Temperature: number
+      Precipitation: number
+    }
+    interface LineChartEightProps {
+      data: Ref<ClimateData[]>
+      categories: Record<string, BulletLegendItemInterface>
+      title?: string
+      subtitle?: string
+      yAxisKeys?: string[]
+    }
+
+emits:
+  interface: |
+    interface LineChartEightEmits {
+      'regional-reports': []
+      'data:update': [newData: ClimateData[]]
+    }
+
+layout:
+  structure: |
+    card-shell (UCard)
+      content-stack (space-y-6)
+        header
+          title (text-lg, font-medium)
+          subtitle (text-muted, text-sm)
+        chart-card (UCard, nested)
+          LineChart (dual y-axis, grid, TopRight legend, radius=3)
+        footer (flex, justify-between)
+          sensor-indicator (flex, gap-2)
+            animated-dot (bg-blue-500, animate-pulse)
+            label (text-muted, "Live Sensor Data")
+          regional-button (UButton, ghost, neutral, thermometer icon, trailing)
+  responsive:
+    mobile: chart height 120px, stacked footer
+    tablet: chart height 240px, inline footer
+    desktop: chart height 240px, spacious
+
+slots:
+  header: Override title and subtitle
+  chart: Override dual-axis chart configuration
+  footer: Override sensor indicator and action
+
+tokens:
+  card-bg: bg-default
+  title-font: text-lg font-medium
+  subtitle-color: text-muted text-sm
+  temp-color: text-red-500
+  rain-color: text-blue-500
+  sensor-dot: bg-blue-500 h-2 w-2 animate-pulse rounded-full
+  sensor-label: text-muted
+  button-variant: ghost
+  button-color: neutral
+
+chartConfig:
+  type: line
+  yAxis: ["Temperature", "Precipitation"]
+  stacked: false
+  radius: 3
+  groupPadding: 0.2
+  barPadding: 0.2
+  xGridLine: true
+  yGridLine: true
+  yNumTicks: 4
+  legendPosition: TopRight
+  tooltip: true
+  xFormatter: "custom function extracting month from data array"
+
+atomicHint:
+  organism: ClimateTrendsCard
+  molecules: [HeaderBlock, DualAxisChart, SensorIndicatorFooter]
+  atoms: [DualYAxis, TempColorLine, RainColorLine, SensorDot, ThermometerButton]
+
+examples:
+  - context: "Regional climate monitoring"
+    data: "7-month temp (4-29 C, red) vs rainfall (15-85 mm, blue) with sensor status"
+  - context: "Agricultural weather station"
+    data: "Temperature and precipitation dual-axis with regional report drill-down"
+  - context: "HVAC monitoring dashboard"
+    data: "Indoor temp vs humidity with distinct color-coded axes"
+
+composesWith:
+  - "line-chart-one (same domain, different color scheme -- green/amber)"
+  - "line-chart-five (multi-city temperature without dual axis)"
+  - "Environmental monitoring dashboard (DSE composition)"
+
+avoid:
+  - "Single axis for temperature and precipitation -- scales differ by 10x+"
+  - "Same color for both series -- red (temp) vs blue (rain) is the semantic convention"
+  - "Removing the thermometer icon -- it reinforces the climate domain"
+  - "Green for precipitation -- blue is the universal water/rain convention"
+  - "Fixed chart height -- use useResponsiveHeight"
+
+derivation:
+  source: "nuxt-charts/line-charts/linecharts-chart-eight"
+  method: "structural-abstraction"
+  what-was-kept: >
+    Climate trends concept with dual y-axis ['Temperature', 'Precipitation'],
+    semantic color coding (red #ef4444 for temp, blue #3b82f6 for rain),
+    radius=3, groupPadding/barPadding=0.2, LegendPosition.TopRight, blue
+    animated sensor dot (bg-blue-500), "Regional Reports" button with
+    i-lucide-thermometer trailing icon, longer subtitle describing comparison.
+  what-was-removed: >
+    Hardcoded 7-month data, specific hex colors, static title text.
+  transformative-value: >
+    Climate-focused dual-axis pattern with semantic color conventions (red=heat,
+    blue=water), regional drill-down action, and live sensor indicator.

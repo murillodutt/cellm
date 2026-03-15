@@ -1,0 +1,134 @@
+# Block Pattern: Basic Sign In
+# Distributable structural specification — no licensed code
+# Generated from catalog ref, not source transcription
+
+id: basic-sign-in
+name: Basic Sign In Form
+version: "1.0.0"
+catalogRef: sign-in
+category: form
+tags: [auth, sign-in, login, credentials, form]
+
+archetype: form-heavy
+description: >
+  Centered authentication card with logo, title, field-driven form
+  (email + password via UAuthForm), "forgot password" hint link, submit
+  button, and footer with sign-up redirect. Optionally supports social
+  OAuth provider buttons. Clean, minimal, single-card layout.
+
+requires:
+  components: [UCard, UAuthForm, UButton]
+  charts: []
+  composables: [useToast]
+
+props:
+  interface: |
+    interface AuthField {
+      name: string
+      type: 'email' | 'password' | 'text'
+      label: string
+      placeholder: string
+      required: boolean
+      autocomplete?: string
+    }
+    interface SocialProvider {
+      label: string
+      icon: string
+      color?: string
+      variant?: 'solid' | 'outline' | 'ghost'
+    }
+    interface BasicSignInProps {
+      fields?: AuthField[]          // defaults: email + password
+      title?: string                // default "Welcome Back"
+      description?: string          // default "Enter your email below to login"
+      logo?: string                 // image URL or component name
+      providers?: SocialProvider[]  // optional social login buttons
+      submitLabel?: string          // default "Login"
+      signUpLink?: string           // URL for "Don't have an account?"
+      forgotPasswordLink?: string   // URL for "Forgot password?"
+    }
+
+layout:
+  structure: |
+    page-center-wrapper (centered vertically and horizontally)
+      logo (image, centered above card)
+      card-shell (max-width ~384px, bordered)
+        auth-form (UAuthForm driven)
+          title-slot [title text]
+          description-slot [subtitle text, muted]
+          field-list (rendered from fields array: email, password)
+          password-hint-slot [forgot-password link, right-aligned, small]
+          submit-button (full-width, neutral color)
+          footer-slot [sign-up prompt with link]
+  responsive:
+    mobile: full-width card with padding
+    tablet: centered card, max-width 384px
+    desktop: same as tablet
+
+emits:
+  interface: |
+    interface BasicSignInEmits {
+      'submit': [credentials: { email: string; password: string }]
+      'provider:click': [providerLabel: string]
+    }
+
+slots:
+  description: "Override subtitle below title"
+  password-hint: "Override forgot password link area"
+  footer: "Override sign-up redirect section"
+  providers: "Override social login button group"
+
+tokens:
+  page-bg: bg-default
+  card-bg: bg-default
+  card-border: border-default
+  title-text: text-highlighted
+  description-text: text-muted
+  link-text: text-highlighted
+  link-hover: opacity-80
+  submit-color: neutral
+
+atomicHint:
+  organism: SignInPage
+  molecules: [AuthCard, SocialProviderGroup]
+  atoms: [LogoImage, ForgotPasswordLink, SignUpPrompt]
+
+examples:
+  - context: "SaaS dashboard login"
+    fields: ["Email (email)", "Password (password)"]
+    providers: []
+  - context: "Consumer app with social login"
+    fields: ["Email (email)", "Password (password)"]
+    providers: ["Google", "GitHub", "Apple"]
+
+composesWith:
+  - "Auth Page Layout (full-page centered)"
+  - "Create Account form (sign-up counterpart)"
+  - "Password Reset form (recovery flow)"
+  - "OTP Verification form (2FA step)"
+
+derivation:
+  source: "nuxt-charts/account/basic-sign-in-component"
+  method: "structural-abstraction"
+  what-was-kept: >
+    Layout concept (centered card with logo above), UAuthForm-driven
+    field rendering, slot pattern (description, password-hint, footer),
+    props shape (fields array with type/label/placeholder), toast
+    feedback on submit, sign-up redirect footer pattern.
+  what-was-removed: >
+    All Vue template markup, specific field configurations (bundui.com
+    placeholder), inline styles, hardcoded image URLs (nuxt.com logo),
+    setTimeout mock submit, specific toast message strings, CSS utility
+    class sequences.
+  transformative-value: >
+    Converts a single-variant Vue sign-in component into a configurable
+    pattern supporting optional social providers, custom fields, and
+    flexible slot overrides. Framework-agnostic — implementable with
+    any form library that supports field-driven rendering.
+
+avoid:
+  - "Building custom form fields — use UAuthForm field-driven rendering"
+  - "Hardcoded form action URLs — use event handlers (onSubmit)"
+  - "Missing autocomplete attributes — required for password managers"
+  - "Fixed 2-field layout — support configurable fields array"
+  - "Inline logo URL — accept as prop for reusability"

@@ -1,0 +1,146 @@
+id: bar-chart-two
+name: Dual-Series Comparison Bar Chart
+version: 1.0.0
+catalogRef: bar-chart-two
+category: visualization
+tags:
+  - bar
+  - dual-series
+  - comparison
+  - grouped
+  - daily
+archetype: chart-heavy
+description: >
+  Dual-series grouped vertical bar chart comparing two metrics side-by-side
+  (e.g., Income vs Expense). Card-wrapped with descriptive header, hidden
+  built-in legend replaced by custom dot legend below chart, dashed y-grid.
+
+requires:
+  components: [UCard]
+  charts: [BarChart]
+  composables: [useResponsiveHeight]
+
+props:
+  interface: |
+    interface DailyDataPoint {
+      day: string
+      Income: number
+      Expense: number
+    }
+    interface BarChartTwoProps {
+      data: DailyDataPoint[]
+      categories: Record<string, BulletLegendItemInterface>
+      title?: string
+      subtitle?: string
+      groupPadding?: number
+      barPadding?: number
+    }
+
+emits:
+  interface: |
+    interface BarChartTwoEmits {
+      'bar:hover': [day: string, series: string, value: number]
+      'period:change': [range: string]
+    }
+
+layout:
+  structure: |
+    card-shell (max-w-4xl)
+      header-block (flex-col gap-1)
+        title (text-xl semibold tracking-tight)
+        subtitle (text-sm dimmed)
+      inner-card (UCard default)
+        BarChart (grouped, dashed y-grid, no domain lines, no tick lines)
+      custom-legend (flex centered gap-4)
+        legend-item (repeat per series)
+          color-dot (h-1.5 w-1.5 rounded-full)
+          label (text-muted-foreground)
+  responsive:
+    mobile: chart height 200px, 10 x-ticks, full width
+    tablet: chart height 300px, comfortable padding
+    desktop: max-w-4xl centered
+
+slots:
+  header: Override title and subtitle area
+  chart: Override chart container
+  legend: Override custom legend rendering
+
+tokens:
+  card-bg: bg-default
+  title-text: text-default text-xl font-semibold tracking-tight
+  subtitle-text: text-sm text-dimmed
+  series-primary: text-primary
+  series-secondary: bg-accented
+  legend-dot: h-1.5 w-1.5 rounded-full
+  legend-label: text-muted-foreground
+  grid-dash: "--vis-axis-grid-line-dasharray: 5 5"
+  bar-radius: radius-4
+  bar-padding: "0.4"
+  group-padding: "0.2"
+
+chartConfig:
+  type: bar
+  orientation: vertical
+  stacked: false
+  radius: 4
+  groupPadding: 0.2
+  barPadding: 0.4
+  xNumTicks: 10
+  hideLegend: true
+  xDomainLine: false
+  yDomainLine: false
+  xTickLine: false
+  yTickLine: false
+  xGridLine: false
+  yGridLine: true
+  gridStyle: dashed
+  tooltip: true
+  legend: false
+  xAxis: true
+  yAxis: true
+
+atomicHint:
+  organism: DualSeriesComparisonCard
+  molecules:
+    - DescriptiveHeader (title + subtitle)
+    - GroupedBarContainer (inner card with chart)
+    - CustomDotLegend (manual legend below chart)
+  atoms:
+    - ColorDot
+    - LegendLabel
+    - GroupedBar
+
+examples:
+  - context: Revenue vs Expenses daily tracker
+    data: "12 days x Income, Expense (0-100 range), custom legend below"
+    usage: Financial dashboard comparing inflow vs outflow per day
+  - context: Desktop vs Mobile traffic
+    data: "Daily sessions by platform, grouped bars for direct comparison"
+    usage: Analytics dashboard showing platform performance side-by-side
+
+composesWith:
+  - bar-chart-stacked (alternative stacked composition view)
+  - bar-chart-one (single-series variant for drill-down)
+  - Dashboard Page Layout (DSE composition)
+
+derivation:
+  source: nuxt-charts/bar-charts/bar-chart-two
+  method: structural-abstraction
+  what-was-kept: >
+    Dual-series grouped bars with custom dot legend below chart, hidden built-in
+    legend, dashed y-grid via CSS custom property, no domain lines or tick lines,
+    descriptive header with title + subtitle, useResponsiveHeight, groupPadding
+    and barPadding for visual spacing.
+  what-was-removed: >
+    All Vue template markup, hardcoded DailyData array, specific series colors,
+    xFormatter implementation, CSS dashed class.
+  transformative-value: >
+    A/B comparison pattern with clean visual separation. Custom legend placement
+    below chart avoids cluttering the chart area.
+
+avoid:
+  - Built-in chart legend — this pattern uses custom dot legend below
+  - Stacking these series — grouped layout is the defining comparison concept
+  - Domain lines and tick lines — the clean look relies on removing them
+  - More than 2 series — use bar-chart-five for multi-series ranking
+  - Missing subtitle — the descriptive header provides analytical context

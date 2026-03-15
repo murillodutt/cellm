@@ -1,0 +1,115 @@
+# Block Pattern: Onboarding Wizard
+id: onboarding-wizard
+name: Multi-step Onboarding Question Form
+version: "1.0.0"
+catalogRef: nuxt-ui-questions-form
+category: form
+tags: [onboarding, questions, stepper, radio, progress, wizard]
+archetype: form-heavy
+description: >
+  Multi-step form wizard showing one question per step with radio/checkbox
+  options. Progress bar at top, navigation buttons at bottom. Collects
+  answers across steps and submits on final step.
+
+requires:
+  components: [UCard, UProgress, URadioGroup, UButton]
+  charts: []
+  composables: []
+
+props:
+  interface: |
+    interface WizardOption {
+      label: string
+      value: string
+      description?: string
+      icon?: string
+    }
+    interface WizardStep {
+      question: string
+      description?: string
+      type: 'radio' | 'checkbox' | 'text' | 'select'
+      options?: WizardOption[]
+      required?: boolean
+    }
+    interface OnboardingWizardProps {
+      steps: WizardStep[]
+      title?: string
+      submitLabel?: string
+    }
+
+emits:
+  interface: |
+    interface OnboardingWizardEmits {
+      'submit': [answers: Record<number, string | string[]>]
+      'step:change': [stepIndex: number]
+      'cancel': []
+    }
+
+layout:
+  structure: |
+    card-shell (max-width constrained, centered)
+      progress-bar (UProgress, value = currentStep/totalSteps * 100)
+      step-counter ("Step X of Y", muted)
+      question-area
+        question-text (large, bold)
+        question-description (optional, muted)
+        options-list (by type: URadioGroup, checkboxes, UInput, USelect)
+          option-card (repeat, selectable with highlight on select)
+      navigation-row
+        back-button (disabled on step 1)
+        next-button / submit-button (on last step)
+  responsive:
+    mobile: full-width card, stacked options
+    tablet: centered card, max-width ~512px
+    desktop: same as tablet
+
+slots:
+  question: "Custom question rendering"
+  options: "Custom options rendering per step"
+  navigation: "Override navigation buttons"
+
+tokens:
+  card-bg: bg-default
+  progress-fill: bg-primary
+  question-text: text-highlighted
+  question-description: text-muted
+  option-default-bg: bg-elevated
+  option-selected-bg: "bg-primary/10"
+  option-selected-border: border-primary
+  step-counter: text-muted
+  back-button: neutral
+  next-button: primary
+
+atomicHint:
+  organism: OnboardingWizard
+  molecules: [StepView, OptionList, NavigationBar]
+  atoms: [OptionCard, ProgressIndicator, StepCounter]
+
+examples:
+  - context: "SaaS onboarding"
+    steps: ["What's your role? (radio)", "Team size? (radio)", "Primary goal? (radio)"]
+  - context: "Survey form"
+    steps: ["Rate experience (radio)", "What could improve? (checkbox)", "Additional comments (text)"]
+
+composesWith:
+  - "stepper (progress indicator alternative to progress bar)"
+  - "basic-sign-in (precedes onboarding in auth flow)"
+
+derivation:
+  source: "nuxt-charts/onboarding/nuxt-ui-questions-form"
+  method: "structural-abstraction"
+  what-was-kept: >
+    Multi-step question concept, progress bar, one-question-per-step
+    pattern, radio group options, back/next navigation, step counter.
+  what-was-removed: >
+    All Vue template markup, hardcoded questions/options, step state
+    management logic, specific component props, CSS classes.
+  transformative-value: >
+    Adds multiple question types (radio/checkbox/text/select), structured
+    answers collection, and typed step configuration.
+
+avoid:
+  - "Showing all questions at once — one per step for focus"
+  - "Missing progress indicator — user must know where they are"
+  - "No back navigation — user must be able to revise answers"
+  - "Submitting on non-final step — only submit button on last step"

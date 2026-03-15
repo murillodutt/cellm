@@ -1,0 +1,107 @@
+# Block Pattern: Integration Cards
+id: integration-cards
+name: Service Integration Cards
+version: "1.0.0"
+catalogRef: integration-cards
+category: navigation
+tags: [integration, service, connector, enable, marketplace]
+archetype: layout-heavy
+description: >
+  Grid of service integration cards, each showing a bordered icon container,
+  service name, description, and a full-width action button. Button state
+  toggles between "Connected" (disabled) and "Enable" (active). Outline card
+  variant with vertical layout.
+
+requires:
+  components: [UCard, UButton, UIcon]
+  charts: []
+  composables: []
+
+props:
+  interface: |
+    interface Integration {
+      name: string
+      description: string
+      icon: string
+      status: 'Connected' | 'Enable'
+    }
+    interface IntegrationCardsProps {
+      integrations: Integration[]
+      title?: string
+    }
+
+emits:
+  interface: |
+    interface IntegrationCardsEmits {
+      'integration:enable': [integrationName: string]
+      'integration:click': [integrationName: string]
+    }
+
+layout:
+  structure: |
+    responsive-grid (1/2/3 columns)
+      card-shell (outline variant, flex-col, justify-between, repeat per integration)
+        icon-container (bordered box, size-12, rounded-md, centered icon)
+          service-icon (size-5, muted)
+        content-group (flex-1, mt-5)
+          service-name (sm, font-medium)
+          service-description (sm, muted, leading-6)
+        action-button (block, mt-8, primary solid, disabled when Connected)
+  responsive:
+    mobile: single column
+    tablet: 2-column grid, gap-6
+    desktop: 3-column grid, gap-6
+
+slots:
+  card: "Override individual integration card"
+  icon: "Custom icon rendering per service"
+  action: "Custom action button or toggle"
+
+tokens:
+  card-variant: outline
+  icon-container-bg: bg-default
+  icon-container-border: border-default
+  icon-color: text-muted
+  name-text: text-highlighted
+  description-text: text-muted
+  button-active-color: primary
+  button-active-variant: solid
+  button-disabled-state: "opacity-50, cursor-not-allowed"
+  grid-gap: "gap-6"
+
+atomicHint:
+  organism: IntegrationGrid
+  molecules: [IntegrationCard, IconContainer]
+  atoms: [ServiceIcon, StatusButton, ServiceLabel]
+
+examples:
+  - context: "SaaS integrations page"
+    integrations: ["Google Drive (file sync, Connected)", "Slack (notifications, Connected)", "Notion (docs, Enable)"]
+  - context: "Developer tools marketplace"
+    integrations: ["GitHub (repos, Connected)", "Jira (issues, Enable)", "Figma (design, Enable)"]
+
+composesWith:
+  - "integration-cards-variant (adds install count footer)"
+  - "Dashboard Page Layout (DSE composition)"
+  - "Settings Connectors Section"
+
+derivation:
+  source: "nuxt-charts/cards/integration-cards"
+  method: "structural-abstraction"
+  what-was-kept: >
+    Bordered icon container concept, vertical card layout (icon -> name ->
+    description -> button), outline card variant, status-driven button
+    (Connected=disabled, Enable=active), responsive 1/2/3 grid, block button.
+  what-was-removed: >
+    All Vue template markup, hardcoded integration data (Google Drive, Slack,
+    etc.), specific icon names, v-for directive, UAvatar reference.
+  transformative-value: >
+    Generic service connector card for any integration marketplace.
+    Status-driven button pattern generalizes to any toggle/connect flow.
+
+avoid:
+  - "UAvatar for icons — use bordered UIcon container instead"
+  - "Inline button — must be full-width block button"
+  - "Missing disabled state — Connected integrations must disable button"
+  - "Horizontal card layout — vertical with icon on top is the pattern"
+  - "Hardcoded service data — always accept via integrations prop"

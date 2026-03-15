@@ -1,0 +1,143 @@
+# Block Pattern: Onboarding Feed (Task Checklist)
+# Distributable structural specification — no licensed code
+# Generated from catalog ref, not source transcription
+
+id: nuxt-ui-onboarding-feed
+name: Onboarding Task Checklist Feed
+version: "1.0.0"
+catalogRef: nuxt-ui-onboarding-feed
+category: form
+tags: [onboarding, checklist, steps, feed, tasks, completion]
+
+archetype: form-heavy
+description: >
+  Onboarding checklist feed showing sequential tasks with completion state.
+  Each step has title, description, done/pending indicator (filled circle with
+  check vs empty circle), and a contextual action button visible only on the
+  active step. Personalized greeting header. Clickable rows to set active step.
+  Alternating row backgrounds. NOT a wizard — a feed of actionable tasks.
+
+requires:
+  components: [UIcon, UButton]
+  charts: []
+  composables: []
+
+props:
+  interface: |
+    interface OnboardingStep {
+      title: string
+      description: string
+      button: {
+        label: string
+        icon: string
+      }
+      done: boolean
+    }
+    interface OnboardingFeedProps {
+      steps: OnboardingStep[]
+      userName?: string              // default "John" for greeting
+      subtitle?: string             // default "Let's set up your first data workspace"
+      activeStep?: number           // default: first incomplete step index
+    }
+
+emits:
+  interface: |
+    interface OnboardingFeedEmits {
+      'step:click': [stepIndex: number]
+      'step:action': [stepIndex: number]
+      'complete': []
+    }
+
+layout:
+  structure: |
+    container (max-width ~576px, centered, bg-default, p-8, rounded-xl)
+      greeting-header
+        title [h2, 2xl, semibold, "Hello, {userName}"]
+        subtitle [dimmed, "Let's set up your..."]
+      step-list (mt-4)
+        step-row (repeat, flex, gap-6, p-6, cursor-pointer, rounded-lg)
+          alternating-bg: odd rows bg-muted/20
+          indicator-column
+            done-indicator (w-6 h-6, bg-primary, rounded-full, border-3 primary)
+              check-icon (white, 14px)
+            pending-indicator (w-6 h-6, rounded-full, border-3 primary, empty)
+          content-column
+            step-title [h3, lg, semibold]
+            step-description [dimmed]
+            action-button (conditional: only visible when stepKey === activeStep)
+              UButton (v-bind step.button, mt-4, semibold)
+  responsive:
+    mobile: full-width container, compact padding
+    tablet: centered, max-width 576px
+    desktop: same as tablet
+
+slots:
+  greeting: "Override greeting header"
+  step-indicator: "Custom completion indicator"
+  step-content: "Custom step content rendering"
+  step-action: "Custom action button per step"
+
+tokens:
+  container-bg: bg-default
+  container-radius: rounded-xl
+  container-padding: p-8
+  greeting-text: text-highlighted
+  subtitle-text: text-dimmed
+  done-indicator-bg: bg-primary
+  done-indicator-border: "border-3 border-primary"
+  done-check-color: text-white
+  done-check-size: "14"
+  pending-border: "border-3 border-primary"
+  step-title-text: text-highlighted
+  step-description-text: text-dimmed
+  alternating-row-bg: "bg-muted/20"
+  action-button-margin: mt-4
+
+atomicHint:
+  organism: OnboardingFeed
+  molecules: [GreetingHeader, StepRow, CompletionIndicator]
+  atoms: [DoneCircle, PendingCircle, StepTitle, StepDescription, ActionButton]
+
+examples:
+  - context: "SaaS workspace setup"
+    steps:
+      - "Sign in with your account (done)"
+      - "Create your first workspace (done)"
+      - "Invite team members (pending, active)"
+  - context: "Developer onboarding"
+    steps:
+      - "Connect repository (done)"
+      - "Configure CI/CD (active)"
+      - "Deploy first app (pending)"
+
+composesWith:
+  - "nuxt-ui-onboarding-feed-two (progress bar variant)"
+  - "nuxt-ui-onboarding-form (wizard alternative)"
+  - "basic-sign-in (first step in onboarding flow)"
+
+derivation:
+  source: "nuxt-charts/onboarding/nuxt-ui-onboarding-feed"
+  method: "structural-abstraction"
+  what-was-kept: >
+    Task checklist feed pattern (not wizard), steps with done boolean and
+    action button config, filled primary circle with check icon for done steps,
+    empty primary-bordered circle for pending, contextual action button visible
+    only on active step (v-if stepKey === activeStep), clickable rows to set
+    active step, personalized greeting header ("Hello, John"), alternating
+    row backgrounds (stepKey % 2 === 1), flex gap-6 layout with indicator
+    and content columns, rounded-xl container.
+  what-was-removed: >
+    All Vue template markup, ref bindings (steps, activeStep), v-for
+    iteration, v-bind button spreading, CSS utility classes.
+  transformative-value: >
+    Captures the "onboarding checklist feed" pattern: sequential tasks with
+    completion tracking, contextual action visibility, and personalized
+    greeting. Distinct from wizard (all steps visible, not paginated).
+    Action buttons are step-specific with icon + label configuration.
+
+avoid:
+  - "Hiding completed steps — all steps should remain visible with done state"
+  - "All action buttons visible — only active step shows its action button"
+  - "No click-to-activate — steps must be clickable to set active"
+  - "Missing done/pending distinction — visual indicators are essential"
+  - "Generic greeting — personalize with user name"

@@ -1,0 +1,143 @@
+id: bar-chart-eight
+name: Horizontal Multi-Series Regional Bar Chart
+version: 1.0.0
+catalogRef: bar-chart-eight
+category: visualization
+tags:
+  - bar
+  - horizontal
+  - multi-series
+  - regional
+  - quarterly
+  - color-mode-aware
+archetype: chart-heavy
+description: >
+  Horizontal grouped bar chart comparing multiple quarterly series across
+  regions. Uses Orientation.Horizontal with region names on y-axis and
+  currency values on x-axis. Color-mode reactive (re-renders on theme change),
+  built-in legend, and x-grid lines (horizontal layout inverts grid axis).
+
+requires:
+  components: [UCard]
+  charts: [BarChart]
+  composables: [useResponsiveHeight, useColorMode]
+
+props:
+  interface: |
+    interface RegionDataPoint {
+      region: string
+      q1: number
+      q2: number
+      q3: number
+      q4: number
+    }
+    interface BarChartEightProps {
+      data: RegionDataPoint[]
+      categories: Record<string, BulletLegendItemInterface>
+      title?: string
+      xFormatter?: (value: number) => string
+    }
+
+emits:
+  interface: |
+    interface BarChartEightEmits {
+      'region:click': [region: string, quarter: string, value: number]
+      'legend:toggle': [quarter: string, visible: boolean]
+    }
+
+layout:
+  structure: |
+    wrapper (max-w-xl centered)
+      card-shell
+        header (UCard #header slot)
+          title (text-lg font-semibold)
+        chart-area
+          BarChart (horizontal, grouped, 4 quarterly series, x-grid, legend top-right)
+            y-axis: region names
+            x-axis: currency values ($Xk format)
+  responsive:
+    mobile: chart height 120px, condensed region labels
+    tablet: chart height 240px, full region names
+    desktop: max-w-xl centered
+
+slots:
+  header: Override card header title
+  chart: Override chart rendering
+  tooltip: Custom tooltip for region+quarter detail
+
+tokens:
+  card-bg: bg-default
+  title-text: text-lg font-semibold
+  series-q1: text-red-500
+  series-q2: text-amber-500
+  series-q3: text-green-500
+  series-q4: text-blue-500
+  bar-radius: radius-4
+  x-grid: visible
+  y-grid: hidden
+  legend-position: top-right
+
+chartConfig:
+  type: bar
+  orientation: horizontal
+  stacked: false
+  radius: 4
+  xGridLine: true
+  yGridLine: false
+  hideLegend: false
+  legendPosition: TopRight
+  xFormatter: currency-k
+  colorModeReactive: true
+  tooltip: true
+  legend: true
+  xAxis: true
+  yAxis: true
+  note: "Uses :key='colorMode.value' to force re-render on theme change"
+
+atomicHint:
+  organism: HorizontalRegionalBarCard
+  molecules:
+    - MinimalCardHeader (title in UCard header slot)
+    - HorizontalGroupedChart (region labels on y-axis)
+    - QuarterlyLegend (4-color quarterly series)
+  atoms:
+    - RegionLabel
+    - QuarterlyBar
+    - CurrencyTick
+
+examples:
+  - context: Regional quarterly revenue comparison
+    data: "5 regions x Q1-Q4 revenue ($k), horizontal layout for long region names"
+    usage: Sales dashboard comparing geographic performance across quarters
+  - context: Department budget allocation
+    data: "Departments x quarterly spend, horizontal bars for readable department names"
+    usage: Finance dashboard with category labels that need horizontal space
+
+composesWith:
+  - bar-chart-grouped (vertical grouped variant)
+  - bar-chart-five (stacked distribution alternative)
+  - Dashboard Page Layout (DSE composition)
+
+derivation:
+  source: nuxt-charts/bar-charts/bar-chart-eight
+  method: structural-abstraction
+  what-was-kept: >
+    Horizontal orientation with Orientation.Horizontal enum, region names on y-axis
+    via yFormatter, currency formatting on x-axis ($Xk), 4 quarterly series with
+    distinct semantic colors (red/amber/green/blue), color-mode reactivity via
+    :key binding on colorMode.value, x-grid lines with y-grid hidden, computed
+    categories, max-w-xl compact card.
+  what-was-removed: >
+    All Vue template markup, hardcoded RegionData array, specific color values,
+    useColorMode import, CSS classes.
+  transformative-value: >
+    Horizontal layout pattern for long category labels. Color-mode reactivity
+    ensures chart re-renders on dark/light toggle. Quarterly color coding provides
+    temporal visual distinction.
+
+avoid:
+  - Vertical orientation — horizontal is essential for readable region/category labels
+  - Missing color-mode reactivity — chart must re-render on theme change
+  - More than 6 regions — horizontal bars stack too tall
+  - More than 4 series — quarterly grouping is the design limit
+  - Y-grid lines — only x-grid is shown in horizontal layout

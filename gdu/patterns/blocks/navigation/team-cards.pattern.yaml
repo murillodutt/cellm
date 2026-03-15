@@ -1,0 +1,112 @@
+# Block Pattern: Team Cards
+id: team-cards
+name: Team Cards with Avatar Group
+version: "1.0.0"
+catalogRef: team-cards
+category: navigation
+tags: [team, avatars, members, organization, groups]
+archetype: layout-heavy
+description: >
+  Grid of team cards showing team name, description, an avatar group with
+  tooltip on each avatar, and a total member count. UAvatarGroup with max
+  overflow, UTooltip for names. Flex layout with content on top and avatars
+  at bottom.
+
+requires:
+  components: [UCard, UAvatarGroup, UAvatar, UTooltip]
+  charts: []
+  composables: []
+
+props:
+  interface: |
+    interface TeamMember {
+      name: string
+      avatar: string
+      role?: string
+    }
+    interface Team {
+      name: string
+      description: string
+      members: TeamMember[]
+      totalMembers?: number
+    }
+    interface TeamCardsProps {
+      teams: Team[]
+      maxAvatars?: number
+    }
+
+emits:
+  interface: |
+    interface TeamCardsEmits {
+      'team:click': [teamName: string]
+      'member:click': [memberName: string, teamName: string]
+    }
+
+layout:
+  structure: |
+    responsive-grid (1/2/3 columns)
+      card-shell (flex-col, repeat per team)
+        content-group (flex-1)
+          team-name (font-semibold)
+          team-description (sm, muted)
+        avatar-row (mt-6, flex, justify-between)
+          avatar-group (sm size, max overflow)
+            avatar (repeat per member, with tooltip)
+              tooltip (member name on hover)
+          member-count-label (sm, muted, pluralized)
+  responsive:
+    mobile: single column
+    tablet: 2-column grid, gap-6
+    desktop: 3-column grid, gap-6
+
+slots:
+  card: "Override individual team card"
+  avatar-group: "Custom avatar rendering"
+  footer: "Additional content below avatar row"
+
+tokens:
+  card-bg: bg-default
+  team-name: text-highlighted
+  team-description: text-muted
+  member-count: text-muted
+  avatar-size: sm
+  avatar-max: 3
+  grid-gap: "gap-6"
+  avatar-row-spacing: "mt-6"
+
+atomicHint:
+  organism: TeamCardGrid
+  molecules: [TeamCard, AvatarRow]
+  atoms: [UAvatar, UTooltip, MemberCount]
+
+examples:
+  - context: "Organization teams overview"
+    teams: ["Engineering (12 members, 4 visible)", "Product (6 members, 3 visible)", "Design (5 members, 2 visible)"]
+  - context: "Project team assignment"
+    teams: ["Frontend (8 members)", "Backend (10 members)", "QA (4 members)"]
+
+composesWith:
+  - "Dashboard Page Layout (DSE composition)"
+  - "integration-cards (similar grid card pattern)"
+  - "Settings Page (team management context)"
+
+derivation:
+  source: "nuxt-charts/cards/team-cards"
+  method: "structural-abstraction"
+  what-was-kept: >
+    Team card with name + description + avatar group layout, UAvatarGroup
+    with max overflow, UTooltip per avatar for name display, totalMembers
+    with singular/plural logic, flex-col card with content-top avatars-bottom.
+  what-was-removed: >
+    All Vue template markup, hardcoded team data (Engineering, Product,
+    Design), specific avatar URLs, v-for directives, Tailwind classes.
+  transformative-value: >
+    Generic team/group card for any organizational structure. Avatar group
+    with overflow and tooltip pattern reusable beyond team context.
+
+avoid:
+  - "Listing all members — use UAvatarGroup max overflow"
+  - "Missing tooltips — avatar-only display needs name on hover"
+  - "Hardcoded plural — use totalMembers === 1 conditional"
+  - "Horizontal card layout — vertical with avatars at bottom"
+  - "Raw member array length as count — use totalMembers prop (may differ)"

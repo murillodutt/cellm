@@ -1,0 +1,135 @@
+# Block Pattern: Calendar Multi-Month
+# Distributable structural specification — no licensed code
+# Generated from catalog ref, not source transcription
+
+id: calendar-multi-month
+name: Multi-Month Calendar View
+version: "1.0.0"
+catalogRef: calendar-multi-month
+category: form
+tags: [calendar, multi-month, date, range, broad-view]
+basePattern: date-picker
+
+archetype: form-heavy
+description: >
+  Calendar component configured with visibleMonths=2+ to show multiple month
+  grids side by side. Header displays condensed month range label (e.g.
+  "Mar - Apr 2026"). Same day selection states as date-picker. Supports
+  single, range, or multiple selection modes across months. Horizontal
+  layout with gap between month grids.
+
+requires:
+  components: [UButton, UIcon]
+  charts: []
+  composables: [useToast]
+
+props:
+  interface: |
+    interface CalendarMultiMonthProps {
+      visibleMonths?: number          // default 2, can be 2-4
+      selectionMode?: 'single' | 'range' | 'multiple'
+      initialDate?: Date
+      initialStartDate?: Date
+      initialEndDate?: Date
+      minDate?: Date
+      maxDate?: Date
+      disabledDates?: Date[]
+      showTimePicker?: boolean
+      timeSlots?: string[]
+      dateFormat?: string
+      weekDayLabels?: string[]
+      locale?: string
+      orientation?: 'horizontal' | 'vertical'
+    }
+
+emits:
+  interface: |
+    interface CalendarMultiMonthEmits {
+      'date-select': [date: Date | Date[]]
+      'range-select': [range: { start: Date | null; end: Date | null }]
+      'time-select': [time: string]
+      'month-change': [month: Date]
+      'year-change': [year: number]
+    }
+
+layout:
+  structure: |
+    container (flex, horizontal or vertical)
+      calendar-section
+        header-bar (flex, space-between)
+          prev-month-button (UButton, chevron-left, neutral soft)
+          month-range-label [condensed: "MMM - MMM YYYY" for multi-month]
+          next-month-button (UButton, chevron-right, neutral soft)
+        month-grids-row (flex, gap-8, horizontal)
+          month-grid (repeat per visibleMonths)
+            weekday-row (7 columns, muted, small)
+            day-grid (7 columns, aspect-square)
+              day-cell (button, all selection states from date-picker)
+      time-picker-panel (conditional, beside or below)
+        time-slot-grid
+          time-button (repeat, neutral soft)
+  responsive:
+    mobile: single month visible, swipe or nav to switch
+    tablet: 2 months side by side
+    desktop: 2-4 months side by side with gap
+
+slots:
+  header: "Override month navigation and label"
+  day-cell: "Custom day cell rendering"
+  month-header: "Per-month header (e.g. individual month names)"
+
+tokens:
+  day-default: text-default
+  day-today: text-primary
+  day-selected: "bg-primary text-white font-medium"
+  day-in-range: bg-muted
+  day-disabled: "opacity-50 cursor-not-allowed"
+  day-outside-month: text-dimmed
+  day-hover: bg-muted
+  weekday-label: text-muted
+  month-label: "text-lg font-medium"
+  nav-button-color: neutral
+  nav-button-variant: soft
+  grid-gap: gap-8
+
+atomicHint:
+  organism: MultiMonthCalendar
+  molecules: [MonthGrid, MonthNavigation, TimeSlotPicker]
+  atoms: [DayCell, WeekdayLabel, MonthLabel, NavButton]
+
+examples:
+  - context: "Vacation booking (2 months visible)"
+    visibleMonths: 2
+    selectionMode: range
+  - context: "Quarter planning (3 months visible)"
+    visibleMonths: 3
+    selectionMode: multiple
+
+composesWith:
+  - "date-picker (single-month alternative)"
+  - "date-range-picker (range selection in single-month view)"
+
+derivation:
+  source: "nuxt-charts/calendar/Calendar.vue (visibleMonths=2+)"
+  method: "structural-abstraction"
+  what-was-kept: >
+    visibleMonths prop generating array of month grids via computed monthsToShow,
+    condensed header label showing "MMM - MMM YYYY" for multi-month, side-by-side
+    month grids with gap-8, shared month navigation (prev/next shifts all grids),
+    all selection modes (single/range/multiple) working across month boundaries,
+    same day-cell states (selected, today, in-range, disabled, outside-month).
+  what-was-removed: >
+    All Vue template markup, dayjs array generation logic, computed calendar
+    grid calculations, CSS utility classes, specific class bindings.
+  transformative-value: >
+    Captures the multi-month calendar as a configuration of the base calendar
+    pattern: visibleMonths determines grid count, header adapts label format,
+    selection states span across month boundaries. Single navigation controls
+    all visible grids simultaneously.
+
+avoid:
+  - "Independent month navigation — prev/next must shift all grids together"
+  - "No condensed header label — show range label for multi-month (MMM - MMM YYYY)"
+  - "Too many months — 4 max for desktop, degrade to 1-2 on mobile"
+  - "Separate selection state per grid — selection must work across month boundaries"
+  - "Missing gap between grids — visual separation between months is essential"

@@ -1,0 +1,115 @@
+# Block Pattern: Stats Cards
+id: stats-cards
+name: Hero Stat Cards with Mini Bar Chart
+version: "1.0.0"
+catalogRef: stats-cards
+category: kpi
+tags: [stats, hero, bar-chart, action, kpi]
+archetype: chart-heavy
+description: >
+  Hero stat card showing a large value, label, an inline mini bar chart for
+  trend visualization, and an action button. The bar chart is decorative —
+  no axes, no legend, no tooltip. Source block was empty (free block), so
+  pattern is derived from the stats-cards concept: hero number + mini chart + CTA.
+
+requires:
+  components: [UCard, UButton]
+  charts: [BarChart]
+  composables: []
+
+props:
+  interface: |
+    interface StatsCardItem {
+      label: string
+      value: string | number
+      trend: { date: string; value: number }[]
+      action?: { label: string; icon?: string }
+      color?: string
+    }
+    interface StatsCardsProps {
+      cards: StatsCardItem[]
+    }
+
+emits:
+  interface: |
+    interface StatsCardsEmits {
+      'card:action': [label: string]
+      'card:click': [label: string]
+    }
+
+layout:
+  structure: |
+    card-grid (responsive columns)
+      card-shell (repeat per card)
+        label-row (muted, small)
+        value-row
+          left: hero-value (2xl, bold)
+          right: mini-bar-chart (fixed height ~48px, width ~112px)
+            bar-chart (no axes, no legend, no tooltip)
+        action-row (optional)
+          action-button (ghost variant, trailing icon)
+  responsive:
+    mobile: single column, chart beside value
+    tablet: 2-column grid
+    desktop: 3-column grid
+
+slots:
+  card: "Override individual card rendering"
+  chart: "Custom chart visualization per card"
+  action: "Custom action button or link"
+
+tokens:
+  card-bg: bg-default
+  label-text: text-muted
+  value-text: text-highlighted
+  chart-bar-color: "text-primary"
+  action-text: text-muted
+  action-hover: text-highlighted
+  card-padding: "p-6"
+  chart-height: "h-12"
+
+chartConfig:
+  type: bar
+  height: 48
+  hideXAxis: true
+  hideYAxis: true
+  hideLegend: true
+  hideTooltip: true
+  note: "Decorative trend indicator, not interactive data visualization"
+
+atomicHint:
+  organism: StatsCardGrid
+  molecules: [StatsCard, MiniBarChart]
+  atoms: [HeroValue, ActionButton, TrendBar]
+
+examples:
+  - context: "SaaS dashboard hero metrics"
+    cards: ["Revenue ($45,231, 6-month bar trend, View Report)", "Users (2,405, 6-month bar trend, View Users)"]
+  - context: "E-commerce overview"
+    cards: ["Orders (1,234, weekly bar trend, View Orders)", "AOV ($67.50, weekly bar trend, View Details)"]
+
+composesWith:
+  - "default-cards (simpler variant without charts)"
+  - "mini-chart-cards (supports area/bar/line per card)"
+  - "Dashboard Page Layout (DSE composition)"
+
+derivation:
+  source: "nuxt-charts/cards/stats-cards"
+  method: "structural-abstraction"
+  what-was-kept: >
+    Hero stat + mini bar chart concept, action button pattern,
+    card grid layout, decorative chart with hidden axes/legend.
+  what-was-removed: >
+    All Vue template markup, hardcoded data, CSS utility classes,
+    specific color values, animation implementations.
+  transformative-value: >
+    Combines hero value display with decorative bar chart and CTA
+    in a single card. More actionable than default-cards, more
+    focused than mini-chart-cards.
+
+avoid:
+  - "Making charts interactive — they are decorative trend indicators"
+  - "Missing action button — differentiator from default-cards"
+  - "Full-size charts — fixed height ~48px, inline beside value"
+  - "Hardcoded colors — use semantic tokens or card.color prop"
+  - "Fixed grid columns — responsive via parent layout"

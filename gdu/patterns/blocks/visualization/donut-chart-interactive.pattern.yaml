@@ -1,0 +1,106 @@
+# Block Pattern: Interactive Donut Chart
+id: donut-chart-interactive
+name: Interactive Donut with Center Label
+version: "1.0.0"
+catalogRef: donut-interactive-monochrome
+category: visualization
+tags: [donut, interactive, click, center-label, segments]
+archetype: chart-heavy
+description: >
+  Donut chart with clickable segments that update a center label showing
+  the selected segment's value and label. Monochrome by default with
+  active segment highlighted.
+
+requires:
+  components: [UCard]
+  charts: [DonutChart]
+  composables: []
+
+props:
+  interface: |
+    interface DonutSegment {
+      label: string
+      value: number
+      color?: string
+    }
+    interface DonutChartInteractiveProps {
+      segments: DonutSegment[]
+      title?: string
+      centerLabel?: string
+      centerValue?: string | number
+    }
+
+emits:
+  interface: |
+    interface DonutChartInteractiveEmits {
+      'segment:select': [segment: DonutSegment | null]
+    }
+
+layout:
+  structure: |
+    card-shell
+      header [title]
+      donut-container (relative positioning)
+        DonutChart (clickable segments, hover highlight)
+        center-overlay (absolutely positioned)
+          center-value (large, bold)
+          center-label (muted, small)
+      segment-details (optional, below chart when segment selected)
+  responsive:
+    mobile: chart fills width, center label scaled
+    tablet: centered chart with comfortable padding
+    desktop: same as tablet
+
+slots:
+  header: "Override card header"
+  center: "Custom center label content"
+  details: "Selected segment detail panel"
+
+tokens:
+  card-bg: bg-default
+  center-value: text-highlighted
+  center-label: text-muted
+  segment-active: "full opacity"
+  segment-inactive: "reduced opacity (0.3)"
+
+chartConfig:
+  type: donut
+  interactive: true
+  centerLabel: true
+  tooltip: true
+  legend: false
+
+atomicHint:
+  organism: InteractiveDonutCard
+  molecules: [DonutContainer, CenterLabel]
+  atoms: [ClickableSegment, CenterOverlay]
+
+examples:
+  - context: "Budget allocation"
+    segments: ["Engineering (45%)", "Marketing (25%)", "Sales (20%)", "Operations (10%)"]
+    centerLabel: "Total Budget"
+  - context: "Device distribution"
+    segments: ["Desktop (60%)", "Mobile (30%)", "Tablet (10%)"]
+    centerLabel: "Total Users"
+
+composesWith:
+  - "Dashboard Page Layout (DSE composition)"
+  - "donut-chart-legend (simpler non-interactive version)"
+
+derivation:
+  source: "nuxt-charts/donut-charts/donut-interactive-monochrome"
+  method: "structural-abstraction"
+  what-was-kept: >
+    Interactive segment selection concept, center label overlay,
+    active/inactive opacity differentiation, click-to-select behavior.
+  what-was-removed: >
+    All Vue template markup, monochrome color generation logic,
+    specific click handlers, CSS positioning classes.
+  transformative-value: >
+    Generic interactive donut with configurable center content and
+    selection state management.
+
+avoid:
+  - "Missing center label — it's the defining interaction feedback"
+  - "No click deselect — clicking selected segment should deselect"
+  - "Legend alongside — this pattern uses center label instead of legend"

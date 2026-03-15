@@ -1,0 +1,171 @@
+id: donut-with-radius
+name: Win Ratio Donut with Configurable Radius
+version: 1.0.0
+catalogRef: donut-with-radius
+category: visualization
+tags:
+  - donut
+  - win-ratio
+  - configurable-radius
+  - tabs
+  - center-percentage
+  - app-config
+basePattern: donut-chart-legend
+archetype: chart-heavy
+description: >
+  Donut chart with configurable inner radius, center percentage label,
+  and side stats panel. Features win/loss ratio visualization with
+  UTabs for period selection and custom app config theming. The donut
+  uses slim arcWidth with padAngle spacing and radius 4 for subtle
+  segment rounding. Side panel shows winning and losing trade counts.
+  Contextual paragraph below tabs compares performance.
+
+requires:
+  components: [UCard, UTabs, UButton, UIcon]
+  charts: [DonutChart]
+  composables: [useColorMode]
+
+props:
+  interface: |
+    interface WinLossData {
+      color: string
+      name: string
+      value: number
+    }
+    interface DonutWithRadiusProps {
+      winValue: number
+      lossValue: number
+      title?: string
+      hideText?: boolean
+      tabItems?: TabsItem[]
+      appConfig?: AppConfigInput
+    }
+
+emits:
+  interface: |
+    interface DonutWithRadiusEmits {
+      'tab:change': [period: string]
+      'ratio:update': [win: number, loss: number, percentage: number]
+    }
+
+layout:
+  structure: |
+    wrapper (max-w-lg py-8)
+      card-shell
+        content-stack (space-y-8)
+          title-row (flex justify-between)
+            title (text-highlighted text-xl font-semibold)
+            action-buttons (flex gap-2)
+              info-btn (UButton variant=link, lucide-info icon)
+              settings-btn (UButton variant=link, lucide-settings icon)
+              delete-btn (UButton variant=link, lucide-trash-2 icon)
+          chart-section (space-y-8)
+            chart-with-stats (flex gap-8)
+              donut-container (relative w-46)
+                DonutChart (full, slim arc, center percentage)
+                center-overlay
+                  percentage (text-2xl font-bold)
+                  unit-symbol (text-toned %)
+              side-stats (ml-6, flex-col justify-between h-40 w-30)
+                winning-block
+                  label (text-toned dark:text-muted)
+                  value (text-3xl font-bold)
+                losing-block
+                  label (text-toned dark:text-muted)
+                  value (text-3xl font-bold)
+            period-tabs (UTabs content=false, full width, size=sm)
+            comparison-text (text-muted px-16 text-center, conditional)
+  responsive:
+    mobile: chart and stats may stack, tabs full width
+    tablet: side-by-side chart + stats
+    desktop: max-w-lg centered, py-8 padding
+
+slots:
+  title-actions: Override action buttons in title row
+  center: Custom center percentage content
+  stats: Override side stats panel
+  comparison: Override comparison text below tabs
+
+tokens:
+  card-bg: bg-default
+  title-text: text-highlighted text-xl font-semibold
+  action-btn: variant-link color-neutral
+  center-value: text-2xl font-bold
+  center-unit: text-toned
+  stat-label: text-toned dark:text-muted
+  stat-value: text-3xl font-bold
+  win-color: text-emerald-500
+  loss-color: text-red-500
+  arc-width: "10"
+  pad-angle: "0.1"
+  segment-radius: "4"
+  comparison-text: text-muted text-center
+  highlight-text: text-primary
+
+chartConfig:
+  type: donut
+  donutType: Full
+  arcWidth: 10
+  padAngle: 0.1
+  radius: 4
+  height: 160
+  hideLegend: true
+  centerLabel: true
+  tooltip: true
+  legend: false
+  note: "Configurable radius via padAngle and radius props. AppConfig overrides theme (emerald primary, zinc neutral, radius 0.25)."
+
+atomicHint:
+  organism: WinRatioDonutCard
+  molecules:
+    - TitleWithActions (title + info/settings/delete buttons)
+    - DonutWithStats (chart + side winning/losing panel)
+    - PeriodTabs (UTabs without content)
+    - ComparisonParagraph (contextual performance text)
+  atoms:
+    - CenterPercentage
+    - StatBlock (label + big value)
+    - ActionIconButton
+    - HighlightedSpan (text-primary inline)
+
+examples:
+  - context: Trading win ratio
+    data: "32 winning / 18 losing = 64%, tabs for Year/Month/Week/Day"
+    usage: Trading dashboard showing win/loss ratio with period filtering
+  - context: Success rate dashboard
+    data: "Successful deploys vs failed, percentage center, period comparison text"
+    usage: DevOps dashboard showing deployment success rate with trend comparison
+
+composesWith:
+  - donut-chart-interactive (interactive variant without side stats)
+  - donut-chart-legend (basic donut with legend)
+  - Dashboard Page Layout (DSE composition)
+
+derivation:
+  source: nuxt-charts/donut-charts/with-radius-and-spacing
+  method: structural-abstraction
+  what-was-kept: >
+    Configurable donut with arcWidth 10, padAngle 0.1, radius 4 for segment
+    rounding, center percentage label with % symbol in text-toned, side stats
+    panel showing winning/losing trade counts (text-3xl font-bold), UTabs
+    with content=false for period selection (Year/Month/Week/Day), comparison
+    paragraph with text-primary highlighted spans, action icon buttons
+    (info/settings/trash-2) in title row, custom AppConfigInput for theme
+    overrides (emerald primary, zinc neutral, radius 0.25), computed percentage
+    from win/(win+loss), w-46 fixed donut width, h-40 w-30 stats panel.
+  what-was-removed: >
+    All Vue template markup, hardcoded win/loss values, colorMode preference
+    override, specific AppConfig values, UTabs item definitions, comparison
+    text content, CSS classes.
+  transformative-value: >
+    Binary outcome ratio pattern with rich contextual UI. The side stats panel
+    provides exact counts while the center shows computed percentage. Period
+    tabs enable temporal analysis without navigation. App config theming
+    demonstrates chart-level theme customization.
+
+avoid:
+  - More than 2 segments — this is a binary ratio pattern (win/loss)
+  - Removing side stats — the exact counts complement the center percentage
+  - UTabs with content — tabs control period filtering, not content panels
+  - Missing comparison text — contextual paragraph provides analytical value
+  - Full-width donut — fixed w-46 ensures room for side stats panel

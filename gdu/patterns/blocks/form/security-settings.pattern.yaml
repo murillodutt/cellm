@@ -1,0 +1,138 @@
+# Block Pattern: Security Settings (General Settings)
+# Distributable structural specification — no licensed code
+# Generated from catalog ref, not source transcription
+
+id: security-settings
+name: General Settings Panel
+version: "1.0.0"
+catalogRef: security-settings
+category: form
+tags: [settings, theme, language, notifications, preferences, general]
+
+archetype: form-heavy
+description: >
+  Settings panel with labeled preference rows: theme switcher (light/dark/system
+  buttons), language selector (USelect dropdown), and notification toggles
+  (email/push checkboxes). Each row uses a two-column layout with label+description
+  on the left and control on the right. Wrapped in a wide UCard.
+
+requires:
+  components: [UCard, UButton, USelect, UCheckbox, UIcon]
+  charts: []
+  composables: [useColorMode]
+
+props:
+  interface: |
+    interface ThemeOption {
+      value: 'light' | 'dark' | 'system'
+      label: string
+      icon: string    // 'i-lucide-sun' | 'i-lucide-moon' | 'i-lucide-computer'
+    }
+    interface LanguageOption {
+      label: string
+      value: string   // locale code: 'en', 'es', 'fr', 'de'
+    }
+    interface NotificationPrefs {
+      email: boolean
+      push: boolean
+    }
+    interface SecuritySettingsProps {
+      themeOptions?: ThemeOption[]       // default: light, dark, system
+      languages?: LanguageOption[]      // default: English, Spanish, French, German
+      defaultLanguage?: string          // default: 'en'
+      notifications?: NotificationPrefs // default: { email: true, push: false }
+    }
+
+emits:
+  interface: |
+    interface SecuritySettingsEmits {
+      'theme:change': [value: 'light' | 'dark' | 'system']
+      'language:change': [locale: string]
+      'notification:change': [prefs: { email: boolean; push: boolean }]
+    }
+
+layout:
+  structure: |
+    card-shell (max-width ~768px, centered, bg-default, vertical margin)
+      card-title [h3, semibold, "General"]
+      settings-list (space-y-6)
+        theme-row (flex, items-center, gap-8)
+          label-column (w-1/2)
+            label-text [font-medium, "Theme"]
+            label-description [muted, small, "Customize your workspace"]
+          control-column (flex-1)
+            theme-button-group (flex, gap-2)
+              light-button (neutral, subtle, sun icon + "Light")
+              dark-button (neutral, subtle, moon icon + "Dark")
+              system-button (neutral, subtle, computer icon + "System")
+        language-row (flex, items-center, gap-8)
+          label-column (w-1/2)
+            label-text [font-medium, "Language"]
+            label-description [muted, small, "Set your preferred language"]
+          control-column (flex-1)
+            language-select (USelect, w-64 on sm+)
+        notifications-row (flex, items-start, gap-8)
+          label-column (w-1/2)
+            label-text [font-medium, "Notifications"]
+            label-description [muted, small, "Enable/disable notifications"]
+          control-column (flex-1, space-y-3)
+            email-checkbox (UCheckbox, "Email Notifications")
+            push-checkbox (UCheckbox, "Push Notifications")
+  responsive:
+    mobile: stacked rows (label above control), full-width controls
+    tablet: two-column rows (label left, control right)
+    desktop: same as tablet, max-width 768px
+
+slots:
+  theme-control: "Override theme button group"
+  language-control: "Override language selector"
+  notifications-control: "Override notification toggles"
+
+tokens:
+  card-bg: bg-default
+  title-text: text-highlighted
+  label-text: text-default
+  label-description: text-muted
+  button-color: neutral
+  button-variant: subtle
+  select-width: "w-full sm:w-64"
+  checkbox-color: primary
+
+atomicHint:
+  organism: GeneralSettingsPanel
+  molecules: [SettingsRow, ThemeButtonGroup, NotificationToggles]
+  atoms: [ThemeButton, LanguageSelect, NotificationCheckbox, SettingLabel]
+
+examples:
+  - context: "SaaS dashboard preferences"
+    sections: ["Theme (light/dark/system)", "Language (4 options)", "Notifications (email/push)"]
+  - context: "Personal app settings"
+    sections: ["Theme", "Language", "Notifications", "Timezone"]
+
+composesWith:
+  - "profile-settings (personal info companion)"
+  - "basic-sign-in (settings accessible post-login)"
+
+derivation:
+  source: "nuxt-charts/account/general-settings"
+  method: "structural-abstraction"
+  what-was-kept: >
+    Two-column settings row pattern (label+description left, control right),
+    theme switcher with 3 buttons (light/dark/system with icons), useColorMode
+    integration, language USelect with locale options, notification checkboxes
+    (email/push) with reactive state, wide card layout with max-w-3xl,
+    consistent gap-8 spacing between columns, items-center/items-start alignment.
+  what-was-removed: >
+    All Vue template markup, specific language options, colorMode.preference
+    assignment logic, checkbox v-model bindings, CSS utility classes.
+  transformative-value: >
+    Captures the "labeled settings row" pattern: consistent two-column layout
+    where each preference has a label+description and a matching control type.
+    Typed preference groups (theme, language, notifications) with structured emits.
+
+avoid:
+  - "All controls in a single form — group by concern with clear labels"
+  - "Theme as dropdown — use button group for immediate visual feedback"
+  - "Missing control descriptions — each setting needs explanation text"
+  - "Inconsistent row alignment — items-center for single-line, items-start for multi-line"
+  - "Fixed language list — accept as configurable prop"

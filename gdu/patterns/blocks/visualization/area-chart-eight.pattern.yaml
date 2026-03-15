@@ -1,0 +1,130 @@
+id: area-chart-eight
+name: Area Chart with Dashed Grid
+version: "1.1.0"
+catalogRef: area-chart-eight
+category: visualization
+tags: [area, chart, dashed-grid, css-custom-property, styling, responsive]
+basePattern: area-chart-gradient
+archetype: chart-heavy
+description: >
+  Area chart card with dashed grid lines via CSS custom property. Uses the
+  .dashed class to set --vis-axis-grid-line-dasharray for custom grid styling.
+  Features the standard dual-series layout with MonotoneX curve, nested card
+  hierarchy, and series breakdown footer.
+
+requires:
+  components: [UCard, UIcon, UBadge, UButton]
+  charts: [AreaChart]
+  composables: [useResponsiveHeight, useColorMode]
+
+props:
+  interface: |
+    interface AreaChartItem {
+      month: string
+      desktop: number
+      mobile: number
+    }
+    interface AreaChartEightProps {
+      data: AreaChartItem[]
+      categories: ComputedRef<Record<string, BulletLegendItemInterface>>
+      title?: string
+      gridDashArray?: string
+    }
+
+emits:
+  interface: |
+    interface AreaChartEightEmits {
+      'view-details': []
+      'series:hover': [seriesKey: string]
+    }
+
+layout:
+  structure: |
+    card-shell (variant=subtle, bg-default/60)
+      content-stack (space-y-4)
+        header (space-y-1)
+          label-row (flex, gap-2)
+            title (text-muted)
+            info-icon (text-dimmed)
+          value-row (flex, gap-4)
+            total (text-3xl, font-semibold)
+            badge (UBadge, variant=soft)
+        chart-card (UCard, variant=soft)
+          AreaChart (class=dashed, MonotoneX, xGridLine=true)
+        footer (flex, justify-between)
+          indicators (flex, gap-6)
+            series-item (dot + label + value) x N
+          action (UButton, ghost)
+  responsive:
+    mobile: chart height 120px, dashed grid still visible
+    tablet: chart height 240px, clear grid pattern
+    desktop: chart height 240px, spacious
+
+slots:
+  header: Override metric header
+  chart: Override chart with custom grid styling
+  footer: Override series breakdown
+
+tokens:
+  card-bg: bg-default/60
+  card-variant: subtle
+  chart-variant: soft
+  title-color: text-muted
+  info-icon-color: text-dimmed
+  total-font: text-3xl font-semibold tracking-tight
+  badge-color: text-success
+  indicator-dot: h-2 w-2 animate-pulse rounded-full
+  series-label: text-muted dark:text-dimmed
+  series-value: font-medium
+  grid-dash: "--vis-axis-grid-line-dasharray: 5 5"
+  dashed-class: "dashed"
+
+chartConfig:
+  type: area
+  curveType: MonotoneX
+  gradient: true
+  tooltip: true
+  xAxis: true
+  yAxis: true
+  xGridLine: true
+  xNumTicks: 6
+  yNumTicks: 4
+  hideLegend: true
+  gridStyle: "dashed via CSS custom property"
+  colorModeReactive: true
+
+atomicHint:
+  organism: DashedGridAreaCard
+  molecules: [MetricHeader, StyledChartContainer, SeriesFooter]
+  atoms: [DashedGridStyle, CurrencyTotal, PercentBadge, AnimatedDot]
+
+examples:
+  - context: "Financial chart with subtle grid"
+    data: "Revenue chart using dashed grid for lighter visual weight"
+  - context: "Analytics dashboard"
+    data: "Traffic chart with 5 5 dash pattern for minimal grid distraction"
+
+composesWith:
+  - "area-chart-gradient (same source, gradient emphasis)"
+  - "area-chart-preview (same source, preview variant)"
+  - "Dashboard card grid (DSE composition)"
+
+avoid:
+  - "Solid grid lines when dashed is the design intent -- use CSS custom property"
+  - "Omitting the .dashed class -- grid will render solid by default"
+  - "Overriding grid dash via inline style when a class is cleaner"
+  - "Heavy dash patterns (e.g., 10 10) -- keep subtle with 5 5"
+  - "Fixed chart height -- use useResponsiveHeight"
+
+derivation:
+  source: "nuxt-charts/area-charts/area-chart-eight"
+  method: "structural-abstraction"
+  what-was-kept: >
+    Dashed grid styling via .dashed CSS class with --vis-axis-grid-line-dasharray
+    custom property, xGridLine=true, dual-series MonotoneX area chart, nested
+    card hierarchy, animated indicators, series footer.
+  what-was-removed: >
+    Hardcoded data, hex colors, static text.
+  transformative-value: >
+    Reusable area chart pattern demonstrating CSS custom property grid styling
+    for lighter visual weight in chart grid lines.

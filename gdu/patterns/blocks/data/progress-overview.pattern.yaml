@@ -1,0 +1,116 @@
+# Block Pattern: Progress Overview
+# Note: Source is progress.vue in bar-lists, same file as orders-overview
+# This pattern covers the progress bar + fulfilled/open breakdown section
+
+id: progress-overview
+name: Progress Overview with Status Breakdown
+version: "1.0.0"
+catalogRef: progress-overview
+category: data
+tags: [progress, overview, percentage, fulfilled, status-breakdown]
+archetype: layout-heavy
+description: >
+  Progress bar showing fulfilled vs total ratio, with a two-column status
+  breakdown (fulfilled count + percent on left, open count + percent on right).
+  Status columns use border-left (primary) and border-right (default) as
+  visual indicators. Part of a larger orders overview pattern.
+
+requires:
+  components: [UCard]
+  charts: []
+  composables: []
+
+props:
+  interface: |
+    interface StatusItem {
+      id: string
+      date: string
+      status: 'fulfilled' | 'open'
+    }
+    interface ProgressOverviewProps {
+      items: StatusItem[]
+      title?: string
+      primaryLabel?: string
+      secondaryLabel?: string
+    }
+
+emits:
+  interface: |
+    interface ProgressOverviewEmits {
+      'status:filter': [status: 'fulfilled' | 'open']
+      'item:click': [itemId: string]
+    }
+
+layout:
+  structure: |
+    card-shell (max-width constrained, centered)
+      header (#header slot)
+        title (font-medium)
+      progress-bar (h-2, rounded-full, primary fill, neutral track)
+      status-breakdown (flex, justify-between, mt-3)
+        fulfilled-column (border-l-2, primary color, pl-4)
+          status-label (sm, font-medium)
+          count + percentage (bold + dimmed)
+        open-column (border-r-2, default color, pr-4, right-aligned)
+          status-label (sm, font-medium)
+          count + percentage (bold + dimmed)
+  responsive:
+    mobile: full-width, status columns side by side
+    tablet: max-width constrained (sm:max-w-lg)
+    desktop: same as tablet, centered
+
+slots:
+  header: "Override card header"
+  status-breakdown: "Custom status display"
+  progress: "Custom progress bar visualization"
+
+tokens:
+  card-bg: bg-default
+  progress-fill: "text-primary"
+  progress-track: bg-muted
+  fulfilled-border: border-primary
+  open-border: border-default
+  status-label: text-highlighted
+  count-text: text-highlighted
+  percentage-text: text-dimmed
+  title-text: text-highlighted
+
+atomicHint:
+  organism: ProgressOverview
+  molecules: [StatusBreakdown, ProgressSection]
+  atoms: [ProgressBar, StatusColumn, PercentageLabel]
+
+examples:
+  - context: "Order fulfillment tracking"
+    items: ["10 fulfilled, 10 open out of 20 orders (50% fulfilled)"]
+  - context: "Task completion dashboard"
+    items: ["75 completed, 25 pending out of 100 tasks (75% done)"]
+
+composesWith:
+  - "orders-overview (complete pattern including item table)"
+  - "Dashboard Page Layout (DSE composition)"
+  - "progress-bar-cards (card-level progress indicator)"
+
+derivation:
+  source: "nuxt-charts/bar-lists/progress"
+  method: "structural-abstraction"
+  what-was-kept: >
+    Progress bar with computed fill width, two-column status breakdown
+    (fulfilled left with primary border, open right with default border),
+    count + percentage display, computed percentages from filtered arrays,
+    card with #header slot, max-width constraint.
+  what-was-removed: >
+    All Vue template markup, hardcoded order data (20 orders), computed
+    properties, order table section (separate orders-overview pattern),
+    footer buttons, Tailwind classes, dark mode conditionals.
+  transformative-value: >
+    Binary status breakdown pattern (done/pending, fulfilled/open,
+    pass/fail). The bordered column concept provides clear visual
+    association between status and count.
+
+avoid:
+  - "More than 2 status categories — use category-cards for 3+ segments"
+  - "Missing percentage — always show count AND percentage"
+  - "Same border for both columns — left=primary, right=default"
+  - "Progress bar without track — always show the background track"
+  - "Hardcoded status values — accept via primaryLabel/secondaryLabel"

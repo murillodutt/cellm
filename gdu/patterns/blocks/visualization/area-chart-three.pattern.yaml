@@ -1,0 +1,132 @@
+id: area-chart-three
+name: Area Chart with Trend Header
+version: "1.1.0"
+catalogRef: area-chart-three
+category: visualization
+tags: [area, chart, trend, header, kpi, badge, revenue, responsive]
+basePattern: area-chart-gradient
+archetype: chart-heavy
+description: >
+  Area chart card with prominent KPI header showing formatted total and trend
+  badge. Emphasizes the headline metric above the chart, with series breakdown
+  and navigation action in the footer. Uses MonotoneX curve interpolation with
+  dashed grid lines in a nested soft card layout.
+
+requires:
+  components: [UCard, UIcon, UBadge, UButton]
+  charts: [AreaChart]
+  composables: [useResponsiveHeight, useColorMode]
+
+props:
+  interface: |
+    interface AreaChartItem {
+      month: string
+      desktop: number
+      mobile: number
+    }
+    interface AreaChartThreeProps {
+      data: AreaChartItem[]
+      categories: ComputedRef<Record<string, BulletLegendItemInterface>>
+      title?: string
+      total?: string
+      percentChange?: string
+      formatOptions?: Intl.NumberFormatOptions
+    }
+
+emits:
+  interface: |
+    interface AreaChartThreeEmits {
+      'view-details': []
+      'metric:click': [total: string]
+    }
+
+layout:
+  structure: |
+    card-shell (variant=subtle, bg-default/60)
+      content-stack (space-y-4)
+        kpi-header (space-y-1)
+          title-row (flex, gap-2, align-center)
+            title (text-muted)
+            info-icon (UIcon, text-dimmed)
+          metric-row (flex, gap-4, align-center)
+            headline-total (text-3xl, font-semibold, tracking-tight)
+            trend-badge (UBadge, variant=soft, text-success)
+        chart-container (UCard, variant=soft)
+          AreaChart (dual-series, MonotoneX, dashed grid, no legend)
+        footer-bar (flex, justify-between)
+          series-indicators (flex, gap-6)
+            indicator (dot + label + value) x N
+          cta-button (UButton, ghost, trailing arrow)
+  responsive:
+    mobile: chart height 120px, metric row may wrap
+    tablet: chart height 240px, all inline
+    desktop: chart height 240px, spacious
+
+slots:
+  kpi-header: Override KPI headline section
+  chart: Override chart content
+  footer: Override series indicators and CTA
+
+tokens:
+  card-bg: bg-default/60
+  card-variant: subtle
+  chart-variant: soft
+  title-color: text-muted
+  info-icon-color: text-dimmed
+  headline-font: text-3xl font-semibold tracking-tight
+  badge-variant: soft
+  badge-color: text-success
+  indicator-dot: h-2 w-2 animate-pulse rounded-full
+  series-label: text-muted dark:text-dimmed
+  series-value: font-medium
+  grid-dash: "--vis-axis-grid-line-dasharray: 5 5"
+
+chartConfig:
+  type: area
+  curveType: MonotoneX
+  gradient: true
+  tooltip: true
+  xAxis: true
+  yAxis: true
+  xGridLine: true
+  xNumTicks: 6
+  yNumTicks: 4
+  hideLegend: true
+  colorModeReactive: true
+
+atomicHint:
+  organism: TrendHeaderAreaCard
+  molecules: [KPIHeader, SeriesIndicatorBar, NestedChartContainer]
+  atoms: [HeadlineTotal, TrendBadge, InfoIcon, AnimatedDot]
+
+examples:
+  - context: "Executive dashboard KPI"
+    data: "6-month revenue total with +21% trend badge, desktop/mobile split chart"
+  - context: "Marketing campaign ROI"
+    data: "Monthly spend with headline total and percentage return badge"
+
+composesWith:
+  - "area-chart-preview (same source, compact preview variant)"
+  - "area-chart-data (same source, data breakdown variant)"
+  - "KPI dashboard row (DSE composition)"
+
+avoid:
+  - "Hiding the KPI header -- the trend headline is this pattern's defining feature"
+  - "Using small font for total -- text-3xl minimum for headline impact"
+  - "Removing the trend badge -- percentage context is essential"
+  - "Static currency strings -- use Intl.NumberFormat for localization"
+  - "Fixed chart height -- use useResponsiveHeight composable"
+
+derivation:
+  source: "nuxt-charts/area-charts/area-chart-three"
+  method: "structural-abstraction"
+  what-was-kept: >
+    KPI-header-first layout with text-3xl currency total, UBadge trend indicator,
+    dual-series area chart in nested soft card, MonotoneX interpolation, dashed
+    grid, animated series indicators with computed totals, ghost CTA button.
+  what-was-removed: >
+    Hardcoded data, specific hex colors, static percentage and title text,
+    inline style bindings.
+  transformative-value: >
+    Reusable KPI-header area chart pattern where the headline metric and trend
+    take visual priority over the chart itself.

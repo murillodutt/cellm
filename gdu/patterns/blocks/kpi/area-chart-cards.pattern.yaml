@@ -1,0 +1,99 @@
+# Block Pattern: Area Chart Score Cards
+id: area-chart-cards
+name: Score Cards with Area Chart
+version: "1.0.0"
+catalogRef: area-chart-cards
+category: kpi
+tags: [area-chart, cards, score, temporal]
+archetype: chart-heavy
+description: >
+  Score cards showing a label, score value with denominator, and a full-width
+  area chart below with temporal data. Larger chart than mini-chart-cards,
+  with date range labels. No axes, no legend, just the area fill.
+
+requires:
+  components: [UCard]
+  charts: [AreaChart]
+  composables: []
+
+props:
+  interface: |
+    interface ScoreCardData {
+      name: string
+      value: number
+      max?: number
+      data: { date: string; value: number }[]
+    }
+    interface AreaChartCardsProps {
+      cards: ScoreCardData[]
+    }
+
+emits:
+  interface: |
+    interface AreaChartCardsEmits {
+      'card:click': [name: string]
+    }
+
+layout:
+  structure: |
+    card-grid (responsive columns)
+      card-shell (repeat per card)
+        label (font-medium)
+        score-row [value (xl bold), denominator (/max, muted small)]
+        area-chart (full card width, height ~60px, no axes/legend)
+        date-range-row [start-date (dimmed small), end-date (dimmed small)]
+  responsive:
+    mobile: single column
+    tablet: 2-column grid
+    desktop: 3-column grid
+
+slots:
+  card: "Override individual card"
+
+tokens:
+  card-bg: bg-default
+  label-text: text-highlighted
+  value-text: text-highlighted
+  max-text: text-muted
+  date-text: text-dimmed
+  chart-color: text-success
+
+chartConfig:
+  height: 60
+  hideXAxis: true
+  hideYAxis: true
+  hideLegend: true
+  note: "Larger than mini-chart, fills card width with date labels below"
+
+atomicHint:
+  organism: AreaChartCardGrid
+  molecules: [AreaScoreCard]
+  atoms: [ScoreDisplay, DateRangeLabel]
+
+examples:
+  - context: "Lighthouse scores with trend"
+    cards: ["Performance (91/100, 12-month area)", "SEO (43/100, 12-month area)"]
+  - context: "Growth metrics"
+    cards: ["MRR ($12K/100K, 12-month area)", "Users (5K, 6-month area)"]
+
+composesWith:
+  - "KPI Card (DSE composition)"
+  - "progress-circle (alternative score visualization)"
+
+derivation:
+  source: "nuxt-charts/cards/cards-with-area-chart"
+  method: "structural-abstraction"
+  what-was-kept: >
+    Score + area chart card concept, value/max display, full-width area
+    chart below value, date range labels, minimal chart config.
+  what-was-removed: >
+    All Vue template markup, hardcoded vitals/chart data, specific chart
+    categories config, BulletLegendItemInterface import, CSS classes.
+  transformative-value: >
+    Combines score display with temporal trend in a single compact card.
+    More informative than progress-circle, less dense than mini-chart-cards.
+
+avoid:
+  - "Axes on the chart — keep it clean, dates go below as text labels"
+  - "Fixed data — accept temporal data via props"
+  - "Ignoring the denominator — show /max when provided"

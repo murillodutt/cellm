@@ -1,0 +1,96 @@
+# Block Pattern: Stacked Bar Chart
+id: bar-chart-stacked
+name: Stacked Bar Chart for Composition
+version: "1.0.0"
+catalogRef: bar-chart-three
+category: visualization
+tags: [bar, stacked, multi-series, composition, proportion]
+archetype: chart-heavy
+description: >
+  Vertical bar chart with series stacked on top of each other, showing
+  composition and total per category. Card-wrapped with legend and tooltip.
+
+requires:
+  components: [UCard]
+  charts: [BarChart]
+  composables: []
+
+props:
+  interface: |
+    interface StackedBarDataPoint {
+      category: string
+      [key: string]: string | number
+    }
+    interface BarChartStackedProps {
+      data: StackedBarDataPoint[]
+      categories: Record<string, { name: string; color?: string }>
+      index?: string
+      title?: string
+      normalized?: boolean
+    }
+
+emits:
+  interface: |
+    interface BarChartStackedEmits {
+      'segment:click': [category: string, series: string, value: number]
+    }
+
+layout:
+  structure: |
+    card-shell
+      header [title]
+      chart-container
+        BarChart (stacked mode, vertical, legend, tooltip)
+      footer [optional total label]
+  responsive:
+    mobile: chart height ~250px
+    tablet: chart height ~300px
+    desktop: chart height ~350px
+
+slots:
+  header: "Override card header"
+  tooltip: "Custom tooltip"
+
+tokens:
+  card-bg: bg-default
+
+chartConfig:
+  type: bar
+  mode: stacked
+  orientation: vertical
+  legend: true
+  tooltip: true
+  xAxis: true
+  yAxis: true
+  note: "Set normalized=true for 100% stacked proportional view"
+
+atomicHint:
+  organism: StackedBarChartCard
+  molecules: [ChartContainer, Legend]
+  atoms: [StackedSegment, Tooltip]
+
+examples:
+  - context: "Revenue breakdown by source"
+    data: "Monthly x Organic, Paid, Referral"
+  - context: "Bug severity distribution"
+    data: "Sprint x Critical, High, Medium, Low"
+
+composesWith:
+  - "Dashboard Page Layout (DSE composition)"
+  - "bar-chart-grouped (alternative comparison view)"
+
+derivation:
+  source: "nuxt-charts/bar-charts/bar-chart-three"
+  method: "structural-abstraction"
+  what-was-kept: >
+    Stacked bar concept, multi-series composition, legend, tooltip,
+    optional normalized (100%) mode.
+  what-was-removed: >
+    All Vue template markup, hardcoded data, CSS classes.
+  transformative-value: >
+    Generic stacked bar with optional normalization for proportional analysis.
+
+avoid:
+  - "Grouping bars — use bar-chart-grouped pattern instead"
+  - "Too many series (>6) — stacks become unreadable"
+  - "Missing legend — essential for distinguishing stacked segments"

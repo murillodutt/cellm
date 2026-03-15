@@ -1,0 +1,152 @@
+id: bar-chart-nine
+name: Period Comparison Stacked Bar Chart
+version: 1.0.0
+catalogRef: bar-chart-nine
+category: visualization
+tags:
+  - bar
+  - stacked
+  - period-comparison
+  - kpi-header
+  - toggle-tip
+basePattern: bar-chart-stacked
+archetype: chart-heavy
+description: >
+  Stacked bar chart with dual-KPI header comparing current vs previous period.
+  Features period summary grid (this period / previous period with percentage
+  delta), soft inner card container, built-in toggleable legend, x-grid lines,
+  and a hint tip below chart suggesting legend interaction.
+
+requires:
+  components: [UCard]
+  charts: [BarChart]
+  composables: [useResponsiveHeight]
+
+props:
+  interface: |
+    interface RevenueDataPoint {
+      month: string
+      desktop: number
+      mobile: number
+    }
+    interface BarChartNineProps {
+      data: RevenueDataPoint[]
+      categories: Record<string, BulletLegendItemInterface>
+      currentPeriodValue?: string
+      previousPeriodValue?: string
+      percentageDelta?: string
+      periodLabel?: string
+    }
+
+emits:
+  interface: |
+    interface BarChartNineEmits {
+      'legend:toggle': [series: string, visible: boolean]
+      'period:change': [period: string]
+    }
+
+layout:
+  structure: |
+    wrapper (max-w-3xl centered)
+      card-shell (bg-default/60 translucent)
+        content-stack (space-y-4)
+          kpi-grid (grid-cols-2 gap-6)
+            current-period
+              label (text-sm muted)
+              value (text-3xl semibold)
+              date-range (text-xs dimmed)
+            previous-period (text-right)
+              label (text-sm muted)
+              value (text-3xl semibold)
+              delta (text-xs dimmed, percentage)
+          inner-card (UCard variant=soft)
+            BarChart (stacked, vertical, x-grid, legend top-right)
+            hint-tip (text-xs dimmed centered, below chart)
+  responsive:
+    mobile: chart height 120px, KPI grid stacks if needed
+    tablet: chart height 240px, side-by-side KPIs
+    desktop: max-w-3xl centered, full layout
+
+slots:
+  kpi-header: Override the dual-KPI comparison grid
+  chart: Override chart container and hint
+  footer: Add optional footer content
+
+tokens:
+  card-bg: bg-default/60 (translucent)
+  inner-card-bg: variant-soft
+  kpi-label: text-sm text-muted
+  kpi-value: text-3xl font-semibold
+  kpi-date: text-xs text-dimmed
+  series-primary: text-primary
+  series-secondary: text-success
+  bar-radius: radius-4
+  hint-text: text-xs text-dimmed
+  x-grid: visible
+  y-grid: hidden
+
+chartConfig:
+  type: bar
+  orientation: vertical
+  stacked: true
+  radius: 4
+  groupPadding: 0
+  barPadding: 0.2
+  xNumTicks: 6
+  yNumTicks: 3
+  legendPosition: TopRight
+  xGridLine: true
+  yGridLine: false
+  tooltip: true
+  legend: true
+  xAxis: true
+  yAxis: true
+
+atomicHint:
+  organism: PeriodComparisonStackedCard
+  molecules:
+    - DualKPIGrid (current vs previous period values)
+    - SoftChartContainer (inner card with chart)
+    - HintTip (legend interaction suggestion)
+  atoms:
+    - KPIValue
+    - PeriodLabel
+    - DeltaPercentage
+    - StackedSegment
+
+examples:
+  - context: Revenue period comparison
+    data: "6 months x desktop+mobile stacked, current 21K vs previous 17K (+21.6%)"
+    usage: Financial dashboard comparing current vs previous period totals
+  - context: User acquisition comparison
+    data: "Weekly organic+paid stacked, this week vs last week with growth delta"
+    usage: Growth dashboard showing acquisition channel mix over time
+
+composesWith:
+  - bar-chart-stacked (base stacked without KPI header)
+  - bar-chart-one (single-series variant with hero total)
+  - Dashboard Page Layout (DSE composition)
+
+derivation:
+  source: nuxt-charts/bar-charts/bar-chart-nine
+  method: structural-abstraction
+  what-was-kept: >
+    Dual-KPI comparison grid (current vs previous period with percentage delta),
+    translucent card background (bg-default/60), soft inner card variant,
+    stacked bars with theme-variable colors (primary + success), x-grid lines
+    with y-grid hidden, hint tip below chart ("Toggle legend items to focus"),
+    3 y-ticks for clean scale, legend at TopRight.
+  what-was-removed: >
+    All Vue template markup, hardcoded revenue data, specific period labels,
+    CSS classes, literal percentage values.
+  transformative-value: >
+    Period-over-period comparison pattern. The dual-KPI header provides immediate
+    context before the user reads the chart. Translucent card and hint tip add
+    visual polish and discoverability.
+
+avoid:
+  - Opaque card background — translucent bg-default/60 is the defining visual
+  - Missing KPI header — the period comparison context is essential
+  - Removing the hint tip — it teaches users about legend toggle interaction
+  - Ungrouped stacking — bars must be stacked to show composition
+  - More than 2 series — the KPI header supports two-period comparison

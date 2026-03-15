@@ -1,0 +1,133 @@
+# Block Pattern: File Upload Profile Variant (Gallery + Upload Modal)
+# Distributable structural specification — no licensed code
+# Generated from catalog ref, not source transcription
+
+id: file-upload-profile-variant
+name: Profile Image Upload with Gallery
+version: "1.0.0"
+catalogRef: file-upload-profile-variant
+category: form
+tags: [upload, image, gallery, profile, modal, drag-drop]
+basePattern: file-upload
+
+archetype: form-heavy
+description: >
+  Profile image upload modal offering two methods: (1) UFileUpload drag-and-drop
+  zone for new images, (2) gallery grid of existing images for selection. Methods
+  separated by "OR" separator. Gallery images show ring highlight on selection.
+  Card with header (title + description), footer with cancel/save actions.
+
+requires:
+  components: [UCard, UFileUpload, USeparator, UButton]
+  charts: []
+  composables: []
+
+props:
+  interface: |
+    interface FileUploadProfileVariantProps {
+      galleryImages?: string[]         // array of image URLs
+      acceptTypes?: string             // default 'PNG, JPG, PDF, GIF, SVG'
+      maxSize?: number                 // bytes, default 5MB
+      multiple?: boolean               // default true
+      uploadLabel?: string             // default 'Click or drag and drop to upload your file'
+      uploadDescription?: string       // default 'PNG, JPG, PDF, GIF, SVG (Max 5 MB)'
+    }
+
+emits:
+  interface: |
+    interface FileUploadProfileVariantEmits {
+      'upload': [files: File[]]
+      'gallery:select': [imageIndex: number]
+      'save': [selection: { type: 'upload' | 'gallery'; value: File[] | number }]
+      'cancel': []
+    }
+
+layout:
+  structure: |
+    card-shell (max-width ~448px, centered)
+      card-header
+        title [h3, semibold, "Upload your profile image"]
+        description [dimmed, small, "Choose an image that will appear everywhere"]
+      card-body (space-y-6)
+        upload-section
+          section-label [small, medium, "Upload new image:"]
+          file-upload-zone (UFileUpload)
+            icon (folder-open)
+            label [click or drag text]
+            description [accepted formats + size limit]
+        separator (USeparator, label="OR")
+        gallery-section
+          section-label [small, medium, "Choose from your gallery:"]
+          gallery-grid (5 columns, gap-2)
+            gallery-image (repeat, aspect-square, rounded-lg)
+              states: default (hover ring) | selected (ring-2 ring-primary ring-offset-2)
+      card-footer (flex, justify-between)
+        cancel-button (neutral outline)
+        save-button (primary solid)
+  responsive:
+    mobile: full-width card, gallery 3-4 columns
+    tablet: centered card, gallery 5 columns
+    desktop: same as tablet, max-width 448px
+
+slots:
+  upload-zone: "Custom file upload zone"
+  gallery-item: "Custom gallery image rendering"
+  actions: "Override footer buttons"
+
+tokens:
+  card-bg: bg-default
+  header-text: text-highlighted
+  description-text: text-dimmed
+  section-label: "text-sm font-medium"
+  separator-label: "OR"
+  gallery-columns: "grid-cols-5"
+  gallery-image-radius: rounded-lg
+  gallery-selected-ring: "ring-2 ring-primary-500 ring-offset-2"
+  gallery-hover-ring: "hover:ring-2 hover:ring-primary-500/50"
+  gallery-dark-offset: ring-offset-default
+  cancel-variant: outline
+  save-color: primary
+
+atomicHint:
+  organism: ProfileImageUploadModal
+  molecules: [FileUploadZone, GalleryGrid, ActionBar]
+  atoms: [GalleryImage, UploadHint, SeparatorLabel]
+
+examples:
+  - context: "User avatar selection"
+    galleryImages: ["5 pre-cropped avatar options"]
+    maxSize: "5MB"
+  - context: "Team profile photo"
+    galleryImages: ["Company photo library thumbnails"]
+    multiple: false
+
+composesWith:
+  - "file-upload (full-featured upload without gallery)"
+  - "file-upload-profile (avatar + form alternative)"
+
+derivation:
+  source: "nuxt-charts/file-upload/nuxt-ui-file-upload-modal"
+  method: "structural-abstraction"
+  what-was-kept: >
+    Dual-method image selection pattern (UFileUpload zone + gallery grid),
+    USeparator with "OR" label between methods, gallery grid with 5 columns
+    and ring highlight on selection (ring-2 ring-primary ring-offset-2),
+    hover ring preview on gallery images, UFileUpload with folder-open icon
+    and format/size description, card header with title + description,
+    footer with cancel/save buttons, selectedImage ref tracking gallery
+    selection index.
+  what-was-removed: >
+    All Vue template markup, gallery image URLs, onUpdate console.log,
+    specific icon names, CSS utility classes, v-for iteration logic.
+  transformative-value: >
+    Captures the "upload OR select from gallery" dual-method pattern.
+    Ring-based selection feedback on gallery grid. Typed emits distinguish
+    between upload and gallery selection paths. Configurable gallery images
+    and upload constraints.
+
+avoid:
+  - "Single method only — always offer both upload and gallery selection"
+  - "No visual separator — OR separator is essential for method distinction"
+  - "Missing selection ring — selected gallery image needs clear ring highlight"
+  - "Gallery without aspect-ratio — images must be square (aspect-square)"
+  - "No hover preview on gallery — ring-primary/50 on hover before selection"

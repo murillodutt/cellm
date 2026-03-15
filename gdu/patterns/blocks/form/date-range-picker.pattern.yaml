@@ -1,0 +1,135 @@
+# Block Pattern: Date Range Picker
+# Distributable structural specification — no licensed code
+# Generated from catalog ref, not source transcription
+
+id: date-range-picker
+name: Calendar Date Range Picker
+version: "1.0.0"
+catalogRef: date-range-picker
+category: form
+tags: [calendar, date, range, picker, selection, period]
+basePattern: date-picker
+
+archetype: form-heavy
+description: >
+  Calendar component configured for range selection mode. Two clicks define
+  start and end dates with visual range highlighting between them. Hover
+  preview shows tentative range before second click. Supports month navigation,
+  disabled dates, min/max bounds, and optional time slot picker alongside.
+
+requires:
+  components: [UButton, UIcon]
+  charts: []
+  composables: [useToast]
+
+props:
+  interface: |
+    interface DateRangePickerProps {
+      initialStartDate?: Date
+      initialEndDate?: Date
+      minDate?: Date
+      maxDate?: Date
+      disabledDates?: Date[]
+      showTimePicker?: boolean      // default false
+      timeSlots?: string[]          // e.g. ['09:00', '09:15', ...]
+      dateFormat?: string           // default 'dddd, MMMM D, YYYY'
+      weekDayLabels?: string[]      // default ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
+      locale?: string               // default 'en'
+      orientation?: 'horizontal' | 'vertical'
+    }
+
+emits:
+  interface: |
+    interface DateRangePickerEmits {
+      'range-select': [range: { start: Date | null; end: Date | null }]
+      'time-select': [time: string]
+      'month-change': [month: Date]
+      'year-change': [year: number]
+    }
+
+layout:
+  structure: |
+    container (flex, horizontal or vertical orientation)
+      calendar-section
+        header-bar (flex, space-between)
+          prev-month-button (UButton, chevron-left, neutral soft)
+          month-year-label [centered, lg font, medium weight]
+          next-month-button (UButton, chevron-right, neutral soft)
+        calendar-grid-area
+          weekday-row (7 columns, muted text, small)
+          day-grid (7 columns, aspect-square cells)
+            day-cell (button, transition-colors)
+              states: default | today (text-primary) | start-date (bg-primary text-white)
+                | end-date (bg-primary text-white) | in-range (bg-muted)
+                | hover-preview (bg-primary-100) | disabled (opacity-50, cursor-not-allowed)
+                | outside-month (text-dimmed)
+      time-picker-panel (conditional, border-left or stacked)
+        time-slot-grid
+          time-button (repeat, neutral soft, selected=bg-primary text-white)
+  responsive:
+    mobile: single column, calendar full-width, time picker below
+    tablet: horizontal layout, time picker beside calendar
+    desktop: same as tablet
+
+slots:
+  header: "Override month navigation bar"
+  day-cell: "Custom day cell rendering"
+  time-slot: "Custom time slot rendering"
+
+tokens:
+  day-default: text-default
+  day-today: text-primary
+  day-selected: "bg-primary text-white font-medium"
+  day-in-range: bg-muted
+  day-hover-preview: "bg-primary-100 dark:bg-primary-900 text-primary-600"
+  day-disabled: "opacity-50 cursor-not-allowed"
+  day-outside-month: text-dimmed
+  day-hover: bg-muted
+  weekday-label: text-muted
+  nav-button-color: neutral
+  nav-button-variant: soft
+  time-slot-default: "neutral soft"
+  time-slot-selected: "bg-primary-500 text-white font-medium"
+
+atomicHint:
+  organism: DateRangePicker
+  molecules: [CalendarGrid, MonthNavigation, TimeSlotPicker, RangeHighlight]
+  atoms: [DayCell, WeekdayLabel, NavButton, TimeSlotButton]
+
+examples:
+  - context: "Hotel booking (check-in to check-out)"
+    mode: range
+    showTimePicker: false
+  - context: "Meeting scheduler (date + time)"
+    mode: range
+    showTimePicker: true
+    timeSlots: ["09:00", "10:00", "11:00", "14:00", "15:00"]
+
+composesWith:
+  - "date-picker (single selection alternative)"
+  - "calendar-multi-month (expanded view for broad ranges)"
+
+derivation:
+  source: "nuxt-charts/calendar/Calendar.vue (selectionMode=Range)"
+  method: "structural-abstraction"
+  what-was-kept: >
+    Range selection mode with two-click start/end, hover preview of tentative
+    range (isInHoverRange), visual states for start-date, end-date, in-range,
+    hover-end-date, month navigation with prev/next buttons, optional time
+    slot picker panel (horizontal/vertical orientation), disabled date support
+    with min/max bounds, locale-aware day.js formatting, toast feedback on
+    selection, mouseenter/mouseleave hover tracking for range preview.
+  what-was-removed: >
+    All Vue template markup, dayjs computation logic, reactive refs, computed
+    properties, CSS utility class sequences, specific time slot values.
+  transformative-value: >
+    Captures range selection UX as a pattern: two-click selection with
+    hover preview, visual range highlighting, and optional time pairing.
+    Orientation-aware layout (horizontal vs vertical) for different contexts.
+
+avoid:
+  - "No hover preview — user must see tentative range before confirming end date"
+  - "Missing start/end visual distinction — both endpoints need bg-primary"
+  - "No range highlighting — days between start and end must be visually connected"
+  - "Ignoring click order — if end < start, auto-swap start and end"
+  - "Missing disabled date support — min/max/specific dates must be enforced"

@@ -1,0 +1,172 @@
+id: donut-chart-four
+name: Revenue Distribution Donut with Detail Panel
+version: 1.0.0
+catalogRef: donut-chart-four
+category: visualization
+tags:
+  - donut
+  - detail-panel
+  - revenue
+  - center-label
+  - responsive-layout
+basePattern: donut-chart-interactive
+archetype: chart-heavy
+description: >
+  Full donut chart with center label and a detailed side panel showing
+  category breakdown with monthly queries and percentages. Responsive
+  layout flips from stacked (mobile) to side-by-side (desktop). Card
+  footer includes real-time indicator, configure button, and analytics
+  link. Designed for product revenue distribution analysis.
+
+requires:
+  components: [UCard, UButton, UIcon]
+  charts: [DonutChart]
+  composables: []
+
+props:
+  interface: |
+    interface RevenueSegment {
+      name: string
+      usage: number
+      color: string
+      performance: number
+      monthlyQueries: string
+    }
+    interface DonutChartFourProps {
+      data: RevenueSegment[]
+      title?: string
+      subtitle?: string
+      centerValue?: string
+      centerLabel?: string
+    }
+
+emits:
+  interface: |
+    interface DonutChartFourEmits {
+      'segment:hover': [name: string, usage: number]
+      'configure': []
+      'view-analytics': []
+    }
+
+layout:
+  structure: |
+    wrapper (max-w-2xl py-8)
+      card-shell
+        header (UCard #header slot)
+          title-block (flex justify-between)
+            title (text-lg font-medium)
+            subtitle (text-muted text-sm)
+        content-layout (flex-col mobile, flex-row desktop, gap-8)
+          chart-column (flex-1 relative)
+            DonutChart (full type, center label, no legend)
+            center-overlay
+              value (text-2xl font-bold)
+              label (text-dimmed text-xs)
+          detail-column (flex-1 space-y-4)
+            section-label (text-muted text-xs uppercase tracking-wide)
+            detail-list (space-y-4)
+              detail-row (repeat per segment, flex justify-between)
+                left (flex gap-2)
+                  color-swatch (h-3 w-3 rounded-full)
+                  name (font-medium)
+                right (flex gap-3 text-muted)
+                  queries-count
+                  percentage (text-default font-medium)
+        footer (UCard #footer slot)
+          footer-row (flex justify-between, responsive)
+            live-indicator (flex gap-2)
+              dot (h-2 w-2 rounded-full bg-green-500)
+              label (text-muted text-sm)
+            action-buttons (flex gap-2)
+              configure-btn (outline, trailing settings icon)
+              analytics-btn (outline, trailing bar-chart-3 icon)
+  responsive:
+    mobile: chart above detail panel (stacked), footer stacks vertically
+    tablet: side-by-side with gap-8
+    desktop: max-w-2xl centered, py-8 comfortable padding
+
+slots:
+  header: Override card header
+  center: Custom center label content
+  detail-panel: Override segment detail column
+  footer: Override footer with actions
+
+tokens:
+  card-bg: bg-default
+  title-text: text-lg font-medium
+  subtitle-text: text-muted text-sm
+  center-value: text-2xl font-bold
+  center-label: text-dimmed text-xs
+  section-label: text-muted text-xs tracking-wide uppercase
+  swatch-size: h-3 w-3 rounded-full
+  segment-name: font-medium
+  segment-queries: text-muted
+  segment-pct: text-default font-medium
+  live-dot: h-2 w-2 rounded-full bg-green-500
+  live-label: text-muted text-sm
+  button-style: variant-outline color-neutral
+
+chartConfig:
+  type: donut
+  donutType: Full
+  radius: 0
+  hideLegend: true
+  height: 160
+  centerLabel: true
+  legendPosition: BottomCenter
+  tooltip: true
+  legend: false
+  note: "Legend hidden — detail panel serves as rich legend alternative with queries and performance data"
+
+atomicHint:
+  organism: RevenueDistributionCard
+  molecules:
+    - TitleSubtitleHeader (in UCard header slot)
+    - DonutWithCenter (chart + center overlay)
+    - DetailPanel (section label + segment rows with queries)
+    - FooterWithActions (live indicator + configure + analytics buttons)
+  atoms:
+    - CenterOverlay
+    - DetailRow (swatch + name + queries + percentage)
+    - LiveIndicator
+    - ActionButton
+
+examples:
+  - context: Product revenue distribution
+    data: "Product 45% (2.1M queries), Services 25% (1.4M), Support 20% (850K), Other 10% (420K)"
+    usage: Product analytics dashboard with detailed segment performance metrics
+  - context: API endpoint usage distribution
+    data: "Authentication 40%, Data 30%, Search 20%, Admin 10% with monthly request counts"
+    usage: Developer dashboard showing API traffic distribution with volume details
+
+composesWith:
+  - donut-chart-interactive (simpler interactive variant without detail panel)
+  - donut-chart-two (side legend without queries/performance data)
+  - Dashboard Page Layout (DSE composition)
+
+derivation:
+  source: nuxt-charts/donut-charts/donut-chart-four
+  method: structural-abstraction
+  what-was-kept: >
+    Full donut with center label (percentage + category name), responsive
+    flex layout (stacked mobile, side-by-side desktop with lg:flex-row lg:gap-8),
+    detail panel with section label ("Category Breakdown"), segment rows showing
+    color swatch h-3 w-3, name, monthlyQueries, and usage percentage. Footer
+    with live indicator (green dot + "Real-time data"), configure button
+    (settings icon), analytics button (bar-chart-3 icon). CSS var colors
+    (--color-indigo-500 etc.), radius 0 for sharp edges.
+  what-was-removed: >
+    All Vue template markup, hardcoded RevenueData array, computed data/categories,
+    specific CSS variable colors, icon names, CSS classes.
+  transformative-value: >
+    Rich distribution analysis pattern with detail panel replacing simple legend.
+    MonthlyQueries and performance metrics per segment enable deeper analysis
+    without drill-down. Footer actions provide configuration and analytics
+    navigation paths.
+
+avoid:
+  - Simple legend instead of detail panel — rich segment data is the defining feature
+  - Removing center label — it provides at-a-glance focus on primary segment
+  - Fixed stacked layout — responsive flip to side-by-side is essential
+  - Missing footer actions — configure and analytics complete the analytics workflow
+  - Too many segments (>5) — detail panel rows become unwieldy

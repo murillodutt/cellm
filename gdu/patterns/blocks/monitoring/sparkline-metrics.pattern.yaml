@@ -1,0 +1,138 @@
+# Block Pattern: Sparkline Metrics
+# Distributable structural specification — no licensed code
+# Generated from catalog ref, not source transcription
+
+id: sparkline-metrics
+name: Real-time Sparkline Metrics Grid
+version: "1.0.0"
+catalogRef: spark-line-inline-metrics
+category: monitoring
+tags: [sparkline, metrics, realtime, monitoring, grid, threshold]
+
+archetype: chart-heavy
+description: >
+  Grid of metric cards, each showing a label, current value with unit,
+  a status badge derived from threshold rules, and a mini sparkline
+  rendered as an inline SVG area path. Supports real-time polling
+  with play/pause toggle and a color-coded legend footer.
+
+requires:
+  components: [UCard, UButton, UIcon]
+  charts: []
+  composables: [useIntervalFn]
+  note: "Inline sparklines use raw SVG paths, not AreaChart — simpler and lighter"
+
+props:
+  interface: |
+    interface SparklineMetric {
+      id: string
+      label: string
+      value: number
+      unit: string
+      data: number[]
+      maxDataPoints?: number       // default 20
+      threshold?: {
+        warning: number
+        critical: number
+      }
+    }
+    interface SparklineMetricsProps {
+      metrics: SparklineMetric[]
+      pollingMs?: number           // default 2000
+      autoStart?: boolean          // default true
+    }
+
+layout:
+  structure: |
+    card-shell
+      header-row
+        title-group [title, subtitle]
+        controls [live-indicator (pulsing dot + label), play-pause-button]
+      metric-grid (responsive: 1-col mobile, 2-col tablet, 3-col desktop)
+        metric-card (repeat per metric)
+          status-badge (top-right, derived from threshold: normal/warning/critical)
+          label (muted, small)
+          value-row [value (large bold), unit (muted small)]
+          sparkline-area (inline SVG: gradient fill + stroke path + endpoint dot)
+      footer-row
+        update-frequency-label
+        legend (dot + label for each status level: normal, warning, critical)
+        action-links [configure, full-dashboard]
+  responsive:
+    mobile: single-column metric grid, stacked footer
+    tablet: 2-column metric grid
+    desktop: 3-column metric grid, inline footer
+
+emits:
+  interface: |
+    interface SparklineMetricsEmits {
+      'update:polling': [active: boolean]
+      'metric:click': [metricId: string]
+    }
+
+slots:
+  metric-card: "Override individual metric card rendering"
+  header-actions: "Extra controls next to play/pause"
+  footer: "Replace default footer entirely"
+
+tokens:
+  card-bg: bg-default
+  card-border: border-default
+  metric-card-bg: bg-elevated
+  label-text: text-muted
+  value-text: text-highlighted
+  status-normal: text-success
+  status-warning: text-warning
+  status-critical: text-error
+  sparkline-gradient-opacity: "0.3 top, 0 bottom"
+  legend-dot-normal: bg-success
+  legend-dot-warning: bg-warning
+  legend-dot-critical: bg-error
+
+chartConfig:
+  type: area
+  inline: true
+  dimensions: { width: 50, height: 20 }
+  gradient: true
+  strokeWidth: 1.5
+  endpointDot: true
+  note: "For inline sparklines, raw SVG path is simpler than full AreaChart component"
+
+atomicHint:
+  organism: SparklineMetricsGrid
+  molecules: [MetricCard, SparklineSVG, StatusBadge, LiveIndicator]
+  atoms: [ThresholdDot, UnitLabel]
+
+examples:
+  - context: "Server monitoring dashboard"
+    metrics: ["CPU Usage (%)", "Memory (%)", "Network I/O (MB/s)", "Requests/sec", "Error Rate (%)", "Avg Latency (ms)"]
+  - context: "E-commerce real-time"
+    metrics: ["Orders/min", "Revenue/hr ($)", "Cart Abandonment (%)", "Active Users"]
+
+composesWith:
+  - "KPI Card (DSE composition)"
+  - "Dashboard Page Layout (DSE composition)"
+  - "Status Overview Section"
+
+derivation:
+  source: "nuxt-charts/status/spark-line-inline-metrics"
+  method: "structural-abstraction"
+  what-was-kept: >
+    Conceptual layout (grid of metric cards with sparklines), threshold-based
+    status logic (normal/warning/critical), responsive breakpoints (1/2/3 cols),
+    props interface shape (metric array with thresholds), interaction pattern
+    (play/pause real-time polling).
+  what-was-removed: >
+    All Vue template markup, inline SVG path generation functions, CSS classes,
+    hardcoded sample data (CPU/Memory/Network values), specific RGB color values,
+    animation timings, DOM structure.
+  transformative-value: >
+    Converts implementation-specific Vue SFC into framework-agnostic structural
+    specification. Any frontend agent can generate a complete component from this
+    pattern using their target framework and project tokens.
+
+avoid:
+  - "Hardcoded RGB/hex colors — use semantic tokens from project DSE"
+  - "Direct SVG path math in template — extract to composable or utility"
+  - "Polling without cleanup — always clear intervals on unmount"
+  - "Fixed grid columns — must be responsive"

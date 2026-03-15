@@ -1,0 +1,147 @@
+# Block Pattern: Early Access Onboarding Form
+# Distributable structural specification — no licensed code
+# Generated from catalog ref, not source transcription
+
+id: onboarding
+name: Early Access Application Form
+version: "1.0.0"
+catalogRef: onboarding
+category: form
+tags: [onboarding, early-access, application, pricing, form, registration]
+basePattern: onboarding-wizard
+
+archetype: form-heavy
+description: >
+  Long-form early access application with personal info fields (name, email,
+  company), company size select, and pricing package selection via clickable
+  cards with radio-style selection. Two-column grid on desktop, separator
+  between personal info and package selection. Footer with back/apply actions.
+
+requires:
+  components: [UCard, UInput, USelect, UFormField, USeparator, UButton, UIcon]
+  charts: []
+  composables: []
+
+props:
+  interface: |
+    interface PackageOption {
+      value: string
+      label: string
+      description: string
+      price: string
+    }
+    interface OnboardingFormProps {
+      title?: string                    // default "Apply for early access"
+      description?: string              // intro text
+      companySizes?: string[]           // default ['1-10', '11-50', '51-200', '201-500', '500+']
+      packages?: PackageOption[]        // pricing tier cards
+      defaultPackage?: string           // pre-selected package value
+      submitLabel?: string              // default "Apply"
+      backLabel?: string                // default "Go back"
+    }
+
+emits:
+  interface: |
+    interface OnboardingFormEmits {
+      'submit': [data: {
+        firstName: string
+        lastName: string
+        email: string
+        company: string
+        companySize: string
+        package: string
+      }]
+      'back': []
+    }
+
+layout:
+  structure: |
+    card-shell (max-width ~768px, centered)
+      header-section
+        title [large, semibold]
+        description [dimmed, small text]
+      form-body (space-y-6)
+        personal-info-grid (2 columns on desktop)
+          first-name-field (UFormField + UInput, required)
+          last-name-field (UFormField + UInput)
+        email-field (UFormField + UInput, email type, required, full-width)
+        company-grid (2 columns on desktop)
+          company-field (UFormField + UInput)
+          company-size-field (UFormField + USelect, dropdown)
+        separator (USeparator)
+        package-section
+          section-label [small, medium font]
+          package-grid (3 columns on desktop)
+            package-card (repeat, clickable UCard)
+              card-header [label + selection icon (circle-check/circle)]
+              card-description [dimmed, small]
+              card-price [bold, bottom]
+        action-row (flex justify-end, gap, border-t)
+          back-button (outline, neutral)
+          apply-button (primary)
+  responsive:
+    mobile: single column, stacked fields, stacked package cards
+    tablet: 2-column grids, 3-column package grid
+    desktop: same as tablet, max-width 768px
+
+slots:
+  header: "Override title and description section"
+  package-card: "Custom package card rendering"
+  actions: "Override back/apply button row"
+
+tokens:
+  card-bg: bg-default
+  title-text: text-highlighted
+  description-text: text-dimmed
+  label-text: text-default
+  field-width: "w-full"
+  separator-color: border-default
+  package-selected-variant: outline
+  package-unselected-variant: soft
+  package-check-icon: "i-lucide-circle-check"
+  package-uncheck-icon: "i-lucide-circle"
+  selected-icon-color: text-primary
+  action-border: border-default
+
+atomicHint:
+  organism: EarlyAccessForm
+  molecules: [PersonalInfoSection, CompanyInfoSection, PackageSelector, ActionBar]
+  atoms: [FormField, CompanySizeSelect, PackageCard, SelectionIcon]
+
+examples:
+  - context: "SaaS early access waitlist"
+    packages: ["Starter (Free)", "Premium ($900/mo)", "Enterprise (Custom)"]
+    fields: ["First name", "Last name", "Email", "Company", "Company size"]
+  - context: "API product tier selection"
+    packages: ["Developer (Free)", "Pro ($49/mo)", "Business ($199/mo)"]
+
+composesWith:
+  - "basic-sign-in (login after application approved)"
+  - "sign-up (simplified registration alternative)"
+  - "onboarding-wizard (post-approval multi-step setup)"
+
+derivation:
+  source: "nuxt-charts/account/early-access-form"
+  method: "structural-abstraction"
+  what-was-kept: >
+    Long-form layout with personal info grid (firstName, lastName, email,
+    company, companySize), USeparator between sections, clickable package
+    cards with radio-style selection (circle-check vs circle icon), 3-column
+    package grid, reactive state binding, UFormField + UInput/USelect field
+    pattern, footer action row with back + apply buttons, 2-column responsive
+    grid for fields.
+  what-was-removed: >
+    All Vue template markup, specific default values (Emma Crown),
+    hardcoded package descriptions and prices, inline CSS classes,
+    specific placeholder text, reactive state management code.
+  transformative-value: >
+    Captures the "application form with pricing tier selection" pattern:
+    multi-section form with personal info, company info, and interactive
+    package card selection. Typed package options with label/description/price.
+
+avoid:
+  - "Package selection via dropdown — use visual cards for pricing tiers"
+  - "Missing required field markers — firstName and email must be required"
+  - "No visual selection feedback — selected card needs distinct variant + icon"
+  - "All fields in single column — use 2-column grid for name and company pairs"
+  - "Missing separator — visually separate personal info from package selection"

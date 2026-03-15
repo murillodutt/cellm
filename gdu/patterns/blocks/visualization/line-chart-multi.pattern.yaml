@@ -1,0 +1,138 @@
+# Block Pattern: Multi-Series Step-After Line Chart
+id: line-chart-multi
+name: Inventory Step-After Line Chart
+version: "1.1.0"
+catalogRef: line-chart-four
+category: visualization
+tags: [line, step-after, inventory, stock, orders, dual-series, axis-labels, responsive]
+archetype: chart-heavy
+description: >
+  Dual-series line chart using StepAfter curve type for discrete inventory
+  data (stock levels and orders). Features axis labels (x-label "Day of Week",
+  y-label "Count"), TopRight legend, y-grid with domain line, tick lines on
+  y-axis, and nested subtle card layout. Color-mode reactive via :key binding.
+  Ideal for data that changes in discrete steps rather than continuous trends.
+
+requires:
+  components: [UCard]
+  charts: [LineChart]
+  composables: [useResponsiveHeight, useColorMode]
+
+props:
+  interface: |
+    interface InventoryDataItem {
+      day: string
+      stock: number
+      orders: number
+    }
+    interface LineChartMultiProps {
+      data: InventoryDataItem[]
+      categories: ComputedRef<Record<string, BulletLegendItemInterface>>
+      title?: string
+      xLabel?: string
+      yLabel?: string
+    }
+
+emits:
+  interface: |
+    interface LineChartMultiEmits {
+      'day:select': [day: string, stock: number, orders: number]
+      'data:refresh': []
+    }
+
+layout:
+  structure: |
+    card-shell (UCard)
+      title-section
+        title (text-xl, font-semibold, tracking-tight)
+      chart-card (UCard, variant=subtle, mt-4)
+        LineChart (:key=colorMode, StepAfter, TopRight legend, tooltip)
+          x-axis (label="Day of Week", domainLine=true, numTicks=7)
+          y-axis (label="Count", gridLine=true, tickLine=true, numTicks=4)
+          series-stock (step-after line, color-1)
+          series-orders (step-after line, color-2)
+  responsive:
+    mobile: chart height 120px, compact
+    tablet: chart height 240px, spacious
+    desktop: chart height 240px, full layout
+
+slots:
+  header: Override title section
+  chart: Override chart with custom StepAfter config
+  legend: Override TopRight legend rendering
+
+tokens:
+  card-bg: bg-default
+  title-font: text-xl font-semibold tracking-tight
+  chart-card-variant: subtle
+  chart-card-margin: mt-4
+  legend-position: TopRight
+  x-label-text: "Day of Week"
+  y-label-text: "Count"
+  series-stock-color: text-blue-500
+  series-orders-color: text-purple-500
+
+chartConfig:
+  type: line
+  curveType: StepAfter
+  xGridLine: false
+  yGridLine: true
+  xDomainLine: true
+  yDomainLine: false
+  xTickLine: false
+  yTickLine: true
+  xNumTicks: 7
+  yNumTicks: 4
+  legendPosition: TopRight
+  hideLegend: false
+  hideTooltip: false
+  xLabel: "Day of Week"
+  yLabel: "Count"
+  tooltip: true
+  colorModeReactive: true
+  keyBinding: "colorMode.value"
+  xFormatter: "custom function mapping index to day name"
+  yFormatter: "custom function (value) => `${value}`"
+
+atomicHint:
+  organism: InventoryStepChartCard
+  molecules: [TitleHeader, StepAfterChart]
+  atoms: [StepAfterCurve, AxisLabel, LegendItem, DomainLine, TickLine]
+
+examples:
+  - context: "Inventory management dashboard"
+    data: "7-day stock levels (260-450 units declining) vs orders (78-125 daily)"
+  - context: "Server capacity monitoring"
+    data: "Hourly available slots (step-down) vs requests (step-up)"
+  - context: "Queue processing"
+    data: "Daily pending items vs completed items with discrete transitions"
+
+composesWith:
+  - "line-chart-five (multi-series with Basis curve, continuous alternative)"
+  - "line-chart-seven (dual-series with Linear curve)"
+  - "Operations dashboard layout (DSE composition)"
+
+avoid:
+  - "MonotoneX or Basis curves for discrete data -- StepAfter shows actual transition points"
+  - "Omitting axis labels -- xLabel and yLabel clarify the data domain"
+  - "Hiding the legend for dual-series -- TopRight position keeps it accessible"
+  - "Adding x-grid lines -- they clutter step charts, y-grid only"
+  - "Fixed chart height -- use useResponsiveHeight"
+
+derivation:
+  source: "nuxt-charts/line-charts/linecharts-chart-four"
+  method: "structural-abstraction"
+  what-was-kept: >
+    StepAfter curve type (CurveType.StepAfter) for discrete transitions,
+    dual-series inventory concept (stock/orders), computed categories with
+    colorMode reactivity, axis labels (x-label="Day of Week", y-label="Count"),
+    specific grid config (xGridLine=false, yGridLine=true, xDomainLine=true,
+    yDomainLine=false, xTickLine=false, yTickLine=true), LegendPosition.TopRight,
+    nested UCard (variant=subtle), colorMode :key binding, xNumTicks=7 for
+    daily data, simple xFormatter and yFormatter functions.
+  what-was-removed: >
+    Hardcoded 7-day inventory data, specific hex colors (#3b82f6, #a855f7),
+    static title text.
+  transformative-value: >
+    Only step-after curve pattern in the collection. Essential for discrete
+    data that changes at specific points rather than flowing continuously.

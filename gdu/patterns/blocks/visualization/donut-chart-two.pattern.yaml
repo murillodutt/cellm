@@ -1,0 +1,161 @@
+id: donut-chart-two
+name: Donut Chart with Side Legend
+version: 1.0.0
+catalogRef: donut-chart-two
+category: visualization
+tags:
+  - donut
+  - side-legend
+  - segments
+  - customer
+  - percentage
+basePattern: donut-chart-legend
+archetype: chart-heavy
+description: >
+  Donut chart with a side-by-side layout: chart on the left, detailed segment
+  legend on the right. Each legend row shows color swatch, segment name,
+  currency value, and percentage. Card header includes title, info icon, and
+  comparison delta badge. "Other" segment included in chart but excluded
+  from legend details.
+
+requires:
+  components: [UCard, UIcon]
+  charts: [DonutChart]
+  composables: []
+
+props:
+  interface: |
+    interface SegmentData {
+      id: string
+      name: string
+      value: number
+      percentage: number
+      color: string
+      chartValue: number
+    }
+    interface DonutChartTwoProps {
+      segments: SegmentData[]
+      title?: string
+      comparisonDelta?: string
+      comparisonLabel?: string
+      valueFormatter?: (value: number) => string
+    }
+
+emits:
+  interface: |
+    interface DonutChartTwoEmits {
+      'segment:hover': [segmentId: string]
+      'segment:click': [segmentId: string]
+      'info:click': []
+    }
+
+layout:
+  structure: |
+    wrapper (p-4)
+      card-shell (max-w-xl, ring-1 ring-muted/50)
+        header (UCard #header slot)
+          header-row (flex justify-between)
+            title-group (flex gap-2)
+              title (text-base font-medium text-highlighted)
+              info-icon (UIcon lucide-info, muted size-4)
+            delta-badge
+              delta-value (text-success font-medium)
+              delta-label (text-sm)
+        content-row (flex gap-4 py-2 px-4)
+          donut-container (shrink-0)
+            DonutChart (full type, no legend, slim arc)
+          legend-column (space-y-2)
+            legend-row (repeat per visible segment, flex justify-between)
+              left (flex gap-3)
+                color-swatch (size-2.5 rounded-full)
+                name (font-medium text-toned)
+              right (flex gap-2)
+                value (font-medium text-highlighted)
+                separator (dot)
+                percentage (text-muted)
+  responsive:
+    mobile: chart and legend stack vertically
+    tablet: side-by-side layout (chart left, legend right)
+    desktop: max-w-xl centered, comfortable spacing
+
+slots:
+  header: Override card header with title and delta
+  legend-item: Custom legend row rendering
+  footer: Add optional footer actions
+
+tokens:
+  card-bg: bg-default
+  card-ring: ring-1 ring-muted/50
+  title-text: text-base font-medium text-highlighted
+  info-icon: text-muted size-4
+  delta-text: text-success font-medium
+  swatch-size: size-2.5 rounded-full
+  segment-name: font-medium text-toned
+  segment-value: font-medium text-highlighted
+  separator: text-muted (dot character)
+  segment-pct: text-muted
+  arc-width: "16"
+  pad-angle: "0.02"
+
+chartConfig:
+  type: donut
+  donutType: Full
+  arcWidth: 16
+  padAngle: 0.02
+  radius: 0
+  hideLegend: true
+  height: 150
+  tooltip: true
+  legend: false
+  note: "Legend is rendered manually as a side column with rich formatting"
+
+atomicHint:
+  organism: DonutSideLegendCard
+  molecules:
+    - HeaderWithDelta (title + info icon + comparison badge)
+    - SideBySideLayout (chart left, legend right)
+    - RichLegendColumn (value + percentage per segment)
+  atoms:
+    - ColorSwatch
+    - SegmentValue
+    - PercentageLabel
+    - InfoIcon
+    - DeltaBadge
+
+examples:
+  - context: Customer segment distribution
+    data: "Premium $9,450 (32%), Regular $8,320 (46%), New $3,280 (20%), Other (hidden in legend)"
+    usage: CRM dashboard showing customer tier revenue breakdown
+  - context: Product category revenue
+    data: "Electronics (45%), Clothing (30%), Food (15%), Other (10%) with currency values"
+    usage: E-commerce dashboard with segment detail in side legend
+
+composesWith:
+  - donut-chart-legend (base pattern with simpler legend)
+  - donut-chart-interactive (clickable variant with center label)
+  - Dashboard Page Layout (DSE composition)
+
+derivation:
+  source: nuxt-charts/donut-charts/donut-chart-two
+  method: structural-abstraction
+  what-was-kept: >
+    Side-by-side layout with donut left and rich legend right, segments array
+    with separate chartValue and display value/percentage, "Other" segment
+    included in chart but filtered from legend, header with info icon and
+    comparison delta (+5.8% vs last week), card with ring-1 ring-muted/50
+    border, slim arcWidth 16, padAngle 0.02, currency formatter, color swatch
+    size-2.5, dot separator between value and percentage.
+  what-was-removed: >
+    All Vue template markup, hardcoded segment data, Intl.NumberFormat
+    formatter, specific segment colors, CSS classes.
+  transformative-value: >
+    Rich side-legend donut with separate chart values and display values.
+    The "Other" segment filtering pattern handles incomplete data gracefully.
+    Delta comparison in header provides trend context.
+
+avoid:
+  - Built-in chart legend — manual side legend is the defining layout
+  - Center label — this pattern uses side legend instead (see donut-chart-interactive)
+  - Showing "Other" in legend — it has no meaningful value to display
+  - Missing delta comparison — the header trend badge provides essential context
+  - Vertical legend stacking on desktop — side-by-side is the core layout

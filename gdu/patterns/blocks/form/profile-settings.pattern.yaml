@@ -1,0 +1,125 @@
+# Block Pattern: Profile Settings
+# Note: catalog describes "profile settings with avatar" but source block
+# (inbox-component.vue) implements an inbox message list. Pattern reflects
+# the actual source code, not the catalog description.
+
+id: profile-settings
+name: Profile Settings (Inbox Message List)
+version: "1.1.0"
+catalogRef: profile-settings
+category: form
+tags: [inbox, messages, notifications, feed, timeline, list, profile]
+catalogDiscrepancy: "Catalog describes 'profile settings with avatar' but source implements inbox message list"
+
+archetype: form-heavy
+description: >
+  Inbox-style message list showing subject, preview, timestamp, and unread
+  indicator for each message. Vertical timeline with connecting lines between
+  items. Each message row is clickable with hover state. Includes delete action
+  per message. Empty state when no messages. Wrapped in UCard with header.
+
+requires:
+  components: [UCard, UButton, UIcon]
+  charts: []
+  composables: []
+
+props:
+  interface: |
+    interface Message {
+      id: number
+      subject: string
+      preview: string
+      timestamp: string
+      unread: boolean
+    }
+    interface ProfileSettingsProps {
+      messages: Message[]
+    }
+
+emits:
+  interface: |
+    interface ProfileSettingsEmits {
+      'message:click': [messageId: number]
+      'message:delete': [messageId: number]
+    }
+
+layout:
+  structure: |
+    card-shell (bg-default, compact body padding)
+      card-header
+        title [h2, semibold, "Inbox"]
+      message-list (divide-y)
+        empty-state (conditional, centered, muted text)
+        message-row (repeat, flex, cursor-pointer, hover-bg)
+          unread-indicator-column
+            timeline-connector (vertical line between items, absolute)
+            unread-dot (primary color, 2px circle) OR read-dot (transparent)
+          content-column (min-w-0, flex-1, pl-4)
+            header-row (flex, space-between)
+              subject [truncate, semibold, neutral-900/white]
+              meta-group (flex, items-center)
+                timestamp [muted, xs, flex-shrink-0]
+                delete-button (icon button, trash icon, xs, ghost)
+            preview [muted, small, mt-1, single line]
+  responsive:
+    mobile: full-width card, compact message rows
+    tablet: comfortable padding, wider preview text
+    desktop: same as tablet
+
+slots:
+  header: "Override card header section"
+  message-row: "Custom message item rendering"
+  empty-state: "Custom empty state content"
+
+tokens:
+  card-bg: bg-default
+  card-body-padding: "p-0 sm:p-2"
+  title-text: text-highlighted
+  subject-text: text-highlighted
+  preview-text: text-muted
+  timestamp-text: text-muted
+  unread-dot: "bg-primary"
+  read-dot: bg-transparent
+  timeline-connector: "w-0.5 bg-muted"
+  hover-bg: hover:bg-elevated
+  divider: divide-default
+  empty-text: text-muted
+
+atomicHint:
+  organism: InboxPanel
+  molecules: [MessageList, MessageRow, CardHeader]
+  atoms: [UnreadDot, TimelineConnector, SubjectText, PreviewText, DeleteButton]
+
+examples:
+  - context: "App notification inbox"
+    messages: ["New deployment completed (2h ago, unread)", "Team invite accepted (1d ago, read)"]
+  - context: "Support ticket messages"
+    messages: ["Ticket #123 updated (5m ago, unread)", "Ticket #120 resolved (3d ago, read)"]
+
+composesWith:
+  - "security-settings (settings page companion)"
+  - "basic-sign-in (inbox accessible post-login)"
+
+derivation:
+  source: "nuxt-charts/account/inbox-component"
+  method: "structural-abstraction"
+  what-was-kept: >
+    Message list with unread dot indicator, vertical timeline connector lines
+    between items, flex layout with indicator column + content column, subject
+    truncation, timestamp + delete button in meta row, preview text below
+    subject, empty state handling, divide-y between items, hover background
+    on clickable rows, compact card body padding (p-0 sm:p-2).
+  what-was-removed: >
+    All Vue template markup, specific icon names (heroicons-trash),
+    inline CSS classes, v-for iteration logic, conditional connector rendering.
+  transformative-value: >
+    Captures the "inbox feed with timeline" pattern: message list with
+    unread indicators, timeline connectors, and action buttons. Typed
+    Message interface with structured emits for click and delete actions.
+
+avoid:
+  - "No empty state — show placeholder when messages array is empty"
+  - "Missing unread indicator — visual distinction between read/unread is essential"
+  - "No delete action — each message needs a remove mechanism"
+  - "Fixed timestamps — accept as string for flexible formatting"
+  - "Missing hover feedback — clickable rows need visual hover state"

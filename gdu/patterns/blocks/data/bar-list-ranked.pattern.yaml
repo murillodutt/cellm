@@ -1,0 +1,99 @@
+# Block Pattern: Bar List Ranked
+id: bar-list-ranked
+name: Horizontal Bar Ranking List
+version: "1.0.0"
+catalogRef: bar-list-top-pages
+category: data
+tags: [bar-list, ranking, top-pages, horizontal]
+archetype: layout-heavy
+description: >
+  Vertical list of horizontal bars ranked by value. Each bar width is
+  proportional to the maximum value. Label inside the bar, value on the
+  right. Supports show-more/show-less pagination.
+
+requires:
+  components: [UCard, UButton]
+  charts: []
+  composables: []
+
+props:
+  interface: |
+    interface RankedItem {
+      label: string
+      value: number
+      href?: string
+    }
+    interface BarListRankedProps {
+      items: RankedItem[]
+      title?: string
+      valueLabel?: string
+      initialRows?: number
+      pageSize?: number
+    }
+
+emits:
+  interface: |
+    interface BarListRankedEmits {
+      'item:click': [item: RankedItem]
+    }
+
+layout:
+  structure: |
+    card-shell
+      header-row
+        title (bold, large)
+        value-column-label (right-aligned, muted)
+      item-list (paginated, vertical stack)
+        item-row (repeat per visible item)
+          proportional-bar (width = item.value / max * 100%, bg-primary)
+            label (inside bar, inverted text, truncated)
+          value (right-aligned, muted, monospace)
+      footer
+        show-more / show-less buttons (center-aligned)
+  responsive:
+    mobile: full-width bars
+    tablet: max-width constrained
+    desktop: same as tablet, max-width ~512px
+
+slots:
+  header: "Override header"
+  item: "Custom item row rendering"
+
+tokens:
+  card-bg: bg-default
+  bar-fill: bg-primary
+  bar-text: text-inverted
+  value-text: text-muted
+  header-border: border-default
+
+atomicHint:
+  organism: BarListRanked
+  molecules: [ItemRow, PaginationControls]
+  atoms: [ProportionalBar, ValueLabel]
+
+examples:
+  - context: "Top pages by traffic"
+    items: ["/products (1,250)", "/pricing (1,100)", "/features (980)"]
+  - context: "Top referrers"
+    items: ["google.com (5,432)", "twitter.com (2,100)", "github.com (1,500)"]
+
+composesWith:
+  - "Dashboard Page Layout (DSE composition)"
+  - "conversion-funnel (similar proportional bar concept)"
+
+derivation:
+  source: "nuxt-charts/bar-lists/bar-list-pages"
+  method: "structural-abstraction"
+  what-was-kept: >
+    Proportional horizontal bar concept, value-based width calculation,
+    show-more/less pagination, card with header, ranking order.
+  what-was-removed: >
+    All Vue template markup, hardcoded page data, computed properties,
+    CSS classes, specific button labels.
+  transformative-value: >
+    Generic ranked bar list for any entity with a sortable numeric value.
+
+avoid:
+  - "Chart components — CSS width percentages are sufficient"
+  - "Unsorted items — always sort by value descending"
+  - "Truncation without tooltip — long labels need hover tooltip"

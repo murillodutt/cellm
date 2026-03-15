@@ -1,0 +1,89 @@
+# Template Pattern: Nuxt Clean Gray
+id: nuxt-clean-gray
+name: Nuxt Clean Gray
+version: "1.0.0"
+catalogRef: nuxt-clean-gray
+category: template
+tags: [template, gray, clean, neutral, professional]
+archetype: layout-heavy
+quality: partial
+
+description: >
+  Clean neutral-gray dashboard template for professional apps. Muted color
+  palette with gray tones, subtle borders, and restrained accent usage.
+  Designed for enterprise or B2B dashboards where visual restraint signals
+  professionalism.
+
+composesPatterns:
+  - navbar-variant-one
+  - expense-budget
+  - area-chart-preview
+  - bar-chart-stacked
+  - sparkline-table
+  - progress-circle
+
+requires:
+  components: [UCard, UButton, UBadge, UTable, UIcon, UProgress]
+  charts: [AreaChart, BarChart]
+  composables: []
+
+layout:
+  sections:
+    - name: navigation
+      patternRef: navbar-variant-one
+      slot: top
+    - name: budget-overview
+      patternRef: expense-budget
+      slot: hero
+    - name: trend-chart
+      patternRef: area-chart-preview
+      slot: main-left
+    - name: breakdown-chart
+      patternRef: bar-chart-stacked
+      slot: main-right
+    - name: data-table
+      patternRef: sparkline-table
+      slot: content
+    - name: completion-widget
+      patternRef: progress-circle
+      slot: sidebar
+  responsive:
+    mobile: single column, gray cards stacked
+    tablet: 2-column chart grid, full-width table
+    desktop: main + sidebar, navigation persistent
+
+tokens:
+  page-bg: bg-default
+  card-bg: bg-default
+  card-border: border-default
+  section-gap: gap-6
+  text-primary: text-highlighted
+  text-secondary: text-muted
+  accent: text-neutral
+  accent-subtle: bg-elevated
+  divider: border-default
+
+atomicHint:
+  organism: CleanGrayDashboardPage
+  molecules: [NavigationBar, BudgetOverview, ChartGrid, DataTable, ProgressWidget]
+  atoms: [BudgetCard, ChartCard, TableRow, ProgressCircle]
+
+examples:
+  - context: "Enterprise finance dashboard"
+    sections: ["Navigation", "Budget cards (spent, remaining, forecast)", "Revenue trend area chart", "Department spend stacked bar", "Transaction table with sparklines", "Budget completion circle"]
+  - context: "HR management dashboard"
+    sections: ["Nav bar", "Headcount metrics", "Hiring trend chart", "Department distribution", "Employee table", "Onboarding completion"]
+
+composesWith:
+  - "nuxt-simplistic (even more minimal variant)"
+  - "nuxt-dashboard-3 (richer, more colorful variant)"
+
+derivation:
+  source: "none — composition derived from catalog description and tags"
+  method: "template-composition"
+
+avoid:
+  - "Vibrant accent colors — keep palette neutral, use primary sparingly"
+  - "Decorative gradients or shadows — clean means flat and subtle"
+  - "Too many chart types — consistency in visual language matters"
+  - "Missing whitespace — gray theme needs breathing room to avoid feeling heavy"

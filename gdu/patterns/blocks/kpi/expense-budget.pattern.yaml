@@ -1,0 +1,101 @@
+# Block Pattern: Expense Budget Cards
+id: expense-budget
+name: Budget Cards with Trend and Progress
+version: "1.0.0"
+catalogRef: expense-budget-cards
+category: kpi
+tags: [budget, expense, progress-bar, trend, cards]
+archetype: layout-heavy
+description: >
+  Repeating card for each budget category showing a color dot, category name,
+  trend percentage badge, current value, budget percentage, and a progress bar
+  showing spend vs budget ratio.
+
+requires:
+  components: [UCard, UBadge, UProgress]
+  charts: []
+  composables: []
+
+props:
+  interface: |
+    interface BudgetCategory {
+      name: string
+      value: number
+      budget: number
+      trend: number
+      color: string
+    }
+    interface ExpenseBudgetProps {
+      categories: BudgetCategory[]
+      currency?: string
+      locale?: string
+    }
+
+emits:
+  interface: |
+    interface ExpenseBudgetEmits {
+      'category:click': [categoryName: string]
+    }
+
+layout:
+  structure: |
+    card-list (repeat per category)
+      card-shell
+        top-row
+          left: color-dot + category-name
+          right: trend-badge (positive=error, negative=success for expenses)
+        value-row
+          left: formatted-currency-value (large, bold)
+          right: budget-percentage-label (muted)
+        progress-bar (width = value/budget ratio, colored by category color)
+  responsive:
+    mobile: single column stack
+    tablet: 2-column grid
+    desktop: 3-4 column grid
+
+slots:
+  card: "Override individual category card"
+  trend-badge: "Custom trend display"
+
+tokens:
+  card-bg: bg-default
+  category-name: text-highlighted
+  value-text: text-highlighted
+  budget-label: text-muted
+  trend-positive: text-error
+  trend-negative: text-success
+  progress-track: bg-elevated
+
+atomicHint:
+  organism: ExpenseBudgetGrid
+  molecules: [BudgetCard]
+  atoms: [ColorDot, TrendBadge, BudgetProgressBar]
+
+examples:
+  - context: "Department budget tracking"
+    categories: ["Marketing ($12,500 of $15,000, +8%)", "Engineering ($45,000 of $50,000, -3%)"]
+  - context: "Personal finance"
+    categories: ["Groceries ($450 of $500, +12%)", "Transport ($180 of $200, -5%)"]
+
+composesWith:
+  - "KPI Card (DSE composition)"
+  - "Dashboard Page Layout (DSE composition)"
+
+derivation:
+  source: "nuxt-charts/cards/expense-budget-cards"
+  method: "structural-abstraction"
+  what-was-kept: >
+    Card-per-category layout, color dot + name header, trend badge with
+    inverted semantics (up=bad for expenses), currency formatting,
+    budget percentage calculation, progress bar with category color.
+  what-was-removed: >
+    All Vue template markup, formatCurrency implementation, hardcoded
+    category data, Tailwind utility class strings, specific card padding.
+  transformative-value: >
+    Generalizes expense cards into configurable budget tracking pattern
+    with locale-aware currency formatting and flexible color assignment.
+
+avoid:
+  - "Hardcoded currency format — use Intl.NumberFormat with locale prop"
+  - "Progress bar exceeding 100% visually — clamp to 100%"
+  - "Same trend color logic as revenue — expenses invert (up=bad)"

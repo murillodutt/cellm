@@ -2,7 +2,7 @@
 description: Execute stack update specs — verify, analyze impact, create fix specs proactively, commit, and certify via Olympus. Use when stack tracker specs need closing, dependency updates need verification, or 'stack update' is mentioned.
 user-invocable: true
 argument-hint: "'all' to batch-process, package name, or check ID"
-allowed-tools: mcp__cellm-oracle__spec_search, mcp__cellm-oracle__spec_get_tree, mcp__cellm-oracle__spec_transition, mcp__cellm-oracle__spec_create_node, mcp__cellm-oracle__spec_add_edge, mcp__cellm-oracle__spec_get_counters, mcp__cellm-oracle__quality_gate, AskUserQuestion, Skill, Read, Grep, Glob, Bash(npx vue-tsc *), Bash(bun run test *), Bash(git *), Bash(bash scripts/sync-version.sh *)
+allowed-tools: mcp__cellm-oracle__spec_search, mcp__cellm-oracle__spec_get_tree, mcp__cellm-oracle__spec_transition, mcp__cellm-oracle__spec_create_node, mcp__cellm-oracle__spec_add_edge, mcp__cellm-oracle__spec_get_counters, mcp__cellm-oracle__quality_gate, AskUserQuestion, Skill, Read, Grep, Glob, Bash(npx nuxt typecheck *), Bash(npx vue-tsc *), Bash(bun run test *), Bash(git *), Bash(bash scripts/sync-version.sh *)
 ---
 
 # Stack Update — Full Lifecycle Dependency Management
@@ -12,17 +12,26 @@ Verify dependency updates, analyze code impact, create fix specs, commit changes
 ## Pipeline
 
 ```
+0. MANTRA   — inject mental model (verify, best path, document)
 1. DETECT   — git rev-parse project name
-2. COMMIT   — commit + push pending dependency changes
+2. COMMIT   — commit + push pending dependency changes (with user confirmation)
 3. SEARCH   — find pending stack-tracker specs
-4. GATE     — quality_gate once for the entire project
-5. ANALYZE  — grep imports, read consuming files, assess impact per spec
-6. COMPLETE — batch-complete safe specs, create fix specs for impacted code
-7. FIX      — ask user to execute fix specs via /cellm:implement
-8. CERTIFY  — after all fix specs completed, run Olympus for certification
+4. RECON    — read spec tree, understand scope before acting
+5. GATE     — quality_gate once for the entire project
+6. ANALYZE  — grep imports, read consuming files, assess impact per spec
+7. COMPLETE — batch-complete safe specs, create fix specs for impacted code
+8. FIX      — ask user to execute fix specs via /cellm:implement
+9. CERTIFY  — after all fix specs completed, run Olympus for certification
 ```
 
 ## Framework
+
+### Step 0: Mantra Gate
+
+Before ANY action, inject the mental model:
+- **Verify before acting**: Read the spec tree fully. Understand updateType, watch items, task structure.
+- **Best path, not first path**: Consider whether batch-complete is safe or if individual analysis is needed.
+- **Document everything**: Every transition gets metadata. Every decision is recorded.
 
 ### Step 1: Detect Project
 
@@ -32,8 +41,10 @@ Verify dependency updates, analyze code impact, create fix specs, commit changes
 
 Before any verification, ensure dependency changes are committed:
 - `git status --porcelain` — check for uncommitted dependency files (bun.lock, package.json)
-- If changes exist: bump version (`VERSION` + `bash scripts/sync-version.sh`), commit, push
-- If clean: proceed to gate
+- If changes exist: ask user via AskUserQuestion whether to bump version and commit now
+- If user approves: bump version (`VERSION` + `bash scripts/sync-version.sh`), commit, push
+- If user declines: proceed without committing (user may want to batch commits)
+- If clean: proceed to next step
 
 ### Step 3: Search
 
@@ -45,11 +56,19 @@ Route by argument:
 | `<package>` | `spec_search(project, query: <package>, state: "pending", limit: 5)` filter by tag `stack-tracker` |
 | `<check-id>` | `spec_get_tree(project, path: <id>)` directly |
 
-### Step 4: Gate
+### Step 4: Reconnaissance
 
-`quality_gate({ scope: 'all' })` — run ONCE for the entire project. Runs typecheck + tests. Fallback: `npx vue-tsc --noEmit` + `bun run test` if Oracle offline.
+Before running the gate, understand the full scope:
+- `spec_get_tree` for each spec found in Step 3
+- Read `body.updateType`, `body.watchItems`, task titles, task count
+- Build a mental map: which packages, which risk levels, how many tasks total
+- Report scope summary to user: `"{N} specs, {M} tasks — {patch: X, minor: Y, major: Z}"`
 
-### Step 5: Analyze
+### Step 5: Gate
+
+`quality_gate({ scope: 'all' })` — run ONCE for the entire project. Runs typecheck + tests. Fallback: `npx nuxt typecheck` + `bun run test` if Oracle offline.
+
+### Step 6: Analyze
 
 For EACH spec, before completing:
 - Read `body.updateType` from check (patch/minor/major/prerelease)
@@ -58,7 +77,7 @@ For EACH spec, before completing:
 - If imports found: `Read` consuming files, check API usage against watch items
 - Assess: does the update affect any code paths?
 
-### Step 6: Route
+### Step 7: Route
 
 | Gate | updateType | Impact Found | Action |
 |------|-----------|-------------|--------|
@@ -70,7 +89,12 @@ For EACH spec, before completing:
 | PASS | major/prerelease | API usage | complete verify, create fix spec with affected files |
 | FAIL | any | any | analyze errors, create fix spec, delegate to `/cellm:implement` |
 
-### Step 7: Fix Spec Creation
+### Step 8: Fix Spec Creation
+
+Before creating a fix spec, deduplicate:
+- `spec_search(project, query: "{package}", tags: "stack-tracker-fix", state: "pending")` — check if a fix spec already exists for this package
+- If found: skip creation, link existing fix spec to update spec instead
+- If not found: create new fix spec
 
 When impact requires code changes:
 ```
@@ -100,14 +124,14 @@ spec_add_edge({
 })
 ```
 
-### Step 8: Batch Mode (`all`)
+### Step 9: Batch Mode (`all`)
 
 - Gate runs ONCE
 - Sort: patch first, then minor, then major/prerelease
 - For each spec: analyze → route → complete or create fix spec
 - Progress: `"[n/total] {package} {from} -> {to} ({type}) — {result}"`
 
-### Step 9: Summary and Handoff
+### Step 10: Summary and Handoff
 
 After all update specs are processed, present summary:
 - Total completed, fix specs created, delegated
@@ -116,7 +140,7 @@ After all update specs are processed, present summary:
 - If user approves: invoke `/cellm:implement` for each fix spec sequentially
 - If user declines: report spec IDs for later execution
 
-### Step 10: Certification Gate
+### Step 11: Certification Gate
 
 After ALL fix specs are executed and completed (pre-certified):
 - Verify: `quality_gate({ scope: 'all' })` passes clean
@@ -152,13 +176,24 @@ After ALL fix specs are executed and completed (pre-certified):
 
 ## Evolutionary Analytical Feedback
 
-When `CELLM_DEV_MODE: true`: after execution, write feedback entry to `dev-cellm-feedback/entries/stack-update-{date}-{seq}.md`. Note: how many specs were batch-completed vs needed fix specs, which packages had actual code impact, whether the impact analysis caught real issues or was noise. Format and lifecycle: see `dev-cellm-feedback/README.md`.
+When `CELLM_DEV_MODE: true`: after execution, write feedback entry to `dev-cellm-feedback/entries/stack-update-{date}-{seq}.md`. Include:
+- Specs processed: batch-completed vs fix specs created vs skipped
+- Packages with actual code impact vs zero-import (noise ratio)
+- Gate result: pass/fail, which check failed, was fallback used
+- Skill friction: steps that felt wrong, missing tools, unclear routing
+- Time sinks: which step consumed the most tool calls
+- Suggested improvements: concrete changes to this skill
+
+Format and lifecycle: see `dev-cellm-feedback/README.md`.
 
 ## NEVER
 
+- Skip Step 0 (mantra) — mental model injection prevents reactive mistakes
 - Skip Step 1 (detect project) — all MCP calls require `project` param
-- Skip Step 2 (commit) — dependency changes must be committed before verification
+- Skip Step 4 (recon) — understand scope before acting on specs
+- Bump version automatically — always ask user first via AskUserQuestion
 - Bump version without using `bash scripts/sync-version.sh` — never manual sed
+- Create duplicate fix specs — always search for existing fix specs before creating
 - Complete specs without running quality_gate first
 - Run quality_gate PER SPEC in batch mode — run ONCE
 - Skip impact analysis — always grep for package imports before completing

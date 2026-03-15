@@ -1,0 +1,140 @@
+id: bar-chart-ten
+name: Horizontal Stacked Bar Chart with Categories
+version: 1.0.0
+catalogRef: bar-chart-ten
+category: visualization
+tags:
+  - bar
+  - horizontal
+  - stacked
+  - categories
+  - composition
+basePattern: bar-chart-stacked
+archetype: chart-heavy
+description: >
+  Horizontal stacked bar chart showing series composition per category.
+  Uses Orientation.Horizontal with category names on y-axis and numeric
+  values on x-axis. Built-in legend at TopRight, x-grid lines visible.
+  Compact card with header title.
+
+requires:
+  components: [UCard]
+  charts: [BarChart]
+  composables: [useResponsiveHeight]
+
+props:
+  interface: |
+    interface CategoryDataPoint {
+      month: string
+      desktop: number
+      mobile: number
+    }
+    interface BarChartTenProps {
+      data: CategoryDataPoint[]
+      categories: Record<string, BulletLegendItemInterface>
+      title?: string
+      orientation?: 'horizontal' | 'vertical'
+    }
+
+emits:
+  interface: |
+    interface BarChartTenEmits {
+      'segment:click': [category: string, series: string, value: number]
+      'legend:toggle': [series: string, visible: boolean]
+    }
+
+layout:
+  structure: |
+    wrapper (max-w-xl centered)
+      card-shell
+        header (UCard #header slot)
+          title (text-lg font-semibold)
+        chart-area
+          BarChart (horizontal, stacked, legend top-right, x-grid)
+            y-axis: category names (via yFormatter)
+            x-axis: numeric values (via xFormatter identity)
+  responsive:
+    mobile: chart height 120px, condensed category labels
+    tablet: chart height 240px
+    desktop: max-w-xl centered
+
+slots:
+  header: Override card header title
+  chart: Override chart rendering
+  tooltip: Custom tooltip content
+
+tokens:
+  card-bg: bg-default
+  title-text: text-lg font-semibold
+  series-a: text-blue-500
+  series-b: text-green-500
+  bar-radius: radius-4
+  group-padding: "0"
+  bar-padding: "0.2"
+  x-grid: visible
+  legend-position: top-right
+
+chartConfig:
+  type: bar
+  orientation: horizontal
+  stacked: true
+  radius: 4
+  groupPadding: 0
+  barPadding: 0.2
+  xNumTicks: 6
+  xFormatter: identity
+  yFormatter: categoryName
+  hideLegend: false
+  legendPosition: TopRight
+  xGridLine: true
+  tooltip: true
+  legend: true
+  xAxis: true
+  yAxis: true
+
+atomicHint:
+  organism: HorizontalStackedBarCard
+  molecules:
+    - MinimalCardHeader (title in UCard header slot)
+    - HorizontalStackedChart (category labels on y-axis)
+    - BuiltInLegend (chart-native top-right)
+  atoms:
+    - CategoryLabel
+    - StackedSegment
+    - GridTick
+
+examples:
+  - context: Revenue categories by platform
+    data: "6 categories x desktop+mobile stacked horizontally, category names on y-axis"
+    usage: Platform comparison with horizontal layout for readable category names
+  - context: Department resource allocation
+    data: "Teams x engineering+design hours stacked, showing total and composition"
+    usage: Resource planning dashboard with department breakdown
+
+composesWith:
+  - bar-chart-stacked (vertical stacked variant)
+  - bar-chart-eight (horizontal grouped variant)
+  - Dashboard Page Layout (DSE composition)
+
+derivation:
+  source: nuxt-charts/bar-charts/bar-chart-ten
+  method: structural-abstraction
+  what-was-kept: >
+    Horizontal stacked orientation via Orientation.Horizontal, category names
+    on y-axis via yFormatter index lookup, identity xFormatter, built-in legend
+    at TopRight, x-grid lines, distinct series colors (blue + green), compact
+    max-w-xl card, radius 4.
+  what-was-removed: >
+    All Vue template markup, hardcoded RevenueData array, specific color values,
+    inline arrow function formatters, CSS classes.
+  transformative-value: >
+    Horizontal stacked pattern combining composition analysis with readable
+    category labels. Complements bar-chart-eight (horizontal grouped) by
+    showing totals with series breakdown.
+
+avoid:
+  - Vertical orientation — horizontal is the defining trait for category readability
+  - Grouping — this is a stacked composition pattern, not side-by-side
+  - Too many categories — horizontal bars stack vertically, limit to 8
+  - Missing legend — essential for distinguishing stacked segments
+  - Complex formatters — identity x-formatter keeps values clean

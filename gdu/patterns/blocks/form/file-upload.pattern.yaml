@@ -1,0 +1,112 @@
+# Block Pattern: File Upload
+id: file-upload
+name: Drag-and-Drop File Upload
+version: "1.0.0"
+catalogRef: file-upload-modal
+category: form
+tags: [file, upload, drag-drop, gallery, modal]
+archetype: form-heavy
+description: >
+  File upload zone supporting drag-and-drop and click-to-browse. Shows
+  upload progress, file previews (thumbnails for images), and a file list
+  with remove action. Optional modal wrapper.
+
+requires:
+  components: [UCard, UButton, UIcon, UProgress]
+  charts: []
+  composables: []
+
+props:
+  interface: |
+    interface UploadedFile {
+      name: string
+      size: number
+      type: string
+      url?: string
+      progress?: number
+    }
+    interface FileUploadProps {
+      accept?: string
+      maxSize?: number
+      maxFiles?: number
+      multiple?: boolean
+      files?: UploadedFile[]
+    }
+
+emits:
+  interface: |
+    interface FileUploadEmits {
+      'upload': [files: File[]]
+      'remove': [fileName: string]
+      'error': [message: string]
+    }
+
+layout:
+  structure: |
+    card-shell (or modal wrapper)
+      drop-zone (dashed border, centered content)
+        icon (upload cloud icon)
+        label ("Drag & drop or click to browse")
+        size-limit-hint (muted, small)
+        hidden-file-input
+      file-list (below drop zone, vertical stack)
+        file-item (repeat per uploaded file)
+          thumbnail (image preview or file-type icon)
+          file-name + file-size
+          progress-bar (during upload)
+          remove-button (icon button)
+  responsive:
+    mobile: full-width drop zone, stacked file list
+    tablet: comfortable padding
+    desktop: same as tablet
+
+slots:
+  drop-zone: "Custom drop zone content"
+  file-item: "Custom file list item"
+  thumbnail: "Custom preview rendering"
+
+tokens:
+  drop-zone-border: border-muted
+  drop-zone-border-active: border-primary
+  drop-zone-bg: bg-elevated
+  drop-zone-bg-active: "bg-primary/5"
+  icon-color: text-muted
+  file-name: text-highlighted
+  file-size: text-muted
+  progress-fill: bg-primary
+  remove-button: text-error
+
+atomicHint:
+  organism: FileUpload
+  molecules: [DropZone, FileList]
+  atoms: [FileThumbnail, ProgressIndicator, RemoveButton]
+
+examples:
+  - context: "Profile photo upload"
+    accept: "image/*"
+    maxFiles: 1
+  - context: "Document submission"
+    accept: ".pdf,.doc,.docx"
+    maxFiles: 10
+    multiple: true
+
+composesWith:
+  - "onboarding-wizard (file upload step)"
+
+derivation:
+  source: "nuxt-charts/file-upload"
+  method: "structural-abstraction"
+  what-was-kept: >
+    Drag-and-drop zone concept, file preview list, upload progress,
+    remove action, accept/size constraints.
+  what-was-removed: >
+    All Vue template markup, drag event handlers, file validation
+    logic, specific icon names, CSS classes.
+  transformative-value: >
+    Adds typed props for constraints (maxSize, maxFiles, accept),
+    structured file list with progress tracking, error emit.
+
+avoid:
+  - "Missing drag feedback — drop zone must change appearance on dragover"
+  - "No file validation — check accept, maxSize, maxFiles before upload"
+  - "Missing progress — show upload progress per file"

@@ -1,0 +1,145 @@
+id: line-chart-six
+name: Traffic Split with Markers Chart
+version: "1.1.0"
+catalogRef: line-chart-six
+category: visualization
+tags: [line, markers, dash-array, custom-tooltip, traffic, dual-series, responsive]
+archetype: chart-heavy
+description: >
+  Dual-series line chart with distinct marker shapes per series (circle for
+  desktop, diamond for mobile) and dashed line for the secondary series.
+  Features a rich custom tooltip slot, color-mode-reactive categories,
+  real-time analytics indicator with animated dot, and "View Details" CTA.
+  Full grid with domain lines and tick lines on both axes.
+
+requires:
+  components: [UCard, UButton, UIcon]
+  charts: [LineChart]
+  composables: [useResponsiveHeight, useColorMode]
+
+props:
+  interface: |
+    type ChartDataItem = {
+      month: string
+      desktop: number
+      mobile: number
+    }
+    interface LineChartSixProps {
+      data: Ref<ChartDataItem[]>
+      categories: ComputedRef<Record<string, BulletLegendItemInterface>>
+      xFormatter?: (tick: number) => string
+      yFormatter?: (v: number) => string
+    }
+
+emits:
+  interface: |
+    interface LineChartSixEmits {
+      'view-details': []
+      'series:hover': [month: string, desktop: number, mobile: number]
+    }
+
+layout:
+  structure: |
+    card-shell (UCard)
+      content-stack (space-y-6)
+        header
+          title (text-lg, font-medium)
+          subtitle (text-muted, text-sm)
+        chart-card (UCard, nested)
+          LineChart (markers, dash array, MonotoneX, full grid, custom tooltip)
+            tooltip-slot (#tooltip="{ values }")
+              tooltip-card (bg-elevated, ring, shadow-lg, rounded-md)
+                month-label (text-muted, text-xs)
+                desktop-row (dot + label + value)
+                mobile-row (dot + label + value)
+        footer (flex, justify-between)
+          live-indicator (flex, gap-2)
+            animated-dot (bg-primary, animate-pulse)
+            label (text-muted, text-sm, "Real-time Analytics")
+          view-details-button (UButton, sm, ghost, neutral, external-link icon)
+  responsive:
+    mobile: chart height 140px, footer stacks
+    tablet: chart height 260px, inline footer
+    desktop: chart height 260px, full layout
+
+slots:
+  header: Override title and subtitle
+  tooltip: Override custom tooltip content (template #tooltip="{ values }")
+  footer: Override live indicator and action
+
+tokens:
+  card-bg: bg-default
+  title-font: text-lg font-medium
+  subtitle-color: text-muted text-sm
+  tooltip-bg: bg-elevated
+  tooltip-ring: ring-1 ring-default
+  tooltip-shadow: shadow-lg rounded-md
+  tooltip-label: text-muted text-xs
+  tooltip-value: font-medium text-default
+  indicator-dot-size: h-2 w-2 rounded-full
+  live-dot: bg-primary animate-pulse
+  live-label: text-muted text-sm
+  button-size: sm
+  button-variant: ghost
+
+chartConfig:
+  type: line
+  curveType: MonotoneX
+  yGridLine: true
+  xGridLine: true
+  xDomainLine: true
+  yDomainLine: true
+  xTickLine: true
+  yTickLine: true
+  legendPosition: BottomRight
+  hideLegend: false
+  tooltip: true
+  markerConfig:
+    desktop: { type: circle, size: 7, strokeWidth: 2 }
+    mobile: { type: diamond, size: 8, strokeWidth: 2 }
+  lineDashArray: [[0, 0], [6, 3]]
+  yFormatter: "custom (v) => `${v} visits`"
+  colorModeReactive: true
+
+atomicHint:
+  organism: TrafficSplitMarkerCard
+  molecules: [HeaderBlock, MarkerLineChart, CustomTooltip, LiveIndicatorFooter]
+  atoms: [CircleMarker, DiamondMarker, DashLine, TooltipDot, LiveDot]
+
+examples:
+  - context: "Web analytics dashboard"
+    data: "6-month desktop (186-305) vs mobile (156-225) visits with marker differentiation"
+  - context: "A/B test results"
+    data: "Variant A (circle markers) vs variant B (diamond markers) with dashed secondary"
+  - context: "Channel performance"
+    data: "Organic vs paid traffic with real-time indicator"
+
+composesWith:
+  - "line-chart-two (budget comparison with similar marker + dash concept)"
+  - "line-chart-multi (multi-series without markers)"
+  - "Analytics dashboard layout (DSE composition)"
+
+avoid:
+  - "Same marker shape for all series -- shape differentiation is the key feature"
+  - "Omitting the custom tooltip -- default tooltip lacks per-series formatting"
+  - "Removing domain lines and tick lines -- full axis chrome defines this variant"
+  - "Using same line style for both series -- dash array differentiates secondary"
+  - "Hardcoding colors -- use computed categories with colorMode reactivity"
+
+derivation:
+  source: "nuxt-charts/line-charts/linecharts-chart-six"
+  method: "structural-abstraction"
+  what-was-kept: >
+    Marker config with circle (desktop, size 7) and diamond (mobile, size 8)
+    with strokeWidth 2, lineDashArray [[0,0],[6,3]], custom #tooltip slot with
+    bg-elevated card showing per-series dot + label + value, yFormatter adding
+    'visits' suffix, full grid (xGridLine, yGridLine, xDomainLine, yDomainLine,
+    xTickLine, yTickLine), LegendPosition.BottomRight, MonotoneX curve,
+    colorMode-reactive computed categories, animated live indicator, external-link
+    View Details button (sm, ghost, neutral).
+  what-was-removed: >
+    Hardcoded data, specific hex colors, static title text, inline style bindings
+    for tooltip dot colors.
+  transformative-value: >
+    Reusable dual-series chart pattern with distinct markers per series, dashed
+    secondary line, and rich custom tooltip. Reference for marker differentiation.

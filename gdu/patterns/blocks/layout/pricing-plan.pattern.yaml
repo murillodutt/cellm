@@ -1,0 +1,135 @@
+# Block Pattern: Pricing Plan Card
+id: pricing-plan
+name: Pricing Plan Card
+version: "1.0.0"
+catalogRef: pricing-plan
+category: layout
+tags: [pricing, plan, tier, subscription, card]
+archetype: layout-heavy
+description: >
+  Individual pricing plan card showing tier name, description, price with
+  billing cycle, CTA button, and feature checklist. Supports highlighted
+  state for recommended plan with badge. Used inside pricing-section.
+
+requires:
+  components: [UCard, UButton, UBadge, UIcon]
+  charts: []
+  composables: []
+
+props:
+  interface: |
+    interface PlanFeature {
+      title: string
+      icon: string
+      included: boolean
+    }
+    interface PlanButton {
+      label: string
+      color: 'primary' | 'neutral'
+      variant?: 'subtle' | 'solid'
+      size?: 'xl' | 'lg'
+    }
+    interface PricingPlanProps {
+      title: string
+      description: string
+      price: string
+      billingCycle: string
+      badge?: string
+      highlight?: boolean
+      button: PlanButton
+      features: PlanFeature[]
+    }
+
+emits:
+  interface: |
+    interface PricingPlanEmits {
+      'select': [planTitle: string]
+      'feature:info': [featureTitle: string]
+    }
+
+layout:
+  structure: |
+    plan-card (UCard, variant outline, conditional highlight ring)
+      card-body (lg:px-8, xl:p-8)
+        title-wrapper (flex, items-center, justify-between, gap-3)
+          title (text-xl, text-highlighted, semibold)
+          badge (UBadge, optional, shown on recommended plan)
+        description (text-muted, mt-1)
+        price-row (mt-6)
+          price (text-4xl, font-bold, text-highlighted)
+          billing-cycle (text-muted, ml-1)
+        cta-button (UButton, mt-6, full-width, size xl)
+        features-divider (border-t, mt-6, pt-6)
+        features-list (space-y-3)
+          feature-item (repeat, flex, gap-2)
+            feature-icon (circle-check for included, x for excluded)
+            feature-title (text-sm)
+  responsive:
+    mobile: full-width card, comfortable internal padding
+    tablet: card in 2-column grid context
+    desktop: card in 3-column grid context, lg:px-8
+
+slots:
+  title: "Override title and badge area"
+  price: "Override price display (e.g., custom pricing, contact sales)"
+  button: "Override CTA button"
+  features: "Override features list"
+
+tokens:
+  card-bg: bg-default
+  card-bg-highlight: bg-default
+  card-border: border-default
+  card-border-highlight: ring-primary
+  title-text: text-highlighted
+  description-text: text-muted
+  price-text: text-highlighted
+  billing-text: text-muted
+  badge-bg: bg-primary
+  badge-text: text-inverted
+  feature-check-icon: text-primary
+  feature-x-icon: text-muted
+
+atomicHint:
+  organism: PricingPlanCard
+  molecules: [TitleRow, PriceDisplay, FeaturesList]
+  atoms: [PlanBadge, FeatureItem, CTAButton]
+
+examples:
+  - context: "Free tier plan card"
+    title: "Free"
+    price: "$0 / month"
+    features: ["1 user seat (check)", "1 workspace (check)", "SSO (x)", "2FA (x)"]
+    highlight: false
+  - context: "Recommended tier plan card"
+    title: "Starter"
+    price: "$49 / month"
+    badge: "Recommended"
+    features: ["10 user seats (check)", "5 workspaces (check)", "SSO (x)", "2FA (check)"]
+    highlight: true
+
+composesWith:
+  - "pricing-section (parent container that holds multiple plan cards)"
+  - "default-cards (KPI cards above pricing for value metrics)"
+
+derivation:
+  source: "nuxt-charts/pricing/alt-price-plan"
+  method: "structural-abstraction"
+  what-was-kept: >
+    Card structure with title + badge row, description, large price with
+    billing cycle suffix, full-width CTA button, feature checklist with
+    circle-check and x icons, highlight state with ring border, appConfig
+    slot customization pattern (titleWrapper flex layout, title sizing).
+  what-was-removed: >
+    All Vue template markup, specific plan names and prices, hardcoded
+    feature lists, CSS utility classes, appConfig override object,
+    specific button colors and variants.
+  transformative-value: >
+    Reusable pricing card component that works standalone or within
+    pricing-section. Supports highlight state for recommended tier.
+    Feature checklist clearly communicates included vs excluded capabilities.
+
+avoid:
+  - "Too many features (>8) — use expandable section or link to comparison page"
+  - "Missing highlight state — recommended plan must stand out visually"
+  - "Generic CTA labels — use action-specific text (Get started vs Contact sales)"
+  - "Price without billing cycle — always show the billing period"

@@ -1,0 +1,130 @@
+id: area-chart-nine
+name: Area Chart with Computed Metrics
+version: "1.1.0"
+catalogRef: area-chart-nine
+category: visualization
+tags: [area, chart, computed, metrics, reduce, aggregate, responsive]
+basePattern: area-chart-gradient
+archetype: chart-heavy
+description: >
+  Area chart card with computed aggregate metrics. Per-series totals are
+  calculated via reduce() and displayed in the footer alongside animated
+  color indicators. The overall total is currency-formatted with
+  Intl.NumberFormat. Features dual-series MonotoneX area chart with
+  dashed grid lines in nested card layout.
+
+requires:
+  components: [UCard, UIcon, UBadge, UButton]
+  charts: [AreaChart]
+  composables: [useResponsiveHeight, useColorMode]
+
+props:
+  interface: |
+    interface AreaChartItem {
+      month: string
+      desktop: number
+      mobile: number
+    }
+    interface AreaChartNineProps {
+      data: AreaChartItem[]
+      categories: ComputedRef<Record<string, BulletLegendItemInterface>>
+      title?: string
+      aggregator?: (data: AreaChartItem[]) => Record<string, number>
+      formatOptions?: Intl.NumberFormatOptions
+    }
+
+emits:
+  interface: |
+    interface AreaChartNineEmits {
+      'view-details': []
+      'metric:computed': [totals: Record<string, number>]
+    }
+
+layout:
+  structure: |
+    card-shell (variant=subtle, bg-default/60)
+      content-stack (space-y-4)
+        header (space-y-1)
+          label-row (flex, gap-2)
+            title (text-muted)
+            info-icon (text-dimmed)
+          value-row (flex, gap-4)
+            computed-total (text-3xl, font-semibold)
+            badge (UBadge, variant=soft)
+        chart-card (UCard, variant=soft)
+          AreaChart (MonotoneX, dashed grid, hidden legend)
+        metrics-footer (flex, justify-between)
+          computed-series-totals (flex, gap-6)
+            series-total (dot + label + reduce() value) x N
+          action (UButton, ghost)
+  responsive:
+    mobile: chart height 120px, stacked metrics
+    tablet: chart height 240px, inline metrics
+    desktop: chart height 240px, spacious
+
+slots:
+  header: Override header with custom aggregation
+  chart: Override chart container
+  metrics: Override per-series computed totals display
+
+tokens:
+  card-bg: bg-default/60
+  card-variant: subtle
+  chart-variant: soft
+  title-color: text-muted
+  info-icon-color: text-dimmed
+  total-font: text-3xl font-semibold tracking-tight
+  badge-color: text-success
+  indicator-dot: h-2 w-2 animate-pulse rounded-full
+  metric-label: text-muted dark:text-dimmed
+  metric-value: font-medium
+  grid-dash: "--vis-axis-grid-line-dasharray: 5 5"
+
+chartConfig:
+  type: area
+  curveType: MonotoneX
+  gradient: true
+  tooltip: true
+  xAxis: true
+  yAxis: true
+  xGridLine: true
+  xNumTicks: 6
+  yNumTicks: 4
+  hideLegend: true
+  colorModeReactive: true
+
+atomicHint:
+  organism: ComputedMetricsAreaCard
+  molecules: [AggregateHeader, ComputedMetricsFooter, ChartContainer]
+  atoms: [ReduceAggregator, CurrencyTotal, AnimatedDot, PercentBadge]
+
+examples:
+  - context: "Sales metrics dashboard"
+    data: "6-month desktop/mobile revenue with per-channel computed totals"
+  - context: "Resource utilization"
+    data: "Monthly CPU/memory usage with computed averages per series"
+
+composesWith:
+  - "area-chart-data (same source, data-table emphasis)"
+  - "area-chart-five (same source, currency emphasis)"
+  - "Metrics dashboard grid (DSE composition)"
+
+avoid:
+  - "Displaying raw data without computed aggregates -- the metrics are the point"
+  - "Non-reactive totals -- use computed() with reduce() for automatic updates"
+  - "Omitting per-series breakdown -- aggregate-only hides important splits"
+  - "Hardcoding aggregation logic -- accept custom aggregator function"
+  - "Fixed chart height -- use useResponsiveHeight"
+
+derivation:
+  source: "nuxt-charts/area-charts/area-chart-nine"
+  method: "structural-abstraction"
+  what-was-kept: >
+    Computed metrics via reduce() for per-series totals, Intl.NumberFormat
+    for currency total, dual-series MonotoneX area chart, dashed grid,
+    animated color indicators, nested card hierarchy, ghost CTA.
+  what-was-removed: >
+    Hardcoded data array, specific hex colors, static reduce accumulator.
+  transformative-value: >
+    Reusable area chart pattern emphasizing computed aggregate metrics,
+    demonstrating the reduce() + computed() pattern for reactive data summaries.

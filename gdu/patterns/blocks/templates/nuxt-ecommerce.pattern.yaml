@@ -1,0 +1,92 @@
+# Template Pattern: Nuxt Ecommerce
+id: nuxt-ecommerce
+name: Nuxt Ecommerce
+version: "1.0.0"
+catalogRef: nuxt-ecommerce
+category: template
+tags: [template, ecommerce, shop, products, orders]
+archetype: layout-heavy
+quality: partial
+
+description: >
+  E-commerce dashboard template with product listings, order metrics,
+  revenue charts, and conversion funnel. Combines KPI cards, sales
+  charts, order tables, and category breakdowns for online store management.
+
+composesPatterns:
+  - navbar-with-search
+  - default-cards
+  - area-chart-preview
+  - conversion-funnel
+  - orders-overview
+  - donut-chart-legend
+  - category-cards
+
+requires:
+  components: [UCard, UButton, UBadge, UTable, UIcon, UAvatar]
+  charts: [AreaChart, DonutChart, FunnelChart]
+  composables: []
+
+layout:
+  sections:
+    - name: navigation
+      patternRef: navbar-with-search
+      slot: top
+    - name: kpi-metrics
+      patternRef: default-cards
+      slot: hero
+    - name: revenue-chart
+      patternRef: area-chart-preview
+      slot: main-left
+    - name: sales-funnel
+      patternRef: conversion-funnel
+      slot: main-right
+    - name: recent-orders
+      patternRef: orders-overview
+      slot: content
+    - name: category-breakdown
+      patternRef: donut-chart-legend
+      slot: sidebar-top
+    - name: product-categories
+      patternRef: category-cards
+      slot: sidebar-bottom
+  responsive:
+    mobile: single column, KPI cards scrollable horizontal, table simplified
+    tablet: 2-column chart grid, full-width orders table
+    desktop: main + sidebar layout, full data table with all columns
+
+tokens:
+  page-bg: bg-default
+  section-gap: gap-6
+  card-bg: bg-default
+  card-border: border-default
+  revenue-accent: text-success
+  order-status-pending: text-warning
+  order-status-completed: text-success
+  order-status-cancelled: text-error
+  product-image-radius: rounded-lg
+
+atomicHint:
+  organism: EcommerceDashboardPage
+  molecules: [NavigationBar, KPIRow, RevenueChart, SalesFunnel, OrdersTable, CategoryBreakdown]
+  atoms: [KPICard, OrderRow, ProductCard, CategoryChip]
+
+examples:
+  - context: "Online store admin dashboard"
+    sections: ["Nav with search", "4 KPI cards (revenue, orders, customers, avg order value)", "Revenue trend area chart", "Conversion funnel (visit > cart > checkout > purchase)", "Recent orders table", "Product category donut", "Category cards"]
+  - context: "Marketplace vendor dashboard"
+    sections: ["Navigation", "Sales metrics", "Revenue chart", "Buyer funnel", "Order history", "Product mix breakdown", "Top categories"]
+
+composesWith:
+  - "pricing-section (public pricing page complement)"
+  - "nuxt-dashboard-3 (generic dashboard alternative)"
+
+derivation:
+  source: "none — composition derived from catalog description and tags"
+  method: "template-composition"
+
+avoid:
+  - "Missing search in navigation — e-commerce dashboards need product/order search"
+  - "No order status indicators — use color-coded badges for order states"
+  - "Revenue without time comparison — always show vs previous period"
+  - "Product images without lazy loading — e-commerce has many images"

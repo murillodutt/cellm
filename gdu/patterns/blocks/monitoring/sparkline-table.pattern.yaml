@@ -1,0 +1,112 @@
+# Block Pattern: Sparkline Table
+id: sparkline-table
+name: User Activity Table with Sparkline Trends
+version: "1.0.0"
+catalogRef: spark-line-inline-table
+category: monitoring
+tags: [table, sparkline, activity, users, trends]
+archetype: chart-heavy
+description: >
+  Data table where each row embeds an inline sparkline showing trend data
+  alongside user/entity information and aggregated totals. Combines
+  UTable structure with per-row SVG sparklines.
+
+requires:
+  components: [UCard, UTable, UAvatar]
+  charts: []
+  composables: []
+  note: "Sparklines rendered as inline SVG paths, not chart components"
+
+props:
+  interface: |
+    interface SparklineTableRow {
+      id: string
+      label: string
+      avatar?: string
+      trend: number[]
+      total: number
+      change?: number
+    }
+    interface SparklineTableProps {
+      rows: SparklineTableRow[]
+      columns?: string[]
+      sortable?: boolean
+    }
+
+emits:
+  interface: |
+    interface SparklineTableEmits {
+      'row:click': [rowId: string]
+      'sort:change': [column: string, direction: 'asc' | 'desc']
+    }
+
+layout:
+  structure: |
+    card-shell
+      header [title, subtitle]
+      data-table (UTable driven)
+        column: avatar + label
+        column: sparkline-svg (inline area path per row)
+        column: total (right-aligned, bold)
+        column: change-badge (optional, color-coded)
+      footer [row-count, pagination controls]
+  responsive:
+    mobile: sparkline column hidden, show total only
+    tablet: all columns visible
+    desktop: same as tablet
+
+slots:
+  row: "Override individual row rendering"
+  header: "Replace card header"
+
+tokens:
+  card-bg: bg-default
+  label-text: text-highlighted
+  total-text: text-highlighted
+  change-positive: text-success
+  change-negative: text-error
+  sparkline-stroke: text-primary
+  table-header: text-muted
+  sparkline-gradient-opacity: "0.3 top, 0 bottom"
+
+chartConfig:
+  type: area
+  inline: true
+  dimensions: { width: 60, height: 16 }
+  gradient: true
+  strokeWidth: 1.5
+  endpointDot: false
+  note: "Per-row inline SVG sparkline, smaller than standalone sparkline-metrics variant"
+
+atomicHint:
+  organism: SparklineTable
+  molecules: [TableRow, InlineSparkline]
+  atoms: [ChangeIndicator, AvatarLabel]
+
+examples:
+  - context: "User engagement dashboard"
+    rows: ["Alice (sparkline, 1,234 sessions)", "Bob (sparkline, 987 sessions)"]
+  - context: "Product analytics"
+    rows: ["Feature A (usage trend, 5,432 events)", "Feature B (usage trend, 3,210 events)"]
+
+composesWith:
+  - "Dashboard Page Layout (DSE composition)"
+  - "sparkline-metrics (same sparkline rendering pattern)"
+
+derivation:
+  source: "nuxt-charts/status/spark-line-inline-table"
+  method: "structural-abstraction"
+  what-was-kept: >
+    Table + sparkline combination concept, per-row trend visualization,
+    column structure (label, sparkline, total), UTable-based rendering.
+  what-was-removed: >
+    All Vue template markup, UTable column definitions, hardcoded user data,
+    SVG path generation logic, CSS utility classes.
+  transformative-value: >
+    Generalizes user-activity table into reusable pattern for any entity
+    with time-series data. Adds sorting, change indicators, and avatar support.
+
+avoid:
+  - "Full chart component per row — inline SVG is lighter"
+  - "Hiding sparklines on desktop — they are the primary value"
+  - "Unsorted tables — default sort by total descending"

@@ -1,0 +1,92 @@
+# Template Pattern: Nuxt Planner
+id: nuxt-planner
+name: Nuxt Planner
+version: "1.0.0"
+catalogRef: nuxt-planner
+category: template
+tags: [template, planner, task, calendar, project-management]
+archetype: layout-heavy
+quality: partial
+
+description: >
+  Project planner template with task management, calendar views, progress
+  tracking, and team overview. Combines navigation, progress bars, category
+  cards, and data tables for project management workflows.
+
+composesPatterns:
+  - navbar-with-search
+  - progress-bar-cards
+  - category-cards
+  - stepper
+  - progress-overview
+  - tracker-bar
+  - team-cards
+
+requires:
+  components: [UCard, UButton, UBadge, UIcon, UTable, UProgress]
+  charts: []
+  composables: []
+
+layout:
+  sections:
+    - name: navigation
+      patternRef: navbar-with-search
+      slot: top
+    - name: progress-summary
+      patternRef: progress-bar-cards
+      slot: hero
+    - name: task-categories
+      patternRef: category-cards
+      slot: main
+    - name: workflow-steps
+      patternRef: stepper
+      slot: content-top
+    - name: project-progress
+      patternRef: progress-overview
+      slot: content
+    - name: status-tracker
+      patternRef: tracker-bar
+      slot: content-bottom
+    - name: team-members
+      patternRef: team-cards
+      slot: sidebar
+  responsive:
+    mobile: single column, collapsible calendar, task list priority
+    tablet: 2-column layout, calendar beside task list
+    desktop: full layout with sidebar for team and calendar views
+
+tokens:
+  page-bg: bg-default
+  section-gap: gap-6
+  card-bg: bg-default
+  progress-track: bg-elevated
+  progress-fill: bg-primary
+  calendar-today: bg-primary
+  task-priority-high: text-error
+  task-priority-medium: text-warning
+  task-priority-low: text-success
+
+atomicHint:
+  organism: PlannerPage
+  molecules: [TaskBoard, CalendarView, ProgressPanel, TeamPanel]
+  atoms: [TaskCard, CalendarDay, ProgressBar, TeamMemberAvatar]
+
+examples:
+  - context: "Sprint planning board"
+    sections: ["Nav with search", "Sprint progress (3 bars: done, in-progress, blocked)", "Category cards (Frontend, Backend, DevOps)", "Sprint workflow stepper", "Task progress overview", "Team member cards"]
+  - context: "Product roadmap planner"
+    sections: ["Navigation", "Quarterly progress bars", "Feature categories", "Release milestone stepper", "Feature completion tracker", "Team assignments"]
+
+composesWith:
+  - "nuxt-dashboard-3 (analytics complement to planning)"
+  - "stepper (reusable workflow component within planner)"
+
+derivation:
+  source: "none — composition derived from catalog description and tags"
+  method: "template-composition"
+
+avoid:
+  - "Calendar without task integration — calendar must show task deadlines"
+  - "Missing progress indicators — planner must communicate completion status"
+  - "No team context — show who is assigned to what"
+  - "Overloaded single view — use tabs for different planning perspectives"

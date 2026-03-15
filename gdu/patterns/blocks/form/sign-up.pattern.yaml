@@ -1,0 +1,130 @@
+# Block Pattern: Sign Up Form
+# Distributable structural specification — no licensed code
+# Generated from catalog ref, not source transcription
+
+id: sign-up
+name: Create Account Form
+version: "1.0.0"
+catalogRef: sign-up
+category: form
+tags: [auth, sign-up, registration, create-account, form]
+
+archetype: form-heavy
+description: >
+  User registration form using UAuthForm field-driven rendering with name,
+  email, password, confirm password, and optional newsletter checkbox.
+  Wrapped in a centered UCard with title, description slot, submit button,
+  footer with terms/privacy links, and external sign-in redirect below card.
+
+requires:
+  components: [UCard, UAuthForm, UButton, NuxtLink]
+  charts: []
+  composables: [useToast]
+
+props:
+  interface: |
+    interface AuthField {
+      name: string
+      type: 'text' | 'email' | 'password' | 'checkbox'
+      label: string
+      placeholder?: string
+      required?: boolean
+      autocomplete?: string
+      size?: 'sm' | 'md' | 'lg'
+    }
+    interface SignUpProps {
+      fields?: AuthField[]           // defaults: name, email, password, confirmPassword, newsletter
+      title?: string                 // default "Create new account"
+      description?: string           // default "Fill in your data to create a new account"
+      submitLabel?: string           // default "Create account"
+      submitSize?: 'sm' | 'md' | 'lg'  // default "lg"
+      signInLink?: string            // URL for "Already have an account?"
+      termsLink?: string             // URL for Terms of Use
+      privacyLink?: string           // URL for Privacy Policy
+    }
+
+emits:
+  interface: |
+    interface SignUpEmits {
+      'submit': [data: { name: string; email: string; password: string; confirmPassword: string; newsletter?: boolean }]
+    }
+
+layout:
+  structure: |
+    page-wrapper (centered)
+      card-shell (max-width ~384px, bordered)
+        auth-form (UAuthForm driven)
+          title-slot [title text]
+          description-slot [subtitle, muted text]
+          field-list (rendered from fields array)
+            name-field (text, autofocus, lg size)
+            email-field (email, autocomplete=email, lg size)
+            password-field (password, autocomplete=new-password, lg size)
+            confirm-password-field (password, autocomplete=new-password, lg size)
+            newsletter-checkbox (checkbox, optional)
+          submit-button (full-width, neutral color, lg size)
+          footer-slot [terms + privacy links, muted, xs text]
+      sign-in-redirect (centered text below card with link)
+  responsive:
+    mobile: full-width card with padding, stacked fields
+    tablet: centered card, max-width 384px
+    desktop: same as tablet
+
+slots:
+  description: "Override subtitle below title"
+  footer: "Override terms/privacy and legal text area"
+
+tokens:
+  card-bg: bg-default
+  card-border: border-default
+  title-text: text-highlighted
+  description-text: text-muted
+  footer-text: text-muted
+  link-text: text-primary
+  link-hover: "hover:underline"
+  submit-color: neutral
+  submit-size: lg
+  field-size: lg
+
+atomicHint:
+  organism: SignUpPage
+  molecules: [AuthCard, FieldGroup, LegalFooter]
+  atoms: [NameField, EmailField, PasswordField, ConfirmPasswordField, NewsletterCheckbox, TermsLink]
+
+examples:
+  - context: "SaaS product registration"
+    fields: ["Name (text)", "Email (email)", "Password (password)", "Confirm Password (password)", "Newsletter (checkbox)"]
+  - context: "Minimal registration"
+    fields: ["Email (email)", "Password (password)"]
+
+composesWith:
+  - "basic-sign-in (login counterpart, linked from footer)"
+  - "password-reset (recovery flow)"
+  - "otp-verification (2FA after registration)"
+  - "onboarding-wizard (post-registration setup)"
+
+derivation:
+  source: "nuxt-charts/account/basic-create-account"
+  method: "structural-abstraction"
+  what-was-kept: >
+    UAuthForm field-driven rendering with 5 fields (name, email, password,
+    confirmPassword, newsletter checkbox), password confirmation validation
+    pattern, slot usage (description, footer with terms/privacy links),
+    sign-in redirect below card, toast feedback on success/error, lg-sized
+    fields and submit button.
+  what-was-removed: >
+    All Vue template markup, specific placeholder values (bundui.com),
+    setTimeout mock submit, inline password match validation logic,
+    specific toast message strings, CSS utility class sequences.
+  transformative-value: >
+    Converts a single-variant Vue registration component into a configurable
+    pattern with typed field array, legal link props, and structured emit
+    for form data. Password confirmation as a pattern concept rather than
+    inline logic.
+
+avoid:
+  - "Missing autocomplete attributes — new-password for registration fields"
+  - "No password confirmation — always pair password with confirmPassword"
+  - "Hardcoded terms/privacy URLs — accept as props"
+  - "Missing field size consistency — all fields should match submit button size"
+  - "No newsletter opt-in — provide optional checkbox field"

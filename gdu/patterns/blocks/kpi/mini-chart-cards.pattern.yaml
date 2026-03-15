@@ -1,0 +1,104 @@
+# Block Pattern: Mini Chart Cards
+id: mini-chart-cards
+name: KPI Cards with Inline Mini Charts
+version: "1.0.0"
+catalogRef: mini-charts-cards
+category: kpi
+tags: [mini-chart, sparkline, kpi, cards, area, bar, line]
+archetype: chart-heavy
+description: >
+  KPI cards where each card shows a label, large value, and a small inline
+  chart (area, bar, or line) determined by chartType per card. Charts are
+  minimal: no axes, no legend, no tooltip — pure visual trend.
+
+requires:
+  components: [UCard]
+  charts: [AreaChart, BarChart, LineChart]
+  composables: []
+
+props:
+  interface: |
+    interface MiniChartCard {
+      label: string
+      value: string
+      chartType: 'area' | 'bar' | 'line'
+      data: { date: string; value: number }[]
+      color?: string
+    }
+    interface MiniChartCardsProps {
+      cards: MiniChartCard[]
+    }
+
+emits:
+  interface: |
+    interface MiniChartCardsEmits {
+      'card:click': [label: string]
+    }
+
+layout:
+  structure: |
+    card-grid (responsive columns)
+      card-shell (repeat per card)
+        label (dimmed, font-medium)
+        content-row
+          left: value (2xl, bold)
+          right: mini-chart-container (fixed height ~48px, width ~112px)
+            conditional-chart (AreaChart | BarChart | LineChart by chartType)
+              hide: x-axis, y-axis, legend, tooltip
+              color: from card.color or semantic token
+  responsive:
+    mobile: single column, chart beside value
+    tablet: 2-column grid
+    desktop: 3-column grid
+
+slots:
+  card: "Override individual card"
+  chart: "Custom chart rendering"
+
+tokens:
+  card-bg: bg-default
+  label-text: text-dimmed
+  value-text: text-highlighted
+  chart-area-color: text-success
+  chart-bar-color: text-info
+  chart-line-color: text-warning
+
+chartConfig:
+  height: 48
+  hideXAxis: true
+  hideYAxis: true
+  hideLegend: true
+  hideTooltip: true
+  note: "Charts are decorative trend indicators, not interactive data views"
+
+atomicHint:
+  organism: MiniChartCardGrid
+  molecules: [MiniChartCard]
+  atoms: [MiniAreaChart, MiniBarChart, MiniLineChart]
+
+examples:
+  - context: "SaaS dashboard KPIs"
+    cards: ["Revenue ($45,231, area chart)", "Users (2,405, bar chart)", "Sessions (12,543, line chart)"]
+
+composesWith:
+  - "KPI Card (DSE composition)"
+  - "default-cards (simpler variant without charts)"
+
+derivation:
+  source: "nuxt-charts/cards/cards-with-mini-charts"
+  method: "structural-abstraction"
+  what-was-kept: >
+    Multi-chart-type KPI card concept, chartType discriminator pattern,
+    minimal chart config (no axes/legend/tooltip), fixed chart dimensions,
+    per-card color assignment, label + value + chart layout.
+  what-was-removed: >
+    All Vue template markup, hardcoded chart data, specific color values,
+    v-if chain for chart type switching, Tailwind utility classes.
+  transformative-value: >
+    Provides a flexible pattern supporting 3 chart types per card.
+    The chartType discriminator allows mixed dashboard layouts.
+
+avoid:
+  - "Making charts interactive — they are decorative trend indicators"
+  - "Full-size charts — fixed height ~48px, inline beside value"
+  - "Same chart type for all cards — support mixed types"

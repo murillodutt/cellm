@@ -1,0 +1,138 @@
+# Block Pattern: Navbar with Toolbar
+id: navbar-toolbar
+name: Dashboard Navbar with Tab Toolbar
+version: "1.0.0"
+catalogRef: navbar-with-toolbar
+category: navigation
+tags: [navbar, dashboard, tabs, toolbar, breadcrumb, navigation-menu]
+archetype: layout-heavy
+description: >
+  Two-tier dashboard navigation: top navbar with sidebar toggle, breadcrumb,
+  and auth buttons; bottom toolbar with UNavigationMenu providing tab-style
+  navigation with active state highlight. Toolbar scrolls horizontally on
+  overflow. Active tab managed via computed items with onSelect handlers.
+
+requires:
+  components: [UDashboardNavbar, UDashboardToolbar, UNavigationMenu, UBreadcrumb, UButton, UIcon]
+  charts: []
+  composables: []
+
+props:
+  interface: |
+    interface BreadcrumbItem {
+      label: string
+      to?: string
+    }
+    interface NavTab {
+      label: string
+      to?: string
+      icon?: string
+      active?: boolean
+    }
+    interface NavTabGroup {
+      items: NavTab[]
+    }
+    interface NavbarToolbarProps {
+      title: string
+      breadcrumbs: BreadcrumbItem[]
+      tabGroups: NavTabGroup[]
+      activeTab?: string
+      showAuthButtons?: boolean
+    }
+
+emits:
+  interface: |
+    interface NavbarToolbarEmits {
+      'sidebar:toggle': []
+      'tab:select': [label: string]
+      'auth:register': []
+      'auth:login': []
+    }
+
+layout:
+  structure: |
+    container (bg-default, rounded, p-4 lg:p-6)
+      UDashboardNavbar (title prop, ui.right: gap-3 lg:gap-4)
+        slot #left
+          sidebar-toggle (UButton ghost neutral, i-lucide-panel-left)
+          breadcrumb (UBreadcrumb, separatorIcon size-4, hidden on mobile)
+        slot #right
+          register-button (UButton ghost neutral rounded-md, hidden lg:inline-flex)
+          login-button (UButton soft rounded-md)
+            mobile: icon-only (i-lucide-log-in), label hidden
+            desktop: label "Login" via hidden lg:inline span
+      UDashboardToolbar (overflow-x-auto for horizontal scroll)
+        UNavigationMenu (items: computed tab groups, highlight prop enabled)
+          tab-items: grouped arrays (primary tabs + secondary/external links)
+          active-state: managed via item.active + onSelect callback
+          min-w-0 flex-1 to fill toolbar width
+      content-area (m-2 mt-4, border dashed)
+  responsive:
+    mobile: breadcrumb hidden, toolbar scrollable horizontally (overflow-x-auto)
+    tablet: breadcrumb visible, toolbar may scroll if many tabs
+    desktop: full breadcrumb, toolbar fits comfortably
+
+slots:
+  navbar-left: "Override sidebar toggle + breadcrumb"
+  navbar-right: "Override auth buttons"
+  toolbar: "Override toolbar content (entire UNavigationMenu)"
+
+tokens:
+  container-bg: bg-default
+  breadcrumb-text: text-muted
+  active-tab: text-primary
+  inactive-tab: text-muted
+  auth-register-variant: ghost
+  auth-login-variant: soft
+  sidebar-icon: "i-lucide-panel-left"
+  login-icon: "i-lucide-log-in"
+
+atomicHint:
+  organism: NavbarToolbar
+  molecules: [TopNavbar, TabToolbar, AuthButtonGroup]
+  atoms: [SidebarToggle, BreadcrumbTrail, NavTab, AuthButton]
+
+examples:
+  - context: "Dashboard settings page"
+    breadcrumbs: ["Dashboard", "Payments"]
+    tabGroups:
+      - items: ["General (active)", "Members", "Notifications"]
+      - items: ["Documentation (external, book-open icon)", "Help & Feedback (external, help-circle icon)"]
+  - context: "Project management"
+    breadcrumbs: ["Projects", "CELLM"]
+    tabGroups:
+      - items: ["Overview (active)", "Tasks", "Timeline", "Settings"]
+
+composesWith:
+  - "navbar-variant-one (simpler dropdown alternative)"
+  - "navbar-with-search (search toolbar alternative)"
+  - "Dashboard Page Layout (DSE composition)"
+
+derivation:
+  source: "nuxt-charts/dashboard-navbar/navbar-with-toolbar"
+  method: "structural-abstraction"
+  what-was-kept: >
+    Two-tier layout (UDashboardNavbar + UDashboardToolbar), UNavigationMenu with
+    highlight prop for active tab indicator, computed items with onSelect callbacks
+    for active tab state management, grouped tab arrays (primary tabs + external
+    links with icons and target _blank), overflow-x-auto on toolbar for horizontal
+    scroll, sidebar toggle with panel-left icon, breadcrumb with separatorIcon size-4,
+    auth buttons with responsive label pattern (hidden lg:inline span), login as
+    soft variant (distinct from ghost register), min-w-0 flex-1 on NavigationMenu.
+  what-was-removed: >
+    All Vue template markup, hardcoded tab labels (General/Members/Notifications),
+    hardcoded external links (ui.nuxt.com, github.com), activeTab ref state,
+    computed(() => [...]) for items, specific breadcrumb paths, class strings.
+  transformative-value: >
+    Captures the most complex navbar variant with full tab navigation state
+    management. Key decisions: 1) UNavigationMenu with highlight for tab indicator,
+    2) Grouped items (primary + external) as separate arrays, 3) Active state via
+    computed items with onSelect, 4) overflow-x-auto for mobile tab scrolling,
+    5) Login as soft variant to visually distinguish from register ghost.
+
+avoid:
+  - "Custom tab implementation — use UNavigationMenu with highlight"
+  - "Static tab active state — use computed items with onSelect for reactivity"
+  - "Missing overflow-x-auto — tabs will clip on mobile"
+  - "Too many tabs (>7) in one group — split into groups or use dropdown overflow"
+  - "External links without target _blank — opens in same window"

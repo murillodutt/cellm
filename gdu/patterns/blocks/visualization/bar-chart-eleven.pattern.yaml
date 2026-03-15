@@ -1,0 +1,153 @@
+id: bar-chart-eleven
+name: Value-Labeled Single-Series Bar Chart
+version: 1.0.0
+catalogRef: bar-chart-eleven
+category: visualization
+tags:
+  - bar
+  - value-labels
+  - single-series
+  - color-mode-aware
+  - product-ranking
+archetype: chart-heavy
+description: >
+  Single-series vertical bar chart with inline value labels displayed above
+  each bar. Uses the valueLabel prop for direct data labeling without tooltip
+  dependency. Color-mode reactive, y-grid lines, large radius for rounded
+  tops, and currency-formatted y-axis. Built-in legend at BottomRight.
+
+requires:
+  components: [UCard]
+  charts: [BarChart]
+  composables: [useResponsiveHeight, useColorMode]
+
+props:
+  interface: |
+    interface SalesDataPoint {
+      product: string
+      sales: number
+    }
+    interface BarChartElevenProps {
+      data: SalesDataPoint[]
+      categories: Record<string, BulletLegendItemInterface>
+      title?: string
+      yFormatter?: (value: number) => string
+      valueLabelConfig?: {
+        label: (d: any) => string | undefined
+        labelSpacing: number
+        color: string
+        labelFontSize: number
+      }
+    }
+
+emits:
+  interface: |
+    interface BarChartElevenEmits {
+      'bar:click': [product: string, value: number]
+      'legend:toggle': [series: string, visible: boolean]
+    }
+
+layout:
+  structure: |
+    wrapper (max-w-xl centered)
+      card-shell
+        header (UCard #header slot)
+          title (text-lg font-semibold)
+        chart-area
+          BarChart (vertical, single-series, value labels above bars)
+            x-axis: product names (via xFormatter)
+            y-axis: currency values ($X.Xk format)
+            value-labels: floating above each bar (labelSpacing 250)
+  responsive:
+    mobile: chart height 180px, value labels may overlap
+    tablet: chart height 240px, full labels
+    desktop: max-w-xl centered
+
+slots:
+  header: Override card header title
+  chart: Override chart rendering
+  footer: Add optional footer content
+
+tokens:
+  card-bg: bg-default
+  title-text: text-lg font-semibold
+  bar-color-light: text-blue-600
+  bar-color-dark: text-blue-500
+  bar-radius: radius-8
+  bar-padding: "0.3"
+  y-grid: visible
+  x-grid: hidden
+  value-label-color: text-highlighted
+  value-label-size: "12"
+  legend-position: bottom-right
+
+chartConfig:
+  type: bar
+  orientation: vertical
+  stacked: false
+  radius: 8
+  barPadding: 0.3
+  yGridLine: true
+  xGridLine: false
+  hideLegend: false
+  legendPosition: BottomRight
+  yFormatter: currency-k
+  yLabel: Revenue
+  colorModeReactive: true
+  valueLabel:
+    labelSpacing: 250
+    color: text-highlighted
+    labelFontSize: 12
+  tooltip: true
+  legend: true
+  xAxis: true
+  yAxis: true
+  note: "Uses :key='colorMode.value' for theme-reactive bar color, valueLabel prop for inline data labels"
+
+atomicHint:
+  organism: ValueLabeledBarCard
+  molecules:
+    - MinimalCardHeader (title in UCard header slot)
+    - LabeledBarChart (bars with floating value labels)
+    - BuiltInLegend (chart-native bottom-right)
+  atoms:
+    - ValueLabel (floating text above bar)
+    - RoundedBar (radius-8 prominent rounding)
+    - CurrencyTick
+
+examples:
+  - context: Product sales revenue ranking
+    data: "5 products x sales ($k), value labels above bars showing exact revenue"
+    usage: Product dashboard with direct value comparison without tooltip hover
+  - context: Team velocity comparison
+    data: "Teams x story points, value labels for quick scanning in standups"
+    usage: Sprint dashboard where exact values matter more than trends
+
+composesWith:
+  - bar-chart-one (single-series without value labels)
+  - bar-chart-six (multi-series comparison variant)
+  - Dashboard Page Layout (DSE composition)
+
+derivation:
+  source: nuxt-charts/bar-charts/bar-chart-eleven
+  method: structural-abstraction
+  what-was-kept: >
+    ValueLabel prop with label function, labelSpacing 250, var(--ui-text) color,
+    fontSize 12. Color-mode reactive via :key binding and computed categories
+    with light/dark color variants. Large radius 8 for prominent rounded tops,
+    y-grid visible, x-grid hidden, legend at BottomRight, yLabel "Revenue",
+    currency-k formatter ($X.Xk), barPadding 0.3.
+  what-was-removed: >
+    All Vue template markup, hardcoded SalesData array, specific color values,
+    xFormatter/yFormatter implementations, CSS classes.
+  transformative-value: >
+    Direct data labeling pattern. ValueLabel eliminates tooltip dependency by
+    showing exact values above each bar. Color-mode reactivity ensures bar
+    colors adapt to theme changes.
+
+avoid:
+  - Removing value labels — they are the defining feature of this pattern
+  - Small radius — radius 8 creates the prominent rounded visual
+  - Multiple series — value labels become cluttered with grouped/stacked bars
+  - Top-positioned legend — BottomRight avoids competing with value labels
+  - Fixed bar colors — must use color-mode reactive computed categories

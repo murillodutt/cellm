@@ -1,0 +1,111 @@
+# Block Pattern: AI Dashboard
+id: ai-dashboard
+name: AI Prompt Dashboard
+version: "1.0.0"
+catalogRef: gemini-dashboard
+category: ai
+tags: [ai, prompt, dashboard, model-selector, actions]
+archetype: layout-heavy
+description: >
+  AI prompt interface with model selector, text input area, action chips
+  for quick operations, and submit button. Designed as a landing/home
+  view for an AI assistant, not a chat interface.
+
+requires:
+  components: [UCard, UButton, USelect, UTextarea]
+  charts: []
+  composables: []
+
+props:
+  interface: |
+    interface ActionChip {
+      label: string
+      icon?: string
+      description?: string
+    }
+    interface AIDashboardProps {
+      models?: string[]
+      selectedModel?: string
+      placeholder?: string
+      actions?: ActionChip[]
+      greeting?: string
+    }
+
+emits:
+  interface: |
+    interface AIDashboardEmits {
+      'submit': [prompt: string, model: string]
+      'action:click': [actionLabel: string]
+      'model:change': [model: string]
+    }
+
+layout:
+  structure: |
+    page-container (centered, max-width constrained)
+      greeting-section
+        greeting-text (large, bold, centered)
+        subtitle (muted, centered)
+      prompt-area
+        model-selector (USelect, above or beside input)
+        text-input (UTextarea, large, centered)
+        submit-button
+      actions-grid (below prompt)
+        action-chip (repeat, clickable card with icon + label)
+          icon
+          label
+          description (optional, muted)
+  responsive:
+    mobile: single column, full-width actions
+    tablet: 2-column action grid
+    desktop: 3-4 column action grid, max-width ~768px
+
+slots:
+  greeting: "Custom greeting content"
+  prompt: "Custom prompt input"
+  actions: "Custom action chips area"
+
+tokens:
+  page-bg: bg-default
+  greeting-text: text-highlighted
+  subtitle-text: text-muted
+  input-bg: bg-default
+  input-border: border-default
+  action-card-bg: bg-elevated
+  action-card-border: border-default
+  action-card-hover: bg-accented
+  action-icon: text-primary
+
+atomicHint:
+  organism: AIDashboard
+  molecules: [PromptArea, ActionGrid]
+  atoms: [ModelSelector, ActionChip, GreetingHeader]
+
+examples:
+  - context: "AI coding assistant home"
+    greeting: "How can I help you today?"
+    actions: ["Generate Code", "Explain Code", "Review PR", "Write Tests"]
+  - context: "AI writing assistant"
+    greeting: "What would you like to write?"
+    actions: ["Blog Post", "Email", "Social Media", "Documentation"]
+
+composesWith:
+  - "chat-interface (transitions to chat after prompt submission)"
+  - "Dashboard Page Layout (DSE composition)"
+
+derivation:
+  source: "nuxt-charts/ai/gemini-dashboard"
+  method: "structural-abstraction"
+  what-was-kept: >
+    Prompt-centric landing concept, model selector, action cards grid,
+    greeting text, centered layout with max-width.
+  what-was-removed: >
+    All Vue template markup, hardcoded model list, specific action
+    labels, CSS classes, Gemini branding.
+  transformative-value: >
+    Generic AI prompt dashboard applicable to any AI product.
+    Decoupled from specific AI provider branding.
+
+avoid:
+  - "Chat history in this view — use chat-interface pattern instead"
+  - "Too many action chips (>8) — group or paginate"
+  - "Missing model selector — important for multi-model products"

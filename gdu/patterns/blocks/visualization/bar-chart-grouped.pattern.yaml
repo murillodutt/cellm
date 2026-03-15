@@ -1,0 +1,95 @@
+# Block Pattern: Grouped Bar Chart
+id: bar-chart-grouped
+name: Grouped Bar Chart for Comparison
+version: "1.0.0"
+catalogRef: bar-chart-four
+category: visualization
+tags: [bar, grouped, comparison, categories, side-by-side]
+archetype: chart-heavy
+description: >
+  Vertical bar chart with multiple series rendered side-by-side per category
+  for direct comparison. Card-wrapped with title, legend, and tooltip.
+
+requires:
+  components: [UCard]
+  charts: [BarChart]
+  composables: []
+
+props:
+  interface: |
+    interface BarDataPoint {
+      category: string
+      [key: string]: string | number
+    }
+    interface BarChartGroupedProps {
+      data: BarDataPoint[]
+      categories: Record<string, { name: string; color?: string }>
+      index?: string
+      title?: string
+    }
+
+emits:
+  interface: |
+    interface BarChartGroupedEmits {
+      'bar:click': [category: string, series: string, value: number]
+    }
+
+layout:
+  structure: |
+    card-shell
+      header [title]
+      chart-container
+        BarChart (grouped mode, vertical, legend, tooltip)
+      footer [optional summary stats]
+  responsive:
+    mobile: chart height ~250px, horizontal scroll if many categories
+    tablet: chart height ~300px
+    desktop: chart height ~350px
+
+slots:
+  header: "Override card header"
+  tooltip: "Custom tooltip"
+
+tokens:
+  card-bg: bg-default
+
+chartConfig:
+  type: bar
+  mode: grouped
+  orientation: vertical
+  legend: true
+  tooltip: true
+  xAxis: true
+  yAxis: true
+
+atomicHint:
+  organism: GroupedBarChartCard
+  molecules: [ChartContainer, Legend]
+  atoms: [BarGroup, Tooltip]
+
+examples:
+  - context: "Quarterly revenue by product"
+    data: "Q1-Q4 x Product A, B, C"
+  - context: "Team performance comparison"
+    data: "Sprint 1-6 x Team Alpha, Beta"
+
+composesWith:
+  - "Dashboard Page Layout (DSE composition)"
+  - "bar-chart-stacked (alternative composition view)"
+
+derivation:
+  source: "nuxt-charts/bar-charts/bar-chart-four"
+  method: "structural-abstraction"
+  what-was-kept: >
+    Grouped bar concept, multi-series side-by-side rendering, category-based
+    x-axis, legend, tooltip interaction.
+  what-was-removed: >
+    All Vue template markup, hardcoded data, specific BarChart props,
+    CSS classes.
+  transformative-value: >
+    Generic grouped bar pattern for any multi-series categorical comparison.
+
+avoid:
+  - "Stacking bars — use bar-chart-stacked pattern instead"
+  - "Too many series (>5) — becomes unreadable"
+  - "Missing legend — required for multi-series"

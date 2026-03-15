@@ -1,0 +1,143 @@
+id: bar-chart-five
+name: Multi-Series Stacked Performance Distribution
+version: 1.0.0
+catalogRef: bar-chart-five
+category: visualization
+tags:
+  - bar
+  - stacked
+  - multi-series
+  - distribution
+  - performance
+  - percentage
+archetype: chart-heavy
+description: >
+  Multi-series stacked bar chart showing distribution across performance
+  tiers (e.g., Excellent/Good/Average/NeedsImprovement). Card-wrapped with
+  header/footer slots, percentage y-axis domain [0, 100], and action buttons
+  in footer for export and detail navigation.
+
+requires:
+  components: [UCard, UButton]
+  charts: [BarChart]
+  composables: [useResponsiveHeight]
+
+props:
+  interface: |
+    interface PerformanceDataPoint {
+      quarter: string
+      excellent: number
+      good: number
+      average: number
+      needsImprovement: number
+    }
+    interface BarChartFiveProps {
+      data: PerformanceDataPoint[]
+      categories: Record<string, BulletLegendItemInterface>
+      title?: string
+      subtitle?: string
+      yDomain?: [number, number]
+      yFormatter?: (value: number) => string
+    }
+
+emits:
+  interface: |
+    interface BarChartFiveEmits {
+      'export': [format: string]
+      'view-details': []
+      'segment:click': [quarter: string, tier: string, value: number]
+    }
+
+layout:
+  structure: |
+    card-shell (max-w-3xl)
+      header (UCard #header slot)
+        title-block (flex justify-between)
+          title (text-lg font-medium)
+          subtitle (text-muted text-sm)
+      chart-area
+        BarChart (stacked, vertical, percentage domain, legend top-right)
+      footer (UCard #footer slot)
+        action-row (flex justify-between)
+          export-button (outline, trailing download icon)
+          details-button (outline, trailing external-link icon)
+  responsive:
+    mobile: chart height 120px, condensed legend
+    tablet: chart height 240px, full legend
+    desktop: max-w-3xl centered, 5 y-ticks
+
+slots:
+  header: Override card header with title and subtitle
+  chart: Override chart rendering
+  footer: Override action buttons in footer
+
+tokens:
+  card-bg: bg-default
+  title-text: text-lg font-medium
+  subtitle-text: text-muted text-sm
+  tier-excellent: color-emerald-500
+  tier-good: color-blue-500
+  tier-average: color-amber-500
+  tier-needs-improvement: color-red-500
+  button-style: variant-outline color-neutral
+  y-domain: "[0, 100]"
+  y-format: percentage
+
+chartConfig:
+  type: bar
+  orientation: vertical
+  stacked: true
+  yDomain: [0, 100]
+  yNumTicks: 5
+  yFormatter: percentage
+  legendPosition: TopRight
+  tooltip: true
+  legend: true
+  xAxis: true
+  yAxis: true
+
+atomicHint:
+  organism: PerformanceDistributionCard
+  molecules:
+    - CardHeader (title + subtitle in UCard header slot)
+    - StackedDistributionChart (multi-tier stacked bars)
+    - FooterActions (export + details buttons)
+  atoms:
+    - TierSegment
+    - ExportButton
+    - DetailsLink
+
+examples:
+  - context: Team performance quarterly distribution
+    data: "Q1-Q4 x Excellent/Good/Average/NeedsImprovement (percentages summing to 100)"
+    usage: HR dashboard showing assessment score distribution by quarter
+  - context: Customer satisfaction tiers
+    data: "Monthly CSAT scores broken into Promoter/Passive/Detractor tiers"
+    usage: Support dashboard with NPS-style distribution visualization
+
+composesWith:
+  - bar-chart-stacked (base stacked pattern without performance tiers)
+  - bar-chart-eleven (100% normalized variant)
+  - Dashboard Page Layout (DSE composition)
+
+derivation:
+  source: nuxt-charts/bar-charts/bar-chart-five
+  method: structural-abstraction
+  what-was-kept: >
+    Multi-tier stacked distribution (4 named tiers with semantic colors),
+    percentage y-axis with [0, 100] domain, formatPercentage y-formatter,
+    UCard header/footer slots for title and action buttons, legend at
+    TopRight, export and view-details actions in footer.
+  what-was-removed: >
+    All Vue template markup, hardcoded PerformanceData array, specific
+    tier colors, xFormatter, i-lucide icon references, CSS classes.
+  transformative-value: >
+    Distribution analysis pattern with semantic performance tiers and
+    bounded percentage domain. Footer actions enable data export workflow.
+
+avoid:
+  - Ungrouped y-domain — always set [0, 100] for percentage distribution
+  - More than 5 tiers — stacked segments become unreadable
+  - Missing tier colors — each tier MUST have distinct semantic color
+  - Removing footer actions — export and details are integral to the pattern
+  - Using this for raw values — this is a percentage/proportion pattern

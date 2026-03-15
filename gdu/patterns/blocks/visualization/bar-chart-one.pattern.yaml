@@ -1,0 +1,143 @@
+id: bar-chart-one
+name: Single-Series Vertical Bar Chart
+version: 1.0.0
+catalogRef: bar-chart-one
+category: visualization
+tags:
+  - bar
+  - basic
+  - single-series
+  - vertical
+  - monthly
+basePattern: bar-chart-stacked
+archetype: chart-heavy
+description: >
+  Single-series vertical bar chart showing one metric over time categories.
+  Card-wrapped with hero total, percentage badge, dashed grid lines, and
+  a soft-variant inner card containing the chart. Scrollable x-axis for
+  dense data points.
+
+requires:
+  components: [UCard, UBadge, UButton]
+  charts: [BarChart]
+  composables: [useResponsiveHeight]
+
+props:
+  interface: |
+    interface SpendingDataPoint {
+      month: string
+      amount: number
+    }
+    interface BarChartOneProps {
+      data: SpendingDataPoint[]
+      categories: Record<string, BulletLegendItemInterface>
+      title?: string
+      totalValue?: string
+      changeBadge?: string
+      yFormatter?: (value: number) => string
+      radius?: number
+    }
+
+emits:
+  interface: |
+    interface BarChartOneEmits {
+      'view-details': []
+      'period:change': [period: string]
+    }
+
+layout:
+  structure: |
+    card-shell (max-w-3xl)
+      content-stack (space-y-4)
+        summary-row
+          label (uppercase, muted)
+          value-group (flex)
+            hero-value (text-3xl, semibold)
+            change-badge (UBadge soft neutral)
+        inner-card (UCard variant=soft)
+          BarChart (vertical, rounded bars, dashed grid, responsive height)
+        footer-row (flex justify-between)
+          live-indicator (pulse dot + label)
+          action-button (ghost, trailing arrow)
+  responsive:
+    mobile: chart height 120px, 4 x-ticks, single column
+    tablet: chart height 240px, comfortable padding
+    desktop: max-w-3xl centered, full tick density
+
+slots:
+  summary: Override the total value and badge area
+  chart: Override the chart container
+  footer: Override the footer row with live indicator and action
+
+tokens:
+  card-bg: bg-default
+  inner-card-bg: bg-muted (variant soft)
+  title-text: text-muted
+  hero-value: text-3xl font-semibold
+  badge-style: variant-soft color-neutral
+  bar-color: color-success (series color)
+  grid-dash: "--vis-axis-grid-line-dasharray: 5 5"
+  live-dot: bg-primary animate-pulse
+  muted-label: text-muted
+  bar-radius: radius-20
+
+chartConfig:
+  type: bar
+  orientation: vertical
+  stacked: false
+  radius: 20
+  xNumTicks: 4
+  yFormatter: currency
+  legendPosition: TopRightCenter
+  curveType: Basis
+  gridStyle: dashed
+  tooltip: true
+  legend: true
+  xAxis: true
+  yAxis: true
+
+atomicHint:
+  organism: SingleSeriesBarChartCard
+  molecules:
+    - SummaryHeader (hero value + change badge)
+    - SoftChartContainer (inner card wrapping chart)
+    - FooterActionRow (live indicator + CTA)
+  atoms:
+    - HeroValue
+    - ChangeBadge
+    - PulseDot
+
+examples:
+  - context: Monthly spending tracker
+    data: "12 months x amount (currency), hero total $10,290, badge +8.5%"
+    usage: Financial dashboard showing year spending trend with drill-down
+  - context: Revenue over time
+    data: "Quarterly revenue, hero total, percentage change vs prior period"
+    usage: Executive summary card in analytics dashboard
+
+composesWith:
+  - bar-chart-stacked (for multi-series composition view)
+  - donut-chart-legend (pair with categorical breakdown)
+  - Dashboard Page Layout (DSE composition)
+
+derivation:
+  source: nuxt-charts/bar-charts/bar-chart-one
+  method: structural-abstraction
+  what-was-kept: >
+    Single-series vertical bar with rounded corners (radius 20), dashed grid lines
+    via CSS custom property, hero total with change badge above chart, soft inner
+    card container, live pulse indicator in footer, useResponsiveHeight composable,
+    currency y-axis formatter, trailing-arrow action button.
+  what-was-removed: >
+    All Vue template markup, hardcoded SpendingData array, formatDate helper,
+    Intl.NumberFormat currency formatter, specific bar color #22c55e, CSS classes.
+  transformative-value: >
+    Single-metric time-series card with summary KPI header and drill-down action.
+    Dashed grid and rounded bars as visual polish tokens.
+
+avoid:
+  - Multiple series on this pattern — use bar-chart-six or bar-chart-grouped instead
+  - Flat grid lines — the dashed grid is a defining visual trait
+  - Missing hero total — the summary header gives context to the chart
+  - Inline chart without card wrapper — the soft inner card provides depth
+  - Dense x-axis labels on mobile — limit ticks with xNumTicks

@@ -1,0 +1,103 @@
+# Block Pattern: Stepper
+id: stepper
+name: Multi-step Progress Indicator
+version: "1.0.0"
+catalogRef: stepper
+category: navigation
+tags: [stepper, progress, steps, workflow, wizard]
+archetype: layout-heavy
+description: >
+  Connected circles showing progress through a multi-step workflow. Each
+  step shows a number or check icon (when completed), with a connecting
+  line between steps. Supports horizontal and vertical orientations.
+
+requires:
+  components: [UCard, UIcon]
+  charts: []
+  composables: []
+
+props:
+  interface: |
+    interface Step {
+      label: string
+      status: 'completed' | 'current' | 'upcoming'
+      description?: string
+    }
+    interface StepperProps {
+      steps: Step[]
+      alignment?: 'horizontal' | 'vertical'
+      labelPosition?: 'top' | 'bottom'
+    }
+
+emits:
+  interface: |
+    interface StepperEmits {
+      'step:click': [stepIndex: number]
+    }
+
+layout:
+  structure: |
+    card-shell
+      stepper-container (flex, direction by alignment)
+        step-group (repeat per step, flex with connector)
+          connector-line (colored if completed, muted if upcoming)
+          step-circle
+            completed: check icon, filled background
+            current: step number, outlined
+            upcoming: step number, muted
+          step-label (positioned by labelPosition: top or bottom)
+  responsive:
+    mobile: vertical alignment, labels beside circles
+    tablet: horizontal alignment
+    desktop: horizontal alignment
+
+slots:
+  step-circle: "Custom step indicator"
+  step-label: "Custom step label content"
+
+tokens:
+  card-bg: bg-default
+  step-completed-bg: bg-primary
+  step-completed-icon: text-inverted
+  step-completed-line: bg-primary
+  step-current-border: border-primary
+  step-current-text: text-highlighted
+  step-upcoming-bg: bg-muted
+  step-upcoming-text: text-muted
+  step-upcoming-line: bg-muted
+  label-completed: text-highlighted
+  label-upcoming: text-muted
+
+atomicHint:
+  organism: Stepper
+  molecules: [StepGroup]
+  atoms: [StepCircle, ConnectorLine, StepLabel]
+
+examples:
+  - context: "Checkout flow"
+    steps: ["Cart (completed)", "Shipping (current)", "Payment (upcoming)", "Confirmation (upcoming)"]
+  - context: "Onboarding wizard"
+    steps: ["Account (completed)", "Profile (completed)", "Preferences (current)", "Done (upcoming)"]
+
+composesWith:
+  - "onboarding-wizard (form pattern using stepper for progress)"
+  - "tracker-bar (complementary progress visualization — stepper for discrete steps, tracker for continuous)"
+
+derivation:
+  source: "nuxt-charts/status/stepper"
+  method: "structural-abstraction"
+  what-was-kept: >
+    Connected circles concept, completed/current/upcoming states, check
+    icon for completed steps, connector line coloring, horizontal/vertical
+    orientation, top/bottom label positioning.
+  what-was-removed: >
+    All Vue template markup, CSS custom properties (--steps-*), enum
+    definitions, computed active step logic, specific circle sizes.
+  transformative-value: >
+    Replaces implementation-specific CSS custom properties with semantic
+    tokens. Adds description field per step and click interaction.
+
+avoid:
+  - "More than 7 steps — consider grouping into phases"
+  - "Missing connector lines — steps must be visually connected"
+  - "Same style for all states — completed/current/upcoming must differ"

@@ -1,0 +1,155 @@
+id: line-chart-two
+name: Budget vs Actual Line Chart
+version: "1.1.0"
+catalogRef: line-chart-two
+category: visualization
+tags: [line, budget, actual, target, variance, markers, dash, tooltip, selectors, responsive]
+archetype: chart-heavy
+description: >
+  Budget vs actual comparison chart with interactive controls. Features dual
+  USelect dropdowns (date range filter + curve type selector), custom marker
+  config (circle for actual, triangle for target), dashed line for target series,
+  rich custom tooltip showing variance with success/error color coding,
+  MoM change insight section, and action buttons. Fully color-mode reactive.
+
+requires:
+  components: [UCard, USelect, UButton]
+  charts: [LineChart]
+  composables: [useResponsiveHeight, useColorMode]
+
+props:
+  interface: |
+    interface BudgetDataItem {
+      month: number
+      actual: number
+      target: number
+    }
+    interface LineChartTwoProps {
+      data: BudgetDataItem[]
+      categories: ComputedRef<Record<string, BulletLegendItemInterface>>
+      rangeOptions?: string[]
+      curveOptions?: string[]
+      currencyFormat?: Intl.NumberFormatOptions
+    }
+
+emits:
+  interface: |
+    interface LineChartTwoEmits {
+      'range:change': [range: string]
+      'curve:change': [curve: string]
+      'report:open': []
+      'insight:dismiss': []
+    }
+
+layout:
+  structure: |
+    card-shell (UCard)
+      toolbar (flex, col on mobile, row on lg, justify-between)
+        header
+          title (text-lg, font-medium)
+          subtitle (text-dimmed, text-sm)
+        controls (flex, gap-2)
+          range-select (USelect, neutral/soft, w-40)
+          curve-select (USelect, neutral/soft, w-36)
+      chart-card (UCard, nested, mt-4)
+        LineChart (:key reactive, markers, dash array, custom tooltip)
+          tooltip-slot
+            tooltip-card (bg-default, border, shadow-lg, rounded-lg)
+              month-label (text-dimmed, text-xs)
+              actual-row (dot + label + currency value)
+              target-row (dot + label + currency value)
+              divider (hr, border-default)
+              variance-row (text-success or text-error, font-semibold)
+      insight-section (mt-6, text-center)
+        insight-label (strong)
+        insight-text (text-dimmed, text-sm, max-w-sm)
+        action-buttons (flex, justify-center, gap-2)
+          open-report (UButton, neutral)
+          dismiss (UButton, link variant, neutral)
+  responsive:
+    mobile: chart height 140px, controls stack vertically, insight wraps
+    tablet: chart height 260px, controls inline
+    desktop: chart height 260px, full toolbar row
+
+slots:
+  toolbar: Override header and controls section
+  tooltip: Override custom tooltip content (template #tooltip="{ values }")
+  insight: Override insight section and action buttons
+
+tokens:
+  card-bg: bg-default
+  title-font: text-lg font-medium
+  subtitle-color: text-dimmed text-sm
+  select-variant: soft
+  select-color: neutral
+  tooltip-bg: bg-default
+  tooltip-border: border-default
+  tooltip-shadow: shadow-lg rounded-lg
+  tooltip-label: text-dimmed text-xs
+  variance-positive: text-success font-semibold
+  variance-negative: text-error font-semibold
+  divider: border-default
+  insight-text: text-dimmed text-sm
+
+chartConfig:
+  type: line
+  curveType: "configurable (MonotoneX | Linear | StepAfter | Basis)"
+  yGridLine: true
+  xGridLine: true
+  xDomainLine: true
+  yDomainLine: true
+  xTickLine: true
+  yTickLine: true
+  xNumTicks: "dynamic (12 or 6 based on range)"
+  yNumTicks: 4
+  legendPosition: TopRight
+  hideLegend: false
+  markerConfig:
+    actual: { type: circle, size: 7 }
+    target: { type: triangle, size: 8 }
+  lineDashArray: [[0, 0], [5, 4]]
+  colorModeReactive: true
+  keyBinding: "colorMode.value + range + curveChoice"
+
+atomicHint:
+  organism: BudgetActualChartCard
+  molecules: [ToolbarWithSelects, MarkerLineChart, CustomTooltip, InsightSection]
+  atoms: [RangeSelect, CurveSelect, MarkerCircle, MarkerTriangle, DashLine, VarianceLabel]
+
+examples:
+  - context: "Financial planning dashboard"
+    data: "12-month budget vs actual with MoM variance, selectable range and curve type"
+  - context: "Sales target tracking"
+    data: "Quarterly targets with circle markers on actual, triangle on forecast, custom tooltip"
+  - context: "Project budget monitoring"
+    data: "Sprint-by-sprint planned vs spent with variance highlighting"
+
+composesWith:
+  - "line-chart-ten (milestone tracking with similar actual vs expected pattern)"
+  - "line-chart-multi (multi-series without variance concept)"
+  - "Financial dashboard layout (DSE composition)"
+
+avoid:
+  - "Omitting the custom tooltip -- variance display is the defining feature"
+  - "Using same line style for both series -- dash array differentiates target from actual"
+  - "Removing marker config -- circle/triangle shapes are key visual cues"
+  - "Static curve type -- the curve selector enables user preference"
+  - "Hardcoding date range filter -- make it configurable"
+
+derivation:
+  source: "nuxt-charts/line-charts/linecharts-chart-two"
+  method: "structural-abstraction"
+  what-was-kept: >
+    Budget vs actual concept with USelect range filter ('Full year'/'Last 6 months')
+    and curve type selector (Smooth/Linear/Step/Basis mapping to CurveType enums),
+    markerConfig with circle (actual, size 7) and triangle (target, size 8),
+    lineDashArray [[0,0],[5,4]], custom #tooltip slot showing currency-formatted
+    actual/target/variance with success/error colors, computed MoM change,
+    formatCurrency via Intl.NumberFormat, colorMode-reactive categories and key,
+    insight section with Open report / Dismiss buttons.
+  what-was-removed: >
+    Hardcoded 12-month budget data, specific hex colors, static insight text.
+  transformative-value: >
+    Comprehensive budget vs actual pattern with interactive controls, custom
+    markers, dashed target line, and variance tooltip. Reference implementation
+    for financial comparison charts.

@@ -1,0 +1,112 @@
+# Block Pattern: Navbar Variant Two
+id: navbar-variant-two
+name: Dashboard Navbar with Inline Nav Links and Upgrade CTA
+version: "1.0.0"
+catalogRef: navbar-variant-two
+category: navigation
+tags: [navbar, dashboard, nav-links, upgrade, cta]
+archetype: layout-heavy
+description: >
+  Dashboard navbar with sidebar toggle and breadcrumb on left, inline
+  navigation buttons (hidden below xl) and a soft-variant upgrade CTA
+  on right. Nav links act as top-level page switching without toolbar.
+
+requires:
+  components: [UDashboardNavbar, UBreadcrumb, UButton, UIcon]
+  charts: []
+  composables: []
+
+props:
+  interface: |
+    interface BreadcrumbItem {
+      label: string
+      to?: string
+    }
+    interface NavbarVariantTwoProps {
+      title: string
+      breadcrumbs: BreadcrumbItem[]
+      navLinks: string[]
+      ctaLabel?: string
+      ctaTo?: string
+    }
+
+emits:
+  interface: |
+    interface NavbarVariantTwoEmits {
+      'sidebar:toggle': []
+      'nav:click': [label: string]
+      'cta:click': []
+    }
+
+layout:
+  structure: |
+    container (bg-default, border, rounded, pb-4)
+      UDashboardNavbar (title prop, ui.right: gap-3 lg:gap-4)
+        slot #left
+          sidebar-toggle (UButton ghost neutral, icon i-lucide-panel-left)
+          breadcrumb (UBreadcrumb, separatorIcon size-4, hidden on mobile)
+        slot #right
+          nav-link-buttons (v-for, UButton ghost neutral rounded-md, hidden below xl)
+          cta-button (UButton soft variant, always visible, label prop)
+      content-area (mx-4 lg:mx-6, mt-4, border dashed)
+  responsive:
+    mobile: sidebar toggle visible, breadcrumb hidden, nav links hidden, CTA visible
+    tablet: breadcrumb appears, nav links still hidden (need xl width)
+    desktop-xl: nav links inline as ghost buttons, full layout
+
+slots:
+  left: "Override sidebar toggle + breadcrumb"
+  right: "Override nav links + CTA"
+  nav-links: "Custom navigation link rendering"
+
+tokens:
+  container-bg: bg-default
+  container-border: border-default
+  sidebar-icon: "i-lucide-panel-left"
+  nav-link-color: neutral
+  nav-link-variant: ghost
+  cta-variant: soft
+  breadcrumb-separator: "size-4"
+  content-border: border-default
+
+atomicHint:
+  organism: NavbarVariantTwo
+  molecules: [BreadcrumbTrail, InlineNavLinks]
+  atoms: [SidebarToggle, NavLinkButton, CTAButton]
+
+examples:
+  - context: "SaaS dashboard with upgrade prompt"
+    navLinks: ["Dashboard", "Orders", "Products", "Customers"]
+    ctaLabel: "Upgrade"
+  - context: "Project management header"
+    navLinks: ["Overview", "Tasks", "Team", "Settings"]
+    ctaLabel: "Go Pro"
+
+composesWith:
+  - "navbar-variant-one (dropdown alternative instead of inline links)"
+  - "navbar-toolbar (toolbar tabs alternative)"
+  - "Dashboard Page Layout (DSE composition)"
+
+derivation:
+  source: "nuxt-charts/dashboard-navbar/navbar-variant-two"
+  method: "structural-abstraction"
+  what-was-kept: >
+    UDashboardNavbar with sidebar toggle (panel-left icon), breadcrumb with custom
+    separatorIcon (size-4), inline nav links hidden below xl (xl:inline-flex via
+    hidden xl:inline-flex class), upgrade CTA as soft variant UButton, gap responsive
+    (gap-3 lg:gap-4), rounded-md on all buttons.
+  what-was-removed: >
+    All Vue template markup, hardcoded nav links (Dashboard/Orders/Products/Customers),
+    hardcoded breadcrumb paths, v-for iteration over string array, _items unused
+    variable with DropdownMenuItem type, specific class strings.
+  transformative-value: >
+    Captures "inline nav + CTA" as a distinct pattern from dropdown (variant-one) and
+    toolbar (navbar-toolbar). Key design decision: xl breakpoint for nav links — they
+    need more horizontal space than toolbar tabs. The CTA uses soft variant to
+    visually separate from ghost nav links.
+
+avoid:
+  - "Nav links visible on mobile/tablet — need xl+ width"
+  - "Missing sidebar toggle — essential for dashboard layouts with collapsible sidebar"
+  - "CTA with ghost variant — must visually stand out from nav links (use soft)"
+  - "Hardcoded nav labels — accept via navLinks string array"

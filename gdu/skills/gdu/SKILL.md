@@ -22,10 +22,16 @@ Follow the **Degradation Protocol Cascade** to resolve design decisions:
 3. **Defaults**: If files don't specify it, fallback to standard Nuxt UI v4/Tailwind v4 defaults.
 - If you don't know the constraints, you find them using this cascade.
 
+### Step 0. Component Library + Block Pattern Check (Before Deconstructing)
+If the request involves any visualization component (chart, sparkline, metric card, donut, bar, progress, tracker, heatmap, contribution graph, KPI card, funnel, status monitor, auth form), run `knowledge_search("nuxt-charts {component-type}")`. If an atom points to the catalog, read `~/.cellm/component-library/nuxt-charts.yaml` and use the matching block — adapt it, don't rebuild it. Only create custom if no block fits, and register the gap: `knowledge_add(scope: "design-system", tags: ["component-library-gap"])`.
+
+**Pattern lookup**: After catalog match, read `cellm-plugin/gdu/patterns/blocks/INDEX.yaml` for a matching pattern file. If found, load the `.pattern.yaml` and inject `props.interface`, `emits.interface`, `layout.structure`, `tokens`, `slots`, `avoid`, `chartConfig`, `atomicHint`, and `examples` as scaffold for the architectural spec. The pattern replaces the need for licensed source code.
+
 ### 2. Architectural Deconstruction (Atomic Design)
 Break every request into atoms, molecules, and organisms.
 - What Nuxt UI components cover this? Query: `nuxt-ui-remote:search-components-by-category`
 - What are the exact props/slots? Query: `nuxt-ui-remote:get-component-metadata`
+- What **Nuxt Charts** blocks cover this? Check Step 0 results first.
 - Where does state live? (Local `ref` vs Global Pinia)
 - How does data flow? (Props down, Emits up)
 

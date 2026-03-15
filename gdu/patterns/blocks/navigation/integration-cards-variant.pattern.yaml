@@ -1,0 +1,110 @@
+# Block Pattern: Integration Cards Variant
+id: integration-cards-variant
+name: Service Integration Cards with Install Count
+version: "1.0.0"
+catalogRef: integration-cards-variant
+category: navigation
+tags: [integration, service, installs, marketplace, footer]
+archetype: layout-heavy
+description: >
+  Variant of integration-cards that replaces the action button with a card
+  footer showing download icon and install count. No enable/connect button.
+  Footer uses UCard #footer slot with download icon and formatted install number.
+
+requires:
+  components: [UCard, UIcon]
+  charts: []
+  composables: []
+
+props:
+  interface: |
+    interface IntegrationVariant {
+      name: string
+      description: string
+      icon: string
+      status: 'Connected' | 'Enable'
+      installs: number
+    }
+    interface IntegrationCardsVariantProps {
+      integrations: IntegrationVariant[]
+      title?: string
+    }
+
+emits:
+  interface: |
+    interface IntegrationCardsVariantEmits {
+      'integration:click': [integrationName: string]
+      'integration:install': [integrationName: string]
+    }
+
+layout:
+  structure: |
+    responsive-grid (1/2/3 columns)
+      card-shell (outline variant, flex-col, justify-between, repeat per integration)
+        icon-container (bordered box, size-12, rounded-md, centered icon)
+          service-icon (size-5, muted)
+        content-group (flex-1, mt-5)
+          service-name (sm, font-medium)
+          service-description (sm, muted, leading-6)
+        card-footer (#footer slot)
+          install-info (flex, gap-2, sm, muted)
+            download-icon (i-lucide-download)
+            install-count (formatted with toLocaleString)
+  responsive:
+    mobile: single column
+    tablet: 2-column grid, gap-6
+    desktop: 3-column grid, gap-6
+
+slots:
+  card: "Override individual integration card"
+  icon: "Custom icon rendering per service"
+  footer: "Custom footer content (replaces install count)"
+
+tokens:
+  card-variant: outline
+  icon-container-bg: bg-default
+  icon-container-border: border-default
+  icon-color: text-muted
+  name-text: text-highlighted
+  description-text: text-muted
+  footer-text: text-muted
+  footer-icon: text-muted
+  install-count-text: text-muted
+  grid-gap: "gap-6"
+
+atomicHint:
+  organism: IntegrationVariantGrid
+  molecules: [IntegrationVariantCard, IconContainer, InstallFooter]
+  atoms: [ServiceIcon, DownloadIcon, InstallCount]
+
+examples:
+  - context: "Plugin marketplace"
+    integrations: ["GitHub (repos, 8,432 installs)", "Figma (design, 5,120 installs)", "Trello (tasks, 3,210 installs)"]
+  - context: "App store integrations"
+    integrations: ["Zendesk (support, 2,100 installs)", "Twitter (social, 7,890 installs)"]
+
+composesWith:
+  - "integration-cards (base variant with action button)"
+  - "Dashboard Page Layout (DSE composition)"
+  - "Settings Connectors Section"
+
+derivation:
+  source: "nuxt-charts/cards/integration-cards-variant"
+  method: "structural-abstraction"
+  what-was-kept: >
+    Same icon + name + description layout as integration-cards, outline card
+    variant, but replaces action button with #footer slot showing download
+    icon + formatted install count, toLocaleString formatting for numbers.
+  what-was-removed: >
+    All Vue template markup, hardcoded integration data (GitHub, Trello,
+    Figma, Twitter, Zendesk), Math.random() install generation, v-for.
+  transformative-value: >
+    Marketplace-oriented variant where install popularity replaces
+    connect/enable action. Social proof pattern for integration discovery.
+
+avoid:
+  - "Action button in this variant — use integration-cards for connect flow"
+  - "Raw numbers — always format with locale-aware toLocaleString"
+  - "Missing download icon — visual cue for install count context"
+  - "UBadge for install count — simple text with icon is the pattern"
+  - "Mixing connect button and install count — pick one variant"

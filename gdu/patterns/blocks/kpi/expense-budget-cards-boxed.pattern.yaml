@@ -1,0 +1,115 @@
+# Block Pattern: Expense Budget Cards Boxed
+id: expense-budget-cards-boxed
+name: Budget Cards with Nested Soft Card
+version: "1.0.0"
+catalogRef: expense-budget-cards-boxed
+category: kpi
+tags: [budget, expense, progress-bar, boxed, nested-card]
+basePattern: expense-budget
+archetype: layout-heavy
+description: >
+  Variant of expense-budget that wraps the value + progress area inside a
+  nested UCard with soft variant and elevated background. The outer card has
+  reduced padding (p-2), header stays outside the inner card. Creates a
+  visually layered card-in-card effect.
+
+requires:
+  components: [UCard]
+  charts: []
+  composables: []
+
+props:
+  interface: |
+    interface BudgetCategory {
+      name: string
+      value: number
+      budget: number
+      trend: number
+      color: string
+    }
+    interface ExpenseBudgetCardsBoxedProps {
+      categories: BudgetCategory[]
+      currency?: string
+      locale?: string
+    }
+
+emits:
+  interface: |
+    interface ExpenseBudgetCardsBoxedEmits {
+      'category:click': [categoryName: string]
+      'category:hover': [categoryName: string]
+    }
+
+layout:
+  structure: |
+    card-list (repeat per category)
+      outer-card (bg-default, compact padding p-2)
+        header-row (px-2, pt-2, pb-1)
+          left: color-dot + category-name
+          right: trend-badge (positive=error, negative=success for expenses)
+        inner-card (soft variant, elevated/50 bg, rounded-lg)
+          value-row
+            left: formatted-currency-value (lg, bold)
+            right: budget-percentage-label (muted, sm)
+          progress-bar (h-1.5, rounded-full, category color, clamped to 100%)
+  responsive:
+    mobile: single column stack
+    tablet: 2-column grid
+    desktop: 3-4 column grid
+
+slots:
+  outer-card: "Override the entire outer card"
+  inner-card: "Override the nested value + progress area"
+  trend-badge: "Custom trend display"
+
+tokens:
+  outer-card-bg: bg-default
+  outer-card-padding: "p-2"
+  inner-card-variant: soft
+  inner-card-bg: "bg-elevated/50"
+  inner-card-radius: rounded-lg
+  category-name: text-highlighted
+  value-text: text-highlighted
+  budget-label: text-muted
+  trend-positive: text-error
+  trend-negative: text-success
+  progress-track: bg-elevated
+  dot-size: "h-2 w-2"
+
+atomicHint:
+  organism: ExpenseBudgetBoxedGrid
+  molecules: [BoxedBudgetCard, InnerValueCard]
+  atoms: [ColorDot, TrendBadge, BudgetProgressBar]
+
+examples:
+  - context: "Department budget dashboard (elevated design)"
+    categories: ["Marketing ($12,500 of $15,000, +8%)", "Engineering ($45,000 of $50,000, -3%)"]
+  - context: "Personal finance app (premium UI)"
+    categories: ["Groceries ($450 of $500, +12%)", "Transport ($180 of $200, -5%)"]
+
+composesWith:
+  - "expense-budget (flat variant without nested card)"
+  - "Dashboard Page Layout (DSE composition)"
+  - "KPI Card (DSE composition)"
+
+derivation:
+  source: "nuxt-charts/cards/expense-budget-cards-boxed"
+  method: "structural-abstraction"
+  what-was-kept: >
+    Same budget card concept as expense-budget, but wrapped value + progress
+    in a nested UCard soft variant with elevated/50 background, reduced outer
+    padding (sm:p-2 p-2), card-in-card visual layering, header stays outside.
+  what-was-removed: >
+    All Vue template markup, formatCurrency implementation, ExpenseCategory
+    import, hardcoded category data, Tailwind classes, :ui prop bindings.
+  transformative-value: >
+    Demonstrates card-in-card nesting pattern. The soft inner card creates
+    visual depth and grouping. Reusable nesting concept for any card that
+    needs a visually distinct content area.
+
+avoid:
+  - "Same padding as expense-budget — outer card has compact p-2 padding"
+  - "Progress bar exceeding 100% visually — clamp to 100%"
+  - "Same trend color logic as revenue — expenses invert (up=bad)"
+  - "Flat card rendering — the nested card is the differentiator"
+  - "Missing inner card variant — must be soft with elevated background"

@@ -1,0 +1,122 @@
+# Block Pattern: Orders Overview
+id: orders-overview
+name: Orders Overview with Progress and Table
+version: "1.0.0"
+catalogRef: orders-overview
+category: data
+tags: [orders, table, overview, progress, status-breakdown]
+archetype: layout-heavy
+description: >
+  Complete orders overview card combining a progress bar, fulfilled/open
+  status breakdown, a mini data table (order ID + date), and footer action
+  buttons. Composes the progress-overview pattern with an item listing.
+  No chart component — uses CSS progress bar.
+
+requires:
+  components: [UCard, UButton]
+  charts: []
+  composables: []
+  note: "No AreaChart — progress is CSS-based, data displayed as a simple list"
+
+props:
+  interface: |
+    interface OrderItem {
+      id: string
+      date: string
+      status: 'fulfilled' | 'open'
+    }
+    interface OrdersOverviewProps {
+      orders: OrderItem[]
+      title?: string
+      visibleRows?: number
+    }
+
+emits:
+  interface: |
+    interface OrdersOverviewEmits {
+      'order:click': [orderId: string]
+      'action:close': []
+      'action:dashboard': []
+    }
+
+layout:
+  structure: |
+    card-shell (max-width sm:max-w-lg, centered)
+      header (#header slot)
+        title (font-medium)
+      progress-section
+        progress-bar (h-2, rounded-full, primary fill)
+        status-breakdown (fulfilled left, open right, bordered columns)
+      table-section (mt-6, conditional on orders.length)
+        table-header (border-b, uppercase, xs tracking-wide)
+          order-id-label (left)
+          date-label (right)
+        item-list (divide-y)
+          item-row (repeat, sliced to visibleRows)
+            order-id (sm, left)
+            order-date (sm, right)
+        empty-state ("No orders available", dimmed)
+      footer (#footer slot)
+        action-row (flex, justify-between)
+          close-button (neutral, link variant)
+          dashboard-button (neutral, default variant)
+  responsive:
+    mobile: full-width, stacked footer buttons
+    tablet: max-width constrained (sm:max-w-lg), inline buttons
+    desktop: same as tablet, centered
+
+slots:
+  header: "Override card header"
+  table: "Custom table rendering"
+  footer: "Custom footer actions"
+
+tokens:
+  card-bg: bg-default
+  progress-fill: "text-primary"
+  progress-track: bg-muted
+  fulfilled-border: border-primary
+  open-border: border-default
+  table-header-text: text-dimmed
+  table-divider: divide-default
+  item-text: text-highlighted
+  empty-state-text: text-dimmed
+  footer-gap: "gap-4"
+
+atomicHint:
+  organism: OrdersOverview
+  molecules: [ProgressSection, OrderTable, FooterActions]
+  atoms: [ProgressBar, StatusColumn, OrderRow, EmptyState]
+
+examples:
+  - context: "E-commerce order management"
+    orders: ["20 orders (10 fulfilled, 10 open), showing first 5 rows"]
+  - context: "Support ticket tracking"
+    orders: ["50 tickets (35 resolved, 15 open), paginated display"]
+
+composesWith:
+  - "progress-overview (extracted progress + status section)"
+  - "bar-list-ranked (similar paginated list concept)"
+  - "Dashboard Page Layout (DSE composition)"
+
+derivation:
+  source: "nuxt-charts/bar-lists/progress"
+  method: "structural-abstraction"
+  what-was-kept: >
+    Complete card with progress bar + status breakdown + order table +
+    footer actions, sliced display (first 5), empty state handling,
+    table headers with uppercase tracking, close + dashboard footer
+    buttons, divide-y between rows, conditional table rendering.
+  what-was-removed: >
+    All Vue template markup, hardcoded 20-order dataset, computed
+    properties (fulfilledOrders, openOrders, percentages), v-for/v-if,
+    Tailwind classes, dark mode classes, orderLength*10 calculation.
+  transformative-value: >
+    Full CRUD overview card pattern: progress summary + data table +
+    actions. Applicable to any entity with binary status and date.
+
+avoid:
+  - "AreaChart — this pattern uses CSS progress bar, not charts"
+  - "Showing all rows — always paginate with visibleRows prop"
+  - "Missing empty state — handle zero orders gracefully"
+  - "Missing footer actions — close + navigate pattern is intentional"
+  - "Combining with progress-overview — this IS the complete version"

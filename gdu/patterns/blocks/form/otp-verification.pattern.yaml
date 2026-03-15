@@ -1,0 +1,123 @@
+# Block Pattern: OTP Verification
+# Distributable structural specification — no licensed code
+# Generated from catalog ref, not source transcription
+
+id: otp-verification
+name: OTP Verification Form
+version: "1.0.0"
+catalogRef: otp-verification
+category: form
+tags: [auth, otp, verification, 2fa, security, two-factor, code]
+
+archetype: form-heavy
+description: >
+  6-digit one-time password verification form for two-factor authentication.
+  Uses UAuthForm with a single code field styled as monospace, centered,
+  wide-tracked input. Includes resend code action, back navigation, and
+  contact support link. Loading + error state handling with toast feedback.
+
+requires:
+  components: [UCard, UAuthForm, UButton, UIcon, NuxtLink]
+  charts: []
+  composables: [useToast]
+
+props:
+  interface: |
+    interface OtpVerificationProps {
+      title?: string               // default "Check your email"
+      description?: string         // default "Enter the 6-digit code from the email."
+      codeLength?: number          // default 6
+      submitLabel?: string         // default "Verify code"
+      submitIcon?: string          // default "i-lucide-check"
+      resendLabel?: string         // default "Resend code"
+      resendIcon?: string          // default "i-lucide-refresh-cw"
+      backLink?: string            // URL for back navigation
+      supportLink?: string         // URL for contact support
+    }
+
+emits:
+  interface: |
+    interface OtpVerificationEmits {
+      'submit': [data: { code: string }]
+      'resend': []
+      'back': []
+    }
+
+layout:
+  structure: |
+    card-shell (max-width ~384px, bg-default, padded)
+      auth-form (UAuthForm driven)
+        title-slot [title text]
+        description-slot [instructions, muted]
+        field-list
+          code-field (text input, centered, monospace, 2xl font, tracking-widest)
+            attributes: maxlength=6, pattern=[0-9]{6}, inputmode=numeric
+        submit-button (full-width, lg size, check icon)
+        footer-slot
+          resend-button (ghost variant, refresh-cw icon, centered)
+          navigation-row
+            back-link (arrow-left icon + "Back", muted)
+          support-prompt [centered, dimmed, xs text with link]
+  responsive:
+    mobile: full-width card, code input spans full width
+    tablet: centered card, max-width 384px
+    desktop: same as tablet
+
+slots:
+  footer: "Override resend/navigation/support section"
+
+tokens:
+  card-bg: bg-default
+  title-text: text-highlighted
+  description-text: text-muted
+  code-input-font: "font-mono text-2xl tracking-widest text-center"
+  resend-variant: ghost
+  back-link-text: text-muted
+  back-link-hover: "hover:text-primary"
+  support-text: text-dimmed
+  link-text: text-primary
+  submit-size: lg
+  error-text: text-error
+
+atomicHint:
+  organism: OtpVerificationPage
+  molecules: [AuthCard, CodeInputGroup, ActionFooter]
+  atoms: [CodeField, ResendButton, BackLink, SupportLink]
+
+examples:
+  - context: "Email 2FA after sign-in"
+    codeLength: 6
+    description: "Enter the 6-digit code sent to your email"
+  - context: "SMS verification"
+    codeLength: 4
+    description: "Enter the 4-digit code sent to your phone"
+
+composesWith:
+  - "basic-sign-in (precedes OTP in auth flow)"
+  - "password-reset (OTP can follow password reset email)"
+  - "sign-up (OTP for email verification after registration)"
+
+derivation:
+  source: "nuxt-charts/account/two-factor-authentication"
+  method: "structural-abstraction"
+  what-was-kept: >
+    UAuthForm with single code field, monospace + centered + tracking-widest
+    styling for OTP input, maxlength=6 and pattern=[0-9]{6} constraints,
+    loading + error ref state management, resend code button with refresh-cw
+    icon (ghost variant), back navigation link, support contact link in footer,
+    toast feedback for success/error/resend, error message display pattern.
+  what-was-removed: >
+    All Vue template markup, hardcoded validation code (123456), setTimeout
+    mock API, specific error/success messages, CSS utility classes.
+  transformative-value: >
+    Captures OTP input UX as a pattern: monospace wide-tracked centered input
+    with numeric constraints, resend mechanism, and error recovery. Configurable
+    code length and messaging. Framework-agnostic verification flow.
+
+avoid:
+  - "Regular text input styling — OTP needs monospace, centered, large tracking"
+  - "No resend mechanism — users must be able to request new codes"
+  - "Missing error display — invalid code must show clear error feedback"
+  - "No back navigation — user must be able to return to previous step"
+  - "Auto-clearing on error — preserve entered digits for correction"
+  - "Missing inputmode=numeric — mobile keyboards should show number pad"

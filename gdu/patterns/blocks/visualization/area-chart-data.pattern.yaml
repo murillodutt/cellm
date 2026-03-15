@@ -1,0 +1,133 @@
+id: area-chart-data
+name: Area Chart with Data Summary
+version: "1.1.0"
+catalogRef: area-chart-data
+category: visualization
+tags: [area, chart, data, summary, dual-series, totals, responsive]
+basePattern: area-chart-gradient
+archetype: chart-heavy
+description: >
+  Area chart card emphasizing data summary and breakdown. Displays dual-series
+  (desktop/mobile) area chart with computed totals per series, currency formatting,
+  percentage change badge, and inline series breakdown in the footer. Designed for
+  data-centric views where the numeric breakdown matters as much as the visualization.
+
+requires:
+  components: [UCard, UIcon, UBadge, UButton]
+  charts: [AreaChart]
+  composables: [useResponsiveHeight, useColorMode]
+
+props:
+  interface: |
+    interface AreaChartItem {
+      month: string
+      desktop: number
+      mobile: number
+    }
+    interface AreaChartDataProps {
+      data: AreaChartItem[]
+      categories: ComputedRef<Record<string, BulletLegendItemInterface>>
+      title?: string
+      percentChange?: string
+      showSeriesBreakdown?: boolean
+      currencyOptions?: Intl.NumberFormatOptions
+    }
+
+emits:
+  interface: |
+    interface AreaChartDataEmits {
+      'view-details': []
+      'series:select': [seriesKey: string]
+    }
+
+layout:
+  structure: |
+    card-shell (variant=subtle, bg-default/60)
+      content-stack (space-y-4)
+        metric-header (space-y-1)
+          label-row (flex, gap-2)
+            title-text (text-muted)
+            info-icon (text-dimmed)
+          value-row (flex, gap-4)
+            total-value (text-3xl, font-semibold, tracking-tight)
+            change-badge (UBadge, variant=soft, text-success)
+        chart-card (UCard, variant=soft)
+          AreaChart (dashed grid, MonotoneX, hidden legend)
+        data-footer (flex, justify-between)
+          series-breakdown (flex, gap-6)
+            series-total (color dot + label + computed value) x N
+          action-cta
+            details-button (UButton, ghost, trailing arrow)
+  responsive:
+    mobile: chart height 120px, stacked series breakdown
+    tablet: chart height 240px, inline breakdown
+    desktop: chart height 240px, spacious data layout
+
+slots:
+  header: Override metric header section
+  chart: Override chart container
+  breakdown: Override series breakdown footer with custom data display
+
+tokens:
+  card-bg: bg-default/60
+  card-variant: subtle
+  chart-card-variant: soft
+  title-color: text-muted
+  info-icon-color: text-dimmed
+  total-font: text-3xl font-semibold tracking-tight
+  badge-color: text-success
+  indicator-dot: h-2 w-2 animate-pulse rounded-full
+  breakdown-label: text-muted dark:text-dimmed
+  breakdown-value: font-medium
+  grid-dash: "--vis-axis-grid-line-dasharray: 5 5"
+
+chartConfig:
+  type: area
+  curveType: MonotoneX
+  gradient: true
+  tooltip: true
+  xAxis: true
+  yAxis: true
+  xGridLine: true
+  xNumTicks: 6
+  yNumTicks: 4
+  hideLegend: true
+  colorModeReactive: true
+
+atomicHint:
+  organism: AreaChartDataCard
+  molecules: [MetricHeader, SeriesBreakdownBar, ChartContainer]
+  atoms: [CurrencyTotal, PercentBadge, AnimatedDot, ComputedSeriesTotal]
+
+examples:
+  - context: "Revenue breakdown dashboard"
+    data: "6-month revenue data with per-series totals (desktop: $1,341, mobile: $748) and +21% change"
+  - context: "Cost center analysis"
+    data: "Quarterly spend by department with computed totals and variance indicator"
+  - context: "User engagement metrics"
+    data: "Monthly active users by platform with total and growth badge"
+
+composesWith:
+  - "area-chart-preview (same source, preview-focused variant)"
+  - "area-chart-gradient (same source, gradient-emphasized)"
+  - "KPI summary cards (DSE composition, data row context)"
+
+avoid:
+  - "Hiding series breakdown when data emphasis is the purpose -- show the numbers"
+  - "Using raw numbers without formatting -- always use Intl.NumberFormat"
+  - "Omitting the computed totals -- the data summary is the differentiator"
+  - "Static data that does not update -- use computed refs for aggregations"
+  - "Removing animated dots -- they signal data freshness"
+
+derivation:
+  source: "nuxt-charts/area-charts/area-chart-data"
+  method: "structural-abstraction"
+  what-was-kept: >
+    Data-centric area chart concept with computed series totals via reduce(),
+    Intl.NumberFormat currency formatting, per-series breakdown with animated
+    color dots, nested UCard layout, dashed grid, MonotoneX interpolation.
+  what-was-removed: >
+    Hardcoded data array, specific hex colors, static percentage text, inline styles.
+  transformative-value: >
+    Reusable data-summary chart pattern where numeric breakdowns are as prominent
+    as the visualization itself. Ideal for financial and analytics dashboards.
