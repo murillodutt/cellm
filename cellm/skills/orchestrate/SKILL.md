@@ -2,7 +2,7 @@
 description: Execute spec tasks systematically from the database. Identifies next executable group, delegates to implementer, transitions states, reports progress.
 user-invocable: true
 argument-hint: "[check title or search term]"
-allowed-tools: mcp__cellm-oracle__spec_get_tree, mcp__cellm-oracle__spec_get_counters, mcp__cellm-oracle__spec_transition, mcp__cellm-oracle__spec_search, mcp__cellm-oracle__spec_get_verifications, mcp__cellm-oracle__spec_record_verification, mcp__plugin_cellm_cellm-oracle__quality_gate, mcp__plugin_cellm_cellm-oracle__dse_search, mcp__plugin_cellm_cellm-oracle__dse_get, Read, Grep, Glob, Write, Edit, AskUserQuestion, Task
+allowed-tools: mcp__cellm-oracle__spec_get_tree, mcp__cellm-oracle__spec_get_counters, mcp__cellm-oracle__spec_transition, mcp__cellm-oracle__spec_search, mcp__cellm-oracle__spec_get_verifications, mcp__cellm-oracle__spec_record_verification, mcp__plugin_cellm_cellm-oracle__quality_gate, mcp__plugin_cellm_cellm-oracle__dse_search, mcp__plugin_cellm_cellm-oracle__dse_get, mcp__plugin_cellm_cellm-oracle__directive_emit, mcp__plugin_cellm_cellm-oracle__directive_emit_for_phase, mcp__plugin_cellm_cellm-oracle__directive_verify, mcp__plugin_cellm_cellm-oracle__directive_list, Read, Grep, Glob, Write, Edit, AskUserQuestion, Task
 ---
 
 # Orchestration Thinking — Before Delegating
@@ -15,9 +15,13 @@ The spec tree is the execution plan. Read it, follow it, update it.
 2. **Load** — `spec_get_tree` → understand phases, tasks, current states.
 2. **Status** — `spec_get_counters` → show progress (completed/total per phase).
 3. **Next** — First phase with pending leaf tasks (skip container tasks that have children — execute leaves only). Respect dependency edges.
-4. **Execute (4-stage pipeline per phase):**
-   - **Stage 1 — Implement**: `dse_search` for phase-relevant decisions before delegating. Pass phase briefing + specialist + DSE decisions to implementation agents so they adopt the correct persona, respect constraints, and follow existing design patterns. When agents call `spec_create_node`, they must include `sessionId` (current session) and `project` params. Agents execute tasks → transition to completed/failed (always pass `project` to `spec_transition`).
-   - **Stage 2 — Verification Check**: After implementation, run `spec_get_verifications` on each completed task. For pending verifications: execute the command via Bash, then `spec_record_verification` with the result. All pass/skip → proceed. Any fail → fix and re-run (max 3 attempts), then mark task as blocked.
+4. **Execute (5-stage pipeline per phase):**
+   - **Stage 0 — Director Emit** (NEW): Before delegating to the implementer, check `phase.body.specialist.role` for a registered Director. If a Director exists for the role, call `directive_emit_for_phase` with `{ project, specNodeId, projectRoot, objective, specialistRole, pathGlob? }` — it automatically extracts keywords, matches INDEX.yaml, loads block patterns, and generates grep evidence directives. If no Director is registered for the role, Stage 0 is a **no-op** — the pipeline continues unchanged.
+     - `frontend` → GDU Director (emits directives from DSE tokens, component decisions, NEVER rules)
+     - `backend`, `database`, `fullstack`, `audit` → No Director registered (Stage 0 = no-op)
+     - After emit, call `directive_list(specNodeId, state='active')` and include the active directives in the Context Envelope passed to the implementer. Directives become mandatory contracts in the briefing.
+   - **Stage 1 — Implement**: `dse_search` for phase-relevant decisions before delegating. Pass phase briefing + specialist + DSE decisions + **active directives** to implementation agents so they adopt the correct persona, respect constraints, and follow existing design patterns. When agents call `spec_create_node`, they must include `sessionId` (current session) and `project` params. Agents execute tasks → transition to completed/failed (always pass `project` to `spec_transition`).
+   - **Stage 2 — Director Verify + Verification Check**: If Stage 0 emitted directives, call `directive_verify(specNodeId, worktreePath)` FIRST. If any directive is **violated** → loop back to Stage 1 with `violated_reason` as fix instructions (no gap nodes created for directive violations). If all directives pass (or no directives exist) → proceed to verification check. Run `spec_get_verifications` on each completed task. For pending verifications: execute the command via Bash, then `spec_record_verification` with the result. All pass/skip → proceed. Any fail → fix and re-run (max 3 attempts), then mark task as blocked.
    - **Stage 3 — Audit**: dedicated agent scans phase output for pattern violations, semantic token leaks, type errors, and **DSE decision drift** (`dse_search` to compare output against decisions[]). Findings → gap nodes or fix inline. **Skip for test-only phases** — test results ARE the audit. Running a reviewer on test code adds negligible value.
    - **Stage 4 — Verify**: dedicated agent runs `quality_gate({ scope: 'all' })`, event gotcha grep, typecheck baseline diff, and security checklist. Then runs the phase's `successCriteria` as a concrete acceptance test — if briefing says "grep -l 'sub-task' returns all 5 files", execute that command and verify. PASS/CONDITIONAL/FAIL verdict.
    - Phase transitions to completed ONLY after Stage 4 = PASS or CONDITIONAL.
@@ -72,7 +76,8 @@ Subagents start with an empty context window. Before delegating ANY phase to a s
    - Example: "The backend phase produced these types: `export interface Comment { id: string; body: string; authorId: string; createdAt: Date }`"
    - Maximum: 200 lines of inlined types. If more, inline the public API surface only (exported types, not internal helpers).
 4. **DSE Decisions**: Run `dse_search` for the phase domain and inline the `decisions[]` arrays.
-5. **Guild Mindset**: The role-specific instructions from the Guild Protocol table.
+5. **Active Directives**: If Stage 0 emitted directives, call `directive_list(specNodeId, state='active')` and inline all directive rules. Label them as "MANDATORY — violation triggers re-implementation loop."
+6. **Guild Mindset**: The role-specific instructions from the Guild Protocol table.
 
 ### Why This Is Non-Negotiable
 
@@ -97,6 +102,7 @@ When `CELLM_DEV_MODE: true`: after orchestration, write feedback entry to `dev-c
 
 ## NEVER
 
+- **Skip Director Stage 0** — when `specialist.role` has a registered Director, always emit directives before implementation. Skipping Director means violations pass silently.
 - **Skip DSE consultation** — `dse_search` before each phase to surface relevant decisions, avoid rules, and existing components
 - **Skip dependency order** — edges define the DAG, respect it. B1 enforcement: phase transitions to `started` will fail with `BLOCKED_BY_DEPENDENCY` if upstream `depends_on` edges are not satisfied. Always check predecessor phase status before delegating.
 - **Silent failures** — blocked tasks get reason + user notification

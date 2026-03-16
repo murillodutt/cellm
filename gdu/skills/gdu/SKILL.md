@@ -23,7 +23,7 @@ Follow the **Degradation Protocol Cascade** to resolve design decisions:
 - If you don't know the constraints, you find them using this cascade.
 
 ### Step 0. Component Library + Block Pattern Check (Before Deconstructing)
-If the request involves any visualization component (chart, sparkline, metric card, donut, bar, progress, tracker, heatmap, contribution graph, KPI card, funnel, status monitor, auth form), run `knowledge_search("nuxt-charts {component-type}")`. If an atom points to the catalog, read `~/.cellm/component-library/nuxt-charts.yaml` and use the matching block — adapt it, don't rebuild it. Only create custom if no block fits, and register the gap: `knowledge_add(scope: "design-system", tags: ["component-library-gap"])`.
+If the request involves ANY frontend component (chart, sparkline, metric card, donut, bar, progress, tracker, heatmap, contribution graph, KPI card, funnel, status monitor, auth form, chat, ai interface, conversation, message list, assistant, sidebar, drawer, modal, form, page layout, navigation, settings panel, list view, detail view, dashboard section, empty state, error boundary), run `knowledge_search("nuxt-charts {component-type}")` and `dse_search("{component-type}")`. If an atom points to the catalog, read `~/.cellm/component-library/nuxt-charts.yaml` and use the matching block — adapt it, don't rebuild it. Only create custom if no block fits, and register the gap: `knowledge_add(scope: "design-system", tags: ["component-library-gap"])`.
 
 **Pattern lookup**: After catalog match, read `cellm-plugin/gdu/patterns/blocks/INDEX.yaml` for a matching pattern file. If found, load the `.pattern.yaml` and inject `props.interface`, `emits.interface`, `layout.structure`, `tokens`, `slots`, `avoid`, `chartConfig`, `atomicHint`, and `examples` as scaffold for the architectural spec. The pattern replaces the need for licensed source code.
 
@@ -48,6 +48,35 @@ Only upon approval do you write code.
 - Dark mode is automatic — never write `dark:` for Nuxt UI components
 - Customize via `ui` prop, not loose classes
 - Idiomatic, accessible, performant Vue 3 code
+
+## Director Mode (Enforcement Loop)
+
+When operating within the orchestrate pipeline, GDU participates in the Director Model:
+
+### Stage 0 — Directive Emit (Before Implementation)
+The orchestrator calls `directive_emit` with directives derived from:
+1. DSE decisions matching the phase scope (`dse_search` → tokens, components, patterns)
+2. Block patterns matching the phase objective keywords
+3. NEVER rules from this skill (no hardcoded colors, no `dark:`, no loose classes)
+
+Each directive includes a `rule` (human-readable contract) and `evidence_payload` (grep pattern for programmatic verification).
+
+### Stage 1 — Implementation with Directives
+The implementer receives active directives via `directive_list(specNodeId, state='active')` as a mandatory contract. Directives are NOT suggestions — they are hard requirements.
+
+### Stage 2 — Directive Verify (After Implementation)
+The orchestrator calls `directive_verify(specNodeId, worktreePath)` which executes grep evidence for each directive:
+- `expectMatch: true` — semantic tokens MUST appear in the output files
+- `expectMatch: false` — anti-patterns MUST NOT appear
+
+If any directive is violated → loop back to Stage 1 with `violated_reason` as fix instructions.
+
+### Director Registration
+| specialist.role | Director | Emits directives? |
+|----------------|----------|-------------------|
+| frontend | GDU Director | Yes |
+| backend | (future) | No |
+| fullstack | None | No |
 
 ## Evolutionary Analytical Feedback
 
