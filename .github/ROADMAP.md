@@ -1,6 +1,6 @@
 # CELLM Roadmap
 
-**Spec-Driven Development for AI Agents**
+**Autopilot for AI-Assisted Development**
 
 ---
 

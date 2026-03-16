@@ -103,5 +103,5 @@ When `CELLM_DEV_MODE: true`: after conversion, write feedback entry to `dev-cell
 - **Leave the check in pending** — always transition to started after creation
 - **Pass fileRef as array** — it is a string. Multi-file = multiple tasks.
 - **Ignore BLOCKED_BY_DEPENDENCY** — if `spec_transition` returns this error, check predecessor phase status
-- **Invalid parent-child hierarchies** — check→phase/task/gap/decision/requirement/verification, phase→task/gap/decision/verification, task→gap/verification. Service rejects violations with INVALID_CHILD_TYPE.
+- **Invalid parent-child hierarchies** — check→phase/task/gap/decision/requirement/verification, phase→task/gap/decision/verification, task→task/gap/verification. Tasks can contain sub-tasks recursively (max depth 5). Service rejects violations with INVALID_CHILD_TYPE.
 - **Skip the Evolutionary Analytical Feedback** — when CELLM_DEV_MODE is true, reflection after conversion is mandatory

@@ -1,6 +1,6 @@
 # Security Policy
 
-> **CELLM** - Spec-Driven Development System for AI Agents
+> **CELLM** - Autopilot for AI-Assisted Development
 
 This document outlines security procedures and policies for the CELLM project.
 
@@ -225,6 +225,6 @@ This security policy may be updated periodically. Changes will be reflected in t
 
 ---
 
-**CELLM** - Spec-Driven Development System for AI Agents
+**CELLM** - Autopilot for AI-Assisted Development
 **Maintainer**: Dutt Yeshua Technology Ltd
 **License**: MIT

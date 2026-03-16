@@ -2,7 +2,7 @@
 description: Implement code from spec context in the database. Loads spec tree, picks next pending task, writes code, transitions state on completion.
 user-invocable: true
 argument-hint: "[task description or check title]"
-allowed-tools: mcp__cellm-oracle__spec_get_tree, mcp__cellm-oracle__spec_search, mcp__cellm-oracle__spec_transition, mcp__cellm-oracle__spec_create_node, mcp__plugin_cellm_cellm-oracle__quality_gate, mcp__plugin_cellm_cellm-oracle__dse_search, mcp__plugin_cellm_cellm-oracle__dse_get, Read, Grep, Glob, Write, Edit, Bash(npx *), Bash(bun *), AskUserQuestion
+allowed-tools: mcp__cellm-oracle__spec_get_tree, mcp__cellm-oracle__spec_search, mcp__cellm-oracle__spec_transition, mcp__cellm-oracle__spec_create_node, mcp__cellm-oracle__spec_get_verifications, mcp__cellm-oracle__spec_record_verification, mcp__plugin_cellm_cellm-oracle__quality_gate, mcp__plugin_cellm_cellm-oracle__dse_search, mcp__plugin_cellm_cellm-oracle__dse_get, Read, Grep, Glob, Write, Edit, Bash(npx *), Bash(bun *), AskUserQuestion
 ---
 
 # Implementation Thinking — Before Writing Code
@@ -16,12 +16,13 @@ Context lives in the database. Load it before touching any file.
    For the current phase: read `body.briefing` (objective, successCriteria, keyFiles, constraints) and `body.specialist` (role, focus, tools). Adopt the specialist persona and respect phase constraints throughout.
    **Guild adoption**: If `specialist.role` is `"frontend"`, engage GDU Framework (DSE cascade, semantic tokens, Nuxt UI MCP contracts). If `"backend"`, enforce Drizzle patterns and Zod boundary validation. If `"database"`, enforce migration safety and index strategy.
 2. **DSE** — `dse_search` for task-relevant design decisions (layout, components, patterns, breakpoints). Absorb `avoid` rules and `decisions[]` before writing any code. If DSE has an existing component for what the task describes, use it — do not create a new one.
-3. **Pick** — First pending task in dependency order. `spec_transition(event: "started", project: "<project>")` to activate. Always pass `project` for isolation validation.
+3. **Pick** — First pending leaf task in dependency order (skip tasks that have sub-tasks — those are containers, auto-completed via rollup). `spec_transition(event: "started", project: "<project>")` to activate. Always pass `project` for isolation validation.
 4. **Start** — `spec_transition(event: "started", project: "<project>")` again to mark in_progress. (Or call `completed` directly — the service auto-chains through intermediate states.)
    > **B1 dependency enforcement**: `spec_transition(event: "started")` will fail with `BLOCKED_BY_DEPENDENCY` if upstream `depends_on` edges are not satisfied. The orchestrator ensures correct ordering — if you hit this error, check predecessor phase status.
 5. **Reuse** — Search codebase first. >= 70% match = extend, don't duplicate.
 6. **Implement** — Write code. Follow project patterns, rules, and DSE decisions.
-8. **Close** — `quality_gate({ scope: 'typecheck' })` passes → `spec_transition(event: "completed", project: "<project>")`. Fails → fix errors and re-run. Still failing → `spec_transition(event: "failed", project: "<project>")`. Discovery → `spec_create_node(nodeType: "gap", sessionId: <current-session-id>)`. **Auto-rollup**: when all tasks in a phase complete, the phase auto-completes — but YOU must call `spec_transition` on each leaf task for rollup to trigger.
+8. **Verify** — Before completing: `spec_get_verifications(nodeId)`. If pending verifications exist, run each command via Bash, then `spec_record_verification(verificationId, actual, result)`. All pass/skip → proceed to Close. Any fail → fix and re-run (max 3 attempts), then mark blocked. No verifications → proceed normally.
+9. **Close** — `quality_gate({ scope: 'typecheck' })` passes → `spec_transition(event: "completed", project: "<project>")`. Fails → fix errors and re-run. Still failing → `spec_transition(event: "failed", project: "<project>")`. Discovery → `spec_create_node(nodeType: "gap", sessionId: <current-session-id>)`. **Auto-rollup**: when all tasks in a phase/parent-task complete, the parent auto-completes — but YOU must call `spec_transition` on each leaf task for rollup to trigger.
 
 ## Framework Conventions (Nuxt)
 
@@ -43,5 +44,6 @@ When `CELLM_DEV_MODE: true`: after implementation, write feedback entry to `dev-
 - **Skip typecheck** — `quality_gate({ scope: 'typecheck' })` before completing (fallback: `npx nuxt typecheck` or `npx tsc --noEmit` if Oracle offline)
 - **Non-English spec content** — gap and decision node titles/descriptions must be in English
 - **Omit sessionId** — always pass `sessionId` to `spec_create_node` for audit trail
-- **Invalid parent-child hierarchies** — check→phase/task/gap/decision/requirement/verification, phase→task/gap/decision/verification, task→gap/verification. Service rejects violations with INVALID_CHILD_TYPE.
+- **Invalid parent-child hierarchies** — check→phase/task/gap/decision/requirement/verification, phase→task/gap/decision/verification, task→task/gap/verification. Service rejects violations with INVALID_CHILD_TYPE.
+- **Execute container tasks** — skip tasks that have sub-tasks. Only execute leaf tasks. Containers auto-complete via rollup.
 - **Skip the Evolutionary Analytical Feedback** — when CELLM_DEV_MODE is true, reflection after implementation is mandatory

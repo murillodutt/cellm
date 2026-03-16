@@ -76,9 +76,17 @@ When creating phases via `spec_create_node`, enrich the body with `briefing` and
 - `focus`: 1 sentence — what the specialist should prioritize above all else
 - `tools`: primary tools (e.g., "Read, Edit, Grep" for frontend; "Bash, Grep" for audit)
 
+## Recursive Sub-Tasks
+
+Tasks can contain sub-tasks (`spec_create_node(nodeType: 'task', parentId: '<parent-task-id>')`). Use when a task is too complex for a single session but logically belongs under one parent.
+
+- Sub-tasks are atomic (leaf nodes). Parent tasks are containers — they auto-complete via rollup when all children finish.
+- Max depth: 5 levels (check=0...task=4). `spec_decompose` creates flat tasks; use individual `spec_create_node` calls for sub-tasks until Onda 2.
+- Generate at least 1 verification per leaf task when the assertion is derivable from the action/fileRef (`spec_add_verification`).
+
 ## Atomicity Test
 
-Can this task be completed in one focused session? If no, split it.
+Can this task be completed in one focused session? If no, split it into sub-tasks.
 Can you verify it passed without running the whole system? If no, refine the action.
 Does the action describe a single visual element or behavioral assertion? If it lists multiple (commas, "and", enumerated elements), split into 1 task per element.
 
@@ -121,5 +129,5 @@ When `CELLM_DEV_MODE: true`: after decomposition, write feedback entry to `dev-c
 - **Non-English content** — all phase titles, task actions, and descriptions must be in English
 - **Omit sessionId** — always pass `sessionId` to `spec_create_node` for audit trail
 - **Ignore BLOCKED_BY_DEPENDENCY** — if `spec_transition` returns this error, check predecessor phase status before proceeding
-- **Invalid parent-child hierarchies** — check→phase/task/gap/decision/requirement/verification, phase→task/gap/decision/verification, task→gap/verification. Service rejects violations with INVALID_CHILD_TYPE.
+- **Invalid parent-child hierarchies** — check→phase/task/gap/decision/requirement/verification, phase→task/gap/decision/verification, task→task/gap/verification. Service rejects violations with INVALID_CHILD_TYPE. Max depth: 5 (check=0, phase=1, task=2, sub-task=3, sub-sub-task=4).
 - **Skip the Evolutionary Analytical Feedback** — when CELLM_DEV_MODE is true, reflection after decomposition is mandatory

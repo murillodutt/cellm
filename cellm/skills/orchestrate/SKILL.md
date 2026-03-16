@@ -2,7 +2,7 @@
 description: Execute spec tasks systematically from the database. Identifies next executable group, delegates to implementer, transitions states, reports progress.
 user-invocable: true
 argument-hint: "[check title or search term]"
-allowed-tools: mcp__cellm-oracle__spec_get_tree, mcp__cellm-oracle__spec_get_counters, mcp__cellm-oracle__spec_transition, mcp__cellm-oracle__spec_search, mcp__plugin_cellm_cellm-oracle__quality_gate, mcp__plugin_cellm_cellm-oracle__dse_search, mcp__plugin_cellm_cellm-oracle__dse_get, Read, Grep, Glob, Write, Edit, AskUserQuestion, Task
+allowed-tools: mcp__cellm-oracle__spec_get_tree, mcp__cellm-oracle__spec_get_counters, mcp__cellm-oracle__spec_transition, mcp__cellm-oracle__spec_search, mcp__cellm-oracle__spec_get_verifications, mcp__cellm-oracle__spec_record_verification, mcp__plugin_cellm_cellm-oracle__quality_gate, mcp__plugin_cellm_cellm-oracle__dse_search, mcp__plugin_cellm_cellm-oracle__dse_get, Read, Grep, Glob, Write, Edit, AskUserQuestion, Task
 ---
 
 # Orchestration Thinking — Before Delegating
@@ -14,8 +14,9 @@ The spec tree is the execution plan. Read it, follow it, update it.
 1. **Detect Project** — `git rev-parse --show-toplevel` → last segment = project name.
 2. **Load** — `spec_get_tree` → understand phases, tasks, current states.
 2. **Status** — `spec_get_counters` → show progress (completed/total per phase).
-3. **Next** — First phase with pending tasks. Respect dependency edges.
+3. **Next** — First phase with pending leaf tasks (skip container tasks that have children — execute leaves only). Respect dependency edges.
 4. **Execute (3-stage pipeline per phase):**
+   - **Stage 0 — Verification Check**: After Stage 1, run `spec_get_verifications` on each completed task. For pending verifications: execute the command via Bash, then `spec_record_verification` with the result. All pass/skip → proceed. Any fail → fix and re-run (max 3 attempts), then mark task as blocked.
    - **Stage 1 — Implement**: `dse_search` for phase-relevant decisions before delegating. Pass phase briefing + specialist + DSE decisions to implementation agents so they adopt the correct persona, respect constraints, and follow existing design patterns. When agents call `spec_create_node`, they must include `sessionId` (current session) and `project` params. Agents execute tasks → transition to completed/failed (always pass `project` to `spec_transition`).
    - **Stage 2 — Audit**: dedicated agent scans phase output for pattern violations, semantic token leaks, type errors, and **DSE decision drift** (`dse_search` to compare output against decisions[]). Findings → gap nodes or fix inline.
    - **Stage 3 — Verify**: dedicated agent runs `quality_gate({ scope: 'all' })`, event gotcha grep (see verify skill table), typecheck baseline diff, and security checklist. PASS/CONDITIONAL/FAIL verdict.
@@ -102,6 +103,7 @@ When `CELLM_DEV_MODE: true`: after orchestration, write feedback entry to `dev-c
 - **Auto-continue** — always confirm before next phase
 - **Lose progress** — every action transitions state in the DB. Auto-chain supported: `completed`/`failed` from `pending`/`active` resolves intermediate hops automatically.
 - **Non-English spec content** — all status reports, gap descriptions, and new nodes must be in English
-- **Invalid parent-child hierarchies** — check→phase/task/gap/decision/requirement/verification, phase→task/gap/decision/verification, task→gap/verification. Service rejects violations with INVALID_CHILD_TYPE.
+- **Invalid parent-child hierarchies** — check→phase/task/gap/decision/requirement/verification, phase→task/gap/decision/verification, task→task/gap/verification. Service rejects violations with INVALID_CHILD_TYPE.
+- **Execute container tasks** — tasks with sub-tasks are containers. Execute only leaf tasks (no children). Containers auto-complete via rollup.
 - **Skip the Evolutionary Analytical Feedback** — when CELLM_DEV_MODE is true, reflection after orchestration is mandatory
 - **Defer feedback generation to "later"** — there is no later. Write the feedback entry BEFORE your final message. Each orchestration session is ephemeral — if the entry is not written during this session, it will never exist

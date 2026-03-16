@@ -18,7 +18,7 @@ When you use Claude Code to develop software, it needs to understand your projec
 
 ## The Solution
 
-**CELLM** (Spec-Driven Development System for AI Agents) provides structured specifications that AI agents consume to understand how to work on a project. Instead of repeating instructions each session, you write specs once and the agent loads them automatically.
+**CELLM** (Autopilot for AI-Assisted Development) provides persistent memory, structured specs, and intelligent context so that AI agents work with continuity between sessions. Instead of repeating instructions each session, the autopilot remembers, learns, and progressively assumes more context autonomously.
 
 ### How It Works
 
