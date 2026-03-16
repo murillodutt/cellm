@@ -18,9 +18,8 @@ Find or create the check, then decompose into the database.
    - Skip irrelevant layers. Add domain-specific groups.
 3. **Define** — Each task is atomic, testable, traceable. One imperative action per task.
 4. **Present** — Show breakdown. Allow adjustments via AskUserQuestion.
-5. **Batch Create (preferred)** — If creating phases + tasks for an existing check, use `spec_decompose` to create the entire subtree atomically in one call (see plan-to-spec skill for full schema). This replaces steps 6-7 with a single call.
-6. **Fallback: Create** — If `spec_decompose` is unavailable, use `spec_create_node(project, nodeType, sessionId: <current-session-id>, ...)` for each phase and task — `project` and `sessionId` params on every call for isolation and audit trail. `spec_add_edge` for cross-phase dependencies.
-7. **Fallback: Edges** — After all phases exist, create DAG edges (see [Edge Creation](#edge-creation)). Auto-chain supported: calling `completed` from `pending`/`active` resolves intermediate states automatically. Auto-rollup: when all child tasks complete, the parent phase auto-completes — but each leaf task must be explicitly transitioned.
+5. **Create** — Use `spec_decompose` to create the entire subtree atomically (see plan-to-spec skill for full schema including recursive sub-tasks). If unavailable, use individual `spec_create_node` calls — but the **same data quality applies**: every phase gets full briefing + specialist (see [Phase Enrichment](#phase-enrichment)). There is no "lite" path. `spec_add_edge` for cross-phase dependencies.
+6. **Edges** — After all phases exist, create DAG edges (see [Edge Creation](#edge-creation)). Auto-chain supported: calling `completed` from `pending`/`active` resolves intermediate states automatically. Auto-rollup: when all child tasks complete, the parent phase auto-completes — but each leaf task must be explicitly transitioned.
 
 ## Edge Creation
 
@@ -81,7 +80,7 @@ When creating phases via `spec_create_node`, enrich the body with `briefing` and
 Tasks can contain sub-tasks (`spec_create_node(nodeType: 'task', parentId: '<parent-task-id>')`). Use when a task is too complex for a single session but logically belongs under one parent.
 
 - Sub-tasks are atomic (leaf nodes). Parent tasks are containers — they auto-complete via rollup when all children finish.
-- Max depth: 5 levels (check=0...task=4). `spec_decompose` creates flat tasks; use individual `spec_create_node` calls for sub-tasks until Onda 2.
+- Max depth: 5 levels (check=0...task=4). `spec_decompose` supports recursive sub-tasks natively (nested `tasks` arrays).
 - Generate at least 1 verification per leaf task when the assertion is derivable from the action/fileRef (`spec_add_verification`).
 
 ## Atomicity Test
@@ -126,6 +125,7 @@ When `CELLM_DEV_MODE: true`: after decomposition, write feedback entry to `dev-c
 - **Vague tasks** — "implement feature" is not a task. "Create POST /api/x endpoint" is.
 - **Ignore DSE for UI phases** — `dse_search` before defining constraints for component/page phases to include avoid rules and existing component mandates
 - **God tasks** — if it crosses multiple files AND multiple concerns, split it
+- **Create phases without briefing** — every phase requires briefing (objective, successCriteria, keyFiles, constraints) and specialist (role, focus, tools). The backend rejects phases without briefing in `spec_decompose`.
 - **Non-English content** — all phase titles, task actions, and descriptions must be in English
 - **Omit sessionId** — always pass `sessionId` to `spec_create_node` for audit trail
 - **Ignore BLOCKED_BY_DEPENDENCY** — if `spec_transition` returns this error, check predecessor phase status before proceeding

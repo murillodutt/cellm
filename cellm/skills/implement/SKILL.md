@@ -20,8 +20,9 @@ Context lives in the database. Load it before touching any file.
 4. **Start** — `spec_transition(event: "started", project: "<project>")` again to mark in_progress. (Or call `completed` directly — the service auto-chains through intermediate states.)
    > **B1 dependency enforcement**: `spec_transition(event: "started")` will fail with `BLOCKED_BY_DEPENDENCY` if upstream `depends_on` edges are not satisfied. The orchestrator ensures correct ordering — if you hit this error, check predecessor phase status.
 5. **Reuse** — Search codebase first. >= 70% match = extend, don't duplicate.
-6. **Implement** — Write code. Follow project patterns, rules, and DSE decisions.
-8. **Verify** — Before completing: `spec_get_verifications(nodeId)`. If pending verifications exist, run each command via Bash, then `spec_record_verification(verificationId, actual, result)`. All pass/skip → proceed to Close. Any fail → fix and re-run (max 3 attempts), then mark blocked. No verifications → proceed normally.
+6. **Implement** — Write code. Follow project patterns, rules, and DSE decisions. Respect phase `constraints` as hard limits — if a constraint says "API response must match CommentSchema", verify that your code satisfies it before proceeding.
+7. **Self-Check** — Before any verification or quality gate, run the phase's `successCriteria` as a concrete command (grep, test, typecheck). If it fails, your implementation is incomplete — fix before proceeding. This is the phase author's definition of "done", not yours.
+8. **Verify** — `spec_get_verifications(nodeId)`. If pending verifications exist, run each command via Bash, then `spec_record_verification(verificationId, actual, result)`. All pass/skip → proceed to Close. Any fail → fix and re-run (max 3 attempts), then mark blocked. No verifications → proceed normally.
 9. **Close** — `quality_gate({ scope: 'typecheck' })` passes → `spec_transition(event: "completed", project: "<project>")`. Fails → fix errors and re-run. Still failing → `spec_transition(event: "failed", project: "<project>")`. Discovery → `spec_create_node(nodeType: "gap", sessionId: <current-session-id>)`. **Auto-rollup**: when all tasks in a phase/parent-task complete, the parent auto-completes — but YOU must call `spec_transition` on each leaf task for rollup to trigger.
 
 ## Framework Conventions (Nuxt)

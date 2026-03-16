@@ -14,7 +14,7 @@ Find a check, work through every phase and task sequentially. Transition states 
 2. **Load** — `spec_get_tree(path, format: "json")`.
 3. **Brief** — Show Context / Problem / Principle + progress.
 4. **Activate** — If pending: `spec_transition(event: "started", project: <current_project>)`. Always pass `project` for isolation validation.
-5. **Per phase** — Transition to active/in_progress. Read phase `body.briefing` and `body.specialist`. `dse_search` for phase-relevant decisions (layout, components, patterns, breakpoints). Announce: specialist role, objective, constraints, and applicable DSE decisions before executing tasks.
+5. **Per phase** — Transition to active/in_progress. Read phase `body.briefing` and `body.specialist`. `dse_search` for phase-relevant decisions (layout, components, patterns, breakpoints). Announce: specialist role, **focus** (the single priority above all else), objective, constraints, and applicable DSE decisions before executing tasks. The `specialist.focus` guides every task decision in this phase.
 6. **Per task:**
    - If a task has sub-tasks, recurse into sub-tasks first (depth-first). Only execute leaf tasks — containers auto-complete via rollup.
    - Show task → `spec_transition(event: "started", project: <current_project>)` to activate, then again for in_progress. (Or call `completed` directly when done — the service auto-chains through intermediate states.) Always pass `project` on every transition for isolation validation. If the response contains `BLOCKED_BY_DEPENDENCY`, the parent phase has an incomplete predecessor — do not proceed; surface the blocker to the user.
@@ -28,6 +28,7 @@ Find a check, work through every phase and task sequentially. Transition states 
    - AskUserQuestion: completed / needs work / blocked / skip / found gap
    - Transition explicitly: completed → `spec_transition(event: "completed", project: <current_project>)`. Blocked → `spec_transition(event: "blocked", project: <current_project>)`. Failed → `spec_transition(event: "failed", project: <current_project>)`. Gaps → `spec_create_node(nodeType: "gap")`. **Auto-rollup propagates**: when all tasks in a phase or parent-task complete, the parent auto-completes; when all phases complete, the check auto-completes. But YOU must call `spec_transition` on each leaf task — rollup does not trigger without it.
 7. **Phase done (close gate)** — Before transitioning phase to completed:
+   - Run the phase's `successCriteria` as a concrete command. This is the phase author's acceptance test — if it fails, the phase is not done regardless of what quality_gate says.
    - Run `quality_gate({ scope: 'all' })` — typecheck + tests must pass. Oracle offline → fallback to `npx nuxt typecheck` and `npx vitest run`.
    - Run audit grep on all phase fileRefs: semantic token leaks, pattern violations.
    - Run event gotcha check (see verify skill table) on all .vue files in the phase.

@@ -15,14 +15,14 @@ The spec tree is the execution plan. Read it, follow it, update it.
 2. **Load** — `spec_get_tree` → understand phases, tasks, current states.
 2. **Status** — `spec_get_counters` → show progress (completed/total per phase).
 3. **Next** — First phase with pending leaf tasks (skip container tasks that have children — execute leaves only). Respect dependency edges.
-4. **Execute (3-stage pipeline per phase):**
-   - **Stage 0 — Verification Check**: After Stage 1, run `spec_get_verifications` on each completed task. For pending verifications: execute the command via Bash, then `spec_record_verification` with the result. All pass/skip → proceed. Any fail → fix and re-run (max 3 attempts), then mark task as blocked.
+4. **Execute (4-stage pipeline per phase):**
    - **Stage 1 — Implement**: `dse_search` for phase-relevant decisions before delegating. Pass phase briefing + specialist + DSE decisions to implementation agents so they adopt the correct persona, respect constraints, and follow existing design patterns. When agents call `spec_create_node`, they must include `sessionId` (current session) and `project` params. Agents execute tasks → transition to completed/failed (always pass `project` to `spec_transition`).
-   - **Stage 2 — Audit**: dedicated agent scans phase output for pattern violations, semantic token leaks, type errors, and **DSE decision drift** (`dse_search` to compare output against decisions[]). Findings → gap nodes or fix inline. **Skip for test-only phases** — test results ARE the audit. Running a reviewer on test code adds negligible value.
-   - **Stage 3 — Verify**: dedicated agent runs `quality_gate({ scope: 'all' })`, event gotcha grep (see verify skill table), typecheck baseline diff, and security checklist. PASS/CONDITIONAL/FAIL verdict.
-   - Phase transitions to completed ONLY after Stage 3 = PASS or CONDITIONAL.
-   - Stage 3 FAIL → create gap nodes for findings, loop back to Stage 1 for fixes, then re-run Stage 2+3.
-5. **Checkpoint** — Phase done (all 3 stages passed) → ask "Continue to next phase?" via AskUserQuestion.
+   - **Stage 2 — Verification Check**: After implementation, run `spec_get_verifications` on each completed task. For pending verifications: execute the command via Bash, then `spec_record_verification` with the result. All pass/skip → proceed. Any fail → fix and re-run (max 3 attempts), then mark task as blocked.
+   - **Stage 3 — Audit**: dedicated agent scans phase output for pattern violations, semantic token leaks, type errors, and **DSE decision drift** (`dse_search` to compare output against decisions[]). Findings → gap nodes or fix inline. **Skip for test-only phases** — test results ARE the audit. Running a reviewer on test code adds negligible value.
+   - **Stage 4 — Verify**: dedicated agent runs `quality_gate({ scope: 'all' })`, event gotcha grep, typecheck baseline diff, and security checklist. Then runs the phase's `successCriteria` as a concrete acceptance test — if briefing says "grep -l 'sub-task' returns all 5 files", execute that command and verify. PASS/CONDITIONAL/FAIL verdict.
+   - Phase transitions to completed ONLY after Stage 4 = PASS or CONDITIONAL.
+   - Stage 4 FAIL → create gap nodes for findings, loop back to Stage 1 for fixes, then re-run Stage 3+4.
+5. **Checkpoint** — Phase done (all 4 stages passed) → ask "Continue to next phase?" via AskUserQuestion.
 6. **Complete** — All phases done → `spec_get_counters` final summary → `spec_transition(event: "completed", project: "<project>")` on the check. **Mandatory**: always pass `project` param to `spec_transition` for isolation validation. Verify the check state is `completed` after transition. If any task was missed, transition it first — auto-rollup propagates upward only when all leaf nodes are completed.
 
 ## Guild Protocol (Domain-Specialist Routing)
