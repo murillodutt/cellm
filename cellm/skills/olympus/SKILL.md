@@ -8,14 +8,37 @@ The mantra is the soul of Olympus. Every god carries it as an active mental gate
 
 Thin wrapper that starts an Olympus session. The engine handles the rest.
 
-## Workflow
+## Scope Detection
+
+After identifying the target, classify its scope to decide the certification mode:
+
+| Signal | Mode | Rationale |
+|--------|------|-----------|
+| Target is a single SKILL.md, config, or doc file | **Lite** | Text/markdown files need review, not system examination |
+| Target is a single small source file (< 200 lines) | **Lite** | Low blast radius, direct fixes sufficient |
+| Target is a module, subsystem, or multi-file block | **Full** | System-level examination requires triad machinery |
+| Target references a spec check with multiple phases | **Full** | Structured work needs formal tracking |
+
+**Lite Mode** skips the triad session. Instead:
+1. Read the target file(s)
+2. List findings inline (same classification: operate/construct/monitor)
+3. Fix operate+construct findings directly (Asclepius-style)
+4. Commit with findings summary in commit message
+5. Report results — no `triad_start`, no `triad_register_finding`, no `triad_resolve_finding`
+
+**Full Mode** follows the standard Workflow below.
+
+When in doubt, default to Full. Lite is an optimization, not a shortcut — the mantra still applies in both modes.
+
+## Workflow (Full Mode)
 
 1. Detect project: `git rev-parse --show-toplevel` last segment
 2. Target: first argument (required)
-3. Call `triad_start` MCP tool with `{ project, target }`
-4. Report session ID and how to monitor
+3. Scope Detection: classify as Lite or Full (see above). If Lite, execute Lite Mode and skip steps 4+.
+4. Call `triad_start` MCP tool with `{ project, target }`
+5. Report session ID and how to monitor
 
-## Output
+## Output (Full Mode)
 
 ```
 [+] Olympus session {id} started for target "{target}" in project "{project}"

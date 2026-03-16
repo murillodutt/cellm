@@ -41,10 +41,11 @@ Each cycle, look through all lenses. Order is fluid — follow what the block de
 | **Temporal Coupling** | Files co-changing without import relation | `git log --name-only` grouped by commit |
 | **Reachability** | Dead exports, handlers without routes | Inverse grep: for each export, search importers |
 | **Contract Fidelity** | Type mismatches at boundaries, schema drift | Read BOTH sides of every boundary. Check serialization (safeJsonParse vs raw) |
-| **Behavioral Completeness** | Failure paths: null input, DB offline, timeout, concurrent | 4 scenarios per handler: missing body, malformed input, downstream failure, concurrent failure |
+| **Behavioral Completeness** | Failure paths: null input, DB offline, timeout, concurrent | 4 scenarios per handler: missing body, malformed input, downstream failure, concurrent failure. For filesystem/scanner blocks: test with 3+ concrete paths from the actual codebase (e.g., real nested component from boundary.yml), not abstract scenarios |
 | **Scope** | Refactoring silently broke consumers? | Trace ALL consumers of changed contract. Check DB for orphan data |
 | **Silent Bugs** | Vue event bindings that compile but never fire | Grep `.vue` for: `USwitch @change`, `UCheckbox @change`, `USelect @change`, `UModal @close` |
 | **Snapshot Drift** | Dependency upgrades invalidated assumptions? | Compare `package.json`/`bun.lock` against DSE ATOM snapshots |
+| **Runtime** | Startup errors, lifecycle ordering, subsystem readiness | Start dev server in background, tail logs for ERROR/WARN patterns, check health endpoint, verify clean startup (no DB-not-initialized cascades, no unhandled rejections). Mandatory for blocks with server plugins or startup lifecycle |
 | **Regression** | Previous cure broke something? (re-exam only) | Read Surgical/Construction Journals, verify cures, trace side-effects |
 
 ## Army
@@ -62,6 +63,7 @@ Each cycle, look through all lenses. Order is fluid — follow what the block de
 | Trace refactoring scope | Agent identifies all consumers, verifies each updated |
 | Scan silent event bugs | Agent greps `.vue` for wrong bindings |
 | Check snapshot drift | Agent reads package.json + bun.lock vs DSE/doc |
+| Runtime observation | Agent starts dev server in background, tails logs for 15s, greps for ERROR/WARN/crash patterns, smoke-tests health + 2-3 critical API endpoints |
 
 **Dispatch rule**: If it doesn't require your creative judgment, send a minion. Stay in the observation seat.
 
@@ -208,5 +210,6 @@ When prompt contains `[OLYMPUS CONTEXT]`:
 - **Freeze exam before inline fixes applied** — snapshot AFTER fixes on re-exam
 - **Skip Silent Bugs on blocks with Vue** — wrong events compile but never fire
 - **Treat project conventions as platform requirements** — severity and wording must reflect authority source
+- **Skip Runtime lens on blocks with server plugins or startup lifecycle** — static analysis alone misses temporal ordering bugs (race conditions, premature DB access, plugin initialization order)
 - **Skip Evolutionary Feedback** — reflection after convergence is mandatory
 - **Finish without all 3 deliverables** — exam, report, feedback entry are ALL mandatory. Reduce form if context low, never skip. There is no "later" — each invocation is a fresh session
