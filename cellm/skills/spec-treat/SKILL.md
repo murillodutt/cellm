@@ -2,7 +2,7 @@
 description: Treat a spec check — work through phases and tasks sequentially, transitioning states, executing actions, recording gaps, and running verifications.
 user-invocable: true
 argument-hint: "query: check title or search term"
-allowed-tools: mcp__cellm-oracle__spec_create_node, mcp__cellm-oracle__spec_transition, mcp__cellm-oracle__spec_search, mcp__cellm-oracle__spec_get_tree, mcp__cellm-oracle__spec_add_edge, mcp__cellm-oracle__spec_add_verification, mcp__cellm-oracle__spec_get_verifications, mcp__cellm-oracle__spec_record_verification, mcp__cellm-oracle__spec_get_counters, mcp__plugin_cellm_cellm-oracle__quality_gate, mcp__plugin_cellm_cellm-oracle__dse_search, mcp__plugin_cellm_cellm-oracle__dse_get, mcp__plugin_cellm_cellm-oracle__record_observation, mcp__plugin_cellm_cellm-oracle__directive_verify, mcp__plugin_cellm_cellm-oracle__directive_list, AskUserQuestion, Read, Edit, Write, Bash, Grep, Glob
+allowed-tools: mcp__cellm-oracle__spec_create_node, mcp__cellm-oracle__spec_transition, mcp__cellm-oracle__spec_search, mcp__cellm-oracle__spec_get_tree, mcp__cellm-oracle__spec_add_edge, mcp__cellm-oracle__spec_add_verification, mcp__cellm-oracle__spec_get_verifications, mcp__cellm-oracle__spec_record_verification, mcp__cellm-oracle__spec_get_counters, mcp__plugin_cellm_cellm-oracle__quality_gate, mcp__plugin_cellm_cellm-oracle__dse_search, mcp__plugin_cellm_cellm-oracle__dse_get, mcp__plugin_cellm_cellm-oracle__record_observation, mcp__plugin_cellm_cellm-oracle__directive_emit, mcp__plugin_cellm_cellm-oracle__directive_emit_for_phase, mcp__plugin_cellm_cellm-oracle__directive_verify, mcp__plugin_cellm_cellm-oracle__directive_list, AskUserQuestion, Read, Edit, Write, Bash, Grep, Glob
 ---
 
 Find a check, work through every phase and task sequentially. Transition states via MCP.
@@ -14,7 +14,9 @@ Find a check, work through every phase and task sequentially. Transition states 
 2. **Load** — `spec_get_tree(path, format: "json")`.
 3. **Brief** — Show Context / Problem / Principle + progress.
 4. **Activate** — If pending: `spec_transition(event: "started", project: <current_project>)`. Always pass `project` for isolation validation.
-5. **Per phase** — Transition to active/in_progress. Read phase `body.briefing` and `body.specialist`. `dse_search` for phase-relevant decisions (layout, components, patterns, breakpoints). Announce: specialist role, **focus** (the single priority above all else), objective, constraints, and applicable DSE decisions before executing tasks. The `specialist.focus` guides every task decision in this phase.
+5. **Per phase** — Transition to active/in_progress. Read phase `body.briefing` and `body.specialist`. `dse_search` for phase-relevant decisions (layout, components, patterns, breakpoints).
+   - **Director Emit**: Check `specialist.role` — if a Director is registered for the role (e.g., `frontend` → GDU Director), call `directive_emit_for_phase` with `{ project, specNodeId: phaseId, projectRoot, objective, specialistRole, pathGlob? }`. This emits mandatory contracts before any task execution. If no Director exists for the role, this is a no-op. After emit, call `directive_list(specNodeId, state='active')` to load active directives.
+   - Announce: specialist role, **focus** (the single priority above all else), objective, constraints, applicable DSE decisions, and **active directives** before executing tasks. The `specialist.focus` guides every task decision in this phase.
 6. **Per task:**
    - If a task has sub-tasks, recurse into sub-tasks first (depth-first). Only execute leaf tasks — containers auto-complete via rollup.
    - Show task → `spec_transition(event: "started", project: <current_project>)` to activate, then again for in_progress. (Or call `completed` directly when done — the service auto-chains through intermediate states.) Always pass `project` on every transition for isolation validation. If the response contains `BLOCKED_BY_DEPENDENCY`, the parent phase has an incomplete predecessor — do not proceed; surface the blocker to the user.
@@ -64,6 +66,7 @@ The server gates `spec_transition(completed)` against active directives. Before 
 
 - **Skip briefing** — always show Context/Problem/Principle before starting
 - **Skip DSE consultation** — `dse_search` per phase for relevant decisions, avoid rules, and existing components before writing UI code
+- **Skip Director Emit** — when `specialist.role` has a registered Director, always `directive_emit_for_phase` at phase start. Without directives, the gate has nothing to enforce
 - **Auto-complete tasks** — always ask user to confirm outcome
 - **Lose gaps** — every discovery creates a gap node
 - **Forget state transitions** — every action must transition via MCP. Auto-chain supported: `completed` from `pending`/`active` resolves intermediate hops automatically.

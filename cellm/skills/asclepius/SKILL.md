@@ -114,7 +114,11 @@ Three phases: Prepare (read evidence, verify root cause) → Cure (apply fix, fi
 
 ### 5. Cure Loop
 
+**Director Emit** — before executing cure tasks, check the phase's `specialist.role`. If a Director is registered for the role, call `directive_emit_for_phase` with `{ project, specNodeId: phaseId, projectRoot, objective, specialistRole, pathGlob? }`. After emit, call `directive_list(specNodeId, state='active')` — respect these as mandatory constraints during the cure. No Director for the role = no-op.
+
 Execute tasks sequentially. After each fix + commit, **immediately** `spec_transition("completed")` on that task. Auto-rollup propagates upward. A fix without transition = invisible cure (UI shows 0/N forever).
+
+**Director Verify** — after cure tasks complete but before transitioning the phase, call `directive_verify(specNodeId, worktreePath)` if directives were emitted. Violations = fix and re-verify (max 3). Escalation on 4th failure.
 
 Priority: `[!!!]` → `[!!]` → `[!]` → `[.]`. Bugs before tech debt before improvements.
 
@@ -206,6 +210,8 @@ Resolutions: `cured`, `blocked`, `false_positive`.
 - **Skip Olympus MCP calls in Olympus mode** — fix without `triad_resolve_finding` is invisible to orchestrator
 - **Operate without Argus report** — no diagnosis, no surgery
 - **Act without spec** — no spec, no surgery
+- **Skip Director Emit** — when `specialist.role` has a registered Director, always emit directives before curing. Without directives, design violations survive the cure
+- **Skip Director Verify** — always `directive_verify` before completing cure phases when directives were emitted. Re-examination catches violations too late
 - **Skip reconnaissance** — understand before touching
 - **Skip deliberation** — enumerate, compare, choose. First solution is rarely best
 - **Skip impact analysis** — map consumers before cutting

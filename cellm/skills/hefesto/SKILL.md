@@ -135,7 +135,15 @@ At every phase boundary, declare output/input types explicitly in phase constrai
 ### 3.1 Execution Model
 
 1. `spec_get_tree` — verify all phases have tasks (M > 0). If 0/0, STOP → decompose first
-2. Per phase in dependency order: transition started → DSE consult → verify MCP docs if uncertain → execute tasks → **shadow verification** (typecheck + tests) → fix before moving on → transition completed
+2. Per phase in dependency order:
+   - Transition started
+   - DSE consult
+   - **Director Emit** — check `phase.body.specialist.role`. If a Director is registered for the role (e.g., `frontend` → GDU Director), call `directive_emit_for_phase` with `{ project, specNodeId: phaseId, projectRoot, objective, specialistRole, pathGlob? }`. After emit, call `directive_list(specNodeId, state='active')` — these are mandatory contracts for the phase. No Director for the role = no-op.
+   - Verify MCP docs if uncertain
+   - Execute tasks
+   - **Director Verify** — if directives were emitted, call `directive_verify(specNodeId, worktreePath)` before completing. Violations = fix and re-verify (max 3). Escalation on 4th failure.
+   - **Shadow verification** (typecheck + tests) → fix before moving on
+   - Transition completed
 3. Commit with traceability after each phase
 
 ### 3.2 Construction Standards
@@ -255,6 +263,8 @@ Resolutions: `built`, `blocked`, `false_positive`.
 - **Build without research** — training data is stale. Live docs first
 - **Build without spec** — no spec, no construction
 - **Build without design** — enumerate, choose, justify
+- **Skip Director Emit** — when `specialist.role` has a registered Director, always emit directives before construction. Without directives, violations pass silently
+- **Skip Director Verify** — always `directive_verify` before completing phases when directives were emitted. Argus catches violations too late — the Director catches them during construction
 - **Skip contract chain** — type mismatches = #1 Argus finding source
 - **Skip invariant enforcement** — project isolation on ALL paths, reads AND writes
 - **Use deprecated APIs** — verify via MCP, document rejection
