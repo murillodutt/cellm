@@ -2,7 +2,7 @@
 description: Treat a spec check — work through phases and tasks sequentially, transitioning states, executing actions, recording gaps, and running verifications.
 user-invocable: true
 argument-hint: "query: check title or search term"
-allowed-tools: mcp__cellm-oracle__spec_create_node, mcp__cellm-oracle__spec_transition, mcp__cellm-oracle__spec_search, mcp__cellm-oracle__spec_get_tree, mcp__cellm-oracle__spec_add_edge, mcp__cellm-oracle__spec_add_verification, mcp__cellm-oracle__spec_get_verifications, mcp__cellm-oracle__spec_record_verification, mcp__cellm-oracle__spec_get_counters, mcp__plugin_cellm_cellm-oracle__quality_gate, mcp__plugin_cellm_cellm-oracle__dse_search, mcp__plugin_cellm_cellm-oracle__dse_get, mcp__plugin_cellm_cellm-oracle__record_observation, AskUserQuestion, Read, Edit, Write, Bash, Grep, Glob
+allowed-tools: mcp__cellm-oracle__spec_create_node, mcp__cellm-oracle__spec_transition, mcp__cellm-oracle__spec_search, mcp__cellm-oracle__spec_get_tree, mcp__cellm-oracle__spec_add_edge, mcp__cellm-oracle__spec_add_verification, mcp__cellm-oracle__spec_get_verifications, mcp__cellm-oracle__spec_record_verification, mcp__cellm-oracle__spec_get_counters, mcp__plugin_cellm_cellm-oracle__quality_gate, mcp__plugin_cellm_cellm-oracle__dse_search, mcp__plugin_cellm_cellm-oracle__dse_get, mcp__plugin_cellm_cellm-oracle__record_observation, mcp__plugin_cellm_cellm-oracle__directive_verify, mcp__plugin_cellm_cellm-oracle__directive_list, AskUserQuestion, Read, Edit, Write, Bash, Grep, Glob
 ---
 
 Find a check, work through every phase and task sequentially. Transition states via MCP.
@@ -56,6 +56,10 @@ Keep states as-is. Show progress. Suggest re-running to continue.
 
 When `CELLM_DEV_MODE: true`: after treatment, write feedback entry to `dev-cellm-feedback/entries/spec-treat-{date}-{seq}.md`. Note which task types caused friction, whether audit gates caught real issues, and how often users chose skip vs completed. Format and lifecycle: see `dev-cellm-feedback/README.md`.
 
+## Directive Gate
+
+The server gates `spec_transition(completed)` against active directives. Before transitioning tasks to completed, call `directive_verify` as a preview to surface violations early. If `DIRECTIVE_VIOLATION` is returned on transition, read violations, fix the code, retry. Always pass `worktreePath` in metadata: `spec_transition({ nodeId, event: "completed", metadata: { worktreePath } })`. Max 3 attempts before `DIRECTIVE_ESCALATION` — escalate to user. Manual directives pass with a flag (non-blocking).
+
 ## NEVER
 
 - **Skip briefing** — always show Context/Problem/Principle before starting
@@ -65,4 +69,6 @@ When `CELLM_DEV_MODE: true`: after treatment, write feedback entry to `dev-cellm
 - **Forget state transitions** — every action must transition via MCP. Auto-chain supported: `completed` from `pending`/`active` resolves intermediate hops automatically.
 - **Non-English spec content** — all node titles, gap descriptions, and verification notes must be in English
 - **Invalid parent-child hierarchies** — check→phase/task/gap/decision/requirement/verification, phase→task/gap/decision/verification, task→task/gap/verification. Service rejects violations with INVALID_CHILD_TYPE.
+- **Ignore DIRECTIVE_VIOLATION errors** — fix the violations or escalate to the user, never force-skip
+- **Skip directive verification** — the server enforces it, but previewing with `directive_verify` before transition avoids surprises
 - **Skip the Evolutionary Analytical Feedback** — when CELLM_DEV_MODE is true, reflection after treatment is mandatory
