@@ -75,8 +75,8 @@ If any directive is violated → loop back to Stage 1 with `violated_reason` as 
 | specialist.role | Director | Emits directives? |
 |----------------|----------|-------------------|
 | frontend | GDU Director | Yes |
-| backend | (future) | No |
-| fullstack | None | No |
+| backend | Engineering Director | Yes |
+| fullstack | Engineering Director | Yes |
 
 ## Evolutionary Analytical Feedback
 

@@ -138,7 +138,7 @@ At every phase boundary, declare output/input types explicitly in phase constrai
 2. Per phase in dependency order:
    - Transition started
    - DSE consult
-   - **Director Emit** — check `phase.body.specialist.role`. If a Director is registered for the role (e.g., `frontend` → GDU Director), call `directive_emit_for_phase` with `{ project, specNodeId: phaseId, projectRoot, objective, specialistRole, pathGlob? }`. After emit, call `directive_list(specNodeId, state='active')` — these are mandatory contracts for the phase. No Director for the role = no-op.
+   - **Director Emit** — check `phase.body.specialist.role`. If a Director is registered for the role (e.g., `frontend` → GDU + Engineering Directors, `backend` → Engineering Director, `fullstack` → Engineering Director), call `directive_emit_for_phase` with `{ project, specNodeId: phaseId, projectRoot, objective, specialistRole, pathGlob? }`. After emit, call `directive_list(specNodeId, state='active')` — these are mandatory contracts for the phase. No Director for the role = no-op.
    - Verify MCP docs if uncertain
    - Execute tasks
    - **Director Verify** — if directives were emitted, call `directive_verify(specNodeId, worktreePath)` before completing. Violations = fix and re-verify (max 3). Escalation on 4th failure.
