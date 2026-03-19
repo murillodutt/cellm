@@ -16,11 +16,17 @@ The spec tree is the execution plan. Read it, follow it, update it.
 2. **Status** — `spec_get_counters` → show progress (completed/total per phase).
 3. **Next** — First phase with pending leaf tasks (skip container tasks that have children — execute leaves only). Respect dependency edges.
 4. **Execute (5-stage pipeline per phase):**
-   - **Stage 0 — Director Emit** (NEW): Before delegating to the implementer, check `phase.body.specialist.role` for a registered Director. If a Director exists for the role, call `directive_emit_for_phase` with `{ project, specNodeId, projectRoot, objective, specialistRole, pathGlob? }` — it automatically extracts keywords, matches INDEX.yaml, loads block patterns, and generates grep evidence directives. If no Director is registered for the role, Stage 0 is a **no-op** — the pipeline continues unchanged.
+   - **Stage 0 — Director Emit (MANDATORY PRE-FLIGHT)**:
+     Before delegating ANY phase to an implementer:
+     1. Call `directive_list(specNodeId, state='active')` for the phase.
+     2. If zero active directives AND `specialist.role` has a registered Director → MUST call `directive_emit_for_phase({ project, specNodeId, projectRoot, objective, specialistRole, pathGlob? })`. This is NOT optional — skipping Director emit means violations pass silently through the gate.
+     3. Include resulting directives in the Context Envelope passed to the implementer. Directives are mandatory contracts.
+     4. After implementation, call `directive_verify(specNodeId)` BEFORE `spec_transition(completed)`. NEVER skip.
      - `frontend` → GDU + Engineering Directors (emits design directives + code quality directives)
      - `backend`, `fullstack` → Engineering Director (emits code quality directives)
      - `database`, `audit` → No Director registered (Stage 0 = no-op)
-     - After emit, call `directive_list(specNodeId, state='active')` and include the active directives in the Context Envelope passed to the implementer. Directives become mandatory contracts in the briefing.
+     - If `directive_emit_for_phase` was called but returned 0 directives, Stage 0 is complete — proceed to Stage 1.
+     - **Directive Scope Contract**: Emit is scope-aware. `effectivePathGlob` derives from phase task `fileRefs` + phase `keyFiles`. Three modes: **scoped** (default — narrowed to phase files), **repo_wide** (no fileRefs/keyFiles — uses original rule pathGlob, emits `directiveWarning: invalid_scope`), **baseline_delta** (future). Catalog-change phases (tag `director-catalog` or keyFiles in `server/services/director/`) auto-skip self-referential directives.
    - **Stage 1 — Implement**: `dse_search` for phase-relevant decisions before delegating. Pass phase briefing + specialist + DSE decisions + **active directives** to implementation agents so they adopt the correct persona, respect constraints, and follow existing design patterns. When agents call `spec_create_node`, they must include `sessionId` (current session) and `project` params. Agents execute tasks → transition to completed/failed (always pass `project` to `spec_transition`).
    - **Stage 2 — Director Verify (Mandatory Gate) + Verification Check**: The server gates `spec_transition(completed)` against active directives automatically. Before transitioning tasks to completed, call `directive_verify` as a **preview** to catch violations early. If violations exist: fix them, then retry. Do NOT attempt `spec_transition(completed)` until `directive_verify` returns compliant. If you attempt completion with violated directives, the server rejects with `DIRECTIVE_VIOLATION` — the task stays in `in_progress`. Always pass `worktreePath` in metadata: `spec_transition({ nodeId, event: "completed", metadata: { worktreePath } })`. Max 3 failed attempts — on the 4th, the server returns `DIRECTIVE_ESCALATION`. Escalate to user via AskUserQuestion with violation details and options: "Fix manually", "Skip directive", or "Block task". Manual directives (evidenceType: manual) pass with a flag — surface `manualPending` items to user after completion. After directive gate passes → run `spec_get_verifications` on each completed task. For pending verifications: execute the command via Bash, then `spec_record_verification`. All pass/skip → proceed. Any fail → fix and re-run (max 3 attempts), then mark task as blocked.
    - **Stage 3 — Audit**: dedicated agent scans phase output for pattern violations, semantic token leaks, type errors, and **DSE decision drift** (`dse_search` to compare output against decisions[]). Findings → gap nodes or fix inline. **Skip for test-only phases** — test results ARE the audit. Running a reviewer on test code adds negligible value.
@@ -99,7 +105,13 @@ Skip completed tasks. Resume from first pending. Show: "Resuming: X/Y completed.
 
 ## Evolutionary Analytical Feedback
 
-When `CELLM_DEV_MODE: true`: after orchestration, write feedback entry to `dev-cellm-feedback/entries/orchestrate-{date}-{seq}.md`. Note which guild activations were effective, whether context materialization was sufficient for subagents, and how many stage 2/3 iterations were needed. Format and lifecycle: see `dev-cellm-feedback/README.md`.
+When `CELLM_DEV_MODE: true`: after orchestration, write feedback entry to `dev-cellm-feedback/entries/orchestrate-{date}-{seq}.md`. Include:
+- Which guild activations were effective
+- Whether context materialization was sufficient for subagents
+- How many stage 2/3 iterations were needed
+- **Director metrics**: `directiveEmitCount` (total directives emitted across phases), `directiveVerifyCount` (total verification attempts), `directiveSkipCount` (phases where Director was skipped or not applicable)
+
+Format and lifecycle: see `dev-cellm-feedback/README.md`.
 
 ## NEVER
 

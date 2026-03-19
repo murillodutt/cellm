@@ -15,7 +15,7 @@ Find a check, work through every phase and task sequentially. Transition states 
 3. **Brief** — Show Context / Problem / Principle + progress.
 4. **Activate** — If pending: `spec_transition(event: "started", project: <current_project>)`. Always pass `project` for isolation validation.
 5. **Per phase** — Transition to active/in_progress. Read phase `body.briefing` and `body.specialist`. `dse_search` for phase-relevant decisions (layout, components, patterns, breakpoints).
-   - **Director Emit**: Check `specialist.role` — if a Director is registered for the role (e.g., `frontend` → GDU + Engineering Directors, `backend` → Engineering Director, `fullstack` → Engineering Director), call `directive_emit_for_phase` with `{ project, specNodeId: phaseId, projectRoot, objective, specialistRole, pathGlob? }`. This emits mandatory contracts before any task execution. If no Director exists for the role, this is a no-op. After emit, call `directive_list(specNodeId, state='active')` to load active directives.
+   - **Director Emit (MANDATORY PRE-FLIGHT)**: Before executing any task in this phase, call `directive_list(specNodeId, state='active')` for the phase. If zero active directives AND `specialist.role` has a registered Director (`frontend`, `backend`, `fullstack`) → MUST call `directive_emit_for_phase({ project, specNodeId: phaseId, projectRoot, objective, specialistRole, pathGlob? })`. This applies whether invoked by orchestrate or directly. After emit, load active directives. Before completing tasks, call `directive_verify(specNodeId)` — violations must be fixed before transition. If no Director exists for the role (e.g., `database`, `audit`), this is a no-op.
    - Announce: specialist role, **focus** (the single priority above all else), objective, constraints, applicable DSE decisions, and **active directives** before executing tasks. The `specialist.focus` guides every task decision in this phase.
 6. **Per task:**
    - If a task has sub-tasks, recurse into sub-tasks first (depth-first). Only execute leaf tasks — containers auto-complete via rollup.
@@ -66,7 +66,7 @@ The server gates `spec_transition(completed)` against active directives. Before 
 
 - **Skip briefing** — always show Context/Problem/Principle before starting
 - **Skip DSE consultation** — `dse_search` per phase for relevant decisions, avoid rules, and existing components before writing UI code
-- **Skip Director Emit** — when `specialist.role` has a registered Director, always `directive_emit_for_phase` at phase start. Without directives, the gate has nothing to enforce
+- **Skip Director Emit** — when `specialist.role` has a registered Director, always `directive_emit_for_phase` at phase start. Without directives, the gate has nothing to enforce. Emit is scope-aware (derives from phase fileRefs/keyFiles). See orchestrate SKILL.md for Directive Scope Contract details
 - **Auto-complete tasks** — always ask user to confirm outcome
 - **Lose gaps** — every discovery creates a gap node
 - **Forget state transitions** — every action must transition via MCP. Auto-chain supported: `completed` from `pending`/`active` resolves intermediate hops automatically.
