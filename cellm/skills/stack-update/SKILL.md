@@ -2,7 +2,7 @@
 description: Execute stack update specs — verify, analyze impact, create fix specs proactively, commit, and certify via Olympus. Use when stack tracker specs need closing, dependency updates need verification, or 'stack update' is mentioned.
 user-invocable: true
 argument-hint: "'all' to batch-process, package name, or check ID"
-allowed-tools: mcp__cellm-oracle__spec_search, mcp__cellm-oracle__spec_get_tree, mcp__cellm-oracle__spec_transition, mcp__cellm-oracle__spec_create_node, mcp__cellm-oracle__spec_add_edge, mcp__cellm-oracle__spec_get_counters, mcp__cellm-oracle__quality_gate, AskUserQuestion, Skill, Read, Grep, Glob, Bash(npx nuxt typecheck *), Bash(npx vue-tsc *), Bash(bun run test *), Bash(git *), Bash(bash scripts/sync-version.sh *)
+allowed-tools: mcp__cellm-oracle__spec_search, mcp__cellm-oracle__spec_get_tree, mcp__cellm-oracle__spec_transition, mcp__cellm-oracle__spec_create_node, mcp__cellm-oracle__spec_add_edge, mcp__cellm-oracle__spec_get_counters, mcp__cellm-oracle__quality_gate, AskUserQuestion, Skill, Read, Grep, Glob, Bash(npx nuxt typecheck *), Bash(npx vue-tsc *), Bash(bun run test *), Bash(git *), Bash(bash scripts/sync-version.sh *), Bash(bun oracle/scripts/stack-update-helper.ts *)
 ---
 
 # Stack Update — Full Lifecycle Dependency Management
@@ -48,46 +48,62 @@ Before any verification, ensure dependency changes are committed:
 
 ### Step 3: Search
 
-Route by argument:
+Uses the stack-update-helper CLI for compact output (~200 tokens vs ~19k from MCP):
 
-| Argument | Action |
-|----------|--------|
-| `all` | `spec_search(project, query: "dependency update", state: "pending", limit: 50)` filter by tag `stack-tracker` |
-| `<package>` | `spec_search(project, query: <package>, state: "pending", limit: 5)` filter by tag `stack-tracker` |
-| `<check-id>` | `spec_get_tree(project, path: <id>)` directly |
+```bash
+bun oracle/scripts/stack-update-helper.ts status
+```
+
+Output includes: spec ID, package, version delta, update type, task progress.
+
+For a specific check ID: `spec_get_tree(project, path: <id>)` directly.
 
 ### Step 4: Reconnaissance
 
-Before running the gate, understand the full scope:
-- `spec_get_tree` for each spec found in Step 3
-- Read `body.updateType`, `body.watchItems`, task titles, task count
-- Build a mental map: which packages, which risk levels, how many tasks total
-- Report scope summary to user: `"{N} specs, {M} tasks — {patch: X, minor: Y, major: Z}"`
+The `status` output already provides updateType and versionDelta for routing decisions.
+For minor/major updates that need deeper analysis (watch items, task structure): use `spec_get_tree` on that specific spec.
+Report scope summary to user: `"{N} specs, {M} tasks — {patch: X, minor: Y, major: Z}"`
 
 ### Step 5: Gate
 
-`quality_gate({ scope: 'all' })` — run ONCE for the entire project. Runs typecheck + tests. Fallback: `npx nuxt typecheck` + `bun run test` if Oracle offline.
+```bash
+bun oracle/scripts/stack-update-helper.ts gate
+```
+
+Runs `npx nuxt typecheck` (auto-detects Nuxt) + `bun run test` from oracle/. Exit code 0 = PASS, 1 = FAIL. Run ONCE for the entire project.
+
+Fallback (if helper unavailable): `npx nuxt typecheck` + `bun run test` manually.
 
 ### Step 6: Analyze
 
-For EACH spec, before completing:
-- Read `body.updateType` from check (patch/minor/major/prerelease)
-- If `body.updateType` missing (legacy): infer from title pattern `Update {pkg} {from} -> {to}` using version delta
-- `Grep` for package imports: `from '{package}'`, `import '{package}'`
-- If imports found: `Read` consuming files, check API usage against watch items
-- Assess: does the update affect any code paths?
+```bash
+bun oracle/scripts/stack-update-helper.ts impact
+```
+
+Shows import analysis per package: file count and locations. Packages with 0 imports are flagged as safe to auto-complete.
+
+For minor/major updates with imports found: `Read` consuming files, check API usage against watch items. Assess: does the update affect any code paths?
 
 ### Step 7: Route
 
 | Gate | updateType | Impact Found | Action |
 |------|-----------|-------------|--------|
-| PASS | patch | none | batch-complete |
+| PASS | patch | none | `bun ... complete --all-pending` or `complete <ids>` |
 | PASS | patch | usage found | complete with note — patch is safe |
-| PASS | minor | none | batch-complete |
+| PASS | minor | none | `bun ... complete <ids>` |
 | PASS | minor | deprecation/API change | complete verify tasks, create fix spec |
 | PASS | major/prerelease | none | complete — no project usage |
 | PASS | major/prerelease | API usage | complete verify, create fix spec with affected files |
 | FAIL | any | any | analyze errors, create fix spec, delegate to `/cellm:implement` |
+
+Batch complete via helper:
+```bash
+bun oracle/scripts/stack-update-helper.ts complete --all-pending
+# or specific IDs:
+bun oracle/scripts/stack-update-helper.ts complete abc123,def456
+```
+
+Auto-chain handles pending→completed in 1 call per task. Auto-rollup completes phases and checks automatically.
 
 ### Step 8: Fix Spec Creation
 
