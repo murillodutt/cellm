@@ -91,6 +91,11 @@
             "type": "http",
             "url": "http://127.0.0.1:31415/api/hooks/plan-guardian",
             "timeout": 3
+          },
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/check-boundary-drift.sh",
+            "timeout": 5
           }
         ]
       },
