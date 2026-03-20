@@ -8,11 +8,6 @@
 
 set -uo pipefail
 
-hook_silent_ok() {
-  printf '{"continue":true,"hookSpecificOutput":{}}\n'
-  exit 0
-}
-
 CELLM_DIR="${HOME}/.cellm"
 LOG_FILE="${CELLM_DIR}/oracle-hook.log"
 # shellcheck disable=SC2034  # Used by sourced _get-port.sh
@@ -27,23 +22,23 @@ input=""
 if [[ ! -t 0 ]]; then
   input=$(head -c 65536 2>/dev/null) || input=""
 fi
-[[ -z "${input}" ]] && hook_silent_ok
+[[ -z "${input}" ]] && exit 0
 
-command -v jq &>/dev/null || hook_silent_ok
+command -v jq &>/dev/null || exit 0
 
 # Reject invalid JSON without failing the hook (jq parse error must not propagate)
 if ! echo "${input}" | jq -e . >/dev/null 2>&1; then
-  hook_silent_ok
+  exit 0
 fi
 
 base_url=$(get_base_url)
 session_id=$(echo "${input}" | jq -r '.session_id // "unknown"')
 prompt_content=$(echo "${input}" | jq -r '.prompt // ""')
 
-[[ "${session_id}" == "unknown" || "${session_id}" == "null" || -z "${session_id}" ]] && hook_silent_ok
+[[ "${session_id}" == "unknown" || "${session_id}" == "null" || -z "${session_id}" ]] && exit 0
 
 # Skip system messages
-[[ "${prompt_content}" == "<task-notification>"* || "${prompt_content}" == "<system-reminder>"* ]] && hook_silent_ok
+[[ "${prompt_content}" == "<task-notification>"* || "${prompt_content}" == "<system-reminder>"* ]] && exit 0
 
 # Truncate long prompts
 [[ ${#prompt_content} -gt 10000 ]] && prompt_content="${prompt_content:0:10000}[truncated]"
@@ -59,4 +54,3 @@ curl -sf --max-time 2 --connect-timeout 0.5 \
   "${base_url}/api/session/prompt" >/dev/null 2>&1 || true
 
 log "Prompt captured (session: ${session_id})"
-hook_silent_ok
