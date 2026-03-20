@@ -13,6 +13,7 @@ DEFAULT_PORT=31415
 log() { echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] [Stop] $1" >> "${LOG_FILE}" 2>/dev/null || true; }
 
 source "$(dirname "${BASH_SOURCE[0]}")/_get-port.sh"
+source "$(dirname "${BASH_SOURCE[0]}")/_get-base-url.sh"
 
 input=""
 [[ ! -t 0 ]] && input=$(head -c 65536)
@@ -20,7 +21,7 @@ input=""
 
 command -v jq &>/dev/null || exit 0
 
-port=$(get_port)
+base_url=$(get_base_url)
 session_id=$(echo "${input}" | jq -r '.session_id // "unknown"')
 stop_reason=$(echo "${input}" | jq -r '.stop_hook_reason // "unknown"')
 hook_event=$(echo "${input}" | jq -r '.hook_event_name // empty')
@@ -48,7 +49,7 @@ if [[ "${hook_event}" == "PreCompact" ]]; then
   curl -sf --max-time 3 --connect-timeout 0.5 \
     -X POST -H "Content-Type: application/json" \
     -d "${payload}" \
-    "http://127.0.0.1:${port}/api/session/compact" >/dev/null 2>&1 || true
+    "${base_url}/api/session/compact" >/dev/null 2>&1 || true
 
   log "Compaction snapshot sent"
 else
@@ -58,7 +59,7 @@ else
   curl -sf --max-time 3 --connect-timeout 0.5 \
     -X POST -H "Content-Type: application/json" \
     -d "${payload}" \
-    "http://127.0.0.1:${port}/api/session/stop" >/dev/null 2>&1 || true
+    "${base_url}/api/session/stop" >/dev/null 2>&1 || true
 
   log "Session stop sent (summary queued)"
 
@@ -70,7 +71,7 @@ else
     (curl -sf --max-time 120 --connect-timeout 1 \
       -X POST -H "Content-Type: application/json" \
       -d "${kf_payload}" \
-      "http://127.0.0.1:${port}/api/session/extract-knowledge" >/dev/null 2>&1 || true) &
+      "${base_url}/api/session/extract-knowledge" >/dev/null 2>&1 || true) &
 
     log "Knowledge extraction triggered (background)"
   fi

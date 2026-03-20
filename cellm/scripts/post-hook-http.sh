@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+# CELLM - HTTP hook wrapper — fail-silent on connection errors
+# Replaces direct "type": "http" hooks to prevent "hook error" in Claude Code UI
+# when Oracle is offline or restarting.
+#
+# Usage: post-hook-http.sh <api-path>
+# Example: post-hook-http.sh /api/hooks/spec-reconcile
+#
+# URL resolution: CELLM_WORKER_URL env var (set in .mcp.json) → worker.json port → default 31415
+#
+# Related files (File Context System):
+#  - cellm-plugin/cellm/hooks/hooks.json
+#  - cellm-plugin/cellm/scripts/_get-port.sh
+
+CELLM_DIR="${HOME}/.cellm"
+# shellcheck disable=SC2034
+DEFAULT_PORT=31415
+
+source "$(dirname "${BASH_SOURCE[0]}")/_get-port.sh"
+source "$(dirname "${BASH_SOURCE[0]}")/_get-base-url.sh"
+
+api_path="${1:-}"
+[[ -z "${api_path}" ]] && exit 0
+
+input=""
+[[ ! -t 0 ]] && input=$(head -c 65536)
+
+base_url=$(get_base_url)
+
+response=$(curl -sf --max-time 3 --connect-timeout 1 \
+  -X POST -H "Content-Type: application/json" \
+  -d "${input:-"{}"}" \
+  "${base_url}${api_path}" 2>/dev/null) || exit 0
+
+# Forward response (hookSpecificOutput) to Claude Code
+[[ -n "${response}" ]] && printf '%s\n' "${response}"

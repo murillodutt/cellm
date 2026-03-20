@@ -13,6 +13,7 @@ DEFAULT_PORT=31415
 log() { echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] [ToolUse] $1" >> "${LOG_FILE}" 2>/dev/null || true; }
 
 source "$(dirname "${BASH_SOURCE[0]}")/_get-port.sh"
+source "$(dirname "${BASH_SOURCE[0]}")/_get-base-url.sh"
 
 input=""
 [[ ! -t 0 ]] && input=$(head -c 65536)
@@ -20,7 +21,6 @@ input=""
 
 command -v jq &>/dev/null || exit 0
 
-port=$(get_port)
 session_id=$(echo "${input}" | jq -r '.session_id // "unknown"')
 tool_name=$(echo "${input}" | jq -r '.tool_name // "unknown"')
 tool_input=$(echo "${input}" | jq -c '.tool_input // {}')
@@ -45,9 +45,11 @@ payload=$(jq -n \
   --arg cwd "${cwd}" \
   '{ sessionId: $sid, project: $proj, toolName: $tn, toolInput: $ti, toolOutput: $tr, cwd: $cwd }')
 
+base_url=$(get_base_url)
+
 curl -sf --max-time 2 --connect-timeout 0.5 \
   -X POST -H "Content-Type: application/json" \
   -d "${payload}" \
-  "http://127.0.0.1:${port}/api/session/observation" >/dev/null 2>&1 || true
+  "${base_url}/api/session/observation" >/dev/null 2>&1 || true
 
 log "Observation: ${tool_name} (session: ${session_id})"

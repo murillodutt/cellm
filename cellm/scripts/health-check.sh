@@ -53,11 +53,13 @@ done
 # Port extraction (shared utility)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/_get-port.sh"
+source "${SCRIPT_DIR}/_get-base-url.sh"
 
 # Quick health check
 check_health() {
-  local port="${1:-$DEFAULT_PORT}"
-  local url="http://127.0.0.1:${port}/health"
+  local base_url="${1:-}"
+  [[ -z "${base_url}" ]] && base_url=$(get_base_url)
+  local url="${base_url}/health"
 
   local response
   response=$(curl -sf --max-time 1 --connect-timeout 0.5 "${url}" 2>/dev/null || echo "")
@@ -71,8 +73,8 @@ check_health() {
 
 # Get detailed status
 get_status() {
-  local port="${1:-$DEFAULT_PORT}"
-  local base_url="http://127.0.0.1:${port}"
+  local base_url="${1:-}"
+  [[ -z "${base_url}" ]] && base_url=$(get_base_url)
 
   # Basic health
   local health_response
@@ -87,7 +89,8 @@ get_status() {
 
 # Wait for readiness
 wait_for_ready() {
-  local port="${1:-$DEFAULT_PORT}"
+  local base_url="${1:-}"
+  [[ -z "${base_url}" ]] && base_url=$(get_base_url)
   local timeout="${2:-$READINESS_TIMEOUT}"
 
   # Validate timeout is a positive number
@@ -101,7 +104,7 @@ wait_for_ready() {
   max_iterations=$((timeout * 5))  # timeout / 0.2 = timeout * 5
 
   for _i in $(seq 1 "${max_iterations}"); do
-    if check_health "${port}" >/dev/null 2>&1; then
+    if check_health "${base_url}" >/dev/null 2>&1; then
       return 0
     fi
     sleep "${sleep_interval}"
@@ -113,18 +116,18 @@ wait_for_ready() {
 # Output result
 output_result() {
   local status="$1"
-  local port="$2"
+  local url="$2"
   local details="$3"
 
   if ${JSON_OUTPUT}; then
     local ts
     ts=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-    echo "{\"timestamp\":\"${ts}\",\"status\":\"${status}\",\"port\":${port},\"details\":${details:-null}}"
+    echo "{\"timestamp\":\"${ts}\",\"status\":\"${status}\",\"url\":\"${url}\",\"details\":${details:-null}}"
   else
     if [[ "${status}" == "healthy" ]]; then
-      echo "[+] Worker healthy at port ${port}"
+      echo "[+] Worker healthy at ${url}"
     else
-      echo "[-] Worker not responding at port ${port}"
+      echo "[-] Worker not responding at ${url}"
       echo "    Start with: cd oracle && bun --bun worker/index.ts"
     fi
 
@@ -136,31 +139,31 @@ output_result() {
 
 # Main execution
 main() {
-  local port
-  port=$(get_port)
+  local base_url
+  base_url=$(get_base_url)
 
   # Readiness check (wait for worker to come up)
   if ${READINESS_CHECK}; then
-    if wait_for_ready "${port}"; then
-      output_result "healthy" "${port}"
+    if wait_for_ready "${base_url}"; then
+      output_result "healthy" "${base_url}"
       exit 0
     else
-      output_result "timeout" "${port}"
+      output_result "timeout" "${base_url}"
       exit 1
     fi
   fi
 
   # Standard health check
   local health_response
-  if health_response=$(check_health "${port}"); then
+  if health_response=$(check_health "${base_url}"); then
     local details=""
     if ${VERBOSE}; then
-      details=$(get_status "${port}")
+      details=$(get_status "${base_url}")
     fi
-    output_result "healthy" "${port}" "${details:-${health_response}}"
+    output_result "healthy" "${base_url}" "${details:-${health_response}}"
     exit 0
   else
-    output_result "down" "${port}"
+    output_result "down" "${base_url}"
     exit 1
   fi
 }

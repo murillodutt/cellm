@@ -27,7 +27,7 @@ One entry point, four modes. Detect project tooling automatically, never assume.
 | Project root | `git rev-parse --show-toplevel` | cwd |
 | Test runner | package.json scripts/deps: vitest > jest > bun > npm test | Skip tests |
 | Typecheck | nuxt.config.ts > tsconfig.json | Skip typecheck |
-| Oracle | `curl -sf --max-time 2 http://127.0.0.1:31415/health` | Skip Oracle features |
+| Oracle | `curl -sf --max-time 2 "${CELLM_WORKER_URL:-http://127.0.0.1:31415}/health"` | Skip Oracle features |
 
 Oracle integration is **optional** — Arena works fully without it. When online: ingest snapshots (`POST /api/arena/ingest`), append trends (`GET /api/arena/trends`).
 

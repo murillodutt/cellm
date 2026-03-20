@@ -16,6 +16,7 @@ DEFAULT_PORT=31415
 log() { echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] [Prompt] $1" >> "${LOG_FILE}" 2>/dev/null || true; }
 
 source "$(dirname "${BASH_SOURCE[0]}")/_get-port.sh"
+source "$(dirname "${BASH_SOURCE[0]}")/_get-base-url.sh"
 
 input=""
 if [[ ! -t 0 ]]; then
@@ -30,7 +31,7 @@ if ! echo "${input}" | jq -e . >/dev/null 2>&1; then
   exit 0
 fi
 
-port=$(get_port)
+base_url=$(get_base_url)
 session_id=$(echo "${input}" | jq -r '.session_id // "unknown"')
 prompt_content=$(echo "${input}" | jq -r '.prompt // ""')
 
@@ -50,6 +51,6 @@ payload=$(jq -n \
 curl -sf --max-time 2 --connect-timeout 0.5 \
   -X POST -H "Content-Type: application/json" \
   -d "${payload}" \
-  "http://127.0.0.1:${port}/api/session/prompt" >/dev/null 2>&1 || true
+  "${base_url}/api/session/prompt" >/dev/null 2>&1 || true
 
 log "Prompt captured (session: ${session_id})"

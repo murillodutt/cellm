@@ -11,13 +11,13 @@
             "timeout": 15
           },
           {
-            "type": "http",
-            "url": "http://127.0.0.1:31415/api/hooks/init",
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/post-hook-http.sh /api/hooks/init",
             "timeout": 5
           },
           {
-            "type": "http",
-            "url": "http://127.0.0.1:31415/api/hooks/context",
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/post-hook-http.sh /api/hooks/context",
             "timeout": 8
           }
         ]
@@ -33,13 +33,13 @@
             "async": true
           },
           {
-            "type": "http",
-            "url": "http://127.0.0.1:31415/api/knowledge/inject",
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/post-hook-http.sh /api/knowledge/inject",
             "timeout": 3
           },
           {
-            "type": "http",
-            "url": "http://127.0.0.1:31415/api/hooks/specs",
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/post-hook-http.sh /api/hooks/specs",
             "timeout": 3
           }
         ]
@@ -50,8 +50,8 @@
         "matcher": "Edit|Write",
         "hooks": [
           {
-            "type": "http",
-            "url": "http://127.0.0.1:31415/api/hooks/check-tags",
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/post-hook-http.sh /api/hooks/check-tags",
             "timeout": 2
           }
         ]
@@ -88,8 +88,8 @@
             "timeout": 1
           },
           {
-            "type": "http",
-            "url": "http://127.0.0.1:31415/api/hooks/plan-guardian",
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/post-hook-http.sh /api/hooks/plan-guardian",
             "timeout": 3
           },
           {
@@ -103,8 +103,8 @@
         "matcher": "Bash",
         "hooks": [
           {
-            "type": "http",
-            "url": "http://127.0.0.1:31415/api/hooks/spec-reconcile",
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/post-hook-http.sh /api/hooks/spec-reconcile",
             "timeout": 5
           }
         ]
