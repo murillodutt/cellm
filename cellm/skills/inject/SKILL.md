@@ -1,5 +1,5 @@
 ---
-description: Inject relevant patterns into the current context. Analyzes work context to suggest matching patterns, or directly injects specified pattern files.
+description: "Inject relevant CELLM patterns into the current context. Analyzes work context to suggest matching patterns from cellm-core/patterns/, or directly injects specified pattern files. Use when: 'inject patterns', 'what patterns apply here', 'load pattern X'."
 user-invocable: true
 argument-hint: "[pattern-path...]"
 allowed-tools: Read, Grep, Glob, AskUserQuestion

@@ -1,5 +1,5 @@
 ---
-description: Generate a comprehensive JOURNAL.md documenting project structure and architecture. Detects project type, extracts metadata from package.json and conveyor, and produces a single-file onboarding overview.
+description: "Docops: generate a comprehensive JOURNAL.md documenting project structure and architecture. Detects project type, extracts metadata, produces a single-file onboarding overview. Use when: 'generate journal', 'create project overview', 'onboarding doc'."
 user-invocable: true
 argument-hint: "[output-path]"
 ---

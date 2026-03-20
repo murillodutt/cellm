@@ -1,5 +1,5 @@
 ---
-description: "Start an Olympus Triad session — autonomous quality cycle with Argus, Asclepius, and Hefesto. Use when: 'run olympus', 'start triad', 'autonomous quality check', 'olympus on X'."
+description: "Start a CELLM Olympus Triad session — autonomous quality cycle orchestrating Argus (examine), Asclepius (cure), and Hefesto (build) until convergence. Use when: 'run olympus', 'start triad', 'autonomous quality check', 'olympus on X'."
 ---
 
 # Olympus — Autonomous Triad Orchestrator

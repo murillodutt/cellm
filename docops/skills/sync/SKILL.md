@@ -1,5 +1,5 @@
 ---
-description: Refresh code evidence, gaps, and derived documentation. Updates evidence files first, then conveyor-gaps with conflicts, then propagates to SPECs/REFs/HOWTOs/RUNBOOKs.
+description: "Docops: refresh code evidence, gaps, and derived documentation. Updates evidence first, then conveyor-gaps, then propagates to SPECs/REFs/HOWTOs/RUNBOOKs. Use when: 'sync docs', 'refresh evidence', 'update documentation chain'."
 user-invocable: true
 argument-hint: "[docRoot]"
 ---

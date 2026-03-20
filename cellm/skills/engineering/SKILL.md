@@ -1,5 +1,5 @@
 ---
-description: Four engineering axioms that calibrate all code decisions. Activates on source files to enforce ONE VERSION, RESOLVE>SILENCE, LAZY>EAGER, NOW>LATER.
+description: Four CELLM engineering axioms that calibrate all code decisions: ONE VERSION, RESOLVE>SILENCE, LAZY>EAGER, NOW>LATER. Activates on source files. Use when editing code to enforce consistent engineering principles across the codebase.
 user-invocable: false
 ---
 

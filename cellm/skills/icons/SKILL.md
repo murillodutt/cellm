@@ -1,5 +1,5 @@
 ---
-description: Icon system routing — two systems (ASCII for text, Nuxt UI/Iconify for Vue), one consistent language. Apply when rendering status, icons, or visual indicators in any file type.
+description: Icon system routing — ASCII icons for text/CLI, Nuxt UI/Iconify for Vue components. One consistent visual language. Activates when rendering status indicators, icons, or visual markers in any file type.
 user-invocable: false
 ---
 

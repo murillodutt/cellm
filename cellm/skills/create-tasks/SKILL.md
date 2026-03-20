@@ -1,5 +1,5 @@
 ---
-description: Break a requirement into dependency-ordered task groups in the spec database. Decomposes checks into phases and tasks with DAG ordering.
+description: "Break a requirement into dependency-ordered task groups in the CellmOS spec database. Decomposes checks into phases and tasks with DAG ordering. Use when: 'decompose this check', 'create tasks for spec', 'break this into phases'."
 user-invocable: true
 argument-hint: "[check title or search term]"
 allowed-tools: mcp__cellm-oracle__spec_decompose, mcp__cellm-oracle__spec_create_node, mcp__cellm-oracle__spec_get_tree, mcp__cellm-oracle__spec_add_edge, mcp__cellm-oracle__spec_search, mcp__cellm-oracle__spec_get_counters, mcp__plugin_cellm_cellm-oracle__dse_search, mcp__plugin_cellm_cellm-oracle__dse_get, AskUserQuestion

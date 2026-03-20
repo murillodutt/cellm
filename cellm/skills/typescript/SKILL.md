@@ -1,5 +1,5 @@
 ---
-description: TypeScript patterns for type-safe code. Activates on .ts/.tsx files to enforce strict typing, Zod validation, and proper use of generics and utility types.
+description: TypeScript patterns for type-safe code. Activates on .ts/.tsx files to enforce strict typing, Zod v4 validation, and proper use of generics and utility types. Use when editing TypeScript to ensure type contracts and boundary validation.
 user-invocable: false
 ---
 

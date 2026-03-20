@@ -1,5 +1,5 @@
 ---
-description: Passive knowledge classifier — routes discoveries to EPHEMERAL, REUSABLE, or ARCHITECTURAL before moving on. Activates when the agent encounters insights, gotchas, decisions, or non-obvious behavior during any work.
+description: Passive CELLM knowledge classifier — routes mid-task discoveries to EPHEMERAL, REUSABLE, or ARCHITECTURAL before moving on. Activates when encountering insights, gotchas, decisions, or non-obvious behavior during any work.
 user-invocable: false
 ---
 

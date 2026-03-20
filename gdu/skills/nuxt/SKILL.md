@@ -1,5 +1,5 @@
 ---
-description: Nuxt 4 patterns for full-stack Vue applications. Activates on nuxt.config, app/, server/, and pages/ to enforce correct data fetching, routing, server/client separation, and Nuxt UI integrations.
+description: Nuxt 4 patterns for full-stack Vue applications. Activates on nuxt.config, app/, server/, and pages/ to enforce correct data fetching, routing, server/client separation, and Nuxt UI v4 integrations. Use when editing Nuxt pages, layouts, middleware, or server routes.
 user-invocable: false
 ---
 

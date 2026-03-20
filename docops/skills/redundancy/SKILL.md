@@ -1,5 +1,5 @@
 ---
-description: Detect redundant and duplicate content across documentation files. Compares heading structures (Jaccard similarity), extracts topic keywords, and reports consolidation opportunities ranked by severity.
+description: "Docops: detect redundant and duplicate content across documentation files. Compares heading structures (Jaccard similarity), extracts topic keywords, reports consolidation opportunities. Use when: 'find duplicates', 'redundancy check', 'consolidate docs'."
 user-invocable: true
 argument-hint: "[docRoot] [--threshold N]"
 ---

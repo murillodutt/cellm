@@ -1,5 +1,5 @@
 ---
-description: Manage complete documentation lifecycle from creation to archival and restoration. Handles undeprecation, restoration from archive, conflict resolution, and state transition logging.
+description: "Docops: manage complete documentation lifecycle — creation, deprecation, archival, restoration, undeprecation. Handles conflict resolution and state transition logging. Use when: 'lifecycle', 'restore doc', 'archive and restore'."
 user-invocable: true
 argument-hint: "<action> <file> [options]"
 ---

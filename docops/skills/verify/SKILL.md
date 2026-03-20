@@ -1,5 +1,5 @@
 ---
-description: Validate documentation structure, required sections, evidence links, normative vocabulary, and drift control artifacts. Reports missing files, broken references, and vocabulary violations.
+description: "Docops: validate documentation structure, required sections, evidence links, normative vocabulary, and drift control artifacts. Reports missing files, broken references, vocabulary violations. Use when: 'verify docs', 'check doc structure', 'validate documentation'."
 user-invocable: true
 argument-hint: "[docRoot]"
 ---

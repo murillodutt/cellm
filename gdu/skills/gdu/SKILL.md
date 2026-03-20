@@ -1,5 +1,5 @@
 ---
-description: Passive frontend architecture orchestrator. Triggers automatically when users request UI/Frontend components, pages, or layouts.
+description: Frontend architecture orchestrator for Nuxt 4, Vue 3, Nuxt UI v4, and Tailwind v4. Routes to specialist GDU skills (vue, nuxt, tailwind, pinia) and enforces DSE decisions. Triggers when users request UI components, pages, layouts, or frontend work.
 user-invocable: false
 ---
 

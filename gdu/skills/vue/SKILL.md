@@ -1,5 +1,5 @@
 ---
-description: Vue 3 Composition API patterns for components and composables. Activates when editing .vue files or composables to enforce script setup, typed props/emits, and canonical section ordering.
+description: Vue 3 Composition API patterns for components and composables. Activates on .vue files to enforce script setup, typed props/emits, and canonical section ordering. Use when creating or editing Vue components, composables, or template logic.
 user-invocable: false
 ---
 

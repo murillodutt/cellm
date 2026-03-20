@@ -1,5 +1,5 @@
 ---
-description: Restore an archived document back to active status. Handles conflict resolution when the original path is occupied, preserves lifecycle metadata.
+description: "Docops: restore an archived document back to active status. Handles conflict resolution when the original path is occupied, preserves lifecycle metadata. Use when: 'restore doc', 'unarchive', 'bring back archived file'."
 user-invocable: true
 argument-hint: "<file>"
 ---

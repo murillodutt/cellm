@@ -1,5 +1,5 @@
 ---
-description: Drizzle ORM patterns for type-safe database operations. Activates on schema files, db directories, and drizzle config to enforce proper schema definitions, relations, and query patterns.
+description: Drizzle ORM patterns for type-safe database operations. Activates on schema files, db directories, and drizzle config to enforce proper schema definitions, relations, and query patterns. Use when editing database schemas, writing migrations, or composing Drizzle queries.
 user-invocable: false
 ---
 

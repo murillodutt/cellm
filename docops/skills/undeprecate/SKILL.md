@@ -1,5 +1,5 @@
 ---
-description: Reverse a deprecation, restoring a document from deprecated status back to active. Removes deprecation banner, clears deprecation frontmatter, and updates references.
+description: "Docops: reverse a deprecation, restoring a document from deprecated to active status. Removes deprecation banner, clears frontmatter, updates references. Use when: 'undeprecate', 'reverse deprecation', 'reactivate doc'."
 user-invocable: true
 argument-hint: "<file>"
 ---

@@ -1,5 +1,5 @@
 ---
-description: Pinia state management for Vue/Nuxt applications. Activates on store files to enforce Setup Store syntax, storeToRefs destructuring, and focused single-domain stores.
+description: Pinia state management for Vue/Nuxt applications. Activates on store files to enforce Setup Store syntax, storeToRefs destructuring, and focused single-domain stores. Use when creating or editing Pinia stores, composables with shared state, or store-consuming components.
 user-invocable: false
 ---
 

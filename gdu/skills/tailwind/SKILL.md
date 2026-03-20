@@ -1,5 +1,5 @@
 ---
-description: Tailwind CSS v4 + Nuxt UI v4 semantic design system. Activates on .vue and .css files to enforce semantic tokens, CSS variables, Tailwind Variants, and automatic dark mode.
+description: Tailwind CSS v4 + Nuxt UI v4 semantic design system. Activates on .vue and .css files to enforce semantic tokens, CSS variables, Tailwind Variants, and automatic dark mode. Use when styling components to ensure design system compliance and dark mode support.
 user-invocable: false
 ---
 

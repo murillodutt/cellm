@@ -1,5 +1,5 @@
 ---
-description: Version control framework for AI-era development. Apply before any version bump, release decision, or when version inflation is detected. Covers SemVer, EffVer, pre-release tags, sync protocol, and anti-inflation strategies.
+description: CELLM version control framework — apply before any version bump, release decision, or when version inflation is detected. Covers SemVer, EffVer, pre-release tags, sync protocol, and anti-inflation strategies. For deep multi-scheme guidance, use cellm:version-control.
 user-invocable: false
 ---
 

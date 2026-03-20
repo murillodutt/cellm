@@ -1,5 +1,5 @@
 ---
-description: Scan a project to extract design system signals and bootstrap its DSE. Detects framework, colors, typography, and components, then applies a preset, imports palette, and indexes chunks. Accepts project directories, Figma HTML exports, W3C DTCG .tokens.json files, Figma MCP output, and palette URLs.
+description: "Scan a project to extract design system signals and bootstrap its CELLM DSE. Detects framework, colors, typography, and components. Accepts project directories, Figma HTML exports, W3C DTCG .tokens.json, Figma MCP output, and palette URLs. Use when: 'discover design system', 'bootstrap DSE', 'scan project for tokens'."
 user-invocable: true
 argument-hint: "[project-path or file-path or URL]"
 allowed-tools: Bash(curl *), Read, Grep, Glob, AskUserQuestion

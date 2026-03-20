@@ -1,5 +1,5 @@
 ---
-description: Extract tribal knowledge from your codebase into documented patterns. Analyzes code for unusual, opinionated, or tribal conventions and writes them as concise, scannable pattern files.
+description: "Extract tribal knowledge from a codebase into CELLM pattern files in cellm-core/patterns/. Analyzes code for unusual, opinionated, or tribal conventions. Use when: 'discover patterns', 'extract conventions', 'what patterns exist here'."
 user-invocable: true
 argument-hint: "[focus area]"
 allowed-tools: Read, Grep, Glob, Write, Edit, AskUserQuestion

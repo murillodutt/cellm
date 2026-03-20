@@ -1,5 +1,5 @@
 ---
-description: Search Oracle context and observations using semantic vector search. Uses a 3-layer retrieval pattern (search index, timeline context, full observations) to minimize token usage.
+description: "Search CELLM Oracle context and observations using semantic vector search. Uses 3-layer retrieval (search index, timeline context, full observations) to minimize tokens. Use when: 'search oracle', 'find in observations', 'oracle search for X'."
 user-invocable: true
 argument-hint: "query: your search query"
 allowed-tools: mcp__cellm-oracle__search, mcp__cellm-oracle__timeline, mcp__cellm-oracle__get_observations

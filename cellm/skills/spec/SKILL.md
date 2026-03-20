@@ -1,5 +1,5 @@
 ---
-description: CellmOS command center. List pending specs, create new checks, view status, and manage the atomic spec-driven system. Entry point for all spec operations.
+description: "CellmOS command center — list pending specs, create new checks, view status, and manage the atomic spec-driven system in Oracle DB. Entry point for all spec operations. Use when: 'show specs', 'create spec', 'spec status', 'list checks'."
 user-invocable: true
 argument-hint: "[action]: (empty) | create <title> | status | treat <check>"
 allowed-tools: mcp__cellm-oracle__spec_create_node, mcp__cellm-oracle__spec_transition, mcp__cellm-oracle__spec_search, mcp__cellm-oracle__spec_get_tree, mcp__cellm-oracle__spec_add_edge, mcp__cellm-oracle__spec_add_verification, mcp__cellm-oracle__spec_get_counters, AskUserQuestion

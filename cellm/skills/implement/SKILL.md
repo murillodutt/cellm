@@ -1,5 +1,5 @@
 ---
-description: Implement code from spec context in the database. Loads spec tree, picks next pending task, writes code, transitions state on completion.
+description: "Implement code from CellmOS spec context. Loads spec tree from Oracle DB, picks next pending task, writes code, runs quality gate, transitions state on completion. Use when: 'implement next task', 'implement spec', 'pick next task'."
 user-invocable: true
 argument-hint: "[task description or check title]"
 allowed-tools: mcp__cellm-oracle__spec_get_tree, mcp__cellm-oracle__spec_search, mcp__cellm-oracle__spec_transition, mcp__cellm-oracle__spec_create_node, mcp__cellm-oracle__spec_get_verifications, mcp__cellm-oracle__spec_record_verification, mcp__plugin_cellm_cellm-oracle__quality_gate, mcp__plugin_cellm_cellm-oracle__dse_search, mcp__plugin_cellm_cellm-oracle__dse_get, mcp__plugin_cellm_cellm-oracle__directive_emit, mcp__plugin_cellm_cellm-oracle__directive_emit_for_phase, mcp__plugin_cellm_cellm-oracle__directive_verify, mcp__plugin_cellm_cellm-oracle__directive_list, Read, Grep, Glob, Write, Edit, Bash(npx *), Bash(bun *), AskUserQuestion

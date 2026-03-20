@@ -1,5 +1,5 @@
 ---
-description: Garbage collection for resolved gaps, stale evidence, and redundant content. Scans conveyor-gaps.md for resolved entries, validates evidence freshness, detects structural duplicates, and archives cleaned items.
+description: "Docops: garbage collection for resolved gaps, stale evidence, and redundant content. Scans conveyor-gaps.md, validates freshness, detects duplicates, archives cleaned items. Use when: 'gc docs', 'clean gaps', 'garbage collect documentation'."
 user-invocable: true
 argument-hint: "[docRoot] [--dry-run]"
 ---

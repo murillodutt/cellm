@@ -1,5 +1,5 @@
 ---
-description: "Deep system block observatory — maps every relationship, flow, and gap of a codebase subsystem into a polished technical document. Use when analyzing a block, module, feature, or subsystem end-to-end: 'analyze this block', 'map this subsystem', 'document this feature completely', 'argus on X'."
+description: "CELLM deep system examiner — maps relationships, flows, and gaps of a codebase block into a structured findings report. Use when: 'analyze this block', 'map this subsystem', 'argus on X'. Produces the examination that Asclepius cures and Hefesto builds from."
 user-invocable: true
 argument-hint: "[block or subsystem name]"
 ---

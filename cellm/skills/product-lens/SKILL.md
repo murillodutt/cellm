@@ -1,5 +1,5 @@
 ---
-description: Product thinking filter — every feature, skill, and API must work for external developers in any project, not just CELLM's own repository.
+description: CELLM product thinking filter — every feature, skill, and API must work for external developers in any project, not just CELLM's own repository. Activates when designing plugin surfaces, Oracle APIs, MCP tools, or NPM-facing behavior.
 user-invocable: false
 ---
 

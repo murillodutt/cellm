@@ -1,5 +1,5 @@
 ---
-description: Audit the DSE for quality, coverage, and alignment with the codebase. Use when reviewing design system completeness or checking if UI code follows DSE decisions.
+description: "Audit the CELLM Design System Engine for quality, coverage, and codebase alignment. Use when: 'audit DSE', 'check design system', 'are UI components following DSE decisions', 'review design system completeness'."
 user-invocable: true
 argument-hint: "[project or component scope]"
 ---

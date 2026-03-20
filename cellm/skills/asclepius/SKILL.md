@@ -1,5 +1,5 @@
 ---
-description: "Surgical fix engine — reads an Argus report, triages findings by operability, creates CellmOS specs for every action, and executes cure loops until verified. Use after an Argus examination: 'cure this block', 'fix the timeline findings', 'asclepius on timeline', 'operate on the argus report'."
+description: "CELLM surgical fix engine — reads Argus findings, triages by operability, creates CellmOS specs, and executes cure loops until verified. Use after Argus: 'cure this block', 'fix the findings', 'asclepius on X', 'operate on the report'. Does not build new features (that is Hefesto)."
 user-invocable: true
 argument-hint: "[block or target name]"
 ---

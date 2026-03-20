@@ -1,5 +1,5 @@
 ---
-description: "Feature construction engine — builds new capabilities from CONSTRUCT findings or direct feature requests. Researches current technology, designs architecture, decomposes into specs, implements end-to-end, and certifies via Argus. Use when building new features, implementing deferred CONSTRUCT items from Argus/Asclepius, creating new subsystems, adding new API endpoints or pipelines, or when told to 'build', 'construct', 'create feature', 'implement new', or 'hefesto'. Also activates on 'the G1 needs building', 'implement the CONSTRUCT items', or 'build SSE for X'."
+description: "CELLM feature construction engine — builds new capabilities from CONSTRUCT findings or direct feature requests. Designs architecture, decomposes into CellmOS specs, implements end-to-end, certifies via Argus. Use when: 'build', 'construct', 'create feature', 'implement new', 'hefesto on X', 'implement the CONSTRUCT items'. Does not fix existing code (that is Asclepius)."
 user-invocable: true
 argument-hint: "[feature description, CONSTRUCT finding ID, or block target]"
 ---

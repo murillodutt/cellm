@@ -1,5 +1,5 @@
 ---
-description: Design System Engine — injects project-specific design decisions before UI work. Activates on .vue files to ensure project tokens, patterns, and compositions override framework defaults.
+description: CELLM Design System Engine — injects project-specific design decisions before UI work. Activates on .vue files to ensure project tokens, patterns, and compositions override framework defaults. Use when creating or editing UI components to check DSE decisions first.
 user-invocable: false
 ---
 

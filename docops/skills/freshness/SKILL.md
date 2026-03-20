@@ -1,5 +1,5 @@
 ---
-description: Validate and maintain freshness status of code evidence files. Checks last_verified dates, transitions status between fresh/stale/expired, and creates gaps for expired evidence.
+description: "Docops: validate and maintain freshness status of code evidence files. Checks last_verified dates, transitions fresh/stale/expired, creates gaps for expired evidence. Use when: 'check freshness', 'stale evidence', 'validate dates'."
 user-invocable: true
 argument-hint: "[docRoot] [--update]"
 ---

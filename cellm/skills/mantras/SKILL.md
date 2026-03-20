@@ -1,5 +1,5 @@
 ---
-description: Three work process mantras. Apply BEFORE planning and BEFORE writing code. Activates on all files to enforce deep verification, best-path thinking, and documentation-first approach.
+description: Three CELLM work process mantras: verify before you act, take the best path, document everything. Activates BEFORE planning and BEFORE writing code to enforce deep verification, best-path thinking, and documentation-first approach.
 user-invocable: false
 ---
 
