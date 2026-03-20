@@ -4,10 +4,10 @@
 # Detects frontend work intent (subject + action verb) and injects GDU framework.
 # Event: UserPromptSubmit
 # Behavior: Non-blocking, injects context via stdout
+#
+# No set -e: stdin/json edge cases must not fail the hook (UserPromptSubmit hook error).
 
-set -e
-
-INPUT=$(cat)
+INPUT=$(cat || true)
 
 # Extract prompt from JSON using sed (macOS compatible)
 PROMPT=$(echo "$INPUT" | sed -n 's/.*"prompt"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)

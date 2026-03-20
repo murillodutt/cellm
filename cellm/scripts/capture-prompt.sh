@@ -2,8 +2,11 @@
 # CELLM Oracle - Capture Prompt v2 (UserPromptSubmit hook, async)
 # Captures user prompts during session for context building.
 # Runs with "async": true — non-blocking, errors are non-visible.
+#
+# Never exit non-zero: Claude Code surfaces UserPromptSubmit hook errors to the user.
+# Invalid JSON, missing jq, or empty stdin must be silent success.
 
-set -euo pipefail
+set -uo pipefail
 
 CELLM_DIR="${HOME}/.cellm"
 LOG_FILE="${CELLM_DIR}/oracle-hook.log"
@@ -15,10 +18,17 @@ log() { echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] [Prompt] $1" >> "${LOG_FILE}" 2>/
 source "$(dirname "${BASH_SOURCE[0]}")/_get-port.sh"
 
 input=""
-[[ ! -t 0 ]] && input=$(head -c 65536)
+if [[ ! -t 0 ]]; then
+  input=$(head -c 65536 2>/dev/null) || input=""
+fi
 [[ -z "${input}" ]] && exit 0
 
 command -v jq &>/dev/null || exit 0
+
+# Reject invalid JSON without failing the hook (jq parse error must not propagate)
+if ! echo "${input}" | jq -e . >/dev/null 2>&1; then
+  exit 0
+fi
 
 port=$(get_port)
 session_id=$(echo "${input}" | jq -r '.session_id // "unknown"')
