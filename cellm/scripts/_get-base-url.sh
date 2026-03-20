@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 # CELLM — Shared base URL resolution for Oracle worker
 # Source this file, then call: get_base_url
 #

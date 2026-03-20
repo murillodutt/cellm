@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 # CELLM Health Gate — Shared health check with retry for critical hooks
 # Source this file, then call: health_gate "critical" or health_gate "non-critical"
 # Requires: _get-port.sh and _get-base-url.sh sourced beforehand (or source them here)
@@ -28,6 +29,6 @@ health_gate() {
   done
 
   # All retries exhausted — block the hook
-  log "Worker offline after retries, blocking hook"
+  echo "[CELLM] Worker offline after retries, blocking hook" >&2
   exit 2
 }

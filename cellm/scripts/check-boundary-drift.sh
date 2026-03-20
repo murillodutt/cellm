@@ -32,11 +32,11 @@ file_path=$(echo "${input}" | sed -n 's/.*"file_path"[[:space:]]*:[[:space:]]*"\
 case "${file_path}" in
   *schema.ts|*client.ts)
     # Schema edit → run auto-fix (proactive patching)
-    output=$(cd "${CLAUDE_PROJECT_DIR}/oracle" && bun run scripts/boundary-auto-fix.ts 2>&1 | tail -1) || true
+    output=$(cd "${CLAUDE_PROJECT_DIR}/oracle" && timeout 4 bun run scripts/boundary-auto-fix.ts 2>&1 | tail -1) || true
     ;;
   *boundary.yml)
     # Boundary edit → detect-only (don't auto-fix what the user is manually editing)
-    output=$(cd "${CLAUDE_PROJECT_DIR}/oracle" && bun run scripts/validate-boundary.ts 2>&1 | tail -1) || true
+    output=$(cd "${CLAUDE_PROJECT_DIR}/oracle" && timeout 4 bun run scripts/validate-boundary.ts 2>&1 | tail -1) || true
     ;;
   *) exit 0 ;;
 esac

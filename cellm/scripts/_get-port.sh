@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 # CELLM — Shared port extraction from worker.json
 # Source this file, then call: get_port
 #
