@@ -4,6 +4,8 @@ description: "Start a CELLM Olympus Triad session — autonomous quality cycle o
 
 # Olympus — Autonomous Triad Orchestrator
 
+> **Execute linearly, no agents.**
+
 The mantra is the soul of Olympus. Every god carries it as an active mental gate — not a motto, but a protection mechanism (Sanskrit: man + tra = instrument of the mind). The triad cycle IS the mantra made operational: Argus VERIFIES, Asclepius takes the BEST PATH, Hefesto DOCUMENTS everything through construction.
 
 Thin wrapper that starts an Olympus session. The engine handles the rest.
