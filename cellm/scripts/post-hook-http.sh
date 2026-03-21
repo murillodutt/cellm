@@ -59,8 +59,10 @@ else
       '{hookSpecificOutput:{hookEventName:$event,additionalContext:.}}' 2>/dev/null \
       || printf '{"hookSpecificOutput":{"hookEventName":"%s"}}\n' "${hook_event}"
   else
+    # hook_event unknown — still include hookEventName with fallback "Unknown"
+    # to satisfy Claude Code validation (hookSpecificOutput without hookEventName is INVALID)
     printf '%s' "${response}" | jq -Rc \
-      '{hookSpecificOutput:{additionalContext:.}}' 2>/dev/null \
-      || printf '{"hookSpecificOutput":{}}\n'
+      '{hookSpecificOutput:{hookEventName:"Unknown",additionalContext:.}}' 2>/dev/null \
+      || printf '{"hookSpecificOutput":{"hookEventName":"Unknown"}}\n'
   fi
 fi

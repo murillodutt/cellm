@@ -43,7 +43,7 @@ esac
 
 [[ -z "${output}" ]] && exit 0
 
-# Sanitize for JSON embedding (no jq): collapse newlines, escape quotes/backslashes, limit length
-output=$(echo "${output}" | tr '\n' ' ' | sed 's/["\\]/\\&/g' | head -c 300)
+# Sanitize for JSON embedding (no jq): collapse newlines/tabs/control chars, escape quotes/backslashes, limit length
+output=$(echo "${output}" | tr '\n\t\r' '   ' | sed 's/["\\]/\\&/g' | head -c 300)
 
 printf '{"hookSpecificOutput":{"hookEventName":"PostToolUse","additionalContext":"[BOUNDARY] %s"}}\n' "${output}"

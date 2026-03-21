@@ -33,8 +33,8 @@ esac
 header_block=$(head -30 "${file_path}" 2>/dev/null) || exit 0
 echo "${header_block}" | grep -q "Related files" || exit 0
 
-# Extract related file paths
-related_files=$(echo "${header_block}" | grep -E '^\s*\*?\s*-\s+\S+' | sed -E 's/^[[:space:]]*\*?[[:space:]]*-[[:space:]]+([^[:space:]]+).*/\1/' | tr '\n' ', ' | sed 's/,$//')
+# Extract related file paths and sanitize for JSON (neutralize control chars, escape quotes)
+related_files=$(echo "${header_block}" | grep -E '^\s*\*?\s*-\s+\S+' | sed -E 's/^[[:space:]]*\*?[[:space:]]*-[[:space:]]+([^[:space:]]+).*/\1/' | tr '\n\t\r' ',  ' | sed 's/,$//' | sed 's/["\\]/\\&/g')
 [[ -z "${related_files}" ]] && exit 0
 
 printf '{"hookSpecificOutput":{"hookEventName":"PostToolUse","additionalContext":"[FILE-CONTEXT] This file has Related files. Read them before continuing: %s"}}\n' "${related_files}"

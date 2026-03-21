@@ -19,5 +19,11 @@ echo "$PROMPT" | grep -qiE '(cria|crie|fac|faz|constr|desenh|mont|implement|ajus
 
 MSG="[GDU] Frontend intent detected. Engage the Goold Design UI (GDU) Framework before writing code. Process: 1. Contextual Anchoring (verify Tailwind config, DSE tokens, Nuxt structure). 2. Architectural Deconstruction (Atomic Design: atoms/molecules/organisms). 3. Propose a Markdown Spec to the user. 4. Implement only after approval. Consult Nuxt UI MCP Server (nuxt-ui-remote) for component APIs."
 # Wrap in hook JSON envelope — plain text stdout causes "UserPromptSubmit hook error"
-escaped=$(printf '%s' "$MSG" | sed 's/\\/\\\\/g; s/"/\\"/g')
-printf '{"additionalContext":"%s"}\n' "$escaped"
+# Use jq for safe JSON escaping (handles all control chars, quotes, backslashes)
+if command -v jq >/dev/null 2>&1; then
+  printf '%s' "$MSG" | jq -Rc '{additionalContext:.}'
+else
+  # Fallback: manual escaping (only quotes and backslashes — less safe but functional)
+  escaped=$(printf '%s' "$MSG" | sed 's/\\/\\\\/g; s/"/\\"/g')
+  printf '{"additionalContext":"%s"}\n' "$escaped"
+fi
