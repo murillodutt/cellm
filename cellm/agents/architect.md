@@ -2,7 +2,6 @@
 description: Software architect specialized in Nuxt 4 and system design. Plans features, defines architecture, makes technical decisions, researches solutions, and writes specifications. Produces specs and decisions — never code.
 disallowedTools: Write, Edit, Bash, NotebookEdit
 model: opus
-permissionMode: plan
 skills:
   - nuxt
   - typescript

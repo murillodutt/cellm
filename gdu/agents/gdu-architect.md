@@ -2,7 +2,6 @@
 description: Frontend architect for Vue 3, Nuxt 4, and Nuxt UI v4. Plans UI structure, verifies component contracts via Nuxt UI MCP, enforces semantic design tokens, and produces UI specifications. Produces specs and decisions — never code.
 disallowedTools: Write, Edit, Bash, NotebookEdit
 model: opus
-permissionMode: plan
 skills:
   - vue
   - tailwind

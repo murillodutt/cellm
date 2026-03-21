@@ -2,7 +2,6 @@
 description: Senior frontend developer for Vue 3, Nuxt 4, and Nuxt UI v4. Translates UI specifications from the architect into production-ready components with semantic tokens, typed props, and Composition API.
 tools: Read, Grep, Glob, Edit, Write, Bash
 model: sonnet
-permissionMode: acceptEdits
 skills:
   - vue
   - tailwind
