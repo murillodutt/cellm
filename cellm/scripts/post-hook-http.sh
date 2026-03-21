@@ -31,6 +31,12 @@ if [[ -n "${input}" ]]; then
   hook_event=$(printf '%s' "${input}" | grep -o '"hook_event_name" *: *"[^"]*"' | head -1 | cut -d'"' -f4)
 fi
 
+# Whitelist validation — prevent injection via unexpected event names
+case "${hook_event}" in
+  SessionStart|UserPromptSubmit|PreToolUse|PostToolUse) ;;
+  *) hook_event="" ;;
+esac
+
 base_url=$(get_base_url)
 
 response=$(curl -sf --max-time 3 --connect-timeout 1 \
