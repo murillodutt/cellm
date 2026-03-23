@@ -11,7 +11,7 @@
   "plugins": [
     {
       "name": "cellm",
-      "version": "0.35.76",
+      "version": "0.35.77",
       "source": "./cellm",
       "description": "Context Engineering for LLM-driven development"
     },
