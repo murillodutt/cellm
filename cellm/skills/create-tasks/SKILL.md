@@ -118,6 +118,55 @@ After decomposition, if `check.principle` contains "mobile-first" or target is a
 
 When `CELLM_DEV_MODE: true`: after decomposition, write feedback entry to `dev-cellm-feedback/entries/create-tasks-{date}-{seq}.md`. Note which composite actions were split, whether atomicity tests failed on first pass, and how interface contracts across phases were defined. Format and lifecycle: see `dev-cellm-feedback/README.md`.
 
+## Stitch Auto-Detection
+
+When `.stitch/` exists at the project root OR the check brief/context mentions "stitch", auto-create a **Phase 0: Stitch Design Ingestion** before any frontend phases:
+
+### Detection
+
+Before presenting the decomposition, check:
+1. `[ -d ".stitch" ]` at git root
+2. Check `context` or `problem` fields contain "stitch" (case-insensitive)
+
+If either condition is true, inject Phase 0.
+
+### Phase 0 Structure
+
+```
+Phase 0: Stitch Design Ingestion
+  specialist: { role: "audit", focus: "Extract and ingest Stitch design artifacts into DSE" }
+  briefing:
+    objective: "Analyze .stitch/ artifacts and ingest design tokens into DSE"
+    successCriteria: "dse_search('stitch') returns at least 1 decision with source: stitch"
+    keyFiles: [".stitch/DESIGN.md", ".stitch/SITE.md", ".stitch/designs/"]
+    constraints: ["Read-only analysis — no Stitch MCP invocations", "All DSE atoms must have source: stitch"]
+
+  Tasks:
+    T0.1: Run stitch-analyst on .stitch/ artifacts — produce Design Analysis Report
+    T0.2: Run stitch-ingest to convert DESIGN.md tokens into DSE atoms
+    T0.3: Run stitch-bridge to-nuxt on HTML screens (if designs/ exists)
+```
+
+### DAG Edges
+
+Phase 0 **blocks** all frontend phases via `spec_add_edge`:
+
+```
+spec_add_edge({
+  project: "<project>",
+  sourceId: "<phase-0-id>",
+  targetId: "<frontend-phase-id>",
+  edgeType: "blocks"
+})
+```
+
+This ensures DSE is populated with Stitch-derived tokens before any UI implementation begins.
+
+### Skip Conditions
+
+- No `.stitch/` directory AND no stitch mention in check context: skip entirely
+- `.stitch/` exists but has no DESIGN.md: create Phase 0 with only T0.1 (analysis to identify gaps)
+
 ## NEVER
 
 - **Markdown files** — tasks are `spec_create_node(nodeType: "task")`, not tasks.md

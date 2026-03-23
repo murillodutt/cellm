@@ -99,6 +99,40 @@ The subagent cannot access the orchestrator's context window. File paths alone a
 | > 200 lines | Inline public API surface + add fileRef paths for deep dive |
 | Non-type files (CSS, config) | Reference path only — subagent can Read |
 
+## Stitch Context Injection
+
+When `.stitch/metadata.json` exists in the project root, inject `stitchContext` into the Context Envelope for **frontend** phases (where `specialist.role === "frontend"`):
+
+### Detection
+
+Before Stage 1 of any frontend phase, check for `.stitch/metadata.json`:
+- If EXISTS: read it and construct `stitchContext`
+- If MISSING: skip Stitch injection entirely — all existing behavior is preserved
+
+### stitchContext Shape
+
+```
+stitchContext: {
+  projectId: string       // from metadata.json
+  designMdPath: string    // ".stitch/DESIGN.md" (if exists)
+  siteMdPath: string      // ".stitch/SITE.md" (if exists)
+  designsDir: string      // ".stitch/designs/" (if exists)
+  availableScreens: []    // list of .html files in designs/
+}
+```
+
+### Envelope Integration
+
+1. Add `stitchContext` to the Context Envelope alongside DSE Decisions and Active Directives.
+2. Check if DSE was populated from DESIGN.md (`dse_search("stitch design")` — look for atoms with `source: stitch`). If DSE has Stitch-originated decisions, note in the envelope: "DSE contains Stitch-derived tokens — use them as authoritative."
+3. For each task with a `fileRef` matching a page/component, check if a corresponding `.stitch/designs/{page}.html` exists. If so, include the path in the implementer briefing: "Reference design: `.stitch/designs/{page}.html` — use as visual target."
+
+### Constraints
+
+- `stitchContext` is **optional** — all existing orchestration behavior must work identically without it.
+- Stitch context **supplements** DSE decisions — it never overrides them.
+- Never auto-invoke Stitch MCP tools during orchestration — only reference local `.stitch/` artifacts.
+
 ## Re-entry
 
 Skip completed tasks. Resume from first pending. Show: "Resuming: X/Y completed."

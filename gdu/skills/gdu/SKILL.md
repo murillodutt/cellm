@@ -71,6 +71,19 @@ The orchestrator calls `directive_verify(specNodeId, worktreePath)` which execut
 
 If any directive is violated → loop back to Stage 1 with `violated_reason` as fix instructions.
 
+### Stitch-Derived Directives
+
+When `stitchContext` is present in the phase envelope (provided by orchestrate or stitch-bridge):
+
+1. **Read DESIGN.md**: parse `.stitch/DESIGN.md` (path from `stitchContext.designMdPath`) and extract design constraints:
+   - Color Foundation — hex values and functional roles become `expectMatch` directives for semantic token usage
+   - Typography — font family, weights, and sizes become directives enforcing correct `font-*` tokens
+   - Components — button radius, card shadows, nav patterns become component-level directives
+   - Layout — max-width, grid, breakpoints become layout constraint directives
+2. **Check route HTML**: if `stitchContext.designsDir/{routeName}.html` exists for the target route, emit a scaffold reference directive pointing to that file. The implementer MUST read the HTML as visual reference before writing Vue SFCs.
+3. **Emit as supplementary**: Stitch-derived directives supplement DSE directives — they do NOT replace them. If a Stitch directive conflicts with a DSE decision, the DSE decision wins (DSE is the canonical design authority).
+4. **Directive format**: same as standard directives — `rule` (human-readable) + `evidence_payload` (grep pattern). Tag with `source: "stitch"` in metadata.
+
 ### Director Registration
 | specialist.role | Director | Emits directives? |
 |----------------|----------|-------------------|
