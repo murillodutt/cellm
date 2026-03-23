@@ -62,6 +62,16 @@ When `CELLM_DEV_MODE: true`: after treatment, write feedback entry to `dev-cellm
 
 The server gates `spec_transition(completed)` against active directives. Before transitioning tasks to completed, call `directive_verify` as a preview to surface violations early. If `DIRECTIVE_VIOLATION` is returned on transition, read violations, fix the code, retry. Always pass `worktreePath` in metadata: `spec_transition({ nodeId, event: "completed", metadata: { worktreePath } })`. Max 3 attempts before `DIRECTIVE_ESCALATION` — escalate to user. Manual directives pass with a flag (non-blocking).
 
+## Fallback Verification (CELLM_DEV_MODE only)
+
+When `CELLM_DEV_MODE: true` (verify via `get_status` MCP -> `config.devMode`):
+
+Before treating, extract the fallback path from the check's `context` field (look for `[fallback: .claude/specs/...]`). If not in context, try `.claude/specs/{check-slug}.yaml`. Check if the file exists:
+- If EXISTS: `[+] Fallback YAML found: {path} — Worker crash recoverable`
+- If MISSING: `[!] No fallback YAML. Worker crash = unrecoverable spec loss. Generate with /cellm:plan-to-spec or create manually.`
+
+Do NOT block execution if missing — warn only.
+
 ## NEVER
 
 - **Skip briefing** — always show Context/Problem/Principle before starting

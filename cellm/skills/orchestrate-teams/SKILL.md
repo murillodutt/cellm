@@ -196,6 +196,16 @@ When `CELLM_DEV_MODE: true`: write feedback to `dev-cellm-feedback/entries/orche
 - Which guild activations were effective
 - Whether context materialization was sufficient
 
+## Fallback Verification (CELLM_DEV_MODE only)
+
+When `CELLM_DEV_MODE: true` (verify via `get_status` MCP -> `config.devMode`):
+
+Before launching teams, extract the fallback path from the check's `context` field (look for `[fallback: .claude/specs/...]`). If not in context, try `.claude/specs/{check-slug}.yaml`. Check if the file exists:
+- If EXISTS: `[+] Fallback YAML found: {path} — Worker crash recoverable`
+- If MISSING: `[!] No fallback YAML. Worker crash during team execution = unrecoverable spec loss. Generate with /cellm:plan-to-spec or create manually.`
+
+Do NOT block execution if missing — warn only.
+
 ## NEVER
 
 - **Parallelize dependent phases** — DAG edges are inviolable

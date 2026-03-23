@@ -38,6 +38,16 @@ Context lives in the database. Load it before touching any file.
 
 When `CELLM_DEV_MODE: true`: after implementation, write feedback entry to `dev-cellm-feedback/entries/implement-{date}-{seq}.md`. Note which DSE decisions influenced code, whether reuse search found matches, and which quality gate failures required iteration. Format and lifecycle: see `dev-cellm-feedback/README.md`.
 
+## Fallback Verification (CELLM_DEV_MODE only)
+
+When `CELLM_DEV_MODE: true` (verify via `get_status` MCP -> `config.devMode`):
+
+Before implementing, extract the fallback path from the check's `context` field (look for `[fallback: .claude/specs/...]`). If not in context, try `.claude/specs/{check-slug}.yaml`. Check if the file exists:
+- If EXISTS: `[+] Fallback YAML found: {path} — Worker crash recoverable`
+- If MISSING: `[!] No fallback YAML. Worker crash = unrecoverable spec loss. Generate with /cellm:plan-to-spec or create manually.`
+
+Do NOT block execution if missing — warn only.
+
 ## NEVER
 
 - **Code without spec context** — always `spec_get_tree` first

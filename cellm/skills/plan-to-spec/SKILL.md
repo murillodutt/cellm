@@ -111,6 +111,27 @@ Apply these checks from `create-tasks` (canonical source) to every task before c
 - **fileRef Completeness Trace**: When displaying data, trace to data source — component alone is insufficient. Create tasks for API route + composable if field is missing upstream.
 - **Mobile-First Consistency**: If principle contains "mobile-first", flag desktop-heavy patterns (UTable, grid-cols-3+) and prefer card lists over tables.
 
+## Spec Fallback YAML (CELLM_DEV_MODE only)
+
+When `CELLM_DEV_MODE: true` (verify via `get_status` MCP -> `config.devMode`):
+
+After `spec_decompose` succeeds (step 8), generate a pure YAML fallback file at `.claude/specs/{check-slug}.yaml`.
+
+| Rule | Detail |
+|------|--------|
+| Format | Pure YAML — no markdown code blocks, no backticks inside values |
+| Multi-line | Use `\|` block scalar for action fields |
+| Fields per task | id, title, action, fileRef, diffExpected, safety_notes |
+| Sections | spec (id, title, briefing), decisions, gaps, dag_edges, phases with tasks, verification |
+| Header | `generated_at`, `stale_after: 24h`, `source_spec_id` |
+| Recovery | Include `recovery_procedure` field with instructions to recreate spec tree from this file |
+| Max size | ~150 lines — condensed, IDs + actions + safety_notes only |
+| Safety notes | Per-task risk notes — these do NOT exist in the DB, only in the YAML |
+| Source of truth | DB is source of truth. YAML is read-only safety net for Worker crash recovery |
+| Context embedding | Append ` [fallback: .claude/specs/{check-slug}.yaml]` to the check's `context` field in `spec_decompose`. This lets execution skills find the YAML path by reading the spec context |
+
+Ensure `.claude/specs/` directory exists before writing (`mkdir -p`).
+
 ## Evolutionary Analytical Feedback
 
 When `CELLM_DEV_MODE: true`: after conversion, write feedback entry to `dev-cellm-feedback/entries/plan-to-spec-{date}-{seq}.md`. Note which plan sections mapped cleanly vs required interpretation, whether DSE alignment surfaced useful constraints, and how many composite actions were split. Format and lifecycle: see `dev-cellm-feedback/README.md`.
@@ -130,3 +151,4 @@ When `CELLM_DEV_MODE: true`: after conversion, write feedback entry to `dev-cell
 - **Ignore BLOCKED_BY_DEPENDENCY** — if `spec_transition` returns this error, check predecessor phase status
 - **Invalid parent-child hierarchies** — check→phase/task/gap/decision/requirement/verification, phase→task/gap/decision/verification, task→task/gap/verification. Tasks can contain sub-tasks recursively (max depth 5). Service rejects violations with INVALID_CHILD_TYPE.
 - **Skip the Evolutionary Analytical Feedback** — when CELLM_DEV_MODE is true, reflection after conversion is mandatory
+- **Skip the Spec Fallback YAML** — when CELLM_DEV_MODE is true, the YAML fallback is mandatory. Worker crash without fallback = unrecoverable spec loss
