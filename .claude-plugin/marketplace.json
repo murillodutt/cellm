@@ -11,7 +11,7 @@
   "plugins": [
     {
       "name": "cellm",
-      "version": "0.35.78",
+      "version": "0.35.79",
       "source": "./cellm",
       "description": "Context Engineering for LLM-driven development"
     },
@@ -29,7 +29,7 @@
     },
     {
       "name": "stitch",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "source": "./stitch",
       "description": "Google Stitch design bridge: bidirectional design-to-code with DSE token translation and gap detection"
     }
