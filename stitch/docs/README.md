@@ -19,42 +19,30 @@ The plugin follows CELLM's isolation pattern: self-contained with graceful degra
 
 ## Setup
 
-### 1. API Key (Development)
+### Automatic (Plugin MCP)
 
-Set the `STITCH_API_KEY` environment variable:
+The plugin includes a `.mcp.json` that registers the Stitch MCP server automatically via `@_davideast/stitch-mcp proxy`. On first session start, the `setup-stitch.sh` hook checks for authentication:
 
-```bash
-export STITCH_API_KEY="your-api-key"
-```
+- If `STITCH_API_KEY`, `STITCH_ACCESS_TOKEN`, or gcloud ADC is detected, the plugin marks auth as configured.
+- If no auth is found, it emits a guidance message with setup options.
 
-### 2. OAuth via gcloud ADC (Production)
+### Authentication Methods
 
-Use Google Application Default Credentials:
+| Method | Setup | Best For |
+|--------|-------|----------|
+| **OAuth wizard** | `npx @_davideast/stitch-mcp init` | First-time setup (recommended) |
+| **API Key** | `export STITCH_API_KEY=your-key` | Dev local, quick start |
+| **gcloud ADC** | `gcloud auth application-default login` | Production, multi-user |
+| **Access Token** | `export STITCH_ACCESS_TOKEN=ya29...` | CI/CD, service accounts |
 
-```bash
-gcloud auth application-default login
-```
+The OAuth wizard (`stitch-mcp init`) handles everything: gcloud login, project selection, API enablement, and credential storage.
 
-### 3. Access Token (CI/CD)
+### Manual MCP Registration (optional)
 
-Set the `STITCH_ACCESS_TOKEN` environment variable directly:
-
-```bash
-export STITCH_ACCESS_TOKEN="ya29...."
-```
-
-### 4. Add Stitch MCP Server
-
-Run the Stitch MCP init wizard:
+If the plugin `.mcp.json` is not detected, add manually:
 
 ```bash
-npx @_davideast/stitch-mcp init
-```
-
-Or add manually via Claude Code:
-
-```bash
-claude mcp add stitch-mcp npx @_davideast/stitch-mcp
+claude mcp add stitch-mcp -- npx -y @_davideast/stitch-mcp proxy
 ```
 
 ## Verify
