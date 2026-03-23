@@ -54,6 +54,7 @@ Calls Stitch MCP tools to generate or edit screens.
 1. **AskUserQuestion**: confirm the operation — show prompt, projectId, estimated cost/time.
 2. **Determine tool**:
    - New screen: `generate_screen_from_text({ projectId, prompt, deviceType, modelId })`
+   - Edit existing: `edit_screens({ projectId, selectedScreenIds, prompt })`
    - Enhance prompt first: `enhance_prompt({ prompt })` then generate
 3. **Execute**: call the selected Stitch MCP tool.
 4. **Wait**: generation takes 1-2 minutes. Do NOT retry if slow.
@@ -103,6 +104,7 @@ If any downstream skill is not available, report which step was skipped and cont
 | Tool | Use |
 |------|-----|
 | `generate_screen_from_text` | Create new screen from prompt |
+| `edit_screens` | Edit existing screens with prompt |
 | `fetch_screen_code` | Download screen HTML |
 | `fetch_screen_image` | Download screen screenshot |
 | `enhance_prompt` | Improve prompt before generation |
@@ -110,6 +112,7 @@ If any downstream skill is not available, report which step was skipped and cont
 | `list_projects` | List accessible Stitch projects |
 | `list_screens` | List screens in a project |
 | `get_screen` | Get single screen details |
+| `get_project` | Get project details |
 | `create_project` | Create new Stitch project |
 
 ## NEVER
@@ -117,6 +120,6 @@ If any downstream skill is not available, report which step was skipped and cont
 - **Retry `generate_screen_from_text`** — generation takes 1-2 min; retrying wastes quota and creates duplicates
 - **Overwrite `.stitch/metadata.json` without backup** — always read existing, merge new screenIds, preserve history
 - **Invoke Stitch MCP without user confirmation** — every `invoke` call must be approved via AskUserQuestion first
-- **Auto-invoke cost-incurring operations** — `generate_screen_from_text` requires explicit confirmation
+- **Auto-invoke cost-incurring operations** — `generate_screen_from_text`, `edit_screens` require explicit confirmation
 - **Skip gap analysis** — always run `analyze` before `compose-prompt` to ensure prompts address real gaps
 - **Assume `list_screens` is current after generation** — known bug: may return empty until project opened in browser
