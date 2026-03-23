@@ -1,11 +1,10 @@
 {
   "name": "stitch",
   "description": "Google Stitch design bridge — consumes DESIGN.md, HTML screens, and SITE.md artifacts into CELLM DSE, GDU Director, and orchestration workflows.",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "author": {
     "name": "Murillo Dutt",
     "email": "contact@cellm.ai"
   },
-  "skills": "./skills/",
-  "mcpServers": "./.mcp.json"
+  "skills": "./skills/"
 }
