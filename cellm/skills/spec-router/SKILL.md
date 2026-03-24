@@ -1,26 +1,30 @@
 ---
 description: Passive CellmOS work classifier — routes each action to trivial (just do it), query (research first), or spec (create check in DB) before execution. Activates before non-trivial work to prevent ungoverned changes. Complements cellm:spec, does not replace it.
 user-invocable: false
-allowed-tools: mcp__cellm-oracle__spec_search, mcp__cellm-oracle__spec_transition, mcp__cellm-oracle__spec_create_node
+allowed-tools: mcp__cellm-oracle__context_preflight, mcp__cellm-oracle__spec_search, mcp__cellm-oracle__spec_transition, mcp__cellm-oracle__spec_create_node
 ---
 
 # Work Routing — Before Action
 
-Before executing, classify:
+Classify work and route non-trivial execution to the SCE + spec pipeline.
 
-| Signal | Classification | Action |
-|--------|---------------|--------|
-| < 5 lines, single file | TRIVIAL | Execute directly |
-| Question, lookup, explanation | QUERY | Answer directly |
-| Bug fix, feature, refactor, multi-file | SPEC | Search or create spec |
+## Intent
 
-## SPEC Path
+- Classify incoming requests as `TRIVIAL`, `QUERY`, or `SPEC`.
+- Keep this skill as a router only.
 
-Project: always `git rev-parse --show-toplevel` → last segment. Pass `sessionId` (current session) to all `spec_create_node` calls.
+## Policy
 
-1. `spec_search(project, query)` — match found? Resume it. No match? Create check.
-2. During work: `spec_transition(node, status, project)` per task. Auto-chain supported: calling `completed` from `pending`/`active` resolves intermediate states. Discoveries become `gap` nodes. Choices become `decision` nodes.
-3. All tasks done: `spec_transition(check, "completed", project)`. Auto-rollup: when all child tasks complete, the parent phase auto-completes — but each leaf task must be explicitly transitioned.
+- For `SPEC`, run `context_preflight` before deciding execution route.
+- Do not perform local ranking, merge, or policy evaluation in this skill.
+- Use spec tools only to create/search/transition check state.
+
+## Routing
+
+1. Detect project and classify request.
+2. `TRIVIAL`: execute directly.
+3. `QUERY`: answer with research path.
+4. `SPEC`: `spec_search` then `context_preflight`, then continue in spec-driven flow.
 
 ## Evolutionary Analytical Feedback
 
@@ -30,10 +34,5 @@ When `CELLM_DEV_MODE: true`: after router processing, write feedback entry to `d
 
 - **Skip classification** — every non-trivial action goes through the router
 - **Create duplicate specs** — always `spec_search` first
-- **Force specs on trivial work** — the router is a filter, not a tax
-- **Create specs as markdown** — specs live in compass.db only
-- **Non-English spec content** — when creating checks, all content must be in English
-- **Omit sessionId** — always pass `sessionId` to `spec_create_node` for audit trail
-- **Ignore BLOCKED_BY_DEPENDENCY** — if `spec_transition` returns this error, check predecessor phase status
-- **Invalid parent-child hierarchies** — check→phase/task/gap/decision/requirement/verification, phase→task/gap/decision/verification, task→gap/verification. Service rejects violations with INVALID_CHILD_TYPE.
-- **Skip the Evolutionary Analytical Feedback** — when CELLM_DEV_MODE is true, reflection after router processing is mandatory
+- **Run custom ranking inside the skill** — routing is thin; SCE owns scoring and budget
+- **Force specs on trivial work** — router is a filter, not a tax
