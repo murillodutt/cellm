@@ -30,6 +30,7 @@ Run dependency-safe parallel execution for independent phases using Agent teams.
 4. Consolidate results and transition completed nodes.
 5. Recompute next executable group and repeat.
 6. Finalize check when all leaf tasks are closed.
+7. Persist outcome with `context_record_outcome` after execution completes.
 
 ## Evolutionary Analytical Feedback
 

@@ -29,7 +29,8 @@ Execute a high-throughput autonomous run using shared CellmOS backlog claiming.
 3. Launch N agents with isolated execution.
 4. Each agent claims tasks via `spec_claim_next` until no work remains.
 5. Consolidate results and finalize unresolved blockers.
-6. Emit final outcomes and user-facing completion summary.
+6. Persist outcome with `context_record_outcome` after execution completes.
+7. Emit user-facing completion summary.
 
 ## Fallback Verification (CELLM_DEV_MODE only)
 
