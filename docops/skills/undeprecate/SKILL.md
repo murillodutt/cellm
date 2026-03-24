@@ -4,19 +4,36 @@ user-invocable: true
 argument-hint: "<file>"
 ---
 
-## Process
+# Undeprecate
 
-1. Verify `status: deprecated` in target file; fail if not deprecated
-2. Remove fields: `deprecated_on`, `deprecated_by`, `deprecation_reason`, `archive_on`
-3. Set `status: active`
-4. Remove `> [!WARNING]` banner
-5. Remove `[DEPRECATED]` markers from all linking documents
-6. Log to `.claude/docops:deprecations.log`
+Reverse a deprecation, restoring a document from deprecated to active status.
 
-Transition: `[deprecated] -> [active]`
+## Intent
+
+- Remove all deprecation markers from a document and restore it to active state.
+- Clean up all linking documents by removing `[DEPRECATED]` markers they carry.
+
+## Policy
+
+- `context_preflight` mandatory before execution (`flow='generic'`).
+- Respect active directives; do not destroy documentation referenced by active directives.
+- Only operates on files with `status: deprecated`; archived files must use `/docops:restore` instead.
+- Every state change must be logged to `.claude/docops:deprecations.log`.
+- Record outcomes via `context_record_outcome` after execution.
+
+## Routing
+
+1. Run `context_preflight` with `flow='generic'`; block execution if preflight fails.
+2. Verify `status: deprecated` in target file frontmatter; fail with clear message if not deprecated.
+3. Remove deprecation frontmatter fields: `deprecated_on`, `deprecated_by`, `deprecation_reason`, `archive_on`.
+4. Set `status: active` in frontmatter.
+5. Remove `> [!WARNING]` deprecation banner from the document body.
+6. Scan all linking documents and remove `[DEPRECATED]` markers next to links pointing to this file.
+7. Log transition (`[deprecated] -> [active]`) to `.claude/docops:deprecations.log`.
+8. Emit outcome via `context_record_outcome`.
 
 ## NEVER
 
-- **Undeprecate archived files** — use `/docops:restore`
+- **Undeprecate archived files** — use `/docops:restore` instead
 - **Skip reference cleanup** — remove all `[DEPRECATED]` markers
 - **Skip logging** — log every state change
