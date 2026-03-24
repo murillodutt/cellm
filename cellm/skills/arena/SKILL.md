@@ -1,68 +1,36 @@
 ---
-description: "CELLM quality lab for Node.js/Bun projects. Four modes: prove (tests + typecheck + health), debug (hypothesize + diagnose), gate (quality verdict), stress (multi-agent convergence). Use when: 'run tests', 'debug this', 'quality gate', 'stress test', 'prove it works', 'why is this failing', 'validate changes'. Not for arbitrary scripts or 'npm run X'."
+description: "Quality lab entrypoint with SCE-backed prove/debug/gate/stress flows. Use when: 'run tests', 'quality gate', 'debug this', 'stress test'."
 user-invocable: true
-argument-hint: "[mode] [args] — prove | debug <error> | gate [path] | stress <target>"
-allowed-tools: Agent, Bash(bun run test *), Bash(npx nuxt typecheck *), Bash(npx tsc *), Bash(npx vitest *), Bash(curl *), Bash(timeout *), Bash(kill *), Bash(lsof *), Bash(git *), Bash(tail *), Bash(mktemp *), Read, Grep, Glob, Edit, Write, AskUserQuestion, mcp__plugin_cellm_cellm-oracle__quality_gate, mcp__plugin_cellm_cellm-oracle__search, mcp__plugin_cellm_cellm-oracle__knowledge_search
+argument-hint: "[prove|debug|gate|stress] [args]"
+allowed-tools: Bash, Read, Grep, Glob, Edit, AskUserQuestion, mcp__plugin_cellm_cellm-oracle__quality_gate, mcp__cellm-oracle__context_preflight, mcp__cellm-oracle__context_certify, mcp__cellm-oracle__context_record_outcome
 context: fork
 ---
 
-# Arena — Quality Proving Ground
+# arena
 
-One entry point, four modes. Detect project tooling automatically, never assume.
+Thin skill contract:
 
-## Mode Routing
+1. Intent
+- Execute reproducible quality checks and produce an operational verdict.
 
-| Argument | Mode | Purpose |
-|----------|------|---------|
-| (empty) / `prove` / `all` | **Prove** | Tests + typecheck + health |
-| `labs` / `typecheck` / `health` / `file <path>` / `pre-commit` | **Prove** | Scoped variant (read `references/prove.md`) |
-| `debug <error>` | **Debug** | Iterative instrumentation (read `references/debug.md`) |
-| `gate [path]` | **Gate** | Quality verdict: PASS / CONDITIONAL / FAIL (read `references/gate.md`) |
-| `stress <target> [N]` | **Stress** | Multi-agent convergence (read `references/stress.md`) |
+2. Policy
+- Preflight before each mode execution.
+- Certify quality threshold before declaring pass.
+- Record outcomes for every run with traceable flow tags.
 
-## Setup Detection — Always First
+3. Routing
+- Test/typecheck/health execution: local toolchain.
+- Quality verdict: `quality_gate`.
+- Context intelligence and telemetry: SCE `context_*`.
 
-| What | How | Fallback |
-|------|-----|----------|
-| Project root | `git rev-parse --show-toplevel` | cwd |
-| Test runner | package.json scripts/deps: vitest > jest > bun > npm test | Skip tests |
-| Typecheck | nuxt.config.ts > tsconfig.json | Skip typecheck |
-| Oracle | `curl -sf --max-time 2 "${CELLM_WORKER_URL:-http://127.0.0.1:31415}/health"` | Skip Oracle features |
+## Modes
 
-Oracle integration is **optional** — Arena works fully without it. When online: ingest snapshots (`POST /api/arena/ingest`), append trends (`GET /api/arena/trends`).
-
-## Reporting Convention
-
-```
-[+] Tests: 42 passed (0 failed) [vitest]
-[-] Typecheck: 3 errors
-[+] Health: all endpoints responding
-[!] Trend: regression detected (delta -12)
-```
-
-## On Failure
-
-Read failing test + source file. Analyze root cause. Propose fix. Ask before applying.
-
-## Decisions
-
-| Decision | Rationale |
-|----------|-----------|
-| Detect tooling, never hardcode | Arena serves any project, not just CELLM |
-| Oracle is conditional, never blocking | Offline Oracle must never prevent quality checks |
-| Read reference files per mode | Keep context lean — load only what the active mode needs |
-| Ask before applying fixes | Quality tool observes and reports, developer decides |
-| Sequential prove pipeline | Tests > typecheck > health — fail-fast ordering |
-| `context: fork` | Isolates Arena's verbose output from main conversation context. Reference files inherit fork — no access to prior conversation |
+- `prove`: tests + typecheck + health.
+- `debug`: bounded hypothesis loop.
+- `gate`: PASS/CONDITIONAL/FAIL.
+- `stress`: repeated convergence runs.
 
 ## NEVER
 
-- **Hardcode test runner** — always detect from package.json
-- **Block on Oracle offline** — skip silently, never error
-- **Apply fixes without asking** — report findings, let the developer decide
-- **Instrument production code** — refuse if `NODE_ENV=production`
-- **Pass gate with CRITICAL findings** — CRITICAL always means FAIL
-- **Fabricate findings** — every finding must have file:line evidence
-- **Exceed debug limits** — 3 iterations, 5 instrumentation points per iteration, 10 min max
-- **Retest refuted hypotheses** — permanently excluded from re-evaluation
-- **Skip CLEANUP after debug** — best-effort, always attempt. If interrupted: `git stash list` for orphan stashes, `grep -rn CELLM-DBG .` for markers, `git worktree list` for orphan worktrees
+- Claim PASS with unresolved critical failures.
+- Skip write-back for failed runs.
