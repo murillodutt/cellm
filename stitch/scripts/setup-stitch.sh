@@ -1,26 +1,16 @@
 #!/bin/sh
 # Stitch MCP auto-setup — runs on SessionStart
-# Checks if Stitch auth is configured in .mcp.json headers.
-# Resolves API key from multiple sources and injects into .mcp.json if empty.
+# Checks if Stitch MCP is already registered via `claude mcp list`.
+# If not, resolves API key from stored sources and registers via `claude mcp add`.
+# If no key found, emits guidance with link to obtain one.
 # Fail-silent: always exits 0.
 
 STITCH_KEY_FILE="${HOME}/.cellm/stitch-api-key"
-PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT:-$(cd "$(dirname "$0")/.." && pwd)}"
-MCP_JSON="${PLUGIN_ROOT}/.mcp.json"
+MCP_NAME="stitch"
+STITCH_URL="https://stitch.googleapis.com/mcp"
 
-# Bail if .mcp.json does not exist
-[ -f "$MCP_JSON" ] || exit 0
-
-# Check if X-Goog-Api-Key is already set in .mcp.json
-CURRENT_KEY=""
-if command -v jq >/dev/null 2>&1; then
-  CURRENT_KEY=$(jq -r '.mcpServers.Stitch.headers["X-Goog-Api-Key"] // ""' "$MCP_JSON" 2>/dev/null)
-else
-  CURRENT_KEY=$(sed -n 's/.*"X-Goog-Api-Key"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$MCP_JSON" | head -1)
-fi
-
-# If key is already set, nothing to do
-if [ -n "$CURRENT_KEY" ]; then
+# Check if already registered
+if claude mcp list 2>/dev/null | grep -qi "$MCP_NAME"; then
   exit 0
 fi
 
@@ -40,21 +30,18 @@ if [ -z "$RESOLVED_KEY" ] && [ -f "$STITCH_KEY_FILE" ]; then
   fi
 fi
 
-# If we found a key, inject it into .mcp.json
+# If we found a key, register the MCP server
 if [ -n "$RESOLVED_KEY" ]; then
-  if command -v jq >/dev/null 2>&1; then
-    TMP=$(mktemp)
-    jq --arg key "$RESOLVED_KEY" '.mcpServers.Stitch.headers["X-Goog-Api-Key"] = $key' "$MCP_JSON" > "$TMP" && mv "$TMP" "$MCP_JSON"
-  else
-    sed -i.bak "s/\"X-Goog-Api-Key\"[[:space:]]*:[[:space:]]*\"\"/\"X-Goog-Api-Key\": \"$RESOLVED_KEY\"/" "$MCP_JSON"
-    rm -f "${MCP_JSON}.bak"
-  fi
+  claude mcp add "$MCP_NAME" \
+    --transport http "$STITCH_URL" \
+    --header "X-Goog-Api-Key: $RESOLVED_KEY" \
+    -s user 2>/dev/null
   exit 0
 fi
 
-# No key found — emit guidance asking user to provide their API key
+# No key found — emit guidance
 cat <<'GUIDE'
-{"additionalContext":"[Stitch] API Key not configured. The Stitch MCP server needs an API key to connect.\n\nTo authenticate:\n1. Get your API key at: https://stitch.withgoogle.com/settings?pli=1\n2. Save it: echo 'YOUR_KEY' > ~/.cellm/stitch-api-key\n3. Run /reload-plugins to reconnect\n\nAlternatively, set the env var: export STITCH_API_KEY=your-key\n\nLocal .stitch/ analysis works without auth. Only invoke/consume need it."}
+{"additionalContext":"[Stitch] API Key not configured. The Stitch MCP server needs an API key to connect.\n\nTo authenticate:\n1. Get your API key at: https://stitch.withgoogle.com/settings?pli=1\n2. Register manually:\n   claude mcp add stitch --transport http https://stitch.googleapis.com/mcp --header \"X-Goog-Api-Key: YOUR_KEY\" -s user\n3. Or save for auto-setup: echo 'YOUR_KEY' > ~/.cellm/stitch-api-key\n\nLocal .stitch/ analysis works without auth. Only invoke/consume need it."}
 GUIDE
 
 exit 0
