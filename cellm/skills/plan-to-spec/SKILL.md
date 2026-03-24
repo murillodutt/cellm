@@ -2,7 +2,7 @@
 description: "Convert a Claude Code plan file into a CellmOS spec check with phases, tasks, and DAG edges. Use when: plan ready to execute, user wants spec-driven workflow, 'decompose this plan', 'plan to spec'. Reads plan markdown, extracts briefings, creates atomic spec tree in Oracle DB."
 user-invocable: true
 argument-hint: "<path-to-plan.md>"
-allowed-tools: mcp__cellm-oracle__spec_decompose, mcp__cellm-oracle__spec_create_node, mcp__cellm-oracle__spec_transition, mcp__cellm-oracle__spec_add_edge, mcp__cellm-oracle__spec_add_verification, mcp__cellm-oracle__spec_search, mcp__cellm-oracle__spec_get_tree, mcp__cellm-oracle__spec_get_counters, mcp__plugin_cellm_cellm-oracle__dse_search, mcp__plugin_cellm_cellm-oracle__dse_get, Read, Grep, Glob, Bash(git rev-parse *), AskUserQuestion
+allowed-tools: mcp__cellm-oracle__spec_decompose, mcp__cellm-oracle__spec_create_node, mcp__cellm-oracle__spec_transition, mcp__cellm-oracle__spec_add_edge, mcp__cellm-oracle__spec_add_verification, mcp__cellm-oracle__spec_search, mcp__cellm-oracle__spec_get_tree, mcp__cellm-oracle__spec_get_counters, mcp__plugin_cellm_cellm-oracle__dse_search, mcp__plugin_cellm_cellm-oracle__dse_get, Read, Write, Grep, Glob, Bash(git rev-parse *), Bash(mkdir *), AskUserQuestion, ExitPlanMode
 ---
 
 # Plan-to-Spec Thinking — Before Converting
@@ -15,6 +15,7 @@ A plan is a dense intention document. Extract its atoms into the database.
 
 ## Framework
 
+0. **Exit Plan Mode** — If plan mode is active, call `ExitPlanMode` FIRST. The spec creation (step 8) requires `Write` for the fallback YAML and `spec_decompose` for DB writes — both are blocked in plan mode. Exit plan mode, then proceed. If plan mode is not active, skip this step.
 1. **Read** — Read the plan file from the provided path. Understand scope, files, order, and verification criteria.
 2. **Detect Project** — `git rev-parse --show-toplevel` → last path segment = project name.
 3. **Deduplicate** — `spec_search(query: plan title, nodeType: "check", limit: 5)`. If a matching check exists, show it and AskUserQuestion: "This plan appears already converted. View existing spec, update it, or create new?"

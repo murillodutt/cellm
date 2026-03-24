@@ -24,16 +24,16 @@ Project: always `git rev-parse --show-toplevel` → last segment. Pass `sessionI
 
 ## Evolutionary Analytical Feedback
 
-When `CELLM_DEV_MODE: true`: after funnel processing, write feedback entry to `dev-cellm-feedback/entries/spec-funnel-{date}-{seq}.md`. Note which funnel stages filtered effectively, whether the pipeline produced actionable specs, and which input formats caused parsing issues. Format and lifecycle: see `dev-cellm-feedback/README.md`.
+When `CELLM_DEV_MODE: true`: after router processing, write feedback entry to `dev-cellm-feedback/entries/spec-router-{date}-{seq}.md`. Note which routing stages filtered effectively, whether the pipeline produced actionable specs, and which input formats caused parsing issues. Format and lifecycle: see `dev-cellm-feedback/README.md`.
 
 ## NEVER
 
-- **Skip classification** — every non-trivial action goes through the funnel
+- **Skip classification** — every non-trivial action goes through the router
 - **Create duplicate specs** — always `spec_search` first
-- **Force specs on trivial work** — the funnel is a filter, not a tax
+- **Force specs on trivial work** — the router is a filter, not a tax
 - **Create specs as markdown** — specs live in compass.db only
 - **Non-English spec content** — when creating checks, all content must be in English
 - **Omit sessionId** — always pass `sessionId` to `spec_create_node` for audit trail
 - **Ignore BLOCKED_BY_DEPENDENCY** — if `spec_transition` returns this error, check predecessor phase status
 - **Invalid parent-child hierarchies** — check→phase/task/gap/decision/requirement/verification, phase→task/gap/decision/verification, task→gap/verification. Service rejects violations with INVALID_CHILD_TYPE.
-- **Skip the Evolutionary Analytical Feedback** — when CELLM_DEV_MODE is true, reflection after funnel processing is mandatory
+- **Skip the Evolutionary Analytical Feedback** — when CELLM_DEV_MODE is true, reflection after router processing is mandatory
