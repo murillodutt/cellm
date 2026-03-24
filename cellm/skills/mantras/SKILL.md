@@ -17,7 +17,7 @@ Every decision point passes through three gates. If any gate fails, the action d
 
 | Gate | Challenge | Pass condition | Fail signal |
 |------|-----------|----------------|-------------|
-| VERIFY | "What evidence do I have?" | Concrete evidence: grep result, file read, DB query, doc consultation | "I think...", "probably...", "should be..." |
+| VERIFY | "What evidence do I have?" | Concrete evidence: grep result, file read, DB query, doc consultation, schema read | "I think...", "probably...", "should be...", "the format is..." |
 | BEST PATH | "Is this the best approach or just the first?" | At least 2 approaches considered, choice justified | Single approach, no alternatives evaluated |
 | DOCUMENT | "Where is this recorded?" | Spec, commit, journal, knowledge entry exists | Action taken but no trace in any system |
 
@@ -64,3 +64,4 @@ These metrics flow into the Evolutionary Analytical Feedback. Patterns across se
 - **Skip gates under time pressure** — the gate IS the protection against rushing
 - **Treat as decoration** — if the gate output says "VERIFY: yes" without evidence, the gate failed
 - **Count self-assessment as verification** — "I already know this" is not evidence
+- **Assume a contract format without reading the schema** — always read the authoritative schema before submitting payloads to any API, MCP tool, or service boundary
