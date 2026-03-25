@@ -26,10 +26,33 @@ Build new capabilities from specs using SCE as the context and governance backbo
 
 1. Resolve scope/check and load execution tree (`spec_search` + `spec_get_tree`).
 2. Run SCE preflight and consume envelope/policy.
-3. Execute construction phases and update states in spec tree.
-4. Invoke certification (`context_certify`) when risk/strictness requires.
-5. Emit learning outcomes (`context_record_outcome`).
-6. Escalate to user when blocked or when constraints conflict.
+3. Decompose check into phases, then decompose each phase into atomic tasks.
+4. Execute tasks, transitioning states in spec tree as each completes.
+5. Invoke certification (`context_certify`) when risk/strictness requires.
+6. Emit learning outcomes (`context_record_outcome`).
+7. Escalate to user when blocked or when constraints conflict.
+
+## Decomposition Rule
+
+Every check MUST have 3 levels: **check -> phase -> task**.
+
+| Level | nodeType | Body fields | Purpose |
+|-------|----------|-------------|---------|
+| Check | `check` | `context`, `problem`, `principle` | Top-level spec |
+| Phase | `phase` | `description`, `briefing`, `specialist` | Work group |
+| Task | `task` | `action`, `fileRef`, `diffExpected` | Atomic unit of work |
+
+```
+NEVER execute a phase directly as if it were a task.
+ALWAYS create 1+ tasks under each phase before starting execution.
+Tasks are what spec_claim_next returns — phases without tasks break swarm execution.
+```
+
+Decomposition sequence:
+1. `spec_create_node(nodeType: 'check')` — top-level
+2. `spec_create_node(nodeType: 'phase', parentId: checkId)` — per work group
+3. `spec_create_node(nodeType: 'task', parentId: phaseId)` — per atomic action
+4. `spec_add_edge` — dependency edges between phases/tasks
 
 ## Evolutionary Analytical Feedback
 
@@ -60,3 +83,4 @@ Resolutions: `built`, `blocked`, `false_positive`.
 - **Duplicate runtime policy in-skill** — avoid local gate logic that conflicts with Worker.
 - **Skip outcome write-back** — construction outcomes must feed learning loop.
 - **Continue blindly on blockers** — escalate when dependency/certify/policy blocks.
+- **Execute phases without tasks** — phases are work groups, tasks are atomic actions. Always decompose phases into tasks before executing.
