@@ -137,6 +137,14 @@ Maintain exact visual consistency with the design system above.
 5. **Present** the composed prompt to the user for review
 6. **Output** the final prompt ready for `stitch:invoke` or manual use
 
+## References
+
+Consult these files for detailed guidance:
+- [Design Mappings](references/design-mappings.md) -- UI/UX keyword refinement and atmosphere descriptors
+- [Prompt Keywords](references/prompt-keywords.md) -- component keywords, adjective palettes, color roles
+- [Tool Schemas](references/tool-schemas.md) -- mcp__stitch__* tool call examples and tips
+- [DESIGN.md Example](examples/DESIGN.md) -- gold standard 6-section DESIGN.md
+
 ## Known Limitations
 
 - Stitch may ignore some color specifications on first generation — re-edit with explicit color references

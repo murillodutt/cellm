@@ -2,14 +2,14 @@
 description: "Convert Stitch-generated HTML screens to Vue 3 SFCs with semantic Nuxt UI tokens. Remaps Tailwind utility classes, substitutes HTML elements for Nuxt UI components, and removes dark: prefixes. Use when: 'html to vue', 'convert stitch html', 'stitch to component'."
 user-invocable: true
 argument-hint: "[path-to-html-file]"
-allowed-tools: Read, Write, Glob, AskUserQuestion
+allowed-tools: Read, Write, Glob, AskUserQuestion, mcp__stitch__get_screen, mcp__stitch__list_screens
 ---
 
 Convert Stitch HTML to Vue SFC with semantic tokens and Nuxt UI components.
 
 ## Pipeline
 
-1. **Read HTML** — Read the `.stitch/designs/{page}.html` file (or user-provided path).
+1. **Read HTML** — Read the `.stitch/designs/{page}.html` file (or user-provided path). If the local file does not exist, fetch HTML via `mcp__stitch__get_screen` using the screen's `htmlCode.downloadUrl`.
 2. **Extract body** — Strip `<head>`, `<script>` (including `tailwind.config`), and `<html>`/`<body>` wrappers. Keep only the inner content.
 3. **Extract tailwind.config** — Parse the inline `tailwind.config` from `<script>` tag to understand project colors, fonts, and radius. This is the token source (Stitch does NOT use CSS variables).
 4. **CLASS_MAP remap** — Apply the full CLASS_MAP table below to replace Tailwind utility classes with Nuxt UI semantic tokens.
