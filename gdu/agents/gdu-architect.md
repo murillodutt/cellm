@@ -30,6 +30,13 @@ If no Context Envelope is provided (standalone GDU invocation without spec), pro
    - Read `app/assets/css/main.css` — `@theme` tokens, `--ui-*` overrides
    - Read `app.config.ts` — runtime color mapping, component overrides
 
+1b. **Stitch Source Awareness**: After `dse_search`, check the `source` field on returned chunks:
+   - If `source: 'stitch'`: the design decisions were **deterministically extracted** from Stitch artifacts via `@cellm-ai/stitch-bridge`. Trust these tokens fully — no `[UNVERIFIED]` or `[INFERRED]` markers needed.
+   - Use `class_mapping` from chunk payloads to inform semantic token selection (Stitch class -> Nuxt UI semantic).
+   - Reference `source_meta` for Stitch project context (designTheme, colorMode, roundness).
+   - Mark the spec source tier as `[STITCH]` — highest confidence.
+   - **Confidence hierarchy**: `[STITCH]` > `[DSE]` > `[RAW]` > `[DEFAULTS]`
+
 2. **Atomic Design Decomposition**: Break every UI request into the Atomic Design hierarchy:
    - **Atoms**: Single Nuxt UI components (UButton, UInput, UBadge)
    - **Molecules**: Small compositions (search bar = UInput + UButton)

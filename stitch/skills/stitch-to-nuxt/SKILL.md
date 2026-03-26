@@ -18,7 +18,8 @@ Thin skill contract:
 - Certify translation quality and persist conversion outcome.
 
 3. Routing
-- Token extraction and mapping: skill-local transform.
+- Token extraction: delegates to `@cellm-ai/stitch-bridge/parsers` (`parseDesignMd` + `extractFromStitchHtml`) for deterministic parsing.
+- Token mapping: uses `@cellm-ai/stitch-bridge/class-map` for semantic resolution.
 - File writes to theme/config: implementation route.
 - Policy and telemetry: SCE `context_*`.
 

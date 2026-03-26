@@ -18,9 +18,9 @@ Thin skill contract:
 - Certify ingestion quality and record outcome metadata.
 
 3. Routing
-- DESIGN parsing and mapping: skill-local logic.
-- DSE persistence: runtime endpoints/tools.
+- Stitch parsing and DSE persistence: `dse_ingest_stitch` MCP tool (deterministic, no LLM parsing). Uses `@cellm-ai/stitch-bridge` parsers and mapper internally.
 - Policy and learning loop: SCE `context_*`.
+- Skill is a thin SCE wrapper: preflight -> call `dse_ingest_stitch` -> certify.
 
 ## NEVER
 

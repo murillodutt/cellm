@@ -12,7 +12,7 @@ Convert Stitch HTML to Vue SFC with semantic tokens and Nuxt UI components.
 1. **Read HTML** — Read the `.stitch/designs/{page}.html` file (or user-provided path). If the local file does not exist, fetch HTML via `mcp__stitch__get_screen` using the screen's `htmlCode.downloadUrl`.
 2. **Extract body** — Strip `<head>`, `<script>` (including `tailwind.config`), and `<html>`/`<body>` wrappers. Keep only the inner content.
 3. **Extract tailwind.config** — Parse the inline `tailwind.config` from `<script>` tag to understand project colors, fonts, and radius. This is the token source (Stitch does NOT use CSS variables).
-4. **CLASS_MAP remap** — Apply the full CLASS_MAP table below to replace Tailwind utility classes with Nuxt UI semantic tokens.
+4. **CLASS_MAP remap** — Apply CLASS_MAP to replace Tailwind utility classes with Nuxt UI semantic tokens. Source of truth: `@cellm-ai/stitch-bridge/class-map` (`resolveClass()` + `matchColor()` for DeltaE fallback). Tables below are human-readable reference.
 5. **Remove dark: prefixes** — Delete all `dark:*` classes. Nuxt UI handles dark mode automatically via the theming layer.
 6. **DeltaE hex matching** — For hardcoded hex values (`bg-[#F8FAFC]`, `text-[#2C2C2C]`), compare against `tailwind.config` colors and DSE palette using deltaE color distance. Map to nearest semantic token if deltaE < 10.
 7. **Component substitution** — Replace HTML elements with Nuxt UI components using the substitution table below.
