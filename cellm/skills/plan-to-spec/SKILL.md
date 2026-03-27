@@ -28,7 +28,7 @@ Convert a user-approved plan into a spec tree through the SCE decomposition brid
 3. **Pre-decomposition deadweight scan**: Use `Grep` and `Glob` to scan target files for deadweight patterns: `USkeleton`, `UCard` containers, `rounded-lg border-default` wrappers, `page-title`/`page-subtitle` CSS, `overflow-hidden` on `nc-bracket`, inline styles, `ds-*` legacy classes. Results feed as gap nodes into the decomposition payload. Gate behavior: WARN only (does not block decomposition). Scan findings listed in context field. User confirms before proceeding.
 4. Build decomposition payload from approved plan (including deadweight scan gaps).
 5. Execute `context_spec_decompose` (fallback: `spec_decompose` / `spec_create_node` path).
-6. Validate structure (`spec_get_tree`, `spec_get_counters`) and report next execution step.
+6. **Post-decomposition validation (MANDATORY)**: Run `spec_get_tree` AND `spec_get_counters` for the new check. If tree is empty or counters show 0 tasks, the decomposition FAILED silently. Retry once via fallback path (`spec_create_node`). If still empty, **ABORT and report**: "Decomposition produced 0 tasks — check exists but is hollow. Manual intervention required." Never return success with 0 tasks.
 
 ## Spec Fallback YAML (CELLM_DEV_MODE only)
 

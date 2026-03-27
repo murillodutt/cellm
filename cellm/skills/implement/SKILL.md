@@ -25,11 +25,13 @@ Implement the next executable spec task as a thin consumer of SCE context.
 ## Routing
 
 1. Resolve project and check (`spec_search` + `spec_get_tree`).
-2. Run `context_preflight` and consume `renderedMarkdown`/envelope as-is.
-3. Execute task and required verification commands.
-4. Register verification state (`spec_get_verifications` + `spec_record_verification`).
-5. Transition task state with `spec_transition`.
-6. Emit outcome via `context_record_outcome`.
+2. **Empty tree guard**: If `spec_get_tree` returns empty YAML/JSON for an `active` check, run `spec_get_counters`. If counters also show 0 tasks, **STOP and escalate**: "Check is active but has 0 tasks — decomposition likely failed. Run /cellm:plan-to-spec to recreate." Do NOT execute work outside the spec tree.
+3. Run `context_preflight` and consume `renderedMarkdown`/envelope as-is.
+4. Execute task and required verification commands.
+5. Register verification state (`spec_get_verifications` + `spec_record_verification`).
+6. Transition task state with `spec_transition`.
+7. **Post-execution reconciliation**: Run `spec_get_counters` and verify `completed` count incremented. If the task transition succeeded but counters did not change, warn: "Task transitioned but counters stale — possible DB inconsistency."
+8. Emit outcome via `context_record_outcome`.
 
 ## Evolutionary Analytical Feedback
 
