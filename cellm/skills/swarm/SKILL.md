@@ -42,6 +42,32 @@ Before launching agents, extract the fallback path from the check's `context` fi
 
 Do NOT block execution if missing — warn only. The user decides whether to proceed.
 
+## NC Reference Metrics (Design System Defaults)
+
+When agents receive NC migration or UI alignment tasks, include these **reference defaults** from Timeline (canonical page). These are Tailwind utility classes, not absolute pixel values. Responsive utilities may override at narrow breakpoints.
+
+| Element | Class | Purpose |
+|---------|-------|---------|
+| Page sections | `gap-3` | Vertical gap between header, KPI, filters, scroll |
+| Filter bar | `py-3 border-b border-default` | Filter toolbar separator |
+| Scroll area top | `pt-2` | Space between filter bar and first card |
+| Card wrapper | `px-2 pb-2` | Per-card horizontal + bottom spacing |
+| Card surface | `nc-glass nc-bracket nc-interactive` | Glass surface with bracket corners |
+| Inner content | `p-3` | Padding inside clickable card element |
+| Page container | `flex flex-col overflow-hidden` | Full-height flex layout |
+| Scroll container | `flex-1 min-h-0 overflow-y-auto` | Fills remaining space |
+
+## DAG Validation Runbook (Before Launching Swarm)
+
+The `spec_claim_next` mechanism correctly validates `depends_on` edges at claim time. However, **malformed DAG edges** during decomposition can cause unexpected task ordering. Before launching a swarm:
+
+1. **Verify edges**: `spec_get_tree` — confirm `depends_on`/`blocks` edges reflect the intended execution order.
+2. **Complete prerequisites**: If Phase 0 is a prerequisite for all other phases, complete it sequentially before launching the swarm.
+3. **Confirm counters**: `spec_get_counters` — verify Phase 0 (or prerequisite phase) shows `done` before dispatching agents.
+4. **Watch for orphans**: Tasks with no incoming edges will be claimed immediately — ensure they are truly independent.
+
+> This is NOT a bug in `spec_claim_next`. It is a risk of poorly modeled DAG edges during `spec_decompose`. Quality of the decomposition determines quality of the swarm execution.
+
 ## NEVER
 
 - **Skip SCE gates** — no swarm launch without preflight/certify policy.

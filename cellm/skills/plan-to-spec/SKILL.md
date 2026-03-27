@@ -25,15 +25,16 @@ Convert a user-approved plan into a spec tree through the SCE decomposition brid
 
 1. Read plan file and detect project root.
 2. Run dedup (`spec_search`) and confirm action with user.
-3. Build decomposition payload from approved plan.
-4. Execute `context_spec_decompose` (fallback: `spec_decompose` / `spec_create_node` path).
-5. Validate structure (`spec_get_tree`, `spec_get_counters`) and report next execution step.
+3. **Pre-decomposition deadweight scan**: Use `Grep` and `Glob` to scan target files for deadweight patterns: `USkeleton`, `UCard` containers, `rounded-lg border-default` wrappers, `page-title`/`page-subtitle` CSS, `overflow-hidden` on `nc-bracket`, inline styles, `ds-*` legacy classes. Results feed as gap nodes into the decomposition payload. Gate behavior: WARN only (does not block decomposition). Scan findings listed in context field. User confirms before proceeding.
+4. Build decomposition payload from approved plan (including deadweight scan gaps).
+5. Execute `context_spec_decompose` (fallback: `spec_decompose` / `spec_create_node` path).
+6. Validate structure (`spec_get_tree`, `spec_get_counters`) and report next execution step.
 
 ## Spec Fallback YAML (CELLM_DEV_MODE only)
 
 When `CELLM_DEV_MODE: true` (verify via `get_status` MCP -> `config.devMode`):
 
-After `spec_decompose` succeeds (step 8), generate a pure YAML fallback file at `.claude/specs/{check-slug}.yaml`.
+After `context_spec_decompose` succeeds (step 5), generate a pure YAML fallback file at `.claude/specs/{check-slug}.yaml`.
 
 | Rule | Detail |
 |------|--------|

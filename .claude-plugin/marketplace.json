@@ -11,25 +11,25 @@
   "plugins": [
     {
       "name": "cellm",
-      "version": "0.35.89",
+      "version": "0.35.90",
       "source": "./cellm",
       "description": "Context Engineering for LLM-driven development"
     },
     {
       "name": "docops",
-      "version": "0.35.89",
+      "version": "0.35.90",
       "source": "./docops",
       "description": "Documentation maintenance with LLM-first templates, drift control, and cleanup"
     },
     {
       "name": "gdu",
-      "version": "0.35.89",
+      "version": "0.35.90",
       "source": "./gdu",
       "description": "Goold Design UI (GDU): The definitive Vue 3, Nuxt 4, and Tailwind architect plugin. Enforces CELLM mantra: Verify before you act, document everything."
     },
     {
       "name": "stitch",
-      "version": "0.35.89",
+      "version": "0.35.90",
       "source": "./stitch",
       "description": "Google Stitch design bridge: bidirectional design-to-code with DSE token translation and gap detection"
     }
