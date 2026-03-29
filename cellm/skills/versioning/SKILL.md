@@ -32,17 +32,18 @@ One version, one reality. Source of truth: `VERSION` file.
 
 | Artifact | Syncs from VERSION |
 |----------|--------------------|
-| `package.json` | `scripts/sync-version.sh` |
-| `plugin.json` (cellm) | `scripts/sync-version.sh` |
-| `marketplace.json` | `scripts/sync-version.sh` |
-| `VERSION.md` | `scripts/sync-version.sh` |
+| `package.json` | `cellm:bump` skill |
+| `plugin.json` (all plugins) | `cellm:bump` skill (auto-discovered) |
+| `marketplace.json` | `cellm:bump` skill |
+| `VERSION.md` | `cellm:bump` skill |
+| Project-specific targets | `cellm.json` → `versionTargets[]` |
 
 Sub-plugins (`dse`, `docops`) version independently.
 
 ## NEVER
 
 - **MAJOR without discussion** — breaking changes require explicit alignment
-- **Bump one without syncing all** — run `scripts/sync-version.sh` or edit VERSION + all artifacts
+- **Bump one without syncing all** — use `cellm:bump` skill to sync all targets
 - **Inflate MAJOR in pre-production** — stay on 0.x.y until real users depend on the API
 - **Guess current version** — read `VERSION` file first, then decide increment
 - **Skip pre-release tags** — use `-alpha`, `-beta`, `-rc` for unstable work
