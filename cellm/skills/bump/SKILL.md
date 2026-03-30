@@ -3,7 +3,7 @@ description: "Bump project version and sync across all targets. Auto-discovers V
 user-invocable: false
 disable-model-invocation: false
 argument-hint: "[patch|minor|major|x.y.z]"
-allowed-tools: Read, Write, Edit, Glob, Grep
+allowed-tools: Read, Write, Edit, Glob, Grep, Bash(python3 *), Bash(bash *), Bash(cat *)
 ---
 
 # Bump — Version Sync Across All Targets
@@ -38,8 +38,9 @@ Search in order (first found wins):
 | `minor` | Increment minor, reset patch: `0.35.94` -> `0.36.0` |
 | `major` | Increment major, reset minor+patch: `0.35.94` -> `1.0.0` |
 | `x.y.z` (explicit) | Set exactly to `x.y.z` |
+| `x.y.z-tag` (pre-release) | Set exactly to `x.y.z-tag` (e.g. `1.0.0-alpha.1`, `0.36.0-rc.1`) |
 
-Parse SemVer strictly: `MAJOR.MINOR.PATCH`. Reject non-SemVer input.
+Parse SemVer: `MAJOR.MINOR.PATCH` or `MAJOR.MINOR.PATCH-prerelease`. Reject input that does not start with digits in `X.Y.Z` format.
 
 ### 3. Discover sync targets
 
@@ -89,6 +90,19 @@ Project identity detection (try in order until config file found):
 If config file does not exist: use only auto-discovered targets. This is normal for most projects.
 
 ### 5. Apply version (ordered, with abort policy)
+
+**Preferred: single Bash call with inline python** for atomic execution:
+```
+Bash: python3 -c "..." that reads all targets, applies version, reports results
+```
+This avoids N sequential Edit tool calls (12+ calls vs 1). The python script should:
+- Write VERSION first (abort if fails)
+- JSON parse/write for package.json and plugin.json files
+- JSON parse + iterate plugins[] for marketplace.json (never string replace)
+- Regex replace for markdown and custom targets
+- Print report with updated/failed targets
+
+**Fallback: individual Edit tool calls** (when Bash is not available or not permitted):
 
 Write targets in this order:
 
