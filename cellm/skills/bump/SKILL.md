@@ -156,8 +156,15 @@ Next steps (or let /sk-git handle):
   git push
 ```
 
-The commit message `chore(scripts): bump version to X.Y.Z` is required for
-`getVersionTimeline()` compatibility (regex: `bump.*version.*to\s+v?(\d+\.\d+\.\d+)`).
+The commit message `chore(scripts): bump version to X.Y.Z` is the recommended format.
+The changelog pipeline (`getVersionTimeline()`) accepts all of these formats:
+- `bump version to X.Y.Z` (default, recommended)
+- `bump version X.Y.Z -> X.Y.Z` (ASCII arrow)
+- `bump version X.Y.Z \u2192 X.Y.Z` (unicode arrow)
+- `bump version X.Y.Z` (bare)
+- `bump deps + version X.Y.Z`
+
+Detection regex: `bump.*version` + last semver extraction from subject.
 
 ### 9. Generate changelog for closed version
 
