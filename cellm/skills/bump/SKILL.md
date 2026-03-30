@@ -135,6 +135,7 @@ Success:
     - cellm-plugin/.claude-plugin/marketplace.json
     - oracle/server/utils/server-state.ts
 [+] Self-validation: all targets in sync
+[+] Changelog: 12 conventional + 3 AI = 15 entries generated for v0.35.95
 ```
 
 Partial:
@@ -158,14 +159,24 @@ Next steps (or let /sk-git handle):
 The commit message `chore(scripts): bump version to X.Y.Z` is required for
 `getVersionTimeline()` compatibility (regex: `bump.*version.*to\s+v?(\d+\.\d+\.\d+)`).
 
-## Changelog Integration
+### 9. Generate changelog for closed version
 
-After bump + commit, the changelog subsystem (`getVersionTimeline()` in `version-topology.ts`)
-automatically detects the new version marker via the bump commit message. No manual
-changelog generation is needed — the version interval is created as a consequence of the bump.
+**This step is MANDATORY.** Every bump closes a version interval. The skill MUST generate the changelog for that interval before finishing — regardless of how the skill was invoked (direct, /sk-git, or NL request).
 
-If the Oracle is running, `/sk-git` will call `POST /api/changelog/generate` with the
-new version to materialize changelog entries for the closed interval.
+Call the Oracle changelog endpoint:
+```
+POST http://localhost:{ORACLE_PORT}/api/changelog/generate
+Body: { "project": "{project}", "version": "v{NEW_VERSION}", "regenerate": true }
+```
+
+- Read Oracle port from `~/.cellm/worker.json` (field `port`, default `31415`)
+- If Oracle is offline (curl fails): report `[!] Oracle offline — changelog generation skipped. Run manually after Oracle starts.`
+- If Oracle returns entries: report count in summary
+- If Oracle returns 0 entries: report `[i] No classified commits for this version (bump-only or all excluded by policy)`
+
+The changelog pipeline (conventional parser + LLM gap-filler) will analyze ALL commits between the previous version and the new version, producing a structured Keep a Changelog summary with categories (Added, Changed, Fixed) and component attribution.
+
+**This is what makes each version release self-documenting.**
 
 ## NEVER
 
