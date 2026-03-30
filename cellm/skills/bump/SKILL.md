@@ -185,6 +185,21 @@ The changelog pipeline (conventional parser + LLM gap-filler) will analyze ALL c
 
 **This is what makes each version release self-documenting.**
 
+### 10. Generate release notes summary
+
+After step 9 completes, generate an editorial release summary:
+
+```
+POST http://localhost:{ORACLE_PORT}/api/changelog/release-notes
+Body: { "project": "{project}", "version": "v{NEW_VERSION}" }
+```
+
+- If Oracle is offline: report `[!] Oracle offline — release notes skipped.`
+- If Oracle returns notes: report summary length in output
+- If Oracle returns no entries: report `[i] No entries for release notes (version has no classified changes)`
+
+This step synthesizes the granular changelog entries into a human-readable narrative summary with thematic synthesis, breaking changes, and migration notes.
+
 ## NEVER
 
 - **NEVER bump without reading current version first** — always detect from source of truth.
