@@ -49,7 +49,7 @@ Auto-discover from project root:
 |--------|-----------|-------------|
 | `VERSION` | File exists at root | Write plain text |
 | `package.json` (root) | Always exists | JSON: update `version` field |
-| `**/package.json` (workspaces) | Read root `package.json` -> check `workspaces` array -> Glob each pattern (e.g. `oracle/package.json`) -> collect all workspace package.json files | JSON: update `version` field |
+| `**/package.json` (workspaces + siblings) | First: read root `package.json` -> check `workspaces` array -> Glob each pattern. Second: if no workspaces field, Glob `*/package.json` (direct subdirectories only, exclude node_modules) to find sibling packages like `oracle/package.json` | JSON: update `version` field |
 | `**/.claude-plugin/plugin.json` | Glob (exclude node_modules) | JSON: update `version` field |
 | `**/.claude-plugin/marketplace.json` | Glob | JSON: Read file, parse JSON, iterate `plugins[]` array, update each entry's `version` field individually, write back. Do NOT use replace_all — entries may have different versions for independent sub-plugins. |
 | `VERSION.md` | File exists at root | Regex: `**Current Version**: X.Y.Z` |
@@ -63,7 +63,10 @@ Then load project-specific targets from `~/.cellm/bump/bump-{project}.json` (if 
 ~/.cellm/bump/bump-{project}.json
 ```
 
-Project identity: `package.json#name` or `basename(cwd)`.
+Project identity detection (try in order until config file found):
+1. `basename(cwd)` — e.g. `cellm-private` -> `~/.cellm/bump/bump-cellm-private.json`
+2. `package.json#name` — e.g. `cellm` -> `~/.cellm/bump/bump-cellm.json`
+3. If neither config exists: use only auto-discovered targets (normal for most projects)
 
 ```json
 {
@@ -90,6 +93,7 @@ If config file does not exist: use only auto-discovered targets. This is normal 
 Write targets in this order:
 
 1. **VERSION** (source of truth) — if this fails, **ABORT everything**
+   - If VERSION file does NOT exist: **do NOT create it**. Use `package.json` as source of truth instead. Write package.json first and treat it as the abort-on-fail target.
 2. **package.json** files — if fail, report and continue
 3. **plugin.json** + **marketplace.json** — if fail, report and continue
 4. **Markdown** (VERSION.md, CLAUDE.md) — if fail, report and continue
