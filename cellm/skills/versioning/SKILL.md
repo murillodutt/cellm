@@ -36,7 +36,7 @@ One version, one reality. Source of truth: `VERSION` file.
 | `plugin.json` (all plugins) | `cellm:bump` skill (auto-discovered) |
 | `marketplace.json` | `cellm:bump` skill |
 | `VERSION.md` | `cellm:bump` skill |
-| Project-specific targets | `cellm.json` → `versionTargets[]` |
+| Project-specific targets | `~/.cellm/bump/bump-{project}.json` → `versionTargets[]` |
 
 Sub-plugins (`dse`, `docops`) version independently.
 

@@ -49,9 +49,9 @@ Auto-discover from project root:
 |--------|-----------|-------------|
 | `VERSION` | File exists at root | Write plain text |
 | `package.json` (root) | Always exists | JSON: update `version` field |
-| `**/package.json` (workspaces) | `workspaces` field in root package.json | JSON: update `version` field |
+| `**/package.json` (workspaces) | Read root `package.json` -> check `workspaces` array -> Glob each pattern (e.g. `oracle/package.json`) -> collect all workspace package.json files | JSON: update `version` field |
 | `**/.claude-plugin/plugin.json` | Glob (exclude node_modules) | JSON: update `version` field |
-| `**/.claude-plugin/marketplace.json` | Glob | JSON: update ALL `plugins[].version` entries |
+| `**/.claude-plugin/marketplace.json` | Glob | JSON: Read file, parse JSON, iterate `plugins[]` array, update each entry's `version` field individually, write back. Do NOT use replace_all — entries may have different versions for independent sub-plugins. |
 | `VERSION.md` | File exists at root | Regex: `**Current Version**: X.Y.Z` |
 | `CLAUDE.md` | File exists at root | Regex: `> Version: X.Y.Z` |
 
@@ -95,7 +95,14 @@ Write targets in this order:
 4. **Markdown** (VERSION.md, CLAUDE.md) — if fail, report and continue
 5. **Custom targets** (from config) — if fail, report and continue
 
-### 6. Report
+### 6. Self-validation
+
+After all writes, verify sync is complete:
+- If `scripts/sync-version.sh` exists in the project: run `bash scripts/sync-version.sh --check-only`
+- If not: re-read VERSION and at least 2 other targets, confirm version string matches
+- If validation fails: report which targets are out of sync before the summary
+
+### 7. Report
 
 Success:
 ```
@@ -109,6 +116,7 @@ Success:
     - cellm-plugin/cellm/.claude-plugin/plugin.json
     - cellm-plugin/.claude-plugin/marketplace.json
     - oracle/server/utils/server-state.ts
+[+] Self-validation: all targets in sync
 ```
 
 Partial:
@@ -119,7 +127,7 @@ Partial:
 [+] Run /sk-git check to verify sync status
 ```
 
-### 7. Post-bump instructions
+### 8. Post-bump instructions
 
 After bump completes, output:
 ```
