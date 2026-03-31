@@ -166,24 +166,124 @@ The changelog pipeline (`getVersionTimeline()`) accepts all of these formats:
 
 Detection regex: `bump.*version` + last semver extraction from subject.
 
-### 9. Generate changelog for closed version
+### 9. Generate and submit changelog entries
 
-**This step is MANDATORY.** Every bump closes a version interval. The skill MUST generate the changelog for that interval before finishing — regardless of how the skill was invoked (direct, /sk-git, or NL request).
+**This step is MANDATORY.** Every bump closes a version interval. The skill MUST classify and submit changelog entries before finishing — regardless of how the skill was invoked (direct, /sk-git, or NL request).
 
-Call the Oracle changelog endpoint:
+#### 9.1 Determine the previous version tag
+
+Run: `git tag --sort=-version:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+' | head -2`
+
+The second result is `{PREV_TAG}` (the tag before the one just created). If no previous tag exists, use the first commit: `git rev-list --max-parents=0 HEAD`.
+
+#### 9.2 Collect commits
+
+Run: `git log --oneline {PREV_TAG}..HEAD`
+
+Each line has format: `{HASH} {SUBJECT}`
+
+#### 9.3 Classify each commit
+
+For each commit, apply the **Changelog Entry Classification** rules below. Produce a list of classified entries; skip all excluded commits.
+
+#### 9.4 Include completed CellmOS specs (if any)
+
+Call `spec_get_tree` with no arguments to list all specs. Filter specs whose status is `completed` and whose `version` field matches `v{NEW_VERSION}`. For each matched spec, produce one entry using the spec-to-changelog mapping rules below.
+
+#### 9.5 Submit all entries
+
+Call the `changelog_submit` MCP tool once with all entries:
+
 ```
-POST http://localhost:{ORACLE_PORT}/api/changelog/generate
-Body: { "project": "{project}", "version": "v{NEW_VERSION}", "regenerate": true }
+changelog_submit({
+  project: "{project}",
+  version: "v{NEW_VERSION}",
+  entries: [
+    {
+      commitHash: "{HASH}",
+      category: "added" | "changed" | "fixed",
+      title: "{entry title}",
+      component: "{component}" (optional),
+      breaking: true | false (optional, default false)
+    },
+    ...
+  ]
+})
 ```
 
-- Read Oracle port from `~/.cellm/worker.json` (field `port`, default `31415`)
-- If Oracle is offline (curl fails): report `[!] Oracle offline — changelog generation skipped. Run manually after Oracle starts.`
-- If Oracle returns entries: report count in summary
-- If Oracle returns 0 entries: report `[i] No classified commits for this version (bump-only or all excluded by policy)`
+- `project`: `basename(cwd)` or `package.json#name`
+- `version`: `v{NEW_VERSION}` with leading `v`
+- If there are zero entries after filtering: skip the `changelog_submit` call and report `[i] No changelog entries for this version`
 
-The changelog pipeline (conventional parser + LLM gap-filler) will analyze ALL commits between the previous version and the new version, producing a structured Keep a Changelog summary with categories (Added, Changed, Fixed) and component attribution.
+#### 9.6 Report
+
+```
+[+] Changelog: {N} entries submitted for v{NEW_VERSION}
+```
+
+If zero entries: `[i] No classified commits for this version (bump-only or all excluded by policy)`
 
 **This is what makes each version release self-documenting.**
+
+---
+
+### Changelog Entry Classification
+
+#### Conventional Commit Regex
+
+```
+^(feat|fix|refactor|perf|docs|style|revert)(\(.*\))?!?: (.+)
+```
+
+- Group 1: type (`feat`, `fix`, etc.)
+- Group 2 (optional): scope in parentheses, e.g. `(oracle)` — used for component inference
+- `!` before `:` indicates a breaking change → set `breaking: true`
+- Group 3: subject text → use as `title`
+
+#### Type → Category Mapping
+
+| Commit type | `category` |
+|-------------|-----------|
+| `feat` | `added` |
+| `fix` | `fixed` |
+| `refactor`, `perf`, `docs`, `style`, `revert` | `changed` |
+| (no match / freeform) | `changed` |
+
+#### Exclusion Rules (skip these commits entirely)
+
+| Rule | Detection |
+|------|-----------|
+| Merge commits | Subject starts with `Merge ` or has `^Merge branch` |
+| Bump commits | Subject matches `bump.*version` (case-insensitive) |
+| Lock file changes | Subject contains `lock`, `yarn.lock`, `bun.lock`, `package-lock` |
+| Bot authors | Author email contains `[bot]` or `noreply@github.com` (check via `git log --format="%ae" -1 {HASH}`) |
+
+#### Component Inference (optional field)
+
+Resolve `component` in this priority order:
+
+1. **Scope from conventional commit**: if group 2 matched, strip parentheses → component (e.g. `(oracle)` → `oracle`)
+2. **File path heuristic**: run `git show --stat {HASH} | head -20`, check changed paths:
+   - `oracle/` → `oracle`
+   - `cellm-plugin/` → `plugin`
+   - `app/` or `server/` → `dashboard`
+   - `cellm-core/` → `core`
+   - `.claude/` → `claude`
+3. If neither applies: omit `component`
+
+#### Spec-to-Changelog Mapping
+
+For each completed spec matched to `v{NEW_VERSION}`:
+
+| Spec tag | `category` |
+|----------|-----------|
+| `bugfix`, `fix`, `cure` | `fixed` |
+| `feat`, `feature` | `added` |
+| (anything else) | `changed` |
+
+- `commitHash`: use the spec's `id` field prefixed with `spec-` (e.g. `spec-b4cd96f3`)
+- `title`: use the spec's `title` field
+- `component`: use the spec's `scope` or `component` field if present
 
 ### 10. Generate release notes summary
 
