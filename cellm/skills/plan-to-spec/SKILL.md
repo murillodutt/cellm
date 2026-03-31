@@ -55,6 +55,22 @@ Ensure `.claude/specs/` directory exists before writing (`mkdir -p`).
 
 When `CELLM_DEV_MODE: true`: after conversion, write feedback entry to `dev-cellm-feedback/entries/plan-to-spec-{date}-{seq}.md`. Note which plan sections mapped cleanly vs required interpretation, whether DSE alignment surfaced useful constraints, and how many composite actions were split. Format and lifecycle: see `dev-cellm-feedback/README.md`.
 
+## Convergence Gate (Auto-Injected)
+
+The `decomposeSpec()` service automatically injects a terminal **Convergence Gate** phase as the last phase of every spec. This phase:
+
+- Collects `successCriteria` from all user phases into a single verification checklist
+- Contains one task with a convergence loop protocol (verify → fix → repeat)
+- Has `depends_on` edges to ALL user phases (cannot start until all complete)
+
+**Suppression:** Pass `injectConvergenceGate: false` in the decomposition payload to skip gate injection (for trivial specs or tests).
+
+**Content governance (v1 → v2 transition, decision spec-1a5dee34):**
+- **v1 (current):** Static template with aggregated criteria + verification protocol
+- **v2 (future):** Agent C output from the A/B/C protocol replaces the static template. Three agents with separated context (Autor → Revisor → Sintetizador) produce a validated convergence protocol per spec.
+
+The skill does NOT need to manually add the Convergence Gate phase — it is injected by the service after all user phases are built.
+
 ## NEVER
 
 - **Create spec without user confirmation** — always confirm extracted structure first.
