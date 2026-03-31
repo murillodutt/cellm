@@ -69,6 +69,17 @@ The `decomposeSpec()` service automatically injects a terminal **Convergence Gat
 - **v1 (current):** Static template with aggregated criteria + verification protocol
 - **v2 (future):** Agent C output from the A/B/C protocol replaces the static template. Three agents with separated context (Autor → Revisor → Sintetizador) produce a validated convergence protocol per spec.
 
+### v2 Integration (A/B/C in decomposition flow)
+
+When the spec is `priority: critical` or `priority: high`, the skill SHOULD run the A/B/C protocol **before** calling `context_spec_decompose`:
+
+1. **Step 4.5a (Agent A):** Pass spec metadata + successCriteria to Autor agent → `convergence-draft`
+2. **Step 4.5b (Agent B):** Pass draft to Revisor agent (separated context) → `convergence-review`
+3. **Step 4.5c (Agent C):** Pass draft + review to Sintetizador → extract Section 5 text
+4. **Step 5:** Call `context_spec_decompose` with `convergenceGateAction: agentCOutput`
+
+The service replaces `{{successCriteria}}` placeholder in the custom text with the aggregated criteria list.
+
 The skill does NOT need to manually add the Convergence Gate phase — it is injected by the service after all user phases are built.
 
 ## NEVER
