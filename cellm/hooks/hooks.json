@@ -106,6 +106,12 @@
             "type": "command",
             "command": "${CLAUDE_PLUGIN_ROOT}/scripts/post-hook-http.sh /api/hooks/spec-reconcile",
             "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/detect-build-profile.sh",
+            "timeout": 5,
+            "async": true
           }
         ]
       },

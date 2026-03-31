@@ -67,7 +67,7 @@ The `decomposeSpec()` service automatically injects a terminal **Convergence Gat
 
 **Content governance (v1 → v2 transition, decision spec-1a5dee34):**
 - **v1 (current):** Static template with aggregated criteria + verification protocol
-- **v2 (future):** Agent C output from the A/B/C protocol replaces the static template. Three agents with separated context (Autor → Revisor → Sintetizador) produce a validated convergence protocol per spec.
+- **v2 (implemented):** Agent C output from the A/B/C protocol replaces the static template via `convergenceGateAction` field. Three agents with separated context (Autor → Revisor → Sintetizador) produce a validated convergence protocol per spec.
 
 ### v2 Integration (A/B/C in decomposition flow)
 
