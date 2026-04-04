@@ -2,7 +2,7 @@
 description: "Intelligent spec execution advisor — analyzes spec structure, proposes optimal per-phase strategy, orchestrates execution with quality gates and go/no-go evaluations. Use when: 'execute spec', 'run spec', 'execute', 'best strategy for spec', 'execute check'."
 user-invocable: true
 argument-hint: "[spec check ID, title, or search term]"
-allowed-tools: mcp__plugin_cellm_cellm-oracle__spec_search, mcp__plugin_cellm_cellm-oracle__spec_get_tree, mcp__plugin_cellm_cellm-oracle__spec_get_counters, mcp__plugin_cellm_cellm-oracle__context_preflight, mcp__plugin_cellm_cellm-oracle__context_record_outcome, mcp__plugin_cellm_cellm-oracle__context_certify, mcp__plugin_cellm_cellm-oracle__go_no_go_evaluate, mcp__plugin_cellm_cellm-oracle__go_no_go_record, mcp__plugin_cellm_cellm-oracle__go_no_go_render, mcp__plugin_cellm_cellm-oracle__quality_gate, Task, Skill, AskUserQuestion
+allowed-tools: mcp__plugin_cellm_cellm-oracle__spec_search, mcp__plugin_cellm_cellm-oracle__spec_get_tree, mcp__plugin_cellm_cellm-oracle__spec_get_counters, mcp__plugin_cellm_cellm-oracle__context_preflight, mcp__plugin_cellm_cellm-oracle__context_record_outcome, mcp__plugin_cellm_cellm-oracle__context_certify, mcp__plugin_cellm_cellm-oracle__go_no_go_evaluate, mcp__plugin_cellm_cellm-oracle__go_no_go_record, mcp__plugin_cellm_cellm-oracle__go_no_go_render, mcp__plugin_cellm_cellm-oracle__go_no_go_history, mcp__plugin_cellm_cellm-oracle__execution_plan_build, mcp__plugin_cellm_cellm-oracle__execution_plan_explain, mcp__plugin_cellm_cellm-oracle__quality_gate, Task, Skill, AskUserQuestion
 ---
 
 # execute — Intelligent Spec Execution Advisor
@@ -36,10 +36,12 @@ Analyze a decomposed spec and propose the optimal execution strategy per phase, 
 1. Resolve spec via `spec_search`.
 2. Load tree via `spec_get_tree` (yaml format) + `spec_get_counters`.
 3. **Empty tree guard**: If tree has 0 tasks or counters show 0 total, STOP and escalate: "Check is active but has 0 tasks — decomposition likely failed. Run /cellm:plan-to-spec to recreate."
-4. Build DAG adjacency from edges — identify parallel groups and linear chains.
-4. Compute risk score per phase.
-5. Select strategy per phase using decision rules.
-6. Group phases into execution steps.
+4. **Deterministic planner**: Call `execution_plan_build` with the check path and desired mode. This computes DAG grouping, risk scores, and strategy selection deterministically.
+   - If planner returns `source: 'planner'`: use the computed plan directly (steps 5-6 are handled by the planner).
+   - If planner returns `source: 'manual-fallback'`: present `[FALLBACK]` badge and use the conservative plan. The `fallbackReason` field explains why (e.g., `PLANNER_DISABLED`, API error).
+5. Build DAG adjacency from edges — identify parallel groups and linear chains. *(Only when planner unavailable — fallback path.)*
+6. Compute risk score per phase. *(Only when planner unavailable — fallback path.)*
+7. Select strategy per phase using decision rules. *(Only when planner unavailable — fallback path.)*
 
 ### Stage 2: Proposal
 
@@ -106,6 +108,7 @@ Risk score maps to a confidence band that determines checkpoint granularity:
 
 Rules are evaluated top-to-bottom. **First match wins** — no fallthrough.
 
+0. **Partially completed phase** -> `cellm:implement` (never parallelize partial phases)
 1. **Convergence Gate phase** -> `cellm:spec-treat` (always — SCE certification required)
 2. **Risk >= 6** -> `cellm:implement` (sequential, maximum control)
 3. **1-2 tasks** -> `cellm:implement` (orchestration overhead not worth it)
@@ -119,7 +122,7 @@ Rules are evaluated top-to-bottom. **First match wins** — no fallthrough.
 
 Parallelizable ratio = tasks with no unsatisfied `depends_on` edges / total pending tasks. Computed from `spec_get_tree` edges.
 
-Phases partially completed (some tasks done, some pending) are excluded from parallel groups — they run individually via `cellm:implement`.
+Phases partially completed (some tasks done, some pending) are handled by rule 0 — they run individually via `cellm:implement`.
 
 ## Execution Mode
 
@@ -184,7 +187,8 @@ In `balanced` and `throughput` modes, batch consecutive high-confidence steps an
 
 ### Evaluate
 When calling `go_no_go_evaluate`, pass IDs from the resolved spec tree:
-- **phase_exit**: `{ projectKey, subjectType: "phase", subjectRef: { phaseId: "<phase-id>" }, decisionClass: "phase_exit" }`
+- **phase_exit**: `{ projectKey, subjectType: "phase", subjectRef: { phaseId: "<phase-id>", phaseTypeKey: "<type>" }, decisionClass: "phase_exit" }`
+  - `phaseTypeKey` is derived from the phase specialist role: `convergence-gate`, `db-specialist`, `security-specialist`, `ui-specialist`, `api-specialist`, or `general`. Always include it — the execution planner uses it for empirical risk adjustment.
 - **check_exit**: `{ projectKey, subjectType: "check", subjectRef: { checkId: "<check-id>" }, decisionClass: "check_exit" }`
 
 ### Record (mandatory after every evaluate)

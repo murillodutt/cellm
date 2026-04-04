@@ -51,6 +51,11 @@
         "hooks": [
           {
             "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/post-hook-http.sh /api/hooks/plan-enforcement",
+            "timeout": 3
+          },
+          {
+            "type": "command",
             "command": "${CLAUDE_PLUGIN_ROOT}/scripts/post-hook-http.sh /api/hooks/check-tags",
             "timeout": 2
           }
