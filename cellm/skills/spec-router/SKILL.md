@@ -1,7 +1,7 @@
 ---
 description: Passive CellmOS work classifier — routes each action to trivial (just do it), query (research first), or spec (create check in DB) before execution. Activates before non-trivial work to prevent ungoverned changes. Complements cellm:spec, does not replace it.
 user-invocable: false
-allowed-tools: mcp__cellm-oracle__context_preflight, mcp__cellm-oracle__spec_search, mcp__cellm-oracle__spec_transition, mcp__cellm-oracle__spec_create_node
+allowed-tools: mcp__plugin_cellm_cellm-oracle__context_preflight, mcp__plugin_cellm_cellm-oracle__spec_search, mcp__plugin_cellm_cellm-oracle__spec_transition, mcp__plugin_cellm_cellm-oracle__spec_create_node
 ---
 
 # Work Routing — Before Action

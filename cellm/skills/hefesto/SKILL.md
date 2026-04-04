@@ -2,7 +2,7 @@
 description: "CELLM feature construction engine — builds new capabilities from CONSTRUCT findings or direct feature requests. Designs architecture, decomposes into CellmOS specs, implements end-to-end, certifies via Argus. Use when: 'build', 'construct', 'create feature', 'implement new', 'hefesto on X', 'implement the CONSTRUCT items'. Does not fix existing code (that is Asclepius)."
 user-invocable: true
 argument-hint: "[feature description, CONSTRUCT finding ID, or block target]"
-allowed-tools: mcp__cellm-oracle__context_preflight, mcp__cellm-oracle__context_certify, mcp__cellm-oracle__context_record_outcome, mcp__cellm-oracle__spec_search, mcp__cellm-oracle__spec_create_node, mcp__cellm-oracle__spec_get_tree, mcp__cellm-oracle__spec_transition, mcp__cellm-oracle__spec_add_edge, Read, Grep, Glob, Write, Edit, Bash, Task, AskUserQuestion
+allowed-tools: mcp__plugin_cellm_cellm-oracle__context_preflight, mcp__plugin_cellm_cellm-oracle__context_certify, mcp__plugin_cellm_cellm-oracle__context_record_outcome, mcp__plugin_cellm_cellm-oracle__spec_search, mcp__plugin_cellm_cellm-oracle__spec_create_node, mcp__plugin_cellm_cellm-oracle__spec_get_tree, mcp__plugin_cellm_cellm-oracle__spec_transition, mcp__plugin_cellm_cellm-oracle__spec_add_edge, Read, Grep, Glob, Write, Edit, Bash, Task, AskUserQuestion
 ---
 
 # Hefesto — The Builder

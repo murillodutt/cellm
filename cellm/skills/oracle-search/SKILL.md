@@ -2,7 +2,7 @@
 description: "Search CELLM Oracle context and observations using semantic vector search. Uses 3-layer retrieval (search index, timeline context, full observations) to minimize tokens. Use when: 'search oracle', 'find in observations', 'oracle search for X'."
 user-invocable: true
 argument-hint: "query: your search query"
-allowed-tools: mcp__cellm-oracle__context_preflight, mcp__cellm-oracle__search, mcp__cellm-oracle__timeline, mcp__cellm-oracle__get_observations
+allowed-tools: mcp__plugin_cellm_cellm-oracle__context_preflight, mcp__plugin_cellm_cellm-oracle__search, mcp__plugin_cellm_cellm-oracle__timeline, mcp__plugin_cellm_cellm-oracle__get_observations
 context: fork
 background: true
 agent: Explore

@@ -2,7 +2,7 @@
 description: "Surgical fix engine with SCE-backed context, contract checks, and verifiable cure loop. Use when: 'cure this block', 'fix findings', 'asclepius on X'."
 user-invocable: true
 argument-hint: "[block or target name]"
-allowed-tools: mcp__cellm-oracle__spec_search, mcp__cellm-oracle__spec_create_node, mcp__cellm-oracle__spec_transition, mcp__cellm-oracle__spec_get_tree, mcp__cellm-oracle__context_preflight, mcp__cellm-oracle__context_certify, mcp__cellm-oracle__context_record_outcome, Read, Edit, Bash, Grep, Glob
+allowed-tools: mcp__plugin_cellm_cellm-oracle__spec_search, mcp__plugin_cellm_cellm-oracle__spec_create_node, mcp__plugin_cellm_cellm-oracle__spec_transition, mcp__plugin_cellm_cellm-oracle__spec_get_tree, mcp__plugin_cellm_cellm-oracle__context_preflight, mcp__plugin_cellm_cellm-oracle__context_certify, mcp__plugin_cellm_cellm-oracle__context_record_outcome, Read, Edit, Bash, Grep, Glob
 ---
 
 # asclepius

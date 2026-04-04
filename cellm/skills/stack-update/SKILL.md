@@ -2,7 +2,7 @@
 description: "Execute CELLM stack update specs — verify dependency updates, analyze impact, create fix specs proactively, commit, and certify via Olympus. Use when: 'stack update', 'close stack specs', 'verify dependency updates'."
 user-invocable: true
 argument-hint: "'all' to batch-process, package name, or check ID"
-allowed-tools: mcp__cellm-oracle__spec_search, mcp__cellm-oracle__spec_get_tree, mcp__cellm-oracle__spec_transition, mcp__cellm-oracle__spec_create_node, mcp__cellm-oracle__spec_add_edge, mcp__cellm-oracle__spec_get_counters, mcp__cellm-oracle__quality_gate, AskUserQuestion, Skill, Read, Grep, Glob, Bash(npx nuxt typecheck *), Bash(npx vue-tsc *), Bash(bun run test *), Bash(git *), Bash(bash scripts/sync-version.sh *), Bash(bun oracle/scripts/stack-update-helper.ts *)
+allowed-tools: mcp__plugin_cellm_cellm-oracle__spec_search, mcp__plugin_cellm_cellm-oracle__spec_get_tree, mcp__plugin_cellm_cellm-oracle__spec_transition, mcp__plugin_cellm_cellm-oracle__spec_create_node, mcp__plugin_cellm_cellm-oracle__spec_add_edge, mcp__plugin_cellm_cellm-oracle__spec_get_counters, mcp__plugin_cellm_cellm-oracle__quality_gate, AskUserQuestion, Skill, Read, Grep, Glob, Bash(npx nuxt typecheck *), Bash(npx vue-tsc *), Bash(bun run test *), Bash(git *), Bash(bash scripts/sync-version.sh *), Bash(bun oracle/scripts/stack-update-helper.ts *)
 ---
 
 # Stack Update — Full Lifecycle Dependency Management

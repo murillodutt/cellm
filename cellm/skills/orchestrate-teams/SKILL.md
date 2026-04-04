@@ -2,7 +2,7 @@
 description: "Execute CellmOS spec tasks using Agent Teams with parallel phase execution. Creates a coordinated team of specialist agents (implementer, reviewer, auditor) that work simultaneously on independent DAG phases in isolated worktrees. Use when: 'orchestrate-teams', 'run with teams', 'parallel execution', 'agent teams', 'swarm execute'. Prefer over /cellm:orchestrate when the spec has 3+ independent phases or when maximum throughput is desired."
 user-invocable: true
 argument-hint: "[spec check ID or search term]"
-allowed-tools: mcp__cellm-oracle__context_preflight, mcp__cellm-oracle__context_certify, mcp__cellm-oracle__context_record_outcome, mcp__cellm-oracle__spec_get_tree, mcp__cellm-oracle__spec_get_counters, mcp__cellm-oracle__spec_transition, mcp__cellm-oracle__spec_search, Task, AskUserQuestion
+allowed-tools: mcp__plugin_cellm_cellm-oracle__context_preflight, mcp__plugin_cellm_cellm-oracle__context_certify, mcp__plugin_cellm_cellm-oracle__context_record_outcome, mcp__plugin_cellm_cellm-oracle__spec_get_tree, mcp__plugin_cellm_cellm-oracle__spec_get_counters, mcp__plugin_cellm_cellm-oracle__spec_transition, mcp__plugin_cellm_cellm-oracle__spec_search, Task, AskUserQuestion
 ---
 
 # Orchestrate Teams — Parallel Spec Execution via Agent Teams

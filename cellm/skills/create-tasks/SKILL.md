@@ -2,7 +2,7 @@
 description: "Decompose checks into dependency-ordered tasks using runtime contracts and SCE context. Use when: 'create tasks', 'decompose check', 'break into phases'."
 user-invocable: true
 argument-hint: "[check title or search term]"
-allowed-tools: mcp__cellm-oracle__spec_search, mcp__cellm-oracle__spec_get_tree, mcp__cellm-oracle__spec_decompose, mcp__cellm-oracle__spec_add_edge, mcp__cellm-oracle__context_preflight, mcp__cellm-oracle__context_record_outcome, AskUserQuestion
+allowed-tools: mcp__plugin_cellm_cellm-oracle__spec_search, mcp__plugin_cellm_cellm-oracle__spec_get_tree, mcp__plugin_cellm_cellm-oracle__spec_decompose, mcp__plugin_cellm_cellm-oracle__spec_add_edge, mcp__plugin_cellm_cellm-oracle__context_preflight, mcp__plugin_cellm_cellm-oracle__context_record_outcome, AskUserQuestion
 ---
 
 # create-tasks

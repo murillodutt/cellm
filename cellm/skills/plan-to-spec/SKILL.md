@@ -2,7 +2,7 @@
 description: "Convert a Claude Code plan file into a CellmOS spec check with phases, tasks, and DAG edges. Use when: plan ready to execute, user wants spec-driven workflow, 'decompose this plan', 'plan to spec'. Reads plan markdown, extracts briefings, creates atomic spec tree in Oracle DB."
 user-invocable: true
 argument-hint: "<path-to-plan.md>"
-allowed-tools: mcp__cellm-oracle__context_spec_decompose, mcp__cellm-oracle__spec_decompose, mcp__cellm-oracle__spec_create_node, mcp__cellm-oracle__spec_transition, mcp__cellm-oracle__spec_add_edge, mcp__cellm-oracle__spec_add_verification, mcp__cellm-oracle__spec_search, mcp__cellm-oracle__spec_get_tree, mcp__cellm-oracle__spec_get_counters, mcp__plugin_cellm_cellm-oracle__dse_search, mcp__plugin_cellm_cellm-oracle__dse_get, Read, Write, Grep, Glob, Bash(git rev-parse *), Bash(mkdir *), AskUserQuestion, ExitPlanMode
+allowed-tools: mcp__plugin_cellm_cellm-oracle__context_spec_decompose, mcp__plugin_cellm_cellm-oracle__spec_decompose, mcp__plugin_cellm_cellm-oracle__spec_create_node, mcp__plugin_cellm_cellm-oracle__spec_transition, mcp__plugin_cellm_cellm-oracle__spec_add_edge, mcp__plugin_cellm_cellm-oracle__spec_add_verification, mcp__plugin_cellm_cellm-oracle__spec_search, mcp__plugin_cellm_cellm-oracle__spec_get_tree, mcp__plugin_cellm_cellm-oracle__spec_get_counters, mcp__plugin_cellm_cellm-oracle__dse_search, mcp__plugin_cellm_cellm-oracle__dse_get, Read, Write, Grep, Glob, Bash(git rev-parse *), Bash(mkdir *), AskUserQuestion, ExitPlanMode, Skill
 ---
 
 # Plan-to-Spec Thinking — Before Converting
@@ -29,7 +29,7 @@ Convert a user-approved plan into a spec tree through the SCE decomposition brid
 4. Build decomposition payload from approved plan (including deadweight scan gaps).
 5. Execute `context_spec_decompose` (fallback: `spec_decompose` / `spec_create_node` path).
 6. **Post-decomposition validation (MANDATORY)**: Run `spec_get_tree` AND `spec_get_counters` for the new check. If tree is empty or counters show 0 tasks, the decomposition FAILED silently. Retry once via fallback path (`spec_create_node`). If still empty, **ABORT and report**: "Decomposition produced 0 tasks — check exists but is hollow. Manual intervention required." Never return success with 0 tasks.
-7. **Execution hint**: After successful decomposition, suggest: "Spec decomposed. Run `/cellm:execute` to analyze and propose optimal execution strategy."
+7. **Auto-invoke execute**: After successful decomposition (counters show tasks > 0), immediately invoke the `cellm:execute` skill via the Skill tool, passing the new spec check ID as the argument. Do not print a text suggestion — execute directly.
 
 ## Spec Fallback YAML (CELLM_DEV_MODE only)
 

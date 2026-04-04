@@ -2,7 +2,7 @@
 description: "Treat a CellmOS check end-to-end with SCE preflight, execution loop, and write-back. Use when: 'treat this spec', 'work the check', 'spec-treat'."
 user-invocable: true
 argument-hint: "query: check title or search term"
-allowed-tools: mcp__cellm-oracle__spec_search, mcp__cellm-oracle__spec_get_tree, mcp__cellm-oracle__spec_transition, mcp__cellm-oracle__spec_get_counters, mcp__cellm-oracle__context_preflight, mcp__cellm-oracle__context_record_outcome, mcp__cellm-oracle__context_certify, mcp__plugin_cellm_cellm-oracle__quality_gate, AskUserQuestion, Read, Edit, Bash, Grep, Glob
+allowed-tools: mcp__plugin_cellm_cellm-oracle__spec_search, mcp__plugin_cellm_cellm-oracle__spec_get_tree, mcp__plugin_cellm_cellm-oracle__spec_transition, mcp__plugin_cellm_cellm-oracle__spec_get_counters, mcp__plugin_cellm_cellm-oracle__context_preflight, mcp__plugin_cellm_cellm-oracle__context_record_outcome, mcp__plugin_cellm_cellm-oracle__context_certify, mcp__plugin_cellm_cellm-oracle__quality_gate, AskUserQuestion, Read, Edit, Bash, Grep, Glob
 ---
 
 # spec-treat

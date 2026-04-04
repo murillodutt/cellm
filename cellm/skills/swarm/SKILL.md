@@ -2,7 +2,7 @@
 description: "Execute CellmOS specs with autonomous agent swarm — N parallel Claude instances claiming tasks from a shared backlog via spec_claim_next. Inspired by Anthropic's C compiler pattern. Each agent loops independently: claim task, execute in worktree, commit, claim next. No central orchestrator bottleneck. Use when: 'swarm', 'swarm execute', 'parallel swarm', 'autonomous agents', 'agent army', 'max throughput'. Premium execution mode — higher token cost, dramatically faster completion."
 user-invocable: true
 argument-hint: "[spec check ID or path] [--agents N] [--model sonnet|opus|haiku]"
-allowed-tools: mcp__cellm-oracle__context_preflight, mcp__cellm-oracle__context_certify, mcp__cellm-oracle__context_record_outcome, mcp__cellm-oracle__spec_claim_next, mcp__cellm-oracle__spec_get_counters, mcp__cellm-oracle__spec_get_node, mcp__cellm-oracle__spec_search, mcp__cellm-oracle__spec_transition, Task, AskUserQuestion
+allowed-tools: mcp__plugin_cellm_cellm-oracle__context_preflight, mcp__plugin_cellm_cellm-oracle__context_certify, mcp__plugin_cellm_cellm-oracle__context_record_outcome, mcp__plugin_cellm_cellm-oracle__spec_claim_next, mcp__plugin_cellm_cellm-oracle__spec_get_counters, mcp__plugin_cellm_cellm-oracle__spec_get_node, mcp__plugin_cellm_cellm-oracle__spec_search, mcp__plugin_cellm_cellm-oracle__spec_transition, Task, AskUserQuestion
 ---
 
 # Swarm Execution — Autonomous Agent Army
