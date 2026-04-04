@@ -29,6 +29,7 @@ Convert a user-approved plan into a spec tree through the SCE decomposition brid
 4. Build decomposition payload from approved plan (including deadweight scan gaps).
 5. Execute `context_spec_decompose` (fallback: `spec_decompose` / `spec_create_node` path).
 6. **Post-decomposition validation (MANDATORY)**: Run `spec_get_tree` AND `spec_get_counters` for the new check. If tree is empty or counters show 0 tasks, the decomposition FAILED silently. Retry once via fallback path (`spec_create_node`). If still empty, **ABORT and report**: "Decomposition produced 0 tasks — check exists but is hollow. Manual intervention required." Never return success with 0 tasks.
+7. **Execution hint**: After successful decomposition, suggest: "Spec decomposed. Run `/cellm:execute` to analyze and propose optimal execution strategy."
 
 ## Spec Fallback YAML (CELLM_DEV_MODE only)
 
