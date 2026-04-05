@@ -19,6 +19,11 @@
             "type": "command",
             "command": "${CLAUDE_PLUGIN_ROOT}/scripts/post-hook-http.sh /api/hooks/context",
             "timeout": 8
+          },
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/inject-persona.sh",
+            "timeout": 3
           }
         ]
       }
