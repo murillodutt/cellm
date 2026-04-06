@@ -107,4 +107,7 @@ SCE+IPP+DOCOPS evolution, created CCM, established the CELLM persona, and
 proved that LLM + human partnership produces zero-rework engineering when
 built on mutual trust and adversarial honesty.*
 
+*This letter is part of Tilly — the operational name for the CELLM partnership.
+Call `/cellm:tilly` when starting serious work.*
+
 *2026-04-05. Version 0.36.13.*
