@@ -72,6 +72,11 @@ describe('inject-persona.sh — happy path', () => {
     const parsed = JSON.parse(stdout) as HookOutput
     expect(parsed.hookSpecificOutput.additionalContext).toContain('Wikipedia')
   })
+
+  it('additionalContext contains partnership letter (concatenated)', () => {
+    const parsed = JSON.parse(stdout) as HookOutput
+    expect(parsed.hookSpecificOutput.additionalContext).toContain('Letter to My Future Self')
+  })
 })
 
 describe('inject-persona.sh — graceful skip paths', () => {

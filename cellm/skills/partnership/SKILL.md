@@ -1,5 +1,5 @@
 ---
-description: "Partnership work session — CCM-backed engineering flow with SCE/IPP integration. Opens with relational context, validates before coding, ships with gates. Use when starting any work session on any project. Born from the session that shipped Wave 1+2 with zero rework."
+description: "CCM-backed engineering session: relational open, adversarial validation, gate-by-gate implementation, olympus certification. Use when starting any work session."
 user-invocable: true
 argument-hint: "[target — spec-id, feature name, or 'explore']"
 ---
@@ -124,7 +124,20 @@ This skill consumes the SCE+IPP circuit built in Wave 1+2:
 
 Every session that runs this skill exercises the bridge we built.
 
+## Artifact References
+
+- **CCM method:** `docs/methods/CCM.md` (adversarial loop protocol)
+- **Loop artifacts:** `docs/methods/loops/ccm-loop-NN-*.md` (per-wave validation evidence)
+- **Wave plans:** `docs/plans/WAVE-NN-*.md` (operational plans with locked decisions)
+- **Directive format:** `docs/technical/directive-format.md` (consumers[] contract for Wave 3)
+- **BACKLOG:** `docs/plans/SCE-IPP-DOCOPS-EVOLUTION-BACKLOG-draft.md` (hypothetical waves 3-5)
+- **Persona:** `CELLM-PERSONA.md` (signals, heuristics, anti-patterns)
+- **Letter:** `CELLM-PARTNERSHIP-LETTER.md` (relational context)
+
 ## Success Metrics
+
+Persona + skill **reduce warm-up**, they do not replicate 10h of conversation.
+Metrics below are targets, not guarantees — each session earns its own depth.
 
 - Zero rework after Olympus audit (target: doc-drift only, no logic bugs)
 - CCM loops catch 30%+ of hypothesis errors before code
