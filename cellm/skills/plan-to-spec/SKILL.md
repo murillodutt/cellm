@@ -21,16 +21,32 @@ Convert a user-approved plan into a spec tree through the SCE decomposition brid
 - Incremental creation via `spec_create_node`: new checks start `pending`; `phase` / `task` under a check require the root check to be `active` (`spec_transition`) or the API returns `CHECK_NOT_APPROVED`.
 - Use `context_spec_decompose` as primary decomposition path.
 - Keep plan file as input artifact; DB is source of truth after conversion.
+- Right-size confirmations: avoid asking for the same decision twice in one run. Dedup confirmation is only required when a real conflict exists.
+- On owner approval, create and persist `check.body.approvalTicket` to support conditional Stage 2 skip in `execute`. Required fields:
+  - `ticketId`
+  - `scope` (`decompose+execute-stage2`)
+  - `approvedBy` (`owner`)
+  - `sessionId`
+  - `approvedAt` (epoch ms)
+  - `ttlMinutes` (default `30`)
+  - `executionMode` (`conservative` | `balanced` | `throughput`)
+  - `treeFingerprint` (deterministic string from approved decomposition payload)
 
 ## Routing
 
 1. Read plan file and detect project root.
-2. Run dedup (`spec_search`) and confirm action with user.
-3. **Pre-decomposition deadweight scan**: Use `Grep` and `Glob` to scan target files for deadweight patterns: `USkeleton`, `UCard` containers, `rounded-lg border-default` wrappers, `page-title`/`page-subtitle` CSS, `overflow-hidden` on `nc-bracket`, inline styles, `ds-*` legacy classes. Results feed as gap nodes into the decomposition payload. Gate behavior: WARN only (does not block decomposition). Scan findings listed in context field. User confirms before proceeding.
-4. Build decomposition payload from **owner-approved** plan (including deadweight scan gaps).
-5. Execute `context_spec_decompose` (fallback: `spec_decompose` / incremental `spec_create_node` only after check is `active` — never add phases/tasks under a `pending` check via incremental API).
-6. **Post-decomposition validation (MANDATORY)**: Run `spec_get_tree` AND `spec_get_counters` for the new check. If tree is empty or counters show 0 tasks, the decomposition FAILED silently. Retry once via fallback path (if using incremental path, ensure check is `active`). If still empty, **ABORT and report**: "Decomposition produced 0 tasks — check exists but is hollow. Manual intervention required." Never return success with 0 tasks.
-7. **Invoke execute**: After successful decomposition (counters show tasks > 0), invoke the `cellm:execute` skill via the Skill tool with the new spec check ID. The `execute` skill performs its own execution-plan approval (Stage 2); do not skip that flow.
+2. Run dedup (`spec_search`). Ask user only if a real duplicate/ambiguity exists; otherwise continue.
+3. **Pre-decomposition deadweight scan**: Use `Grep` and `Glob` to scan target files for deadweight patterns: `USkeleton`, `UCard` containers, `rounded-lg border-default` wrappers, `page-title`/`page-subtitle` CSS, `overflow-hidden` on `nc-bracket`, inline styles, `ds-*` legacy classes. Results feed as gap nodes into the decomposition payload. Gate behavior: WARN only (does not block decomposition).
+4. Present one consolidated approval prompt (single ask): decompose now + desired execution mode (`conservative`/`balanced`/`throughput`) + whether to force confirmation (`force-confirmation`) or allow ticket reuse (default).
+5. Build decomposition payload from **owner-approved** plan (including deadweight scan gaps) and include `check.body.approvalTicket`. Build `treeFingerprint` deterministically from approved payload summary:
+   - `phaseCount`
+   - `taskCount` (recursive)
+   - `edgeCount`
+   - `injectConvergenceGate` (`0|1`)
+   Format: `p{phaseCount}-t{taskCount}-e{edgeCount}-cg{flag}`.
+6. Execute `context_spec_decompose` (fallback: `spec_decompose` / incremental `spec_create_node` only after check is `active` — never add phases/tasks under a `pending` check via incremental API).
+7. **Post-decomposition validation (MANDATORY)**: Run `spec_get_tree` AND `spec_get_counters` for the new check. If tree is empty or counters show 0 tasks, the decomposition FAILED silently. Retry once via fallback path (if using incremental path, ensure check is `active`). If still empty, **ABORT and report**: "Decomposition produced 0 tasks — check exists but is hollow. Manual intervention required." Never return success with 0 tasks.
+8. **Invoke execute**: After successful decomposition (counters show tasks > 0), invoke the `cellm:execute` skill via the Skill tool with the new spec check ID. `execute` decides whether Stage 2 approval can be skipped using `approvalTicket` validity rules.
 
 ## Spec Fallback YAML (CELLM_DEV_MODE only)
 
@@ -88,6 +104,7 @@ The skill does NOT need to manually add the Convergence Gate phase — it is inj
 
 - **Create spec without user confirmation** — always confirm extracted structure first; decomposition MCP only after that confirmation.
 - **Use incremental `spec_create_node` to add phases/tasks under a `pending` check** — server rejects with `CHECK_NOT_APPROVED`; use `spec_transition` to `active` first.
+- **Ask redundant confirmations for the same decision in the same run** — use one consolidated approval and persist `approvalTicket`.
 - **Bypass SCE bridge without reason** — prefer `context_spec_decompose`.
 - **Treat markdown as post-conversion source of truth** — DB state is authoritative.
 - **Drop constraints/verification intent** — preserve execution-critical details.

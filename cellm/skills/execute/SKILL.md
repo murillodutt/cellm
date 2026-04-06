@@ -22,10 +22,12 @@ Analyze a decomposed spec and propose the optimal execution strategy per phase, 
 - Spec lifecycle (pending check vs `active`, incremental API vs bulk `decomposeSpec`): see `docs/technical/SPEC-DECOMPOSE-LIFECYCLE.md`. Execution assumes a decomposed tree; it does not replace owner approval of the plan before decomposition.
 - Run `context_preflight` before analysis (`flow='orchestrate'`).
 - Use `spec_get_tree` + `spec_get_counters` as single source of truth.
+- Confirmation right-sizing: Stage 2 approval may be skipped only with a valid `check.body.approvalTicket` (`scope=decompose+execute-stage2`) and strict checks (same session, TTL valid, fingerprint match, non-critical priority).
 - Evaluate `go_no_go_evaluate(phase_exit)` between execution steps.
 - Evaluate `go_no_go_evaluate(check_exit)` before declaring check complete.
 - **Record every evaluation**: after each `go_no_go_evaluate`, call `go_no_go_record` to persist the verdict. Render the decision matrix via `go_no_go_render` in inter-stage reports.
 - Persist outcome via `context_record_outcome` after each step. Use deterministic key: `{checkId}/{phaseId}/step-{n}` for idempotent writes.
+- Persist confirmation telemetry via `context_record_outcome` with deterministic keys (`approval_prompt_count`, `approval_prompt_skipped`, `approval_ticket_reused`, `approval_ticket_rejected`).
 - **Retry limit**: maximum 2 cycles of `asclepius -> re-evaluate` per step. If still `no_go` after 2 retries, escalate to user with full context.
 - **Degradation policy**: if `go_no_go_evaluate` itself fails (API error, timeout), BLOCK advancement and ask user for explicit decision. Never assume `go` on evaluation failure.
 - Present plan and wait for user approval before executing anything.
@@ -37,17 +39,32 @@ Analyze a decomposed spec and propose the optimal execution strategy per phase, 
 1. Resolve spec via `spec_search`.
 2. Load tree via `spec_get_tree` (yaml format) + `spec_get_counters`.
 3. **Empty tree guard**: If tree has 0 tasks or counters show 0 total, STOP and escalate: "Check is active but has 0 tasks — decomposition likely failed. Run /cellm:plan-to-spec to recreate."
-4. **Deterministic planner**: Call `execution_plan_build` with the check path and desired mode. This computes DAG grouping, risk scores, and strategy selection deterministically.
+4. Load `approvalTicket` from check body (if present) and compute current fingerprint from the current tree summary:
+   - `phaseCount`, `taskCount`, `edgeCount`, `injectConvergenceGate`.
+   - Format: `p{phaseCount}-t{taskCount}-e{edgeCount}-cg{flag}`.
+   Evaluate validity (`scope`, session, ttl, fingerprint, priority).
+   - If valid: mark `ticketEligible=true`.
+   - If invalid: store rejection reason (`scope|session|ttl|fingerprint|priority|missing`) for telemetry.
+5. **Deterministic planner**: Call `execution_plan_build` with the check path and desired mode. This computes DAG grouping, risk scores, and strategy selection deterministically.
    - If planner returns `source: 'planner'`: use the computed plan directly (steps 5-6 are handled by the planner).
    - If planner returns `source: 'manual-fallback'`: present `[FALLBACK]` badge and use the conservative plan. The `fallbackReason` field explains why (e.g., `PLANNER_DISABLED`, API error).
-5. Build DAG adjacency from edges — identify parallel groups and linear chains. *(Only when planner unavailable — fallback path.)*
-6. Compute risk score per phase. *(Only when planner unavailable — fallback path.)*
-7. Select strategy per phase using decision rules. *(Only when planner unavailable — fallback path.)*
+6. Build DAG adjacency from edges — identify parallel groups and linear chains. *(Only when planner unavailable — fallback path.)*
+7. Compute risk score per phase. *(Only when planner unavailable — fallback path.)*
+8. Select strategy per phase using decision rules. *(Only when planner unavailable — fallback path.)*
 
 ### Stage 2: Proposal
 
-7. Present EXECUTION PLAN table to user via `AskUserQuestion`.
-8. User can approve, modify strategy for any step, or abort.
+9. If `ticketEligible=true` and user did not request `force-confirmation`:
+   - Skip Stage 2 `AskUserQuestion`.
+   - Reuse ticket mode (`executionMode`) when present, else keep requested/default mode.
+   - Record telemetry via `context_record_outcome`:
+     - `approval_prompt_skipped`
+     - `approval_ticket_reused`
+10. Otherwise present EXECUTION PLAN table to user via `AskUserQuestion`.
+11. User can approve, modify strategy for any step, or abort.
+12. Record telemetry via `context_record_outcome`:
+   - always `approval_prompt_count`
+   - if ticket existed but invalid: `approval_ticket_rejected` with reason.
 
 ### Stage 3: Execution Loop
 
@@ -217,6 +234,9 @@ Track per execution run via `context_record_outcome`:
 - **Late no_go**: `no_go` detected after next step started. Target: 0.
 - **Retry rate**: asclepius retries / total steps.
 - **Decision coverage**: steps with recorded go/no-go / total steps. Target: 100%.
+- **Approval prompt count**: explicit Stage 2 prompts shown in run.
+- **Approval prompt skipped**: Stage 2 skipped by valid ticket.
+- **Approval ticket reused/rejected**: ticket acceptance quality by reason.
 
 ### Evolutionary Analytical Feedback
 
@@ -232,6 +252,7 @@ When `CELLM_DEV_MODE: true`: write feedback to `dev-cellm-feedback/entries/execu
 ## NEVER
 
 - **Execute without user approval** — always present plan first.
+- **Skip Stage 2 approval without a valid ticket** — enforce `scope+session+ttl+fingerprint+priority` checks.
 - **Skip go/no-go evaluation** between steps.
 - **Evaluate without recording** — every `go_no_go_evaluate` must be followed by `go_no_go_record`.
 - **Assume `go` on evaluation failure** — API errors or timeouts BLOCK advancement.
