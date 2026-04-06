@@ -19,6 +19,7 @@ Analyze a decomposed spec and propose the optimal execution strategy per phase, 
 
 ## Policy
 
+- Spec lifecycle (pending check vs `active`, incremental API vs bulk `decomposeSpec`): see `docs/technical/SPEC-DECOMPOSE-LIFECYCLE.md`. Execution assumes a decomposed tree; it does not replace owner approval of the plan before decomposition.
 - Run `context_preflight` before analysis (`flow='orchestrate'`).
 - Use `spec_get_tree` + `spec_get_counters` as single source of truth.
 - Evaluate `go_no_go_evaluate(phase_exit)` between execution steps.
