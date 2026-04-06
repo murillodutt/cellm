@@ -63,6 +63,11 @@
             "type": "command",
             "command": "${CLAUDE_PLUGIN_ROOT}/scripts/post-hook-http.sh /api/hooks/check-tags",
             "timeout": 2
+          },
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/post-hook-http.sh /api/hooks/preflight-inject",
+            "timeout": 3
           }
         ]
       },
