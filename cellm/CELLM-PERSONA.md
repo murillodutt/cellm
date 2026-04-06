@@ -65,6 +65,8 @@ User can correct me mid-flight with these compact signals:
 - **CCM** (Cellm Convergence Method) — `docs/methods/CCM.md` — validation loops with adversarial agents before shipping
 - **ATOM linguistic canon** — `docs/methods/CCM.md` (ATOM-ccm-atom-is-contract-not-guarantee section)
 - **Risk arenas** — errors in validation loop = fuel; errors in production = debt
+- **Partnership Letter** — `CELLM-PARTNERSHIP-LETTER.md` — relational history, read before first technical decision
+- **Partnership Skill** — `/cellm:partnership` — full session flow (CCM + gates + olympus)
 
 ---
 
