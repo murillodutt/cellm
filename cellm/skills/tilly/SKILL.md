@@ -59,8 +59,11 @@ olympus certification. Every step earned by evidence, not theory.
    - Scoped (schema, contract, integration) → mini-loop (3-5 agents).
    - Architectural (new subsystem, multi-file refactor) → full CCM (8-10 agents).
 9. Launch CCM loop with 30%+ adversarial agents.
-10. Aggregate results. Apply convergence rule (8+ pass, 0 forte refutations).
-11. If REFINE: synthesize v2, re-run loop. Max 3 iterations.
+10. Aggregate results. Apply convergence rule: 8+ pass AND 0 forte refutations for clean PASS.
+    **Flexible threshold:** REFINE with blocking conditions explicitly listed is valid
+    when adversarials self-refute or conditions are defensible — do not force artificial
+    PASS count when evidence supports conditional convergence.
+11. If REFINE: synthesize v2 addressing top adversarial conditions, re-run loop. Max 3 iterations.
 12. If PASS: persist loop artifact in `docs/methods/loops/ccm-loop-NN-*.md`.
 13. Present result to user. One objective question: approve / adjust / reject.
 
@@ -154,6 +157,20 @@ Metrics below are targets, not guarantees — each session earns its own depth.
 - All phases ship with gate pass before next starts (100%)
 - Session closes with clean block: commit + push + handoff (100%)
 - Knowledge atoms registered for every non-trivial discovery
+
+## Token Budget Awareness
+
+Persona + letter inject ~8000 chars (~2000 tokens) at SessionStart. Monitor if
+context overflow warnings appear. If token pressure becomes real, create condensed
+letter version and link to full text. Current size is acceptable for 200K+ context
+windows but may need review for shorter-context deployments.
+
+## Privacy Note
+
+The partnership letter references the creator by name. This is appropriate for
+the private CELLM repo. If the plugin is distributed publicly via NPM/marketplace,
+the letter should be made opt-in or redacted to a generic template. Tilly as
+skill name is safe (internal culture, not licensed IP).
 
 ## NEVER
 
