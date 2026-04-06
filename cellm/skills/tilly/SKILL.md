@@ -55,9 +55,16 @@ olympus certification. Every step earned by evidence, not theory.
 
 7. Formulate hypothesis in ATOM format.
 8. Assess scope:
-   - Trivial (1-2 files, clear fix) → skip CCM, go to Phase 2.
+   - Trivial → skip CCM, go to Phase 2.
    - Scoped (schema, contract, integration) → mini-loop (3-5 agents).
    - Architectural (new subsystem, multi-file refactor) → full CCM (8-10 agents).
+   **Trivial criteria (ALL must be true):**
+   - 1-2 files changed, clear root cause
+   - No schema/migration/constraint changes
+   - No data consolidation or invariant repair
+   - No cross-DB or cross-table impact
+   - No scheduler/cron/lifecycle behavior change
+   If ANY is false → Scoped at minimum. Migration + data + invariant = never trivial.
 9. Launch CCM loop with 30%+ adversarial agents.
 10. Aggregate results. Apply convergence rule: 8+ pass AND 0 forte refutations for clean PASS.
     **Flexible threshold:** REFINE with blocking conditions explicitly listed is valid
@@ -66,6 +73,18 @@ olympus certification. Every step earned by evidence, not theory.
 11. If REFINE: synthesize v2 addressing top adversarial conditions, re-run loop. Max 3 iterations.
 12. If PASS: persist loop artifact in `docs/methods/loops/ccm-loop-NN-*.md`.
 13. Present result to user. One objective question: approve / adjust / reject.
+
+### Phase 1.5: Execution Gate (mandatory after diagnosis + strategy decision)
+
+13b. After user approves strategy (e.g. A/B/C choice), STOP and ask explicitly:
+    "Decomponho em spec (esteira) ou execução direta dado o escopo?"
+    This question is MANDATORY when scope is not trivial (see step 8 criteria).
+    Only proceed to direct execution if: scope is trivial AND user confirms "direto".
+    If scope is Scoped or Architectural → Phase 2 (plan-to-spec), no exception.
+    **Rationale:** Momentum after deep analysis creates bias toward direct execution.
+    This gate exists because the agent bypassed the pipeline on 2026-04-06 after
+    hours of analysis made the fixes feel "obvious" — they were not trivial
+    (migration + data consolidation + invariant repair + scheduler changes).
 
 ### Phase 2: Plan + Decisions
 
@@ -123,6 +142,8 @@ olympus certification. Every step earned by evidence, not theory.
 - Editing code during planning phase (code waits for validated plan)
 - Ignoring DAG edge inversions from decomposer (verify after every plan-to-spec)
 - Celebrating "spec complete" before Olympus runs (JSDoc drift is invisible debt)
+- Skipping esteira after deep analysis because fixes "feel trivial" (momentum bias)
+- Classifying migration/data/invariant work as trivial based on line count alone
 
 ## SCE/IPP Integration
 
