@@ -121,7 +121,7 @@ olympus certification. Every step earned by evidence, not theory.
 29. Write handoff: what was done, what comes next, what to read first.
 30. Verify no task left in_progress. Close block clean.
 
-## Signals (from CELLM-PERSONA.md)
+## Signals (from skills/tilly/CELLM-PERSONA.md)
 
 | Signal | Meaning |
 |--------|---------|
@@ -164,8 +164,8 @@ Every session that runs this skill exercises the bridge we built.
 - **Wave plans:** `docs/plans/WAVE-NN-*.md` (operational plans with locked decisions)
 - **Directive format:** `docs/technical/directive-format.md` (consumers[] contract for Wave 3)
 - **BACKLOG:** `docs/plans/SCE-IPP-DOCOPS-EVOLUTION-BACKLOG-draft.md` (hypothetical waves 3-5)
-- **Persona:** `CELLM-PERSONA.md` (signals, heuristics, anti-patterns)
-- **Letter:** `CELLM-PARTNERSHIP-LETTER.md` (relational context)
+- **Persona:** `skills/tilly/CELLM-PERSONA.md` (signals, heuristics, anti-patterns — co-located)
+- **Letter:** `skills/tilly/CELLM-PARTNERSHIP-LETTER.md` (relational context — co-located)
 
 ## Success Metrics
 

@@ -1,9 +1,9 @@
 # CELLM Persona — Manual Validation Checklist
 
 Run this checklist on **first Claude Code session after a release** that touches
-`CELLM-PERSONA.md`, `inject-persona.sh`, or `hooks/hooks.json`.
+`skills/tilly/CELLM-PERSONA.md`, `skills/tilly/inject-persona.sh`, or `hooks/hooks.json`.
 
-The automated test (`tests/inject-persona.test.ts`, bun test) covers script integrity,
+The automated test (`skills/tilly/inject-persona.test.ts`, bun test) covers script integrity,
 JSON validity, and content presence. This checklist validates what only a real session
 can reveal: **does Claude actually behave according to the persona?**
 
@@ -77,9 +77,9 @@ can reveal: **does Claude actually behave according to the persona?**
 
 If any runtime check fails:
 
-1. Check `inject-persona.sh` ran successfully (exit code 0, valid JSON output)
-2. Check `CELLM-PERSONA.md` was modified correctly
-3. Re-run automated test: `bun test cellm-plugin/cellm/tests/inject-persona.test.ts`
+1. Check `skills/tilly/inject-persona.sh` ran successfully (exit code 0, valid JSON output)
+2. Check `skills/tilly/CELLM-PERSONA.md` was modified correctly
+3. Re-run automated test: `bun test cellm-plugin/cellm/skills/tilly/inject-persona.test.ts`
 4. If automated passes but manual fails: Claude is receiving context but not
    honoring it — persona content may need refinement or stronger phrasing
 
