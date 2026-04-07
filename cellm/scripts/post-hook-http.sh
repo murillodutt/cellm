@@ -39,10 +39,23 @@ esac
 
 base_url=$(get_base_url)
 
+# Log hook degradation to AGENT-JOURNAL.md (dev-mode observability)
+# Maintains exit 0 behavior — never blocks Claude Code
+log_hook_degraded() {
+  local path="$1"
+  local journal="${CELLM_DIR}/logs/AGENT-JOURNAL.md"
+  mkdir -p "${CELLM_DIR}/logs"
+  if [ ! -f "${journal}" ]; then
+    printf '# JORNAL DE ERROS — CELLM Agent\n\n' >> "${journal}"
+  fi
+  printf -- '---\n\n## %s\n\n- **Tipo**: HOOK_DEGRADED\n- **Tool**: post-hook-http %s\n- **Erro**: curl failed — Worker unreachable or timeout\n- **Acao sugerida**: Verificar Worker: curl %s/health\n\n' \
+    "$(date -u +%Y-%m-%dT%H:%M:%S.000Z)" "${path}" "${base_url}" >> "${journal}" 2>/dev/null || true
+}
+
 response=$(curl -sf --max-time 3 --connect-timeout 1 \
   -X POST -H "Content-Type: application/json" \
   -d "${input:-"{}"}" \
-  "${base_url}${api_path}" 2>/dev/null) || exit 0
+  "${base_url}${api_path}" 2>/dev/null) || { log_hook_degraded "${api_path}"; exit 0; }
 
 # Forward response to Claude Code
 # Skip empty responses or Nitro's serialized empty string '""'
