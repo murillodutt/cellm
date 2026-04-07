@@ -49,43 +49,7 @@ Convert a user-approved plan into a spec tree through the SCE decomposition brid
    Format: `p{phaseCount}-t{taskCount}-e{edgeCount}-cg{flag}`.
 6. Execute `context_spec_decompose` (fallback: `spec_decompose` / incremental `spec_create_node` only after check is `active` — never add phases/tasks under a `pending` check via incremental API).
 7. **Post-decomposition validation (MANDATORY)**: Run `spec_get_tree` AND `spec_get_counters` for the new check. If tree is empty or counters show 0 tasks, the decomposition FAILED silently. Retry once via fallback path (if using incremental path, ensure check is `active`). If still empty, **ABORT and report**: "Decomposition produced 0 tasks — check exists but is hollow. Manual intervention required." Never return success with 0 tasks.
-8. **Post-decomposition command center**: After successful decomposition (counters show tasks > 0), present a 3-phase menu system. Analyze the spec structure (phase count, task count, independent phases, priority) to recommend the best option in each phase.
-
-   **Phase 1 — Execution Strategy**
-   ```
-   Spec decomposed: {checkId} — {title}
-   {phaseCount} phases, {taskCount} tasks, {edgeCount} edges
-
-   Execution strategy:
-   [1] implement        — 1 task at a time, surgical focus (best for: small specs, fixes)
-   [2] orchestrate      — phase by phase respecting DAG, with specialist agents (best for: medium specs)
-   [3] orchestrate-teams — independent phases in parallel with teams (best for: 3+ independent phases)
-   [4] swarm            — N autonomous agents in parallel worktrees (best for: large specs, max throughput)
-   [5] execute          — intelligent advisor with quality gates per phase (best for: critical specs)
-   [6] spec-treat       — full cycle: preflight + execution + outcome (best for: isolated checks)
-   [7] iterate          — optimization loop with measurable deltas (best for: incremental refinement)
-   ```
-   CELLM recommendation: analyze spec and suggest best option based on phase count, task count, independent phases, and priority.
-
-   **Phase 2 — Intervention Mode**
-   ```
-   Intervention mode:
-   [A] Autonomous — direct execution without human intervention
-   [B] Assisted  — execution with human confirmations at gates
-   ```
-   Default: A for `balanced`/`throughput` execution modes. B for `conservative` or `critical` priority specs.
-
-   **Phase 3 — Validation and Certification**
-   ```
-   Post-execution (runs automatically on completion):
-   [V1] convergir  — typecheck + root tests + oracle tests loop until zero failures
-   [V2] arena gate — quality gate with SCE (prove + gate modes)
-   [V3] olympus    — full triad certification (Argus/Asclepius/Hefesto)
-   [V4] skip       — no additional validation
-   ```
-   CELLM recommendation: V1 for all specs. V3 for `critical`/`high` priority. V4 only for trivial.
-
-   Present all 3 phases in sequence. Wait for user selection before invoking.
+8. **Post-decomposition gate**: After successful decomposition (counters show tasks > 0), invoke `cellm:execute` via `Skill` tool with the check ID returned from decomposition (e.g., `spec-abc12345`). All execution decisions (executor, autonomy, certification) are handled by `cellm:execute` as the single mandatory gate. Do NOT present execution menus here — `cellm:execute` owns M1/M2/M3 exclusively.
 
 ## Spec Fallback YAML (CELLM_DEV_MODE only)
 
@@ -147,3 +111,5 @@ The skill does NOT need to manually add the Convergence Gate phase — it is inj
 - **Bypass SCE bridge without reason** — prefer `context_spec_decompose`.
 - **Treat markdown as post-conversion source of truth** — DB state is authoritative.
 - **Drop constraints/verification intent** — preserve execution-critical details.
+- **Present execution menus directly** — M1/M2/M3 belong to `cellm:execute`. This skill redirects after decomposition, never duplicates menu logic.
+- **Skip cellm:execute after decomposition** — mandatory gate, no exception.

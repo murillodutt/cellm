@@ -94,32 +94,30 @@ olympus certification. Every step earned by evidence, not theory.
 17. User approves plan. Only then: `/cellm:plan-to-spec`.
 18. Post-decomposition: verify DAG edges (fix inversions if needed).
 19. Smoke test: `spec_claim_next` returns Phase 1 task (not Phase N).
+20. **MANDATORY: Invoke `cellm:execute` via Skill tool with the check ID** (e.g., `spec-abc12345`).
+    This is the central execution gate. Tilly does NOT present execution menus
+    (M1/M2/M3) directly — `cellm:execute` owns all execution decisions.
+    No exception. No shortcut. No "just this once".
 
-### Phase 3: Implementation
+### Phase 3: Implementation (delegated to cellm:execute)
 
-20. For each phase in DAG order:
-    a. `spec_claim_next` for next task.
-    b. Think out loud: 3 approaches, pick best (not fastest).
-    c. Implement. Typecheck after each task.
-    d. `spec_transition(completed)` with metadata.
-    e. After all phase tasks: `go_no_go_evaluate(phase_exit)` + record.
-    f. Full test suite must pass before next phase.
-21. Convergence Gate: verify all success criteria. 0 FAIL required.
-22. `go_no_go_evaluate(check_exit)` + record.
+21. `cellm:execute` presents M1/M2/M3 menus and receives user decisions.
+22. `cellm:execute` runs execution loop with go/no-go evaluations and post-check certification.
 
-### Phase 4: Certification
+Tilly resumes at Phase 4 only after `cellm:execute` completes.
 
-23. Run Olympus triad (`triad_start`, audit, register findings, resolve).
-24. Run `context_certify` on final envelope.
-25. Commit: feat commit + bump + push + public sync.
-26. Changelog: `changelog_submit` with classified entries.
+### Phase 4: Post-Execution
+
+23. Run `context_certify` on final envelope.
+24. Commit: feat commit + bump + push + public sync.
+25. Changelog: `changelog_submit` with classified entries.
 
 ### Phase 5: Session Close
 
-27. Record outcome via `context_record_outcome`.
-28. Register knowledge atoms for discoveries made during session.
-29. Write handoff: what was done, what comes next, what to read first.
-30. Verify no task left in_progress. Close block clean.
+26. Record outcome via `context_record_outcome`.
+27. Register knowledge atoms for discoveries made during session.
+28. Write handoff: what was done, what comes next, what to read first.
+29. Verify no task left in_progress. Close block clean.
 
 ## Signals (from skills/tilly/CELLM-PERSONA.md)
 
@@ -198,6 +196,8 @@ skill name is safe (internal culture, not licensed IP).
 - **Skip the letter** — relational context shapes every decision downstream.
 - **Code before CCM validates** — for architectural changes.
 - **Decompose before decisions lock** — ambiguity mid-implementation is expensive.
+- **Present execution menus directly** — M1/M2/M3 belong to `cellm:execute`. Tilly redirects, never duplicates.
+- **Skip cellm:execute after decomposition** — mandatory gate, no exception.
 - **Push without gates** — typecheck + tests + schema all green.
 - **Leave task hanging** — close block or write handoff before pausing.
 - **Ignore adversarial findings** — they are the most valuable signal.

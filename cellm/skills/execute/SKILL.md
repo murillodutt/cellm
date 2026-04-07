@@ -52,40 +52,73 @@ Analyze a decomposed spec and propose the optimal execution strategy per phase, 
 7. Compute risk score per phase. *(Only when planner unavailable — fallback path.)*
 8. Select strategy per phase using decision rules. *(Only when planner unavailable — fallback path.)*
 
-### Stage 2: Proposal
+### Stage 2: Execution Gate (mandatory — 3 menus)
+
+This stage is the **central mandatory gate** for all post-decomposition execution.
+All decomposition flows (plan-to-spec, tilly, direct) redirect here. No execution
+without explicit user decisions on all 3 menus.
 
 9. If `ticketEligible=true` and user did not request `force-confirmation`:
-   - Skip Stage 2 `AskUserQuestion`.
-   - Reuse ticket mode (`executionMode`) when present, else keep requested/default mode.
+   - Skip M1 `AskUserQuestion` — reuse ticket executor.
+   - M2 and M3 are **never skippable** — always ask explicitly.
    - Record telemetry via `context_record_outcome`:
      - `approval_prompt_skipped`
      - `approval_ticket_reused`
-10. Otherwise present EXECUTION PLAN table to user via `AskUserQuestion`.
-11. User can approve, modify strategy for any step, or abort.
-12. Record telemetry via `context_record_outcome`:
-   - always `approval_prompt_count`
-   - if ticket existed but invalid: `approval_ticket_rejected` with reason.
+
+10. **Menu 1 — Executor (M1)**: Present EXECUTION PLAN table with CELLM recommendation per phase, then ask user to select executor via `AskUserQuestion`.
+    - Options: `cellm:implement`, `cellm:orchestrate`, `cellm:orchestrate-teams`, `cellm:swarm` (and future executors).
+    - `cellm:execute` does NOT appear as an option — it is the gate, not an executor.
+    - CELLM recommendation is computed from Strategy Selection Rules (risk score, DAG structure).
+    - User can approve recommendation, modify strategy for any step, or abort.
+
+11. **Menu 2 — Autonomy Level (M2)**: Ask user via `AskUserQuestion`:
+    - **(A)** Direct execution without human intervention
+    - **(B)** Assisted execution with human checkpoints
+    - Maps to Execution Mode: A = `throughput`, B = `balanced` (user can further refine to `conservative`).
+    - **Telemetry value**: `autonomy_level` records the execution mode value (`throughput`, `balanced`, or `conservative`), NOT the menu label (A/B).
+    - **Fail-closed**: if M2 not explicitly answered, execution MUST NOT proceed.
+
+12. **Menu 3 — Certification (M3, multiple choice)**: Ask user via `AskUserQuestion`:
+    - `cellm:olympus` — Triad certification (Argus/Asclepius/Hefesto)
+    - `cellm:arena` — Quality lab (prove/debug/gate/stress)
+    - `cellm:convergir` — E2E convergence loop (typecheck + tests + oracle)
+    - `skip` — No certification (user accepts risk)
+    - User may select **one or more** options (e.g., `V3+V1` = convergir then olympus).
+    - CELLM recommendation: based on check priority (critical -> olympus+convergir, high -> convergir, medium -> convergir, low -> skip).
+    - **Fail-closed**: if M3 not explicitly answered, execution MUST NOT proceed.
+
+13. Record telemetry via `context_record_outcome`:
+    - always: `approval_prompt_count`, `decomposition_source`
+    - M1: `recommended_executor`, `selected_executor`
+    - M2: `autonomy_level`
+    - M3: `certification_choice` (array of selected options)
+    - if blocked: `blocked_reason`
+    - if ticket existed but invalid: `approval_ticket_rejected` with reason.
 
 ### Stage 3: Execution Loop
 
-9. For each approved step:
-   a. Invoke execution skill via `Skill` tool (e.g., `cellm:implement`, `cellm:orchestrate-teams`).
-   b. Run `go_no_go_evaluate` with `decisionClass: phase_exit` for completed phases.
-   c. Call `go_no_go_record` to persist the verdict. Include in inter-stage report via `go_no_go_render`.
-   d. If verdict is `conditional`: run `quality_gate`, report, ask user.
-   e. If verdict is `no_go`: invoke `cellm:asclepius` via `Skill`, re-evaluate. Max 2 retries per step — if still `no_go`, escalate to user.
-   f. If `go_no_go_evaluate` fails (error/timeout): BLOCK and ask user — never assume `go`.
-   g. Present inter-stage report to user (include rendered go/no-go matrix).
-   h. Ask user to proceed / pause / abort.
-10. Persist step outcome via `context_record_outcome` with key `{checkId}/{phaseId}/step-{n}`.
+14. For each approved step:
+    a. Invoke execution skill via `Skill` tool (e.g., `cellm:implement`, `cellm:orchestrate-teams`).
+    b. Run `go_no_go_evaluate` with `decisionClass: phase_exit` for completed phases.
+    c. Call `go_no_go_record` to persist the verdict. Include in inter-stage report via `go_no_go_render`.
+    d. If verdict is `conditional`: run `quality_gate`, report, ask user.
+    e. If verdict is `no_go`: invoke `cellm:asclepius` via `Skill`, re-evaluate. Max 2 retries per step — if still `no_go`, escalate to user.
+    f. If `go_no_go_evaluate` fails (error/timeout): BLOCK and ask user — never assume `go`.
+    g. Present inter-stage report to user (include rendered go/no-go matrix).
+    h. Ask user to proceed / pause / abort.
+15. Persist step outcome via `context_record_outcome` with key `{checkId}/{phaseId}/step-{n}`.
 
-### Stage 4: Post-Check
+### Stage 4: Post-Check (respects M3 user choice)
 
-11. Run `go_no_go_evaluate` with `decisionClass: check_exit`. Call `go_no_go_record` to persist.
-12. Render full decision matrix via `go_no_go_render` — include in final report.
-13. If check priority high or critical: invoke `cellm:convergir` via `Skill`.
-14. If check priority critical: invoke `cellm:olympus` via `Skill`.
-15. Present final summary report with complete go/no-go history.
+16. Run `go_no_go_evaluate` with `decisionClass: check_exit`. Call `go_no_go_record` to persist.
+17. Render full decision matrix via `go_no_go_render` — include in final report.
+18. Execute certification tools **based on user M3 selection** (not automatic by priority):
+    - If M3 includes `convergir`: invoke `cellm:convergir` via `Skill`.
+    - If M3 includes `arena`: invoke `cellm:arena` via `Skill`.
+    - If M3 includes `olympus`: invoke `cellm:olympus` via `Skill`.
+    - If M3 is `skip`: skip certification (go_no_go check_exit from step 16 still runs).
+    - Execute in order listed by user (e.g., `V3+V1` = convergir first, then olympus).
+19. Present final summary report with complete go/no-go history and certification results.
 
 ## Risk Score (per phase, 0-10) — Hybrid Model
 
@@ -172,8 +205,7 @@ Post-Check:
 | Gate | Condition |
 |------|-----------|
 | go_no_go check_exit | Always |
-| cellm:convergir | Priority high or critical |
-| cellm:olympus | Priority critical |
+| {M3 selections} | User choice from Menu 3 (e.g., convergir + olympus) |
 
 Approve plan? Choose mode (conservative / balanced / throughput) or modify steps.
 ```
@@ -226,6 +258,16 @@ Call `go_no_go_render` to generate the decision matrix for inter-stage and final
 
 ## Telemetry and Continuous Improvement
 
+### Execution Gate Metrics (mandatory — recorded at Stage 2)
+
+Track per execution run via `context_record_outcome` with deterministic keys:
+- **`decomposition_source`**: which skill/flow triggered decomposition (e.g., `plan-to-spec`, `tilly`, `direct`).
+- **`recommended_executor`**: CELLM recommendation from Strategy Selection Rules.
+- **`selected_executor`**: user M1 choice.
+- **`autonomy_level`**: user M2 choice (`direct` or `assisted`).
+- **`certification_choice`**: user M3 choice (array, e.g., `["convergir", "olympus"]`).
+- **`blocked_reason`**: when fail-closed activates (e.g., `M2_not_answered`, `M3_not_answered`).
+
 ### Execution Metrics (always collected)
 
 Track per execution run via `context_record_outcome`:
@@ -251,6 +293,11 @@ When `CELLM_DEV_MODE: true`: write feedback to `dev-cellm-feedback/entries/execu
 
 ## NEVER
 
+- **Execute without explicit M1/M2/M3 decisions** — fail-closed. No defaults, no assumptions.
+- **Skip M2 or M3** — both are mandatory even with valid approval ticket. Ticket only skips M1.
+- **Present `cellm:execute` as an executor option in M1** — execute is the gate, not an executor.
+- **Auto-select certification based on priority** — priority drives CELLM recommendation in M3, user decides.
+- **Duplicate menu logic in other skills** — cellm:execute owns M1/M2/M3 exclusively.
 - **Execute without user approval** — always present plan first.
 - **Skip Stage 2 approval without a valid ticket** — enforce `scope+session+ttl+fingerprint+priority` checks.
 - **Skip go/no-go evaluation** between steps.
