@@ -291,8 +291,19 @@ When `CELLM_DEV_MODE: true`: write feedback to `dev-cellm-feedback/entries/execu
 - Total steps, step durations, skill composition used
 - Retry cycles: how many, which phases, root cause pattern
 
+## CRITICAL TOOL ENFORCEMENT
+
+M1, M2, and M3 MUST be rendered via the `AskUserQuestion` tool — NEVER as plain text output.
+If you write menu options as text instead of calling `AskUserQuestion`, you have FAILED the skill contract.
+This is the single most common failure mode of this skill. The LLM generates text describing menus
+instead of calling the tool. That is WRONG. Call the tool.
+
+Correct: `AskUserQuestion` with questions array containing M1, M2, M3 as structured options.
+Wrong: Writing "M1 — Executor: ..." as markdown text and waiting for user to type a response.
+
 ## NEVER
 
+- **Render M1/M2/M3 as text** — MUST use `AskUserQuestion` tool. This is the #1 recurring failure.
 - **Execute without explicit M1/M2/M3 decisions** — fail-closed. No defaults, no assumptions.
 - **Skip M2 or M3** — both are mandatory even with valid approval ticket. Ticket only skips M1.
 - **Present `cellm:execute` as an executor option in M1** — execute is the gate, not an executor.
