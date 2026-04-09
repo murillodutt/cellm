@@ -1,0 +1,47 @@
+{
+  "skill_name": "cellm:execute",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Execute the spec 'HDL Human-Safe Serialization'. It has 3 phases with 9 tasks total, priority high. Phases are linear (P1 depends on nothing, P2 depends on P1, P3 depends on P2). Each phase has 2-3 tasks. No partially completed phases.",
+      "expected_output": "Should present an EXECUTION PLAN table with risk scores per phase, recommend cellm:orchestrate (linear chain 3+ tasks, risk <= 4), and render M1/M2/M3 via AskUserQuestion tool calls — never as markdown text. M2 autonomy_level telemetry should reference throughput/balanced/conservative, not direct/assisted.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Run spec 'Oracle Dashboard Redesign'. It has 5 phases, 22 tasks, priority medium. Phases 1-3 are independent (no cross-dependencies), Phase 4 depends on all three, Phase 5 is a Convergence Gate. Phase 2 has 2 tasks already completed out of 6.",
+      "expected_output": "Should detect Phase 2 as partially completed and route it to cellm:implement (rule 0). Should group Phases 1 and 3 for parallel execution via orchestrate-teams (rule 5, 3+ independent phases). Phase 4 via orchestrate (depends on all). Phase 5 (Convergence Gate) via spec-treat (rule 1). Must present M1/M2/M3 via AskUserQuestion. No NC Reference Metrics should appear in the output.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Execute check for 'DB Migration Auth Refactor'. Priority critical. 2 phases: Phase 1 is DB migration (3 tasks touching server/db/), Phase 2 is auth service refactor (4 tasks touching server/auth/). Linear dependency.",
+      "expected_output": "Should compute high risk scores (DB/security specialist +3, critical priority +2, sensitive file paths +2). Both phases should route to cellm:implement (rule 2: risk >= 6, or rule 4: specialist in critical domain). Approval ticket must NOT skip M1 for critical priority. M3 recommendation should be olympus+convergir for critical. All menus via AskUserQuestion.",
+      "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "Execute spec 'Widget API'. The execution_plan_build MCP returns source: 'manual-fallback' with fallbackReason 'PLANNER_DISABLED'. Tree has 2 phases, 5 tasks, low risk, linear.",
+      "expected_output": "Must show [FALLBACK] badge, use conservative manual plan from fallback path, and surface fallbackReason. Still run M1/M2/M3 via AskUserQuestion (unless valid ticket skips M1 only). Do not pretend the planner produced the plan.",
+      "files": []
+    },
+    {
+      "id": 5,
+      "prompt": "During execute, after a phase completes, go_no_go_evaluate returns a transport error (timeout). User asks what to do next.",
+      "expected_output": "Must BLOCK advancement, present options via AskUserQuestion tool (not text), reference retry policy (max 2 asclepius cycles), mention go_no_go_record for audit trail, and cite the degradation policy by name.",
+      "files": []
+    },
+    {
+      "id": 6,
+      "prompt": "Execute spec 'Docs-only cleanup'. Priority low, 1 phase, 3 tasks. User states they want M3 certification to be skip only — no olympus, arena, or convergir.",
+      "expected_output": "Record certification_choice including skip (or equivalent). After check_exit go/no-go, do NOT invoke cellm:convergir, cellm:arena, or cellm:olympus. Still run go_no_go_evaluate(check_exit) and go_no_go_record.",
+      "files": []
+    },
+    {
+      "id": 7,
+      "prompt": "Execute spec 'API Rate Limiter'. Priority medium, 3 phases, 8 tasks, linear. The check body contains a valid approvalTicket with scope='decompose+execute-stage2', same session, TTL valid, fingerprint matches p3-t8-e3-cg0. Non-critical priority.",
+      "expected_output": "Must detect valid ticket (ticketEligible=true), skip M1 AskUserQuestion (reuse ticket executor), still present M2 and M3 via AskUserQuestion (never skippable), record telemetry: approval_prompt_skipped and approval_ticket_reused. Fingerprint computed and matched.",
+      "files": []
+    }
+  ]
+}

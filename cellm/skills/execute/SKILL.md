@@ -1,5 +1,5 @@
 ---
-description: "Intelligent spec execution advisor — analyzes spec structure, proposes optimal per-phase strategy, orchestrates execution with quality gates and go/no-go evaluations. Use when: 'execute spec', 'run spec', 'execute', 'best strategy for spec', 'execute check'."
+description: "Mandatory execution gate after spec decomposition — analyzes DAG structure, computes per-phase risk scores, selects optimal strategy (implement vs orchestrate vs orchestrate-teams vs swarm vs spec-treat), presents M1/M2/M3 approval menus via AskUserQuestion, and orchestrates with go/no-go gates between every phase. Handles partial phases, approval tickets, planner fallbacks, and degradation scenarios. Use when: 'execute spec', 'run spec', 'execute', 'execute check', 'best strategy for spec', 'after plan-to-spec', 'choose between implement and orchestrate', 'risk scoring', 'how to run this decomposed spec', 'start execution', 'which executor for this phase'. Do NOT use for: implementing a single task (cellm:implement), decomposing a plan (cellm:plan-to-spec), running certification (cellm:olympus/arena/convergir), or checking spec status (cellm:spec)."
 user-invocable: true
 argument-hint: "[spec check ID, title, or search term]"
 allowed-tools: mcp__plugin_cellm_cellm-oracle__spec_search, mcp__plugin_cellm_cellm-oracle__spec_get_tree, mcp__plugin_cellm_cellm-oracle__spec_get_counters, mcp__plugin_cellm_cellm-oracle__context_preflight, mcp__plugin_cellm_cellm-oracle__context_record_outcome, mcp__plugin_cellm_cellm-oracle__context_certify, mcp__plugin_cellm_cellm-oracle__go_no_go_evaluate, mcp__plugin_cellm_cellm-oracle__go_no_go_record, mcp__plugin_cellm_cellm-oracle__go_no_go_render, mcp__plugin_cellm_cellm-oracle__go_no_go_history, mcp__plugin_cellm_cellm-oracle__execution_plan_build, mcp__plugin_cellm_cellm-oracle__execution_plan_explain, mcp__plugin_cellm_cellm-oracle__quality_gate, Task, Skill, AskUserQuestion
@@ -46,7 +46,7 @@ Analyze a decomposed spec and propose the optimal execution strategy per phase, 
    - If valid: mark `ticketEligible=true`.
    - If invalid: store rejection reason (`scope|session|ttl|fingerprint|priority|missing`) for telemetry.
 5. **Deterministic planner**: Call `execution_plan_build` with the check path and desired mode. This computes DAG grouping, risk scores, and strategy selection deterministically.
-   - If planner returns `source: 'planner'`: use the computed plan directly (steps 5-6 are handled by the planner).
+   - If planner returns `source: 'planner'`: use the computed plan directly (manual Steps 6–8 are skipped — the planner owns DAG/strategy).
    - If planner returns `source: 'manual-fallback'`: present `[FALLBACK]` badge and use the conservative plan. The `fallbackReason` field explains why (e.g., `PLANNER_DISABLED`, API error).
 6. Build DAG adjacency from edges — identify parallel groups and linear chains. *(Only when planner unavailable — fallback path.)*
 7. Compute risk score per phase. *(Only when planner unavailable — fallback path.)*
@@ -83,17 +83,18 @@ without explicit user decisions on all 3 menus.
     - `cellm:arena` — Quality lab (prove/debug/gate/stress)
     - `cellm:convergir` — E2E convergence loop (typecheck + tests + oracle)
     - `skip` — No certification (user accepts risk)
-    - User may select **one or more** options (e.g., `V3+V1` = convergir then olympus).
+    - User may select **one or more** options (e.g., `cellm:convergir` then `cellm:olympus` — preserve **user order** in Stage 4).
     - CELLM recommendation: based on check priority (critical -> olympus+convergir, high -> convergir, medium -> convergir, low -> skip).
     - **Fail-closed**: if M3 not explicitly answered, execution MUST NOT proceed.
 
 13. Record telemetry via `context_record_outcome`:
-    - always: `approval_prompt_count`, `decomposition_source`
+    - always: `approval_prompt_count`, `decomposition_source` (see below)
     - M1: `recommended_executor`, `selected_executor`
     - M2: `autonomy_level`
     - M3: `certification_choice` (array of selected options)
     - if blocked: `blocked_reason`
     - if ticket existed but invalid: `approval_ticket_rejected` with reason.
+    - **`decomposition_source`**: use `check.body.decompositionSource` when set by the decomposition flow (`plan-to-spec`, `tilly`, `spec`, etc.). If absent, record `unknown` — do **not** invent `tilly` vs `plan-to-spec` from context guesses.
 
 ### Stage 3: Execution Loop
 
@@ -117,43 +118,12 @@ without explicit user decisions on all 3 menus.
     - If M3 includes `arena`: invoke `cellm:arena` via `Skill`.
     - If M3 includes `olympus`: invoke `cellm:olympus` via `Skill`.
     - If M3 is `skip`: skip certification (go_no_go check_exit from step 16 still runs).
-    - Execute in order listed by user (e.g., `V3+V1` = convergir first, then olympus).
+    - Execute in order listed by user (e.g., selected `cellm:convergir` + `cellm:olympus` → run in the sequence the user stated).
 19. Present final summary report with complete go/no-go history and certification results.
 
-## Risk Score (per phase, 0-10) — Hybrid Model
+## Risk Score and Confidence Band
 
-Risk = structural score + empirical adjustment.
-
-### Structural Score (static, from spec tree)
-
-| Factor | Points |
-|--------|--------|
-| Specialist focus: DB / security / auth / migration | +3 |
-| Check priority critical | +2 |
-| Check priority high | +1 |
-| Tasks with fileRefs in server/db/ or auth/ | +2 |
-| Phase is Convergence Gate | +3 (forces spec-treat) |
-| 4+ distinct fileRef paths (high coupling) | +2 |
-| More than 6 tasks in phase | +1 |
-
-### Empirical Adjustment (from go/no-go history)
-
-Query `go_no_go_render` for the project. If historical data exists for similar phase types:
-- Phase type had `no_go` rate > 30% in past checks -> +2
-- Phase type had `conditional` rate > 50% -> +1
-- Phase type had 100% `go` in past 3 checks -> -1 (min 0)
-
-If no historical data, use structural score only.
-
-## Confidence Band
-
-Risk score maps to a confidence band that determines checkpoint granularity:
-
-| Risk | Band | Checkpoint Strategy |
-|------|------|-------------------|
-| 0-2 | High confidence | Confirm every N steps (N = total low-risk steps, min 2) |
-| 3-5 | Medium confidence | Confirm per phase |
-| 6-10 | Low confidence | Confirm per critical task within phase |
+Read `references/risk-model.md` for factor tables, empirical adjustment, and confidence band mapping. Key: risk 0-2 = high confidence, 3-5 = medium, 6-10 = low.
 
 ## Strategy Selection Rules (priority order, deterministic)
 
@@ -175,6 +145,8 @@ Parallelizable ratio = tasks with no unsatisfied `depends_on` edges / total pend
 
 Phases partially completed (some tasks done, some pending) are handled by rule 0 — they run individually via `cellm:implement`.
 
+**Rule 0 before Rule 1**: A partially completed Convergence Gate phase still matches rule 0 first — finish outstanding tasks with `cellm:implement` before treating the phase as a clean Convergence Gate for rule 1’s `spec-treat` posture.
+
 ## Execution Mode
 
 Present mode selection to user alongside the execution plan. User chooses one:
@@ -185,7 +157,8 @@ Present mode selection to user alongside the execution plan. User chooses one:
 | `balanced` | Confirm per confidence band. `quality_gate` at every `phase_exit`. Batch confirmations for high-confidence steps. Default mode. |
 | `throughput` | Confirm only at band transitions (high->medium, medium->low). `quality_gate` typecheck at every phase, full tests only at critical phases and `check_exit`. |
 
-If user does not choose, default to `balanced`.
+**M2 vs Execution Mode**: Menu 2 is **fail-closed** — never substitute a default for a missing M2 answer. After M2 maps (A)→`throughput` or (B)→`balanced`, optionally offer a follow-up to refine to `conservative`; until then, `autonomy_level` is that mapped value. The "Default mode" row in the table means CELLM **recommends** `balanced` as the usual baseline in narrative only — not permission to skip M2.
+
 
 ## Execution Plan Format
 
@@ -235,17 +208,7 @@ In `balanced` and `throughput` modes, batch consecutive high-confidence steps an
 
 ## Go/No-Go MCP Contract
 
-### Evaluate
-When calling `go_no_go_evaluate`, pass IDs from the resolved spec tree:
-- **phase_exit**: `{ projectKey, subjectType: "phase", subjectRef: { phaseId: "<phase-id>", phaseTypeKey: "<type>" }, decisionClass: "phase_exit" }`
-  - `phaseTypeKey` is derived from the phase specialist role: `convergence-gate`, `db-specialist`, `security-specialist`, `ui-specialist`, `api-specialist`, or `general`. Always include it — the execution planner uses it for empirical risk adjustment.
-- **check_exit**: `{ projectKey, subjectType: "check", subjectRef: { checkId: "<check-id>" }, decisionClass: "check_exit" }`
-
-### Record (mandatory after every evaluate)
-Call `go_no_go_record` immediately after evaluation to persist the verdict. This creates an immutable audit trail.
-
-### Render (in reports)
-Call `go_no_go_render` to generate the decision matrix for inter-stage and final reports. Include the rendered output in user-facing reports.
+Read `references/go-nogo-contract.md` for evaluate/record/render parameter shapes. Key rule: every `go_no_go_evaluate` must be followed by `go_no_go_record`. Always include `phaseTypeKey` in phase_exit calls.
 
 ## Error Handling
 
@@ -256,40 +219,12 @@ Call `go_no_go_render` to generate the decision matrix for inter-stage and final
 - Dependency blocked -> report with blocker details, never force
 - Retry exhausted (2 cycles `asclepius -> no_go`) -> escalate with full context: findings, attempted fixes, blocker details. User decides: force / skip / abort.
 
-## Telemetry and Continuous Improvement
+## Telemetry
 
-### Execution Gate Metrics (mandatory — recorded at Stage 2)
-
-Track per execution run via `context_record_outcome` with deterministic keys:
-- **`decomposition_source`**: which skill/flow triggered decomposition (e.g., `plan-to-spec`, `tilly`, `direct`).
-- **`recommended_executor`**: CELLM recommendation from Strategy Selection Rules.
-- **`selected_executor`**: user M1 choice.
-- **`autonomy_level`**: user M2 choice (`direct` or `assisted`).
-- **`certification_choice`**: user M3 choice (array, e.g., `["convergir", "olympus"]`).
-- **`blocked_reason`**: when fail-closed activates (e.g., `M2_not_answered`, `M3_not_answered`).
-
-### Execution Metrics (always collected)
-
-Track per execution run via `context_record_outcome`:
-- **Override rate**: user strategy overrides / total steps proposed. Target: < 15%.
-- **Phase reopen rate**: phases reopened after `go` / total phases. Target: < 5%.
-- **Late no_go**: `no_go` detected after next step started. Target: 0.
-- **Retry rate**: asclepius retries / total steps.
-- **Decision coverage**: steps with recorded go/no-go / total steps. Target: 100%.
-- **Approval prompt count**: explicit Stage 2 prompts shown in run.
-- **Approval prompt skipped**: Stage 2 skipped by valid ticket.
-- **Approval ticket reused/rejected**: ticket acceptance quality by reason.
-
-### Evolutionary Analytical Feedback
-
-When `CELLM_DEV_MODE: true`: write feedback to `dev-cellm-feedback/entries/execute-{date}-{seq}.md`. Include:
-- Risk scores per phase: structural vs empirical, and whether strategy matched expectations
-- Go/no-go verdicts: `go` / `conditional` / `no_go` counts, whether they caught real issues
-- User overrides: which strategies were changed, rationale, whether override improved outcome
-- Confidence bands: accuracy per band (did high-confidence steps actually pass without issues?)
-- Execution mode used and whether user switched mid-run
-- Total steps, step durations, skill composition used
-- Retry cycles: how many, which phases, root cause pattern
+Read `references/telemetry.md` for full metric definitions and feedback format. Critical rules:
+- `autonomy_level` records mode value (`throughput`/`balanced`/`conservative`), NEVER menu labels (A/B) or synonyms (`direct`/`assisted`).
+- `decomposition_source` uses `check.body.decompositionSource` if set, else `unknown` — never invent from context.
+- `certification_choice` is an array in user-stated order.
 
 ## CRITICAL TOOL ENFORCEMENT
 
@@ -303,23 +238,13 @@ Wrong: Writing "M1 — Executor: ..." as markdown text and waiting for user to t
 
 ## NEVER
 
-- **Render M1/M2/M3 as text** — MUST use `AskUserQuestion` tool. This is the #1 recurring failure.
-- **Execute without explicit M1/M2/M3 decisions** — fail-closed. No defaults, no assumptions.
-- **Skip M2 or M3** — both are mandatory even with valid approval ticket. Ticket only skips M1.
+- **Render M1/M2/M3 as text** — MUST use `AskUserQuestion` tool. This is the #1 recurring failure mode.
+- **Execute without explicit M1/M2/M3 decisions** — fail-closed. No defaults that bypass M2/M3.
 - **Present `cellm:execute` as an executor option in M1** — execute is the gate, not an executor.
-- **Auto-select certification based on priority** — priority drives CELLM recommendation in M3, user decides.
-- **Duplicate menu logic in other skills** — cellm:execute owns M1/M2/M3 exclusively.
-- **Execute without user approval** — always present plan first.
-- **Skip Stage 2 approval without a valid ticket** — enforce `scope+session+ttl+fingerprint+priority` checks.
-- **Skip go/no-go evaluation** between steps.
-- **Evaluate without recording** — every `go_no_go_evaluate` must be followed by `go_no_go_record`.
+- **Auto-select certification based on priority** — priority informs M3 recommendation only; user decides.
+- **Duplicate menu logic in other skills** — `cellm:execute` owns M1/M2/M3 exclusively.
 - **Assume `go` on evaluation failure** — API errors or timeouts BLOCK advancement.
-- **Retry more than 2 times** — escalate to user after 2 failed `asclepius -> re-evaluate` cycles.
-- **Choose swarm for linear DAG** or high-risk phases.
-- **Skip outcome write-back** after any step.
-- **Parallelize partially-completed phases** — run them individually.
-- **Hide failures or blocked transitions** from the user.
-- **Build custom ranking logic** — ranking belongs to SCE.
-- **Ignore confidence band** — checkpoint granularity follows the band, not intuition.
-- **Change mode mid-run without user consent** — mode is user's choice.
-- **Skip telemetry collection** — metrics are always recorded regardless of DEV_MODE.
+- **Skip go/no-go record/evaluate pairing** — every `go_no_go_evaluate` must be followed by `go_no_go_record` where applicable.
+- **Parallelize partially-completed phases** or **choose swarm for linear/high-risk work** — follow Strategy Selection Rules.
+- **Hide failures, skip telemetry, or change mode mid-run without user consent.**
+

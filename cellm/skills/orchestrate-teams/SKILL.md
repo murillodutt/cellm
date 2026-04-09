@@ -39,7 +39,7 @@ When `CELLM_DEV_MODE: true`: write feedback to `dev-cellm-feedback/entries/orche
 - Wall-clock time vs sequential estimate
 - Merge conflicts encountered
 - Agent failures and recovery actions
-- Director metrics: emitCount, verifyCount, skipCount
+- Director metrics (aggregated from worker agents via implement): emitCount, verifyCount, skipCount
 - Which guild activations were effective
 - Whether context materialization was sufficient
 
