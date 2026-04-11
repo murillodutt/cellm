@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
-# CELLM - Inject Persona + Partnership Letter as SessionStart additionalContext.
-# Pure bash, no jq dependency, POSIX-compatible.
+# CELLM - Inject Persona + startup contract as SessionStart additionalContext.
+# Pure bash, no jq dependency.
 #
-# Concatenates CELLM-PERSONA.md + CELLM-PARTNERSHIP-LETTER.md (if exists)
-# into a single additionalContext payload with separator. One escape path,
-# one JSON output — avoids inflating context with duplicate hooks.
+# Concatenates CELLM-PERSONA.md + the startup contract extracted from
+# CELLM-PARTNERSHIP-LETTER.md into a single additionalContext payload.
+# One escape path, one JSON output — avoids inflating context with duplicate
+# hooks and keeps the injected context operational.
 #
 # Event: SessionStart (delegated from scripts/inject-persona.sh shim)
 # Behavior: Non-blocking, injects additionalContext.
@@ -27,10 +28,16 @@ persona_file="${script_dir}/CELLM-PERSONA.md"
 content=$(cat "${persona_file}")
 [[ -z "${content}" ]] && exit 0
 
-# Append letter if exists (with separator)
+# Append startup contract extracted from the letter if present (with separator)
 letter_file="${script_dir}/CELLM-PARTNERSHIP-LETTER.md"
 if [[ -f "${letter_file}" ]]; then
-  letter=$(cat "${letter_file}")
+  letter=$(
+    awk '
+      /<!-- STARTUP_CONTRACT_START -->/ { capture=1; next }
+      /<!-- STARTUP_CONTRACT_END -->/ { capture=0; exit }
+      capture { print }
+    ' "${letter_file}"
+  )
   if [[ -n "${letter}" ]]; then
     content="${content}
 ---

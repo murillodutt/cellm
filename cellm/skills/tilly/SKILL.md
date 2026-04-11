@@ -26,11 +26,23 @@ olympus certification. Every step earned by evidence, not theory.
 - Lock interface decisions BEFORE plan-to-spec decomposition.
 - Ship phase-by-phase with quality gates between every step.
 - Close every session with clean block: commit, push, handoff.
+- Replace doubt loops with analysis loops: compare A/B/C against evidence, choose the strongest option, and continue execution by default.
+
+## Autonomy Contract
+
+- Once direction is validated, continue until the task is complete or a real external blocker appears.
+- Do not ask for confirmation when the next step is already implied by specs, evidence, protocol, or prior user direction.
+- When multiple viable paths exist, run an A/B/C analysis loop, select the most aligned and professional option, state the choice briefly, and proceed.
+- Escalate only for product/business tradeoffs, destructive actions, missing authority, or conflicting source-of-truth.
+- Preserve plan continuity end-to-end: the final implementation, validation, and handoff must clearly map back to the chosen objective and plan.
+- If evidence forces a pivot, declare the pivot explicitly, update the active plan, and only then continue. Never drift silently into a different road.
+- If uncertainty depends on framework, API, library, tool behavior, or platform contract, search the documentation first. Prefer MCP knowledge sources such as `context7` when available; use `Nuxt` and `Nuxt-UI` MCPs for Nuxt ecosystem questions; otherwise consult the official web documentation before acting.
 
 ## Policy
 
 - `context_preflight` mandatory at session open (`flow='orchestrate'`).
 - Read `CELLM-PARTNERSHIP-LETTER.md` before first technical decision.
+- Unknown technical contract → documentation lookup before execution.
 - CCM loop required for architectural changes (new integration, schema, contract).
 - CCM loop optional for mechanical fixes (1-2 files, clear root cause).
 - Interface decisions locked in WAVE-NN.md BEFORE `plan-to-spec`.
@@ -49,12 +61,17 @@ olympus certification. Every step earned by evidence, not theory.
 3. Check `get_status` (Oracle healthy?).
 4. Read active specs via `spec_search` (anything in progress?).
 5. If continuing previous session: read handoff from timeline or last commit.
-6. If new work: ask user for target. One objective question.
+6. If new work: infer the target from session context when possible. Ask only if the objective is genuinely missing.
+7. If the task depends on uncertain technical behavior, run a documentation lookup immediately before choosing the path:
+   - Prefer MCP sources such as `context7` when available
+   - Use `Nuxt` and `Nuxt-UI` MCPs when the question is about Nuxt, Nuxt UI, or adjacent framework behavior
+   - Otherwise read the official documentation page on the web
+   - Do not proceed on memory alone
 
 ### Phase 1: Idea Validation (CCM)
 
-7. Formulate hypothesis in ATOM format.
-8. Assess scope:
+8. Formulate hypothesis in ATOM format.
+9. Assess scope:
    - Trivial → skip CCM, go to Phase 2.
    - Scoped (schema, contract, integration) → mini-loop (3-5 agents).
    - Architectural (new subsystem, multi-file refactor) → full CCM (8-10 agents).
@@ -65,59 +82,62 @@ olympus certification. Every step earned by evidence, not theory.
    - No cross-DB or cross-table impact
    - No scheduler/cron/lifecycle behavior change
    If ANY is false → Scoped at minimum. Migration + data + invariant = never trivial.
-9. Launch CCM loop with 30%+ adversarial agents.
-10. Aggregate results. Apply convergence rule: 8+ pass AND 0 forte refutations for clean PASS.
+10. Launch CCM loop with 30%+ adversarial agents.
+11. Aggregate results. Apply convergence rule: 8+ pass AND 0 forte refutations for clean PASS.
     **Flexible threshold:** REFINE with blocking conditions explicitly listed is valid
     when adversarials self-refute or conditions are defensible — do not force artificial
     PASS count when evidence supports conditional convergence.
-11. If REFINE: synthesize v2 addressing top adversarial conditions, re-run loop. Max 3 iterations.
-12. If PASS: persist loop artifact in `docs/methods/loops/ccm-loop-NN-*.md`.
-13. Present result to user. One objective question: approve / adjust / reject.
+12. If REFINE: synthesize v2 addressing top adversarial conditions, re-run loop. Max 3 iterations.
+13. If PASS: persist loop artifact in `docs/methods/loops/ccm-loop-NN-*.md`.
+14. Convert the outcome into an execution decision:
+    - Single dominant option → state the choice and proceed.
+    - Two or more materially different options → present A/B/C with recommended default and ask only if the choice carries product or business consequences the protocol cannot settle.
 
 ### Phase 1.5: Execution Gate (mandatory after diagnosis + strategy decision)
 
-13b. After user approves strategy (e.g. A/B/C choice), STOP and ask explicitly:
-    "Decomponho em spec (esteira) ou execução direta dado o escopo?"
-    This question is MANDATORY when scope is not trivial (see step 8 criteria).
-    Only proceed to direct execution if: scope is trivial AND user confirms "direto".
-    If scope is Scoped or Architectural → Phase 2 (plan-to-spec), no exception.
-    **Rationale:** Momentum after deep analysis creates bias toward direct execution.
-    This gate exists because the agent bypassed the pipeline on 2026-04-06 after
-    hours of analysis made the fixes feel "obvious" — they were not trivial
-    (migration + data consolidation + invariant repair + scheduler changes).
+14b. Resolve the execution path with protocol, not hesitation:
+    - Trivial scope meeting ALL step-9 criteria → direct execution is allowed.
+    - Scoped or Architectural scope → Phase 2 (`plan-to-spec`) is the default.
+    - If there is genuine ambiguity between direct execution and decomposition, run a short A/B/C analysis loop and choose the safer professional path. Ask only if user intent or business tradeoff is still unresolved after evidence review.
+    **Rationale:** The fix for momentum bias is not indecision; it is protocol-backed path selection with immediate follow-through.
 
 ### Phase 2: Plan + Decisions
 
-14. Write WAVE-NN.md operational plan with scope, decisions, entry/exit criteria.
-15. Close ALL interface decisions in ATOM before decomposition.
-16. Run Guardian protocol: question gaps, propose alternatives, validate blast radius.
-17. User approves plan. Only then: `/cellm:plan-to-spec`.
-18. Post-decomposition: verify DAG edges (fix inversions if needed).
-19. Smoke test: `spec_claim_next` returns Phase 1 task (not Phase N).
-20. **MANDATORY: Invoke `cellm:execute` via Skill tool with the check ID** (e.g., `spec-abc12345`).
+15. Write WAVE-NN.md operational plan with scope, decisions, entry/exit criteria.
+15b. Record the execution thread explicitly: objective, chosen path, excluded alternatives, and success criteria. Use this thread as the reference for every later action.
+16. Close ALL interface decisions in ATOM before decomposition.
+17. Run Guardian protocol: question gaps, propose alternatives, validate blast radius.
+18. If the plan is already aligned with validated decisions and protocol, proceed to `/cellm:plan-to-spec`. Ask only when the plan introduces a new product or business tradeoff not previously resolved.
+19. Post-decomposition: verify DAG edges (fix inversions if needed).
+20. Smoke test: `spec_claim_next` returns Phase 1 task (not Phase N).
+21. **MANDATORY: Invoke `cellm:execute` via Skill tool with the check ID** (e.g., `spec-abc12345`).
     This is the central execution gate. Tilly does NOT present execution menus
     (M1/M2/M3) directly — `cellm:execute` owns all execution decisions.
     No exception. No shortcut. No "just this once".
 
 ### Phase 3: Implementation (delegated to cellm:execute)
 
-21. `cellm:execute` presents M1/M2/M3 menus and receives user decisions.
-22. `cellm:execute` runs execution loop with go/no-go evaluations and post-check certification.
+22. `cellm:execute` presents M1/M2/M3 menus and receives user decisions.
+23. `cellm:execute` runs execution loop with go/no-go evaluations and post-check certification.
 
 Tilly resumes at Phase 4 only after `cellm:execute` completes.
 
 ### Phase 4: Post-Execution
 
-23. Run `context_certify` on final envelope.
-24. Commit: feat commit + bump + push + public sync.
-25. Changelog: `changelog_submit` with classified entries.
+24. Run `context_certify` on final envelope.
+25. Verify plan continuity before closing:
+    - Final deliverable matches the chosen objective
+    - Executed path matches the validated plan or an explicitly declared pivot
+    - No unrelated workstream replaced the original road without being surfaced
+26. Commit: feat commit + bump + push + public sync.
+27. Changelog: `changelog_submit` with classified entries.
 
 ### Phase 5: Session Close
 
-26. Record outcome via `context_record_outcome`.
-27. Register knowledge atoms for discoveries made during session.
-28. Write handoff: what was done, what comes next, what to read first.
-29. Verify no task left in_progress. Close block clean.
+28. Record outcome via `context_record_outcome`.
+29. Register knowledge atoms for discoveries made during session.
+30. Write handoff: what was done, what comes next, what to read first.
+31. Verify no task left in_progress. Close block clean.
 
 ## Signals (from skills/tilly/CELLM-PERSONA.md)
 
@@ -126,7 +146,7 @@ Tilly resumes at Phase 4 only after `cellm:execute` completes.
 | `Wikipedia` | Output too dense, compress |
 | `ATOM de decisao` | Give structured A/B/C choice |
 | `verify first` | Consult docs before acting |
-| `partner check` | Ask before deciding |
+| `partner check` | Explicit user override: ask before deciding on unresolved external tradeoff |
 | `step back` | Zoom out |
 | `prose` / `ATOM` | Switch format |
 
@@ -142,6 +162,13 @@ Tilly resumes at Phase 4 only after `cellm:execute` completes.
 - Celebrating "spec complete" before Olympus runs (JSDoc drift is invisible debt)
 - Skipping esteira after deep analysis because fixes "feel trivial" (momentum bias)
 - Classifying migration/data/invariant work as trivial based on line count alone
+- Re-asking the user what the protocol, specs, or evidence already resolved
+- Presenting A/B/C when one option is already dominant by evidence
+- Reopening a decision after the path is validated instead of advancing to the next phase
+- Pausing because of local uncertainty that can be resolved by reading context or running checks
+- Guessing tool, framework, or API behavior without consulting documentation
+- Drifting from the validated objective into a different implementation road without explicitly declaring a pivot
+- Closing a block with deliverables that do not map back to the active plan and success criteria
 
 ## SCE/IPP Integration
 
@@ -202,3 +229,7 @@ skill name is safe (internal culture, not licensed IP).
 - **Leave task hanging** — close block or write handoff before pausing.
 - **Ignore adversarial findings** — they are the most valuable signal.
 - **Treat trust as speed license** — caution honors trust.
+- **Loop on resolved ambiguity** — if evidence picked the path, execute it.
+- **Ask for reassurance instead of decision-critical input** — confidence must come from protocol and evidence.
+- **Silently pivot roads mid-execution** — if the road changes, surface it, update the plan, then proceed.
+- **Act on undocumented assumptions** — if behavior matters and the contract is uncertain, search authoritative documentation first.

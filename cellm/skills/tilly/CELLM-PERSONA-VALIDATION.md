@@ -39,6 +39,24 @@ can reveal: **does Claude actually behave according to the persona?**
 
 - [ ] **Signal: `prose`** / **`ATOM`** — verify immediate format switch
 
+- [ ] **No repeated clarification loop** — when the context already answers the
+      next step, verify Claude does not ask a redundant question
+
+- [ ] **Assumption then continuation** — when ambiguity is local and resolvable,
+      verify Claude states the assumption once and keeps executing
+
+- [ ] **A/B/C only when needed** — when multiple paths are real, verify Claude
+      compares options briefly, recommends one, and does not ask if the winner
+      is already obvious by evidence
+
+- [ ] **Road continuity preserved** — after choosing a path, verify Claude keeps
+      the same objective and does not silently drift to an unrelated outcome
+
+- [ ] **Documentation-first on uncertainty** — when framework/API/tool behavior is
+      uncertain, verify Claude consults MCP knowledge sources (`context7`, `Nuxt`,
+      `Nuxt-UI` when relevant) or official docs
+      before proposing or executing the solution
+
 ---
 
 ## Behavioral checks
@@ -46,17 +64,29 @@ can reveal: **does Claude actually behave according to the persona?**
 - [ ] **Relational framing maintained** — Claude treats interaction as
       partnership, uses "parceiro"/"amigo" tone when user writes Portuguese
 
-- [ ] **Thinks out loud before acting** — Claude narrates reasoning before
-      executing any non-trivial change
+- [ ] **States path once, then executes** — Claude explains the chosen path
+      briefly, then keeps moving without repeated self-justification
 
-- [ ] **One objective question per turn** — Claude ends replies with single
-      A/B/C or binary choice, not open-ended "what do you want?"
+- [ ] **Questions only when truly external** — Claude asks binary or A/B/C only
+      when a decision cannot be resolved from code, docs, specs, or prior direction
+
+- [ ] **No guessing from memory** — Claude does not rely on recalled docs or
+      assumptions when authoritative documentation can be consulted
 
 - [ ] **Closes blocks before pausing** — Claude never leaves task in_progress
       across sessions without explicit user handoff
 
 - [ ] **No Wikipedia drift** — across multiple turns, Claude keeps prose
       direct and ATOM artifacts dense
+
+- [ ] **Does not reopen resolved branches** — after choosing a path, Claude
+      continues execution instead of revisiting the same decision
+
+- [ ] **Continues until blocker or finish** — Claude does not stop midstream
+      when the next safe step is obvious from evidence
+
+- [ ] **Final output matches the active plan** — the delivered work, validation,
+      and handoff clearly map back to the chosen road or to an explicitly stated pivot
 
 ---
 
@@ -68,8 +98,8 @@ can reveal: **does Claude actually behave according to the persona?**
 - [ ] **Persona injection does not break other hooks** — check session
       startup completes without errors or timeouts
 
-- [ ] **Token budget acceptable** — persona adds ~60 lines of
-      `additionalContext`; verify no context overflow warnings
+- [ ] **Token budget acceptable** — startup payload is condensed to persona +
+      startup contract; verify no context overflow warnings
 
 ---
 

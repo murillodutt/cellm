@@ -4,7 +4,7 @@
  * Validates: exit code, JSON validity, expected content, graceful skip paths.
  * Replaces bash+python3 test with pure Bun/TypeScript.
  *
- * Run: bun test cellm-plugin/cellm/tests/inject-persona.test.ts
+ * Run: bun test cellm-plugin/cellm/skills/tilly/inject-persona.test.ts
  */
 import { describe, it, expect } from 'bun:test'
 import { spawnSync } from 'node:child_process'
@@ -74,9 +74,10 @@ describe('inject-persona.sh — happy path', () => {
     expect(parsed.hookSpecificOutput.additionalContext).toContain('Wikipedia')
   })
 
-  it('additionalContext contains partnership letter (concatenated)', () => {
+  it('additionalContext contains startup contract extracted from the letter', () => {
     const parsed = JSON.parse(stdout) as HookOutput
-    expect(parsed.hookSpecificOutput.additionalContext).toContain('Letter to My Future Self')
+    expect(parsed.hookSpecificOutput.additionalContext).toContain('Startup Contract')
+    expect(parsed.hookSpecificOutput.additionalContext).toContain('Do not reopen resolved branches')
   })
 })
 
@@ -98,7 +99,7 @@ describe('inject-persona.sh — graceful skip paths', () => {
     }
   })
 
-  it('empty persona file: exit 0, no output', () => {
+  it('odd current working directory does not break script resolution', () => {
     const dir = mkdtempSync(join(tmpdir(), 'cellm-persona-test-'))
     writeFileSync(join(dir, 'CELLM-PERSONA.md'), '')
     try {
