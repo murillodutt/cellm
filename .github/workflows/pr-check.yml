@@ -133,7 +133,7 @@ jobs:
           fetch-depth: 0
 
       - name: Add labels based on changes
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             const { execSync } = require('child_process');
