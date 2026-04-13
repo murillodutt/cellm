@@ -1,0 +1,22 @@
+{
+  "_comment": [
+    "CELLM Oracle MCP config for Cursor IDE.",
+    "Place this file at ~/.cursor/mcp.json (user-global) or .cursor/mcp.json (project-scoped).",
+    "Kept in sync with .mcp.json.example — if envs change, update both.",
+    "The -y flag ensures non-interactive first run (no npm prompts)."
+  ],
+  "mcpServers": {
+    "cellm-oracle": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@cellm-ai/oracle",
+        "mcp"
+      ],
+      "env": {
+        "CELLM_DATA_DIR": "~/.cellm",
+        "CELLM_WORKER_URL": "http://127.0.0.1:31415"
+      }
+    }
+  }
+}
