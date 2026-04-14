@@ -1,5 +1,6 @@
 ---
 description: CELLM product thinking filter — every feature, skill, and API must work for external developers in any project, not just CELLM's own repository. Activates when designing plugin surfaces, Oracle APIs, MCP tools, or NPM-facing behavior.
+cellm_scope: universal
 user-invocable: false
 ---
 
@@ -12,7 +13,7 @@ CELLM is a product installed via NPM in **other people's projects**. Before writ
 | Correct | Wrong |
 |---------|-------|
 | "CELLM users will..." | "We will use this to..." |
-| Generic Node.js/Bun support | Only works in cellm-private repo |
+| Generic Node.js/Bun support | Only works in one specific internal repository |
 | Skills for any project | Skills for CELLM development |
 | Data in `~/.cellm/` | Data in repo directories |
 

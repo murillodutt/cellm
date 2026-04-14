@@ -12,7 +12,7 @@ claude plugin install cellm
 
 Optional Oracle setup:
 ```
-/cellm:init
+/cellm:oracle
 ```
 
 ## Structure

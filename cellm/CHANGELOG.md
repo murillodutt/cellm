@@ -6,6 +6,13 @@
 
 All notable changes to CELLM Plugin will be documented in this file.
 
+## [0.36.30] - 2026-04-14
+
+### Changed
+
+- Rename `/cellm:init` -> `/cellm:oracle` for Oracle worker lifecycle operations. Plugin is pre-NPM-publish so no external contract was broken.
+- Portability contract introduced for plugin distribution hygiene and decontamination.
+
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 

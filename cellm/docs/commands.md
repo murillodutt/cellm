@@ -57,7 +57,7 @@ Skills are organized in two categories: **workflow skills** (invoked explicitly 
 
 | Skill | Purpose | Usage |
 |-------|---------|-------|
-| `/cellm:init` | Oracle worker installation and management | `/cellm:init install` |
+| `/cellm:oracle` | Oracle worker installation and management | `/cellm:oracle install` |
 | `/cellm:status` | Check Oracle worker daemon status | `/cellm:status` |
 
 ### Design System

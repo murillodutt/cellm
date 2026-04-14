@@ -167,7 +167,7 @@ Oracle converts text to vectors using a local embedding model, then finds simila
 
 ### Can I add my own patterns?
 
-Yes. Add pattern files to your project's `cellm-core/patterns/` directory.
+Yes. Project-local patterns are stored in the Oracle Compass database (`~/.cellm/compass/compass.db`) via `knowledge_add` or the `/cellm:discover` skill. Patterns are scoped per project and surfaced automatically through SCE context injection.
 
 ### What are anti-patterns?
 

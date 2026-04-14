@@ -1,5 +1,6 @@
 ---
 description: Passive CellmOS work classifier — routes each action to trivial (just do it), query (research first), or spec (create check in DB) before execution. Activates before non-trivial work to prevent ungoverned changes. Complements cellm:spec, does not replace it.
+cellm_scope: universal
 user-invocable: false
 allowed-tools: mcp__plugin_cellm_cellm-oracle__context_preflight, mcp__plugin_cellm_cellm-oracle__spec_search, mcp__plugin_cellm_cellm-oracle__spec_transition, mcp__plugin_cellm_cellm-oracle__spec_create_node
 ---
@@ -25,10 +26,6 @@ Classify work and route non-trivial execution to the SCE + spec pipeline.
 2. `TRIVIAL`: execute directly.
 3. `QUERY`: answer with research path.
 4. `SPEC`: `spec_search` then `context_preflight`, then continue in spec-driven flow.
-
-## Evolutionary Analytical Feedback
-
-When `CELLM_DEV_MODE: true`: after router processing, write feedback entry to `dev-cellm-feedback/entries/spec-router-{date}-{seq}.md`. Note which routing stages filtered effectively, whether the pipeline produced actionable specs, and which input formats caused parsing issues. Format and lifecycle: see `dev-cellm-feedback/README.md`.
 
 ## NEVER
 

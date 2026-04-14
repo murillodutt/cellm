@@ -26,7 +26,7 @@ Validate documentation structure, evidence links, normative vocabulary, and drif
    1. **Structure exists**: `specs/`, `reference/`, `howto/`, `index.md`, `glossary.md` present.
    2. **Source of truth**: `project-conveyor.md` present and referenced by SPECs/REFs — stop here if missing.
    3. **Evidence links**: all derived docs (SPEC/REF) link to evidence files in `reference/code-evidence/`.
-   4. **Vocabulary**: correct normative language used (DEVE, NAO DEVE, DEVERIA, PODE); flag non-standard language.
+   4. **Vocabulary**: correct normative language used (MUST, MUST NOT, SHOULD, MAY); flag non-standard language.
    5. **Gaps file**: `conveyor-gaps.md` present and contains dated entries.
 3. Compile and report all findings; distinguish errors (blocking) from warnings (advisory).
 

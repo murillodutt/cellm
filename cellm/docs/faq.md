@@ -175,7 +175,7 @@ Claude Code 2.1.59+ includes a native auto-memory (`/memory`). CELLM provides it
 
 ### Can I add my own patterns?
 
-Yes. Add pattern files to your project's `cellm-core/patterns/` directory.
+Yes. Add pattern files to your project's `.cellm/patterns/` directory.
 
 ### What are anti-patterns?
 

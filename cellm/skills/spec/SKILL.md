@@ -1,5 +1,6 @@
 ---
 description: "CellmOS command center — list pending specs, create new checks, view status, and manage the atomic spec-driven system in Oracle DB. Entry point for all spec operations. Use when: 'show specs', 'create spec', 'spec status', 'list checks'."
+cellm_scope: universal
 user-invocable: true
 argument-hint: "[action]: (empty) | create <title> | status | treat <check>"
 allowed-tools: mcp__plugin_cellm_cellm-oracle__spec_create_node, mcp__plugin_cellm_cellm-oracle__spec_transition, mcp__plugin_cellm_cellm-oracle__spec_search, mcp__plugin_cellm_cellm-oracle__spec_get_tree, mcp__plugin_cellm_cellm-oracle__spec_add_edge, mcp__plugin_cellm_cellm-oracle__spec_add_verification, mcp__plugin_cellm_cellm-oracle__spec_get_counters, AskUserQuestion
@@ -32,10 +33,6 @@ After the check: decompose into phases (work groups) and tasks (atomic actions).
 
 Project: always `git rev-parse --show-toplevel` → last segment. Pass `sessionId` (current session) to `spec_create_node` for audit trail. Auto-chain supported: calling `completed` from `pending`/`active` resolves intermediate states automatically. Auto-rollup: when all child tasks complete, the parent phase auto-completes — but YOU must call `spec_transition` on each leaf task for rollup to trigger.
 
-## Evolutionary Analytical Feedback
-
-When `CELLM_DEV_MODE: true`: after spec creation or transition, write feedback entry to `dev-cellm-feedback/entries/spec-{date}-{seq}.md`. Note which nodeTypes and transitions caused friction, which body schemas were unclear, and whether deduplication caught real duplicates. Format and lifecycle: see `dev-cellm-feedback/README.md`.
-
 ## NEVER
 
 - **Markdown files** — specs live in compass.db, never in cellm-core/specs/
@@ -46,4 +43,3 @@ When `CELLM_DEV_MODE: true`: after spec creation or transition, write feedback e
 - **Omit sessionId** — always pass `sessionId` (current session) to `spec_create_node` and `spec_add_verification` for audit trail
 - **Ignore BLOCKED_BY_DEPENDENCY** — if `spec_transition` returns this error, check predecessor phase status before proceeding
 - **Invalid parent-child hierarchies** — check→phase/task/gap/decision/requirement/verification, phase→task/gap/decision/verification, task→gap/verification. Service rejects violations with INVALID_CHILD_TYPE.
-- **Skip the Evolutionary Analytical Feedback** — when CELLM_DEV_MODE is true, reflection after spec creation or transition is mandatory

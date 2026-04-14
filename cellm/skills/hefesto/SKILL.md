@@ -1,5 +1,6 @@
 ---
 description: "CELLM feature construction engine — builds new capabilities from CONSTRUCT findings or direct feature requests. Designs architecture, decomposes into CellmOS specs, implements end-to-end, certifies via Argus. Use when: 'build', 'construct', 'create feature', 'implement new', 'hefesto on X', 'implement the CONSTRUCT items'. Does not fix existing code (that is Asclepius)."
+cellm_scope: universal
 user-invocable: true
 argument-hint: "[feature description, CONSTRUCT finding ID, or block target]"
 allowed-tools: mcp__plugin_cellm_cellm-oracle__context_preflight, mcp__plugin_cellm_cellm-oracle__context_certify, mcp__plugin_cellm_cellm-oracle__context_record_outcome, mcp__plugin_cellm_cellm-oracle__spec_search, mcp__plugin_cellm_cellm-oracle__spec_create_node, mcp__plugin_cellm_cellm-oracle__spec_get_tree, mcp__plugin_cellm_cellm-oracle__spec_transition, mcp__plugin_cellm_cellm-oracle__spec_add_edge, Read, Grep, Glob, Write, Edit, Bash, Task, AskUserQuestion
@@ -53,14 +54,6 @@ Decomposition sequence:
 2. `spec_create_node(nodeType: 'phase', parentId: checkId)` — per work group
 3. `spec_create_node(nodeType: 'task', parentId: phaseId)` — per atomic action
 4. `spec_add_edge` — dependency edges between phases/tasks
-
-## Evolutionary Analytical Feedback
-
-When `CELLM_DEV_MODE: true`: write `dev-cellm-feedback/entries/hefesto-{date}-{seq}.md` after Post-Construction.
-
-Capture: research effectiveness (which MCP sources worked), design accuracy (did approach survive Argus), contract chain gaps, edge case misses, phase structure issues, shadow verification value, Argus finding categorization (construction defect vs pre-existing vs false positive).
-
-Format: see `dev-cellm-feedback/README.md`.
 
 ## Olympus Integration
 

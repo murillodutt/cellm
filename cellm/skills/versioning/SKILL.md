@@ -1,5 +1,6 @@
 ---
 description: CELLM version control framework — apply before any version bump, release decision, or when version inflation is detected. Covers SemVer, EffVer, pre-release tags, sync protocol, and anti-inflation strategies. For deep multi-scheme guidance, use cellm:version-control.
+cellm_scope: universal
 user-invocable: false
 ---
 
@@ -38,7 +39,7 @@ One version, one reality. Source of truth: `VERSION` file.
 | `VERSION.md` | `cellm:bump` skill |
 | Project-specific targets | `~/.cellm/bump/bump-{project}.json` → `versionTargets[]` |
 
-Sub-plugins (`dse`, `docops`) version independently.
+Plugin or package versioning can be independent per namespace; follow each project's release contract.
 
 ## NEVER
 

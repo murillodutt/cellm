@@ -1,5 +1,6 @@
 ---
 description: Vue 3 Composition API patterns for components and composables. Activates on .vue files to enforce script setup, typed props/emits, and canonical section ordering. Use when creating or editing Vue components, composables, or template logic.
+cellm_scope: universal
 user-invocable: false
 ---
 
@@ -21,10 +22,6 @@ user-invocable: false
 - **`class` prop** — override root/base slot only
 - **Tailwind Variants** — components use slots (root, header, body, footer), variants (size, color), compoundVariants
 
-## Evolutionary Analytical Feedback
-
-When `CELLM_DEV_MODE: true`: after component implementation, write feedback entry to `dev-cellm-feedback/entries/vue-{date}-{seq}.md`. Note which Composition API patterns caused friction, whether typed props/emits caught real issues, and which Vue 3 conventions were misapplied. Format and lifecycle: see `dev-cellm-feedback/README.md`.
-
 ## NEVER
 
 - **Options API** — no `data()`, `methods:`, `computed:`, `watch:`
@@ -33,4 +30,3 @@ When `CELLM_DEV_MODE: true`: after component implementation, write feedback entr
 - **`<script>` without `setup`** — always `<script setup lang="ts">`
 - **Destructure store without `storeToRefs`** — loses reactivity
 - **`className`** — Vue uses `class`, not React's `className`
-- **Skip the Evolutionary Analytical Feedback** — when CELLM_DEV_MODE is true, reflection after component implementation is mandatory

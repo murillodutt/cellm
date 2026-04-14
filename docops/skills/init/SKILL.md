@@ -1,5 +1,5 @@
 ---
-description: "Docops: scaffold LLM-first documentation structure, templates, and docops.json for a project. Creates directory hierarchy without overwrite. Use when: 'init docs', 'setup documentation', 'create docops structure'. Not for Oracle setup (use cellm:init)."
+description: "Docops: scaffold LLM-first documentation structure, templates, and docops.json for a project. Creates directory hierarchy without overwrite. Use when: 'init docs', 'setup documentation', 'create docops structure'. Not for Oracle setup (use cellm:oracle)."
 user-invocable: true
 argument-hint: "[docRoot]"
 ---

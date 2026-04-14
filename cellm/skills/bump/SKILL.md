@@ -2,6 +2,7 @@
 description: "Bump project version and sync across all targets. Auto-discovers VERSION, package.json, plugin.json. Use when: 'bump version', 'bump', 'version bump', 'bump 0.36.0', or /sk-git delegates. NEVER during implement, orchestrate, asclepius, argus, hefesto, arena, or any code work."
 user-invocable: false
 disable-model-invocation: false
+cellm_scope: universal
 argument-hint: "[patch|minor|major|x.y.z]"
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash(python3 *), Bash(bash *), Bash(cat *)
 ---
@@ -262,14 +263,9 @@ If zero entries: `[i] No classified commits for this version (bump-only or all e
 
 Resolve `component` in this priority order:
 
-1. **Scope from conventional commit**: if group 2 matched, strip parentheses → component (e.g. `(oracle)` → `oracle`)
-2. **File path heuristic**: run `git show --stat {HASH} | head -20`, check changed paths:
-   - `oracle/` → `oracle`
-   - `cellm-plugin/` → `plugin`
-   - `app/` or `server/` → `dashboard`
-   - `cellm-core/` → `core`
-   - `.claude/` → `claude`
-3. If neither applies: omit `component`
+1. **Scope from conventional commit**: if group 2 matched, strip parentheses -> component (e.g. `(oracle)` -> `oracle`)
+2. **Project config map**: if `~/.cellm/bump/bump-{project}.json` defines a `componentMap`, resolve by explicit path prefix rules.
+3. If neither applies: omit `component` (do not guess).
 
 #### Spec-to-Changelog Mapping
 

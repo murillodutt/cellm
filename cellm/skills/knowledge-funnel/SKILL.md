@@ -1,5 +1,6 @@
 ---
 description: Passive CELLM knowledge classifier — routes mid-task discoveries to EPHEMERAL, REUSABLE, or ARCHITECTURAL before moving on. Activates when encountering insights, gotchas, decisions, or non-obvious behavior during any work.
+cellm_scope: universal
 user-invocable: false
 allowed-tools: mcp__plugin_cellm_cellm-oracle__knowledge_add, mcp__plugin_cellm_cellm-oracle__context_record_outcome, mcp__plugin_cellm_cellm-oracle__context_promote, mcp__plugin_cellm_cellm-oracle__record_expertise, mcp__plugin_cellm_cellm-oracle__record_observation
 ---
@@ -40,7 +41,7 @@ Call `knowledge_add` when you encounter any of these during work:
 knowledge_add({
   title: "bun:sqlite Database constructor rejects readonly:false — omit option for read-write",
   scope: "oracle",
-  project: "cellm-private",
+  project: "<project-name>",
   source: "session",
   detail: "Bun v1.3.10 throws SQLITE_MISUSE when readonly:false is passed. Use new Database(path) without options for read-write.",
   confidence: 0.9
@@ -49,7 +50,7 @@ knowledge_add({
 knowledge_add({
   title: "spec_create_node approval gate rejects phases under pending checks",
   scope: "oracle",
-  project: "cellm-private",
+  project: "<project-name>",
   source: "session",
   detail: "CHECK_NOT_APPROVED error when adding phase/task under a check in pending/cancelled/deferred/failed state. Transition to active first.",
   confidence: 0.95

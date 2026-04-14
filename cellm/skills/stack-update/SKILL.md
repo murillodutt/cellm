@@ -1,5 +1,6 @@
 ---
 description: "Execute CELLM stack update specs — verify dependency updates, analyze impact, create fix specs proactively, commit, and certify via Olympus. Use when: 'stack update', 'close stack specs', 'verify dependency updates'."
+cellm_scope: internal
 user-invocable: true
 argument-hint: "'all' to batch-process, package name, or check ID"
 allowed-tools: mcp__plugin_cellm_cellm-oracle__spec_search, mcp__plugin_cellm_cellm-oracle__spec_get_tree, mcp__plugin_cellm_cellm-oracle__spec_transition, mcp__plugin_cellm_cellm-oracle__spec_create_node, mcp__plugin_cellm_cellm-oracle__spec_add_edge, mcp__plugin_cellm_cellm-oracle__spec_get_counters, mcp__plugin_cellm_cellm-oracle__quality_gate, AskUserQuestion, Skill, Read, Grep, Glob, Bash(npx nuxt typecheck *), Bash(npx vue-tsc *), Bash(bun run test *), Bash(git *), Bash(bash scripts/sync-version.sh *), Bash(bun oracle/scripts/stack-update-helper.ts *)
@@ -190,18 +191,6 @@ After ALL fix specs are executed and completed (pre-certified):
 | `Evaluate: {item}` | auto-complete | grep for item usage, note result | investigate |
 | `Update project code` | auto-complete (nothing to update) | create fix spec with specific tasks | delegate to implement |
 
-## Evolutionary Analytical Feedback
-
-When `CELLM_DEV_MODE: true`: after execution, write feedback entry to `dev-cellm-feedback/entries/stack-update-{date}-{seq}.md`. Include:
-- Specs processed: batch-completed vs fix specs created vs skipped
-- Packages with actual code impact vs zero-import (noise ratio)
-- Gate result: pass/fail, which check failed, was fallback used
-- Skill friction: steps that felt wrong, missing tools, unclear routing
-- Time sinks: which step consumed the most tool calls
-- Suggested improvements: concrete changes to this skill
-
-Format and lifecycle: see `dev-cellm-feedback/README.md`.
-
 ## NEVER
 
 - Skip Step 0 (mantra) — mental model injection prevents reactive mistakes
@@ -221,4 +210,3 @@ Format and lifecycle: see `dev-cellm-feedback/README.md`.
 - Forget `project` param on `spec_transition` and `spec_create_node` calls
 - Leave specs in intermediate states — either complete or report why not
 - Edit source code directly — create fix specs, delegate to `/cellm:implement`
-- Skip the Evolutionary Analytical Feedback when CELLM_DEV_MODE is true

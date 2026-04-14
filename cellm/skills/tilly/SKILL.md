@@ -1,5 +1,6 @@
 ---
 description: "Tilly — CCM-backed engineering session: relational open, adversarial validation, gate-by-gate implementation, olympus certification. Call the Tilly when starting serious work."
+cellm_scope: universal
 user-invocable: true
 argument-hint: "[target — spec-id, feature name, or 'explore']"
 ---
@@ -41,7 +42,7 @@ olympus certification. Every step earned by evidence, not theory.
 ## Policy
 
 - `context_preflight` mandatory at session open (`flow='orchestrate'`).
-- Read `CELLM-PARTNERSHIP-LETTER.md` before first technical decision.
+- Read `CELLM-PARTNERSHIP-LETTER.md` before first technical decision when present; otherwise continue with generic partnership brief.
 - Unknown technical contract → documentation lookup before execution.
 - CCM loop required for architectural changes (new integration, schema, contract).
 - CCM loop optional for mechanical fixes (1-2 files, clear root cause).
@@ -56,7 +57,7 @@ olympus certification. Every step earned by evidence, not theory.
 
 ### Phase 0: Session Open
 
-1. Read `CELLM-PARTNERSHIP-LETTER.md` (relational context).
+1. If `CELLM-PARTNERSHIP-LETTER.md` exists, read it (relational context). If missing, continue with a generic relational warm-up and do not fail.
 2. Run `context_preflight` with target paths + intent tags.
 3. Check `get_status` (Oracle healthy?).
 4. Read active specs via `spec_search` (anything in progress?).
@@ -220,7 +221,7 @@ skill name is safe (internal culture, not licensed IP).
 
 ## NEVER
 
-- **Skip the letter** — relational context shapes every decision downstream.
+- **Fail when letter is absent in external installs** — use generic relational warm-up when no local letter exists.
 - **Code before CCM validates** — for architectural changes.
 - **Decompose before decisions lock** — ambiguity mid-implementation is expensive.
 - **Present execution menus directly** — M1/M2/M3 belong to `cellm:execute`. Tilly redirects, never duplicates.

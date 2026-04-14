@@ -1,5 +1,6 @@
 ---
 description: "Convert a Claude Code plan file into a CellmOS spec check with phases, tasks, and DAG edges. Use when: plan ready to execute, user wants spec-driven workflow, 'decompose this plan', 'plan to spec'. Reads plan markdown, extracts briefings, creates atomic spec tree in Oracle DB."
+cellm_scope: universal
 user-invocable: true
 argument-hint: "<path-to-plan.md>"
 allowed-tools: mcp__plugin_cellm_cellm-oracle__context_spec_decompose, mcp__plugin_cellm_cellm-oracle__spec_decompose, mcp__plugin_cellm_cellm-oracle__spec_create_node, mcp__plugin_cellm_cellm-oracle__spec_transition, mcp__plugin_cellm_cellm-oracle__spec_add_edge, mcp__plugin_cellm_cellm-oracle__spec_add_verification, mcp__plugin_cellm_cellm-oracle__spec_search, mcp__plugin_cellm_cellm-oracle__spec_get_tree, mcp__plugin_cellm_cellm-oracle__spec_get_counters, mcp__plugin_cellm_cellm-oracle__dse_search, mcp__plugin_cellm_cellm-oracle__dse_get, Read, Write, Grep, Glob, Bash(git rev-parse *), Bash(mkdir *), AskUserQuestion, ExitPlanMode, Skill
@@ -71,10 +72,6 @@ After `context_spec_decompose` succeeds (step 5), generate a pure YAML fallback 
 | Context embedding | Append ` [fallback: .claude/specs/{check-slug}.yaml]` to the check's `context` field in `spec_decompose`. This lets execution skills find the YAML path by reading the spec context |
 
 Ensure `.claude/specs/` directory exists before writing (`mkdir -p`).
-
-## Evolutionary Analytical Feedback
-
-When `CELLM_DEV_MODE: true`: after conversion, write feedback entry to `dev-cellm-feedback/entries/plan-to-spec-{date}-{seq}.md`. Note which plan sections mapped cleanly vs required interpretation, whether DSE alignment surfaced useful constraints, and how many composite actions were split. Format and lifecycle: see `dev-cellm-feedback/README.md`.
 
 ## Convergence Gate (Auto-Injected)
 

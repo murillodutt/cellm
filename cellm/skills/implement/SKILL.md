@@ -1,5 +1,6 @@
 ---
 description: "Implement code from CellmOS spec context. Loads spec tree from Oracle DB, picks next pending task, writes code, runs quality gate, transitions state on completion. Use when: 'implement next task', 'implement spec', 'pick next task'."
+cellm_scope: universal
 user-invocable: true
 argument-hint: "[task description or check title]"
 allowed-tools: mcp__plugin_cellm_cellm-oracle__context_preflight, mcp__plugin_cellm_cellm-oracle__context_record_outcome, mcp__plugin_cellm_cellm-oracle__spec_get_tree, mcp__plugin_cellm_cellm-oracle__spec_search, mcp__plugin_cellm_cellm-oracle__spec_transition, mcp__plugin_cellm_cellm-oracle__spec_create_node, mcp__plugin_cellm_cellm-oracle__spec_get_verifications, mcp__plugin_cellm_cellm-oracle__spec_record_verification, mcp__plugin_cellm_cellm-oracle__quality_gate, mcp__plugin_cellm_cellm-oracle__dse_search, mcp__plugin_cellm_cellm-oracle__dse_get, mcp__plugin_cellm_cellm-oracle__directive_emit, mcp__plugin_cellm_cellm-oracle__directive_emit_for_phase, mcp__plugin_cellm_cellm-oracle__directive_verify, mcp__plugin_cellm_cellm-oracle__directive_list, Read, Grep, Glob, Write, Edit, Bash(npx *), Bash(bun *), AskUserQuestion
@@ -32,10 +33,6 @@ Implement the next executable spec task as a thin consumer of SCE context.
 6. Transition task state with `spec_transition`.
 7. **Post-execution reconciliation**: Run `spec_get_counters` and verify `completed` count incremented. If the task transition succeeded but counters did not change, warn: "Task transitioned but counters stale — possible DB inconsistency."
 8. Emit outcome via `context_record_outcome`.
-
-## Evolutionary Analytical Feedback
-
-When `CELLM_DEV_MODE: true`: after implementation, write feedback entry to `dev-cellm-feedback/entries/implement-{date}-{seq}.md`. Note which DSE decisions influenced code, whether reuse search found matches, and which quality gate failures required iteration. Format and lifecycle: see `dev-cellm-feedback/README.md`.
 
 ## Fallback Verification (CELLM_DEV_MODE only)
 

@@ -1,23 +1,31 @@
 ---
-description: "Rebuild and maintain the CELLM patterns index file (index.yml). Scans cellm-core/patterns/ for new, deleted, or changed files and updates with one-line descriptions. Use when: 'rebuild index', 'update patterns index', 'index patterns'."
+description: "Create a compact convention index from current project evidence and Oracle-backed knowledge. Use when: 'rebuild index', 'summarize conventions', 'refresh pattern index'."
+cellm_scope: universal
 user-invocable: true
-argument-hint: "[search query]"
-allowed-tools: Read, Grep, Glob, Write, Edit, AskUserQuestion
+argument-hint: "[scope]"
+allowed-tools: mcp__plugin_cellm_cellm-oracle__context_preflight, mcp__plugin_cellm_cellm-oracle__knowledge_add, Read, Grep, Glob, Write, Edit, AskUserQuestion
 ---
 
-Rebuild `cellm-core/patterns/index.yml`. Enables `/cellm:inject` to suggest patterns without reading all files.
+# index
 
-## Process
+Thin skill contract:
 
-1. **Scan** — List all `.md` in `cellm-core/patterns/` and subfolders.
-2. **Compare** — Load existing `index.yml`. Identify new files, deleted entries, unchanged.
-3. **New files** — Read content, propose one-sentence description via AskUserQuestion.
-4. **Stale entries** — List for user, remove automatically.
-5. **Write** — Alphabetize by category, then filename. Names without `.md` extension.
-6. **Report** — `[+] added, [-] removed, [=] unchanged, Total: N indexed`.
+1. Intent
+- Build or refresh a concise, searchable convention index for the current project.
+- Keep index format portable and repository-local.
+
+2. Policy
+- Prefer project-local index location (`.cellm/patterns/index.yml`) when writing files.
+- Keep every index line short, factual, and evidence-backed.
+- Use Oracle persistence to record the index refresh outcome.
+
+3. Routing
+- Scope shaping: `context_preflight` + user-provided focus.
+- Evidence extraction: inspect existing convention docs/files in the repo.
+- Output: write/update `.cellm/patterns/index.yml` and persist summary via `knowledge_add`.
 
 ## NEVER
 
-- **Multi-sentence descriptions** — one short sentence for matching, not documentation
-- **Skip stale cleanup** — always remove entries for deleted files
-- **Forget alphabetization** — categories and files both alphabetized
+- Depend on repository-specific legacy paths.
+- Generate multi-paragraph index entries.
+- Keep stale entries when source evidence no longer exists.

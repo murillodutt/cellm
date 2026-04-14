@@ -24,7 +24,7 @@ Context skills stack: editing a `server/api/*.ts` loads **typescript**.
 
 | Skill | Invocation | What it does |
 |-------|-----------|-------------|
-| **init** | `/cellm:init [mode]` | Interactive Oracle setup: install, status, update, doctor, restart, uninstall |
+| **init** | `/cellm:oracle [mode]` | Interactive Oracle setup: install, status, update, doctor, restart, uninstall |
 | **plan** | `/cellm:plan [product]` | Create mission.md, roadmap.md, tech-stack.md via guided Q&A |
 | **shape** | `/cellm:shape [feature]` | Gather context and structure specs (requires plan mode) |
 | **write-spec** | `/cellm:write-spec [path]` | Formalize shaping into technical spec (spec.md) |

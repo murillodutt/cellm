@@ -1,5 +1,6 @@
 ---
 description: "Execute CellmOS spec tasks systematically from the database. Identifies next executable group respecting DAG dependencies, delegates to specialist agents, transitions states, reports progress. Use when: 'orchestrate', 'execute spec', 'run all phases'."
+cellm_scope: universal
 user-invocable: true
 argument-hint: "[check title or search term]"
 allowed-tools: mcp__plugin_cellm_cellm-oracle__context_preflight, mcp__plugin_cellm_cellm-oracle__context_record_outcome, mcp__plugin_cellm_cellm-oracle__context_certify, mcp__plugin_cellm_cellm-oracle__spec_get_tree, mcp__plugin_cellm_cellm-oracle__spec_get_counters, mcp__plugin_cellm_cellm-oracle__spec_transition, mcp__plugin_cellm_cellm-oracle__spec_search, mcp__plugin_cellm_cellm-oracle__spec_get_verifications, mcp__plugin_cellm_cellm-oracle__spec_record_verification, mcp__plugin_cellm_cellm-oracle__quality_gate, mcp__plugin_cellm_cellm-oracle__dse_search, mcp__plugin_cellm_cellm-oracle__dse_get, mcp__plugin_cellm_cellm-oracle__directive_emit, mcp__plugin_cellm_cellm-oracle__directive_emit_for_phase, mcp__plugin_cellm_cellm-oracle__directive_verify, mcp__plugin_cellm_cellm-oracle__directive_list, Read, Grep, Glob, Write, Edit, AskUserQuestion, Task
@@ -34,16 +35,6 @@ Orchestrate phase execution from the spec tree using SCE context as the default 
 ## Re-entry
 
 Skip completed tasks. Resume from first pending. Show: "Resuming: X/Y completed."
-
-## Evolutionary Analytical Feedback
-
-When `CELLM_DEV_MODE: true`: after orchestration, write feedback entry to `dev-cellm-feedback/entries/orchestrate-{date}-{seq}.md`. Include:
-- Which guild activations were effective
-- Whether context materialization was sufficient for subagents
-- How many stage 2/3 iterations were needed
-- **Director metrics**: `directiveEmitCount` (total directives emitted across phases), `directiveVerifyCount` (total verification attempts), `directiveSkipCount` (phases where Director was skipped or not applicable)
-
-Format and lifecycle: see `dev-cellm-feedback/README.md`.
 
 ## Fallback Verification (CELLM_DEV_MODE only)
 

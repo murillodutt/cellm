@@ -1,5 +1,6 @@
 ---
 description: "Execute a real convergence loop — test the complete end-to-end pipeline with real data, identify failures, fix them, and repeat until total convergence. Concludes with full typecheck + root tests + Oracle tests. Use when: 'convergir', 'convergence loop', 'testar pipeline completo', 'e2e convergence', 'rodar tudo ate passar', 'loop de qualidade', 'validar tudo'. Also use proactively after large refactors, multi-file changes, or spec implementations that touch Oracle server code."
+cellm_scope: internal
 user-invocable: true
 argument-hint: "[optional: specific phase to start from, e.g. 'phase 4']"
 allowed-tools: Bash, Read, Grep, Glob, AskUserQuestion

@@ -1,31 +1,31 @@
 ---
-description: "Establish foundational product documentation through interactive conversation. Creates mission.md, roadmap.md, and tech-stack.md via guided Q&A. Use when: 'plan the product', 'create mission', 'define roadmap', 'setup product docs'."
+description: "Create foundational product docs through guided Q&A and persist planning outcomes to Oracle knowledge. Use when: 'plan product', 'define mission', 'create roadmap'."
+cellm_scope: universal
 user-invocable: true
 argument-hint: "[product name]"
-allowed-tools: Read, Grep, Glob, Write, Edit, AskUserQuestion
+allowed-tools: mcp__plugin_cellm_cellm-oracle__knowledge_add, mcp__plugin_cellm_cellm-oracle__context_record_outcome, Read, Grep, Glob, Write, Edit, AskUserQuestion
 ---
 
-Gather product vision through AskUserQuestion (one question at a time) and generate docs in `cellm-core/project/product/`.
+# plan
 
-## Thinking Framework
+Thin skill contract:
 
-1. **Check existing** — If `cellm-core/project/product/` has files, ask: start fresh, update, or cancel?
-2. **Vision** (→ mission.md) — Problem? Users? Differentiator?
-3. **Roadmap** (→ roadmap.md) — MVP features? Post-launch features?
-4. **Stack** (→ tech-stack.md) — Check `cellm-core/patterns/core/` first. If patterns exist, confirm. If not, ask.
-5. **Generate** — Write the 3 files. Report paths.
+1. Intent
+- Capture product intent, roadmap, and stack decisions through guided questions.
+- Produce portable docs and persist plan-level knowledge atoms.
 
-## Output
+2. Policy
+- Ask one question at a time.
+- If docs already exist, ask whether to refresh, extend, or cancel.
+- Persist key planning decisions with `knowledge_add` (`source: "plan"`).
 
-```
-cellm-core/project/product/
-  mission.md      # Problem, Target Users, Solution
-  roadmap.md      # Phase 1 (MVP), Phase 2 (Post-Launch)
-  tech-stack.md   # Frontend, Backend, Database, Other
-```
+3. Routing
+- Conversation flow: mission -> roadmap -> stack.
+- Docs output: write under `docs/product/` (`mission.md`, `roadmap.md`, `tech-stack.md`).
+- Persistence: `knowledge_add` atoms + `context_record_outcome` run summary.
 
 ## NEVER
 
-- **Batch questions** — one at a time via AskUserQuestion
-- **Over-document** — lightweight, not exhaustive
-- **Ignore existing patterns** — check patterns/core/ before asking tech stack
+- Depend on repository-specific legacy paths.
+- Skip confirmation when replacing existing docs.
+- Produce exhaustive specs; keep this stage lightweight.

@@ -1,5 +1,6 @@
 ---
-description: "Inject relevant CELLM patterns into the current context. Analyzes work context to suggest matching patterns from cellm-core/patterns/, or directly injects specified pattern files. Use when: 'inject patterns', 'what patterns apply here', 'load pattern X'."
+description: "Inject relevant project patterns into the current context. Use when: 'inject patterns', 'what patterns apply here', 'load pattern X'."
+cellm_scope: universal
 user-invocable: true
 argument-hint: "[pattern-path...]"
 allowed-tools: mcp__plugin_cellm_cellm-oracle__context_preflight, Read, Grep, Glob, AskUserQuestion

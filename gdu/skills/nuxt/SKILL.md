@@ -1,5 +1,6 @@
 ---
 description: Nuxt 4 patterns for full-stack Vue applications. Activates on nuxt.config, app/, server/, and pages/ to enforce correct data fetching, routing, server/client separation, and Nuxt UI v4 integrations. Use when editing Nuxt pages, layouts, middleware, or server routes.
+cellm_scope: universal
 user-invocable: false
 ---
 
@@ -31,10 +32,6 @@ Must be registered **after** `@nuxt/ui` in modules array. Provides: ContentSearc
 
 Add `@source "../../../content/**/*"` in CSS for Tailwind class detection in markdown.
 
-## Evolutionary Analytical Feedback
-
-When `CELLM_DEV_MODE: true`: after Nuxt implementation, write feedback entry to `dev-cellm-feedback/entries/nuxt-{date}-{seq}.md`. Note which auto-imports were missed, whether server/client separation was respected, and which Nuxt 4 patterns required correction. Format and lifecycle: see `dev-cellm-feedback/README.md`.
-
 ## NEVER
 
 - **Raw `$fetch` in component setup** — use `useFetch`/`useAsyncData`
@@ -43,4 +40,3 @@ When `CELLM_DEV_MODE: true`: after Nuxt implementation, write feedback entry to 
 - **Server imports in `app/`** — never import from `server/`
 - **Missing method suffix** — always `.get.ts`, `.post.ts`
 - **Install `@nuxt/icon` or `@nuxt/fonts` manually** — auto-registered by `@nuxt/ui`
-- **Skip the Evolutionary Analytical Feedback** — when CELLM_DEV_MODE is true, reflection after Nuxt implementation is mandatory

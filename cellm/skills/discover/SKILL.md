@@ -1,33 +1,31 @@
 ---
-description: "Extract tribal knowledge from a codebase into CELLM pattern files in cellm-core/patterns/. Analyzes code for unusual, opinionated, or tribal conventions. Use when: 'discover patterns', 'extract conventions', 'what patterns exist here'."
+description: "Discover reusable project conventions and persist them as Oracle knowledge atoms. Use when: 'discover patterns', 'extract conventions', 'what should newcomers know here'."
+cellm_scope: universal
 user-invocable: true
 argument-hint: "[focus area]"
-allowed-tools: Read, Grep, Glob, Write, Edit, AskUserQuestion
+allowed-tools: mcp__plugin_cellm_cellm-oracle__context_preflight, mcp__plugin_cellm_cellm-oracle__knowledge_add, mcp__plugin_cellm_cellm-oracle__context_record_outcome, Read, Grep, Glob, AskUserQuestion
 ---
 
-Scan for tribal knowledge — conventions that are unusual, opinionated, or invisible to newcomers. Write as pattern files in `cellm-core/patterns/`.
+# discover
 
-## Discovery Loop
+Thin skill contract:
 
-1. **Focus** — User specified area? Use it. Otherwise: analyze structure, present 3-5 areas via AskUserQuestion.
-2. **Scan** — Read 5-10 representative files. Look for unusual, opinionated, tribal, consistently repeated patterns.
-3. **Select** — Present findings via AskUserQuestion. User picks which to document.
-4. **Per pattern** (one at a time, full loop):
-   - Ask 1-2 "why" questions
-   - Draft incorporating answer
-   - Confirm via AskUserQuestion
-   - Create/append in `cellm-core/patterns/core/` or `anti/`
-5. **Index** — Update `cellm-core/patterns/index.yml` (alphabetized).
-6. **Oracle** — If available, create observation (type: `pattern`).
-7. **Continue** — Ask to discover another area.
+1. Intent
+- Identify non-obvious, opinionated, reusable conventions in the current project.
+- Convert discoveries into durable Oracle knowledge atoms.
 
-## Writing Rules
+2. Policy
+- Start with `context_preflight` to constrain scope and reduce noise.
+- Ask one focused question at a time; never batch interviews.
+- Persist only reusable discoveries via `knowledge_add`.
 
-Lead with the rule. Show code examples. Skip the obvious. One concept per pattern. Scannable > readable.
+3. Routing
+- Evidence collection: local tools (`Read`, `Grep`, `Glob`) over representative files.
+- Discovery loop: AskUserQuestion for focus, rationale, and validation.
+- Persistence: `knowledge_add` for each accepted convention + `context_record_outcome` summary.
 
 ## NEVER
 
-- **Batch questions** — one pattern, full loop, then next
-- **Duplicate patterns** — check existing files first
-- **Verbose patterns** — every word costs tokens
-- **Skip the "why"** — tribal knowledge without rationale is arbitrary rules
+- Hardcode repository-specific directories.
+- Persist low-confidence or ephemeral notes.
+- Skip rationale capture before persistence.

@@ -94,7 +94,7 @@ Workflow skills guide phases of development. Invoked explicitly as `/cellm:{name
 
 | Skill | Purpose |
 |-------|---------|
-| `/cellm:init` | Initialize project or feature, set up structure |
+| `/cellm:bootstrap` | Bootstrap CELLM in a fresh project with visibility-aware defaults |
 | `/cellm:plan` | Create task breakdown, timeline, dependencies |
 | `/cellm:shape` | Define technical approach, architecture decisions |
 

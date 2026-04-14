@@ -22,7 +22,7 @@ CELLM provides **29 skills** (22 workflow + 7 context), **12 DocOps skills**, an
 | **Pattern Management** | `/cellm:discover`, `/cellm:inject`, `/cellm:index` |
 | **Quality & Arena** | `/cellm:arena`, `/cellm:spec-treat` |
 | **Discovery** | `/cellm:dse-discover` |
-| **Setup & Monitoring** | `/cellm:init`, `/cellm:oracle-search` |
+| **Setup & Monitoring** | `/cellm:oracle`, `/cellm:oracle-search` |
 
 **DocOps Skills**: `/docops:init`, `/docops:sync`, `/docops:verify`, plus 9 additional skills
 
@@ -275,15 +275,15 @@ Context skills are automatically available and provide framework/language awaren
 
 ### Setup & Monitoring Phase
 
-#### /cellm:init
+#### /cellm:oracle
 
-**Purpose:** CELLM setup and maintenance
+**Purpose:** CELLM Oracle worker setup and maintenance
 
-**Description:** Guided setup with interactive menu for installation, status checks, diagnostics, configuration, and updates.
+**Description:** Guided setup with interactive menu for installation, status checks, diagnostics, configuration, and updates of the Oracle daemon at `~/.cellm/`.
 
 **Usage:**
 ```bash
-/cellm:init
+/cellm:oracle
 ```
 
 ---
@@ -433,7 +433,7 @@ See [DSE Plugin](../dse/README.md) for detailed documentation.
 | `/cellm:arena` | Quality | Quality proving ground (prove/debug/gate/stress) |
 | `/cellm:spec-treat` | Quality | Refine specifications |
 | `/cellm:dse-discover` | Discovery | Find DSE patterns |
-| `/cellm:init` | Setup | CELLM setup & maintenance |
+| `/cellm:oracle` | Setup | Oracle worker setup & maintenance |
 | `/cellm:oracle-search` | Setup | Query Oracle knowledge base |
 
 ---

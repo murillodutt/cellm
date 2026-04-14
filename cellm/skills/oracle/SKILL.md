@@ -1,5 +1,6 @@
 ---
-description: "CELLM Oracle Worker setup — interactive menus for install, status, update, diagnostics, and uninstall of the Oracle daemon at ~/.cellm/. Use when: 'setup oracle', 'init cellm', 'oracle not working', 'check worker', 'reinstall oracle'. Not for documentation init (use docops:init)."
+description: "CELLM Oracle Worker setup — interactive menus for install, status, update, diagnostics, and uninstall of the Oracle daemon at ~/.cellm/. Use when: 'setup oracle', 'oracle setup', 'oracle not working', 'check worker', 'reinstall oracle'. Not for documentation init (use docops:init)."
+cellm_scope: universal
 user-invocable: true
 argument-hint: "[install|status|update|doctor|restart|uninstall|boundaries]"
 allowed-tools: Bash(curl *), Bash(bun *), Bash(npm *), Bash(brew *), Bash(apt *), Bash(jq *), Bash(lsof *), Bash(kill *), Bash(mkdir *), Bash(cat *), Bash(tail *), Bash(rm *), Read, Grep, Glob, AskUserQuestion

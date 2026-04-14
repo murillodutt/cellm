@@ -1,5 +1,6 @@
 ---
 description: "Execute CellmOS spec tasks using Agent Teams with parallel phase execution. Creates a coordinated team of specialist agents (implementer, reviewer, auditor) that work simultaneously on independent DAG phases in isolated worktrees. Use when: 'orchestrate-teams', 'run with teams', 'parallel execution', 'agent teams', 'swarm execute'. Prefer over /cellm:orchestrate when the spec has 3+ independent phases or when maximum throughput is desired."
+cellm_scope: universal
 user-invocable: true
 argument-hint: "[spec check ID or search term]"
 allowed-tools: mcp__plugin_cellm_cellm-oracle__context_preflight, mcp__plugin_cellm_cellm-oracle__context_certify, mcp__plugin_cellm_cellm-oracle__context_record_outcome, mcp__plugin_cellm_cellm-oracle__spec_get_tree, mcp__plugin_cellm_cellm-oracle__spec_get_counters, mcp__plugin_cellm_cellm-oracle__spec_transition, mcp__plugin_cellm_cellm-oracle__spec_search, Task, AskUserQuestion
@@ -31,17 +32,6 @@ Run dependency-safe parallel execution for independent phases using Agent teams.
 5. Recompute next executable group and repeat.
 6. Finalize check when all leaf tasks are closed.
 7. Persist outcome with `context_record_outcome` after execution completes.
-
-## Evolutionary Analytical Feedback
-
-When `CELLM_DEV_MODE: true`: write feedback to `dev-cellm-feedback/entries/orchestrate-teams-{date}-{seq}.md`. Include:
-- Parallelism achieved: how many phases ran simultaneously per group
-- Wall-clock time vs sequential estimate
-- Merge conflicts encountered
-- Agent failures and recovery actions
-- Director metrics (aggregated from worker agents via implement): emitCount, verifyCount, skipCount
-- Which guild activations were effective
-- Whether context materialization was sufficient
 
 ## Fallback Verification (CELLM_DEV_MODE only)
 

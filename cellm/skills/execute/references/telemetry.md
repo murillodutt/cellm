@@ -24,7 +24,6 @@ Track per execution run via `context_record_outcome`:
 
 ## Evolutionary Analytical Feedback
 
-When `CELLM_DEV_MODE: true`: write feedback to `dev-cellm-feedback/entries/execute-{date}-{seq}.md`. Include:
 - Risk scores per phase: structural vs empirical, and whether strategy matched expectations
 - Go/no-go verdicts: `go` / `conditional` / `no_go` counts, whether they caught real issues
 - User overrides: which strategies were changed, rationale, whether override improved outcome
