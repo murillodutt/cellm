@@ -1,5 +1,6 @@
 ---
 description: Passive file relationship classifier — detects multi-file systems and enforces Related files headers. Activates when creating or modifying files that participate in cross-file protocols, shared data flows, or lifecycle chains. Use when editing files that span multiple modules.
+cellm_scope: universal
 user-invocable: false
 ---
 

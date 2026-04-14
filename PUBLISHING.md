@@ -8,6 +8,30 @@ This checklist prepares a clean external artifact. It does not publish to NPM.
 - `cellm:oracle` rename completed and references updated.
 - Version bumped consistently across manifests.
 
+## Scope Filter Contract (fail-closed)
+
+Every `SKILL.md` file inside `**/skills/*/SKILL.md` **MUST** declare a
+`cellm_scope` frontmatter field with exactly one of these values:
+
+| Value | Effect on external tarball |
+|-------|---------------------------|
+| `universal` | Shipped to external consumers. Default intent for generic skills. |
+| `internal` | Stripped by `scripts/build-external-tarball.sh`. Reserved for cellm-private maintenance tools (`convergir`, `stack-update`). |
+| `dev` | Stripped by `scripts/build-external-tarball.sh`. Reserved for author-only telemetry and dev-mode workflows. |
+
+**Enforcement is fail-closed**: any SKILL.md missing `cellm_scope` or carrying
+an unknown value causes `build-external-tarball.sh` to abort with a list of
+offending files. There is no silent "default to universal" path.
+
+Field format tolerance (normalized before comparison):
+- Case-insensitive: `Cellm_Scope: UNIVERSAL` is valid.
+- Whitespace: leading/trailing spaces around field name and value are allowed.
+- Quotes: `cellm_scope: "universal"` and `cellm_scope: 'internal'` are valid.
+
+Any new skill added to the plugin MUST declare its scope. Reviewers of
+new-skill PRs are expected to confirm the scope decision is conscious,
+not accidental.
+
 ## Automated checks
 
 Run from `cellm-plugin/`:

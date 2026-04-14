@@ -35,7 +35,7 @@ Project: always `git rev-parse --show-toplevel` → last segment. Pass `sessionI
 
 ## NEVER
 
-- **Markdown files** — specs live in compass.db, never in cellm-core/specs/
+- **Markdown files** — specs live in compass.db, never on disk
 - **Create without all 3 briefing fields** — Context, Problem, Principle are mandatory
 - **Skip project detection** — always derive from git root
 - **Vague tasks** — every task action is imperative and atomic

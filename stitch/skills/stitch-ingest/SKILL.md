@@ -1,5 +1,6 @@
 ---
 description: "Ingest Stitch DESIGN.md into DSE using SCE-governed contracts and outcome tracking. Use when: 'ingest design', 'stitch to dse', 'sync design.md'."
+cellm_scope: universal
 user-invocable: true
 argument-hint: "[path to DESIGN.md or .stitch/ directory]"
 allowed-tools: Read, Glob, AskUserQuestion, mcp__cellm-oracle__context_preflight, mcp__cellm-oracle__context_record_outcome, mcp__cellm-oracle__context_certify

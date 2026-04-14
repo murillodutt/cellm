@@ -1,5 +1,6 @@
 ---
 description: Four CELLM work process mantras: verify before you act, take the best path, document everything, resolve what you find. Activates BEFORE planning and BEFORE writing code to enforce deep verification, best-path thinking, documentation-first, and zero-debt approach.
+cellm_scope: universal
 user-invocable: false
 ---
 

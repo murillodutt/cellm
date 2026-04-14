@@ -1,9 +1,9 @@
 ---
-description: "Create a compact convention index from current project evidence and Oracle-backed knowledge. Use when: 'rebuild index', 'summarize conventions', 'refresh pattern index'."
+description: "Refresh the project's convention index by persisting entries to Oracle knowledge atoms. Use when: 'rebuild index', 'summarize conventions', 'refresh pattern index'."
 cellm_scope: universal
 user-invocable: true
 argument-hint: "[scope]"
-allowed-tools: mcp__plugin_cellm_cellm-oracle__context_preflight, mcp__plugin_cellm_cellm-oracle__knowledge_add, Read, Grep, Glob, Write, Edit, AskUserQuestion
+allowed-tools: mcp__plugin_cellm_cellm-oracle__context_preflight, mcp__plugin_cellm_cellm-oracle__knowledge_add, mcp__plugin_cellm_cellm-oracle__knowledge_search, mcp__plugin_cellm_cellm-oracle__knowledge_archive, Read, Grep, Glob, AskUserQuestion
 ---
 
 # index
@@ -11,21 +11,23 @@ allowed-tools: mcp__plugin_cellm_cellm-oracle__context_preflight, mcp__plugin_ce
 Thin skill contract:
 
 1. Intent
-- Build or refresh a concise, searchable convention index for the current project.
-- Keep index format portable and repository-local.
+- Refresh the convention index for the current project by delegating all persistence to Oracle.
+- Keep each indexed entry short, factual, and evidence-backed.
 
 2. Policy
-- Prefer project-local index location (`.cellm/patterns/index.yml`) when writing files.
-- Keep every index line short, factual, and evidence-backed.
-- Use Oracle persistence to record the index refresh outcome.
+- Never write to disk. All index entries live as knowledge atoms with `source: "index"` and `scope: "pattern"`.
+- Deduplicate via `knowledge_search` before calling `knowledge_add` on a new entry.
+- Archive atoms whose source evidence no longer exists via `knowledge_archive`.
 
 3. Routing
-- Scope shaping: `context_preflight` + user-provided focus.
-- Evidence extraction: inspect existing convention docs/files in the repo.
-- Output: write/update `.cellm/patterns/index.yml` and persist summary via `knowledge_add`.
+- Scope shaping: `context_preflight` + optional user-provided focus argument.
+- Evidence extraction: read project files via Read/Grep/Glob to discover conventions.
+- Persistence: call `knowledge_add` per entry. Query existing entries via `knowledge_search` before adding to avoid duplicates.
+- Cleanup: for each existing atom whose evidence is gone, call `knowledge_archive`.
 
 ## NEVER
 
-- Depend on repository-specific legacy paths.
-- Generate multi-paragraph index entries.
-- Keep stale entries when source evidence no longer exists.
+- Write index files to disk. Persistence is Oracle-only.
+- Generate multi-paragraph entries. One factual line per atom, max.
+- Skip dedup via `knowledge_search` before `knowledge_add`.
+- Leave stale atoms when their source evidence was removed.

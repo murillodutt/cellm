@@ -1,5 +1,6 @@
 ---
 description: "Deep examiner for subsystem mapping and evidence-based findings with SCE envelope and write-back. Use when: 'argus on X', 'analyze block', 'map subsystem'."
+cellm_scope: universal
 user-invocable: true
 argument-hint: "[block or subsystem name]"
 allowed-tools: mcp__plugin_cellm_cellm-oracle__context_preflight, mcp__plugin_cellm_cellm-oracle__context_record_outcome, mcp__plugin_cellm_cellm-oracle__context_certify, Read, Grep, Glob, Bash

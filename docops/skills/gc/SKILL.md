@@ -1,5 +1,6 @@
 ---
 description: "Docops: garbage collection for resolved gaps, stale evidence, and redundant content. Scans conveyor-gaps.md, validates freshness, detects duplicates, archives cleaned items. Use when: 'gc docs', 'clean gaps', 'garbage collect documentation'."
+cellm_scope: universal
 user-invocable: true
 argument-hint: "[docRoot] [--dry-run]"
 ---

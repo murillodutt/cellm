@@ -1,5 +1,6 @@
 ---
 description: "Iterative optimization loop backed by SCE context, measurable deltas, and outcome write-back. Use when: 'iterate', 'optimize', 'improve until done'."
+cellm_scope: universal
 user-invocable: true
 argument-hint: "[target to optimize]"
 allowed-tools: Read, Edit, Glob, Grep, Bash, WebSearch, WebFetch, mcp__plugin_cellm_cellm-oracle__context_preflight, mcp__plugin_cellm_cellm-oracle__context_record_outcome, mcp__plugin_cellm_cellm-oracle__context_certify

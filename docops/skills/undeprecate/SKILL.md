@@ -1,5 +1,6 @@
 ---
 description: "Docops: reverse a deprecation, restoring a document from deprecated to active status. Removes deprecation banner, clears frontmatter, updates references. Use when: 'undeprecate', 'reverse deprecation', 'reactivate doc'."
+cellm_scope: universal
 user-invocable: true
 argument-hint: "<file>"
 ---

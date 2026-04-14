@@ -1,5 +1,6 @@
 ---
 description: Icon system routing — ASCII icons for text/CLI, Nuxt UI/Iconify for Vue components. One consistent visual language. Activates when rendering status indicators, icons, or visual markers in any file type.
+cellm_scope: universal
 user-invocable: false
 ---
 

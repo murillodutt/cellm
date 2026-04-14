@@ -1,5 +1,6 @@
 ---
 description: "Deep versioning guidance for any project — SemVer vs EffVer vs CalVer, release automation, AI artifact versioning. Use when: 'versioning strategy', 'which versioning scheme', 'setup releases', 'version AI artifacts'. For CELLM-specific version bumps and inflation checks, use cellm:versioning."
+cellm_scope: universal
 user-invocable: true
 argument-hint: "[question or project context]"
 allowed-tools: Read, Grep, Glob, AskUserQuestion

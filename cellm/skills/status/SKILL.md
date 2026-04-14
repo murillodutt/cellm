@@ -1,5 +1,6 @@
 ---
 description: "Check CELLM Oracle Worker daemon status. Reads worker.json for port config, calls health endpoint, reports online/offline state with uptime and database info. Use when: 'oracle status', 'is worker running', 'check cellm status'."
+cellm_scope: universal
 user-invocable: true
 argument-hint: "[verbose]"
 allowed-tools: Bash(curl *), Bash(cat *), Read

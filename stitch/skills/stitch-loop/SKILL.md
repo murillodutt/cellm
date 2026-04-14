@@ -1,5 +1,6 @@
 ---
 description: "Iterative site building loop using Stitch baton system. Reads next-prompt.md, generates via MCP, converts to Vue SFC, updates SITE.md. Use when: 'stitch loop', 'build loop', 'iterative build', 'baton system'."
+cellm_scope: universal
 user-invocable: true
 argument-hint: "[start|continue|status]"
 allowed-tools: Read, Write, Edit, Glob, Grep, AskUserQuestion, mcp__stitch__list_projects, mcp__stitch__get_project, mcp__stitch__create_project, mcp__stitch__list_screens, mcp__stitch__get_screen, mcp__stitch__generate_screen_from_text, mcp__stitch__edit_screens, mcp__cellm-oracle__context_preflight, mcp__cellm-oracle__context_record_outcome, mcp__cellm-oracle__context_certify

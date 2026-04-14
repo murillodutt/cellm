@@ -32,26 +32,44 @@ python3 - "${STAGE_DIR}" <<'PY'
 from pathlib import Path
 import re, shutil, sys
 stage = Path(sys.argv[1])
+
+# Fail-closed scope filter: any SKILL.md missing cellm_scope is a hard error.
+# Variants (case, whitespace, trailing spaces) are normalized before comparison.
+errors = []
 for skill in stage.glob('**/skills/*/SKILL.md'):
     text = skill.read_text(encoding='utf-8', errors='ignore')
     m = re.search(r'^---\n(.*?)\n---\n', text, flags=re.S)
     if not m:
+        errors.append(f"{skill.relative_to(stage)}: missing frontmatter (cellm_scope required)")
         continue
     fm = m.group(1)
-    scope_match = re.search(r'^cellm_scope:\s*(\S+)\s*$', fm, flags=re.M)
-    scope = scope_match.group(1) if scope_match else 'universal'
+    # Tolerant regex: case-insensitive field name, normalized whitespace, optional quotes
+    scope_match = re.search(r'^\s*cellm_scope\s*:\s*["\']?(\S+?)["\']?\s*$', fm, flags=re.M | re.I)
+    if not scope_match:
+        errors.append(f"{skill.relative_to(stage)}: cellm_scope field absent in frontmatter")
+        continue
+    scope = scope_match.group(1).strip().lower()
+    if scope not in {'universal', 'internal', 'dev'}:
+        errors.append(f"{skill.relative_to(stage)}: unknown cellm_scope value '{scope}' (expected universal|internal|dev)")
+        continue
     if scope in {'internal', 'dev'}:
         shutil.rmtree(skill.parent)
+
+if errors:
+    print("[!] Scope filter refused to ship — fail-closed enforcement:", file=sys.stderr)
+    for e in errors:
+        print(f"    - {e}", file=sys.stderr)
+    sys.exit(1)
 
 # Remove private partnership letter from external bundle when present
 for letter in stage.glob('**/CELLM-PARTNERSHIP-LETTER.md'):
     letter.unlink()
 PY
 
-# Guard 1: no internal/dev scoped skill should remain
-if rg -n "cellm_scope:\s*(internal|dev)" "${STAGE_DIR}" --glob '**/skills/*/SKILL.md' >/dev/null; then
+# Guard 1: no internal/dev scoped skill should remain (tolerant regex)
+if rg -in "^\s*cellm_scope\s*:\s*[\"']?(internal|dev)[\"']?\s*$" "${STAGE_DIR}" --glob '**/skills/*/SKILL.md' >/dev/null; then
   echo "[!] Internal/dev scoped skills still present in staged package"
-  rg -n "cellm_scope:\s*(internal|dev)" "${STAGE_DIR}" --glob '**/skills/*/SKILL.md' || true
+  rg -in "^\s*cellm_scope\s*:\s*[\"']?(internal|dev)[\"']?\s*$" "${STAGE_DIR}" --glob '**/skills/*/SKILL.md' || true
   exit 1
 fi
 

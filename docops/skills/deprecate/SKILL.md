@@ -1,5 +1,6 @@
 ---
 description: "Docops: mark documentation for deprecation with configurable grace period before archival. Adds deprecation banner, updates references, schedules archive date. Use when: 'deprecate this doc', 'mark for removal'."
+cellm_scope: universal
 user-invocable: true
 argument-hint: "<file> [--days N] [--reason 'text']"
 ---

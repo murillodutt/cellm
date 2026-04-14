@@ -1,5 +1,6 @@
 ---
 description: "Docops: validate and maintain freshness status of code evidence files. Checks last_verified dates, transitions fresh/stale/expired, creates gaps for expired evidence. Use when: 'check freshness', 'stale evidence', 'validate dates'."
+cellm_scope: universal
 user-invocable: true
 argument-hint: "[docRoot] [--update]"
 ---

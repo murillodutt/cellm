@@ -1,5 +1,6 @@
 ---
 description: "Compose optimized prompts for Google Stitch screen generation. Reads DESIGN.md Section 6 context, applies Stitch Effective Prompting best practices, and outputs ready-to-use prompts. Use when: 'stitch prompt', 'compose prompt', 'create stitch prompt', 'prompt for stitch'."
+cellm_scope: universal
 user-invocable: true
 argument-hint: "[description of the screen or edit]"
 allowed-tools: Read, Glob, AskUserQuestion

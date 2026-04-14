@@ -1,5 +1,6 @@
 ---
 description: "Scan a project to extract design system signals and bootstrap its CELLM DSE. Detects framework, colors, typography, and components. Accepts project directories, Figma HTML exports, W3C DTCG .tokens.json, Figma MCP output, and palette URLs. Use when: 'discover design system', 'bootstrap DSE', 'scan project for tokens'."
+cellm_scope: universal
 user-invocable: true
 argument-hint: "[project-path or file-path or URL]"
 allowed-tools: Bash(curl *), Read, Grep, Glob, AskUserQuestion

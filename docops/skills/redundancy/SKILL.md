@@ -1,5 +1,6 @@
 ---
 description: "Docops: detect redundant and duplicate content across documentation files. Compares heading structures (Jaccard similarity), extracts topic keywords, reports consolidation opportunities. Use when: 'find duplicates', 'redundancy check', 'consolidate docs'."
+cellm_scope: universal
 user-invocable: true
 argument-hint: "[docRoot] [--threshold N]"
 ---

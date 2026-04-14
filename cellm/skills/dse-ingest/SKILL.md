@@ -1,5 +1,6 @@
 ---
 description: "Ingest design decisions into the CELLM DSE from conversation context. Use when the user describes project-specific design choices, color palettes, component patterns, or UI constraints that should persist as DSE decisions."
+cellm_scope: universal
 user-invocable: true
 argument-hint: "[design decisions from conversation context]"
 ---

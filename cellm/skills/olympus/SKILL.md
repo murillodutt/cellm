@@ -1,5 +1,6 @@
 ---
 description: "Start Olympus triad session with SCE policies and operational gates. Use when: 'run olympus', 'start triad', 'autonomous quality check'."
+cellm_scope: universal
 ---
 
 # olympus

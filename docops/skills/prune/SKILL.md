@@ -1,5 +1,6 @@
 ---
 description: "Docops: archive or remove deprecated documentation, broken references, and orphaned files. Scans for deprecated frontmatter, validates links, identifies unreferenced files. Use when: 'prune docs', 'remove orphans', 'clean dead references'."
+cellm_scope: universal
 user-invocable: true
 argument-hint: "[docRoot] [--dry-run]"
 ---

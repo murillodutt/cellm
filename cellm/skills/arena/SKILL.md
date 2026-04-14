@@ -1,5 +1,6 @@
 ---
 description: "Quality lab entrypoint with SCE-backed prove/debug/gate/stress flows. Use when: 'run tests', 'quality gate', 'debug this', 'stress test'."
+cellm_scope: universal
 user-invocable: true
 argument-hint: "[prove|debug|gate|stress] [args]"
 allowed-tools: Bash, Read, Grep, Glob, Edit, AskUserQuestion, mcp__plugin_cellm_cellm-oracle__quality_gate, mcp__plugin_cellm_cellm-oracle__context_preflight, mcp__plugin_cellm_cellm-oracle__context_certify, mcp__plugin_cellm_cellm-oracle__context_record_outcome

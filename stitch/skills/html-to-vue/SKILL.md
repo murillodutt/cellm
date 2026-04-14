@@ -1,5 +1,6 @@
 ---
 description: "Convert Stitch-generated HTML screens to Vue 3 SFCs with semantic Nuxt UI tokens. Remaps Tailwind utility classes, substitutes HTML elements for Nuxt UI components, and removes dark: prefixes. Use when: 'html to vue', 'convert stitch html', 'stitch to component'."
+cellm_scope: universal
 user-invocable: true
 argument-hint: "[path-to-html-file]"
 allowed-tools: Read, Write, Glob, AskUserQuestion, mcp__stitch__get_screen, mcp__stitch__list_screens

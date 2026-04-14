@@ -1,5 +1,6 @@
 ---
 description: "Translate Stitch design tokens to Nuxt UI theme contracts with SCE gating. Use when: 'stitch to nuxt', 'convert tokens', 'generate theme'."
+cellm_scope: universal
 user-invocable: true
 argument-hint: "[path to DESIGN.md or .stitch/ directory]"
 allowed-tools: Read, Edit, Glob, AskUserQuestion, mcp__cellm-oracle__context_preflight, mcp__cellm-oracle__context_record_outcome, mcp__cellm-oracle__context_certify

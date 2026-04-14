@@ -1,5 +1,6 @@
 ---
 description: "Orchestrate Stitch bridge with SCE contracts: analyze, compose, invoke, consume, and sync. Use when: 'stitch bridge', 'analyze stitch', 'sync stitch'."
+cellm_scope: universal
 user-invocable: true
 argument-hint: "[analyze|compose-prompt|invoke|consume|sync]"
 allowed-tools: Read, Glob, Grep, AskUserQuestion, mcp__cellm-oracle__context_preflight, mcp__cellm-oracle__context_record_outcome, mcp__cellm-oracle__context_certify, mcp__stitch__list_projects, mcp__stitch__get_project, mcp__stitch__list_screens, mcp__stitch__get_screen, mcp__stitch__generate_screen_from_text, mcp__stitch__edit_screens, mcp__stitch__generate_variants, mcp__stitch__list_design_systems, mcp__stitch__create_design_system, mcp__stitch__update_design_system, mcp__stitch__apply_design_system

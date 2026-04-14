@@ -1,5 +1,6 @@
 ---
 description: "Docops: manage complete documentation lifecycle — creation, deprecation, archival, restoration, undeprecation. Handles conflict resolution and state transition logging. Use when: 'lifecycle', 'restore doc', 'archive and restore'."
+cellm_scope: universal
 user-invocable: true
 argument-hint: "<action> <file> [options]"
 ---
