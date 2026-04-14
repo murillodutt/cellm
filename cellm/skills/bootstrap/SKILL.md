@@ -22,6 +22,7 @@ Thin skill contract:
 3. Routing
 - Visibility check: inspect `git remote -v`; infer public/private from host URL and naming hints.
 - Scaffolding: create `.cellm-field/entries/`, `.cellm-field/SCHEMA.md`, and `docs/letters/` when absent.
+- SCHEMA.md MUST be copied verbatim from `${CLAUDE_PLUGIN_ROOT}/skills/bootstrap/templates/SCHEMA.md`. Do not paraphrase, do not reconstruct from memory, do not adapt from another project's SCHEMA.
 - Registration: persist bootstrap summary via `knowledge_add` with `source: "bootstrap"`.
 - Handoff: generate `docs/letters/BOOTSTRAP-HANDOFF.md` with context, decisions, and next actions.
 
@@ -30,3 +31,4 @@ Thin skill contract:
 - Assume repository visibility without checking remotes.
 - Hardcode internal-only paths or private workflow folders.
 - Block bootstrap because Oracle config tools are unavailable; use knowledge fallback.
+- Generate SCHEMA.md from memory or from another project's SCHEMA — always copy from the bundled template.
