@@ -1,8 +1,8 @@
 ---
-description: "Universal Git operations for any project: semantic commit, safe push, sync pipeline, and optional bump/changelog integrations when available. Use when: 'commit changes', 'push current branch', 'sync repo', 'bump version', 'git workflow'."
+description: "Universal Git operations for any project: semantic commit, safe push, sync pipeline, and optional bump/changelog integrations when available. Supports delegated execution mode for orchestrators (e.g., sk-git) with no interactive menus."
 cellm_scope: universal
 user-invocable: true
-argument-hint: "[--silent] [commit|push|sync|bump [patch|minor|major|x.y.z]|check]"
+argument-hint: "[--silent] [--delegated] [--op commit|push|sync|bump|check|status] [commit|push|sync|bump [patch|minor|major|x.y.z]|check]"
 allowed-tools: Read, Grep, Glob, AskUserQuestion, Skill, Bash(git *), Bash(bash *), Bash(bun *), Bash(node *)
 ---
 
@@ -28,12 +28,29 @@ allowed-tools: Read, Grep, Glob, AskUserQuestion, Skill, Bash(git *), Bash(bash 
 | `bump [version]` | Prefer `cellm:bump` delegation; fallback to project scripts if available |
 | `check` | Dry-run capability and version/changelog sync checks |
 
+## Delegated Mode (for orchestrators)
+
+`gitpro` supports non-interactive delegated execution when called by a higher-level
+orchestrator (example: `sk-git`).
+
+Flags:
+- `--delegated`: enable delegated contract
+- `--op <mode>`: explicit operation (`commit|push|sync|bump|check|status`)
+
+Delegated contract:
+- skip Navigation Gate menus (M1/M2/M3)
+- behave as `silent-safe` with fail-closed safety
+- disable optional integrations unless explicitly requested by caller
+- never ask confirmation prompts
+- precedence rule: when `--delegated` is active, delegated contract overrides generic `--silent` defaults
+
 ## Navigation Gate (M1/M2/M3) — Execute-style
 
-For state-changing flows (`commit`, `push`, `sync`, `bump`), `gitpro` MUST run a 3-menu navigation gate via `AskUserQuestion` before mutating the repository.
+For state-changing flows (`commit`, `push`, `sync`, `bump`), `gitpro` MUST run a 3-menu navigation gate via `AskUserQuestion` before mutating the repository, except in delegated mode.
 
 - In interactive runs: M1, M2, M3 are mandatory.
 - In `--silent`: menus are skipped and resolved to safe defaults (never unsafe defaults).
+- In `--delegated`: menus are skipped unconditionally and execution uses delegated contract.
 
 ### Menu 1 — Operation (M1)
 
@@ -74,6 +91,7 @@ Rules:
 - M3 is mandatory in interactive runs for state-changing flows.
 - If `skip-optional-integrations` is selected, it overrides other optional choices.
 - In `--silent`, default to: `bump-if-needed` + `md-lint-if-md-changed`, and `changelog-if-available` only when capability exists and no failure risk is introduced.
+- In `--delegated`, default to `skip-optional-integrations` unless caller explicitly requests otherwise.
 
 ## --silent Contract
 
@@ -108,12 +126,12 @@ Failure: not a git repo -> stop with actionable error.
 
 ### S1 — Navigation Gate (state-changing modes)
 
-1. Render M1/M2/M3 via `AskUserQuestion` (interactive mode only).
-2. Resolve effective operation, autonomy level, and integration policy.
+1. If NOT delegated: render M1/M2/M3 via `AskUserQuestion` (interactive mode only).
+2. If delegated: resolve operation from `--op` (or explicit mode arg), set autonomy to `silent-safe`, and set integration policy to `skip-optional-integrations` unless caller explicitly overrides.
 3. Persist resolved navigation decisions in run notes/output summary.
 
 Hard rule:
-- State-changing execution MUST NOT proceed without resolved M1/M2/M3.
+- State-changing execution MUST NOT proceed without resolved M1/M2/M3 unless `--delegated` is active with explicit operation.
 
 ### S2 — Check (mode `check` and as sync pre-step)
 
@@ -218,6 +236,8 @@ Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>
 
 - render M1/M2/M3 as plain text menu without `AskUserQuestion` in interactive runs
 - proceed with state-changing execution when M1/M2/M3 are unresolved
+- ask M1/M2/M3 in delegated mode (`--delegated`) — delegated calls are non-interactive by contract
+- run delegated mode without explicit operation (`--op` or explicit mode arg)
 - `git push --force`
 - `git reset --hard`
 - `git commit --no-verify`
