@@ -286,9 +286,18 @@ For each completed spec matched to `v{NEW_VERSION}`:
 After step 9 completes, generate an editorial release summary:
 
 ```
-POST http://localhost:{ORACLE_PORT}/api/changelog/release-notes
+source cellm-plugin/cellm/scripts/_get-port.sh
+source cellm-plugin/cellm/scripts/_get-base-url.sh
+BASE_URL="$(get_base_url)"
+POST ${BASE_URL}/api/changelog/release-notes
 Body: { "project": "{project}", "version": "v{NEW_VERSION}" }
 ```
+
+- **Port/URL resolution is mandatory and non-guessable**:
+  1. `CELLM_WORKER_URL` environment variable (if defined)
+  2. `~/.cellm/worker.json` via shared script `cellm-plugin/cellm/scripts/_get-port.sh`
+  3. Final fallback: `http://127.0.0.1:31415`
+- **Never hardcode `3003`** (commonly a project dev server, not CELLM Oracle).
 
 - If Oracle is offline: report `[!] Oracle offline — release notes skipped.`
 - If Oracle returns notes: report summary length in output
@@ -305,3 +314,4 @@ This step synthesizes the granular changelog entries into a human-readable narra
 - **NEVER activate during implementation or orchestration workflows** — bump is a release action only.
 - **NEVER accept paths with `..` or absolute paths from config** — reject and report.
 - **NEVER guess version format** — parse SemVer strictly (`MAJOR.MINOR.PATCH`).
+- **NEVER guess Oracle port or URL** — always resolve via shared scripts (`_get-base-url.sh` / `_get-port.sh`), fallback `31415`.
