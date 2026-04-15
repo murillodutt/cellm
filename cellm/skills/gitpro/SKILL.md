@@ -43,6 +43,7 @@ Delegated contract:
 - disable optional integrations unless explicitly requested by caller
 - never ask confirmation prompts
 - precedence rule: when `--delegated` is active, delegated contract overrides generic `--silent` defaults
+- deterministic-safe: never widen scope from requested `--op`
 
 ## Navigation Gate (M1/M2/M3) — Execute-style
 
@@ -132,6 +133,7 @@ Failure: not a git repo -> stop with actionable error.
 
 Hard rule:
 - State-changing execution MUST NOT proceed without resolved M1/M2/M3 unless `--delegated` is active with explicit operation.
+- In delegated mode, execution MUST NOT branch into additional operations not requested by `--op`.
 
 ### S2 — Check (mode `check` and as sync pre-step)
 
@@ -238,6 +240,7 @@ Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>
 - proceed with state-changing execution when M1/M2/M3 are unresolved
 - ask M1/M2/M3 in delegated mode (`--delegated`) — delegated calls are non-interactive by contract
 - run delegated mode without explicit operation (`--op` or explicit mode arg)
+- expand delegated `--op commit` into implicit bump/changelog/push without explicit caller request
 - `git push --force`
 - `git reset --hard`
 - `git commit --no-verify`
