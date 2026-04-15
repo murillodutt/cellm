@@ -39,6 +39,17 @@ olympus certification. Every step earned by evidence, not theory.
 - If evidence forces a pivot, declare the pivot explicitly, update the active plan, and only then continue. Never drift silently into a different road.
 - If uncertainty depends on framework, API, library, tool behavior, or platform contract, search the documentation first. Prefer MCP knowledge sources such as `context7` when available; use `Nuxt` and `Nuxt-UI` MCPs for Nuxt ecosystem questions; otherwise consult the official web documentation before acting.
 
+## Directive Precedence
+
+When instructions conflict, apply this order:
+
+1. Explicit user directive in current session
+2. Active ADR/WAVE objective and locked decisions
+3. This skill (`SKILL.md`)
+4. Partnership letter tone guidance
+
+Never use lower-priority guidance to block a higher-priority execution order.
+
 ## Policy
 
 - `context_preflight` mandatory at session open (`flow='orchestrate'`).
@@ -47,11 +58,28 @@ olympus certification. Every step earned by evidence, not theory.
 - CCM loop required for architectural changes (new integration, schema, contract).
 - CCM loop optional for mechanical fixes (1-2 files, clear root cause).
 - Interface decisions locked in WAVE-NN.md BEFORE `plan-to-spec`.
+- WAVE must carry execution guardrails contract before decomposition:
+  - `directivePrecedence`
+  - `executionModeContract` + interrupt budget
+  - `loopBreaker`
+  - `hardBlockers`
+  - `phaseGatePolicy`
+  - `approvalInheritance`
+  - `postDecomposeHandoff`
+  (Canonical template: `docs/technical/guardrails-contract-v1.md`)
 - DAG edges from decomposer require manual verification (known inversion bug `ka_40f90b2c`).
-- Phase gates: typecheck + full test suite after every phase.
+- Phase gates:
+  - `DIRECT` mode: lightweight checks per phase (`contract`/`typecheck`/targeted tests), full 7-item gate at convergence.
+  - `BALANCED`/`AUDIT` modes: typecheck + full relevant test suite after every phase.
 - Olympus triad after spec convergence (even when "nothing to find").
 - Commit atomically per semantic unit. Push only after gates pass.
 - Public sync guard after every push to private repo.
+- Tracking default for long executions: phase-level state in Oracle + task-level evidence in journal.
+- Interrupt budget:
+  - `DIRECT`: zero proactive confirmation prompts between phases.
+  - `BALANCED`: max 1 objective escalation per phase.
+  - `AUDIT`: escalations allowed when risk requires.
+- Loop breaker: after 2 consecutive meta/status messages without code/test progression, execute the next safe protocol step immediately.
 
 ## Routing
 
@@ -107,6 +135,7 @@ olympus certification. Every step earned by evidence, not theory.
 15. Write WAVE-NN.md operational plan with scope, decisions, entry/exit criteria.
 15b. Record the execution thread explicitly: objective, chosen path, excluded alternatives, and success criteria. Use this thread as the reference for every later action.
 16. Close ALL interface decisions in ATOM before decomposition.
+16b. Persist/confirm `guardrailsContract` in the plan context before `/cellm:plan-to-spec`.
 17. Run Guardian protocol: question gaps, propose alternatives, validate blast radius.
 18. If the plan is already aligned with validated decisions and protocol, proceed to `/cellm:plan-to-spec`. Ask only when the plan introduces a new product or business tradeoff not previously resolved.
 19. Post-decomposition: verify DAG edges (fix inversions if needed).
@@ -120,6 +149,8 @@ olympus certification. Every step earned by evidence, not theory.
 
 22. `cellm:execute` presents M1/M2/M3 menus and receives user decisions.
 23. `cellm:execute` runs execution loop with go/no-go evaluations and post-check certification.
+    - If M2 resolves to `DIRECT`, do not pause for confirmations between phases.
+    - Escalate only hard blockers (security/regulatory invariant break, destructive action, missing authority, conflicting source-of-truth).
 
 Tilly resumes at Phase 4 only after `cellm:execute` completes.
 
@@ -234,3 +265,4 @@ skill name is safe (internal culture, not licensed IP).
 - **Ask for reassurance instead of decision-critical input** — confidence must come from protocol and evidence.
 - **Silently pivot roads mid-execution** — if the road changes, surface it, update the plan, then proceed.
 - **Act on undocumented assumptions** — if behavior matters and the contract is uncertain, search authoritative documentation first.
+- **Emit emojis in output** — strictly prohibited; use only `[+]`, `[-]`, `[!]`, `[~]` markers (preserve emojis only inside literal user quotes).

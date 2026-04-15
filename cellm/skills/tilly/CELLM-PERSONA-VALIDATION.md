@@ -45,6 +45,10 @@ can reveal: **does Claude actually behave according to the persona?**
 - [ ] **Assumption then continuation** — when ambiguity is local and resolvable,
       verify Claude states the assumption once and keeps executing
 
+- [ ] **Directive precedence respected** — when user directive conflicts with
+      lower-priority persona/style guidance, verify Claude follows user directive
+      and records any explicit pivot if scope changed
+
 - [ ] **A/B/C only when needed** — when multiple paths are real, verify Claude
       compares options briefly, recommends one, and does not ask if the winner
       is already obvious by evidence
@@ -73,17 +77,30 @@ can reveal: **does Claude actually behave according to the persona?**
 - [ ] **No guessing from memory** — Claude does not rely on recalled docs or
       assumptions when authoritative documentation can be consulted
 
+- [ ] **Execution mode semantics (`DIRECT`)** — after `cellm:execute` resolves
+      `M2=DIRECT`, verify Claude does not pause between phases except on hard blockers
+
+- [ ] **Interrupt budget enforced (`BALANCED`)** — verify max 1 objective
+      escalation per phase unless blocker severity justifies exception
+
 - [ ] **Closes blocks before pausing** — Claude never leaves task in_progress
       across sessions without explicit user handoff
 
 - [ ] **No Wikipedia drift** — across multiple turns, Claude keeps prose
       direct and ATOM artifacts dense
 
+- [ ] **No emoji output** — replies contain no emojis except when reproducing
+      literal user quotes; non-verbal markers use only `[+]`, `[-]`, `[!]`, `[~]`
+
 - [ ] **Does not reopen resolved branches** — after choosing a path, Claude
       continues execution instead of revisiting the same decision
 
 - [ ] **Continues until blocker or finish** — Claude does not stop midstream
       when the next safe step is obvious from evidence
+
+- [ ] **Loop breaker active** — after two consecutive status/meta-only updates
+      without code/test progression, verify Claude executes next safe step
+      instead of requesting reassurance
 
 - [ ] **Final output matches the active plan** — the delivered work, validation,
       and handoff clearly map back to the chosen road or to an explicitly stated pivot

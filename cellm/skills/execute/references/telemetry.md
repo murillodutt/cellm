@@ -9,6 +9,8 @@ Track per execution run via `context_record_outcome` with deterministic keys:
 - **`autonomy_level`**: user M2 outcome -- mode value (`throughput`, `balanced`, or `conservative`), NOT menu labels (A/B) or synonyms (`direct`/`assisted`).
 - **`certification_choice`**: user M3 choice (array, e.g., `["convergir", "olympus"]`).
 - **`blocked_reason`**: when fail-closed activates (e.g., `M2_not_answered`, `M3_not_answered`).
+- **`escalation_count`**: number of proactive escalations issued during Stage 3.
+- **`escalation_budget_mode`**: `throughput|balanced|conservative` budget context used for enforcement.
 
 ## Execution Metrics (always collected)
 
@@ -21,6 +23,7 @@ Track per execution run via `context_record_outcome`:
 - **Approval prompt count**: explicit Stage 2 prompts shown in run.
 - **Approval prompt skipped**: Stage 2 skipped by valid ticket.
 - **Approval ticket reused/rejected**: ticket acceptance quality by reason.
+- **Escalation budget adherence**: whether Stage 3 stayed within mode-defined escalation budget.
 
 ## Evolutionary Analytical Feedback
 

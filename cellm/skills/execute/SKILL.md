@@ -24,6 +24,11 @@ Analyze a decomposed spec and propose the optimal execution strategy per phase, 
 - Run `context_preflight` before analysis (`flow='orchestrate'`).
 - Use `spec_get_tree` + `spec_get_counters` as single source of truth.
 - Confirmation right-sizing: Stage 2 approval may be skipped only with a valid `check.body.approvalTicket` (`scope=decompose+execute-stage2`) and strict checks (same session, TTL valid, fingerprint match, non-critical priority).
+- Guardrails contract: read `check.body.guardrailsContract` as canonical execution policy (writer: `plan-to-spec`).
+  - Expected minimum schema: `docs/technical/guardrails-contract-v1.md`.
+  - Missing/invalid contract handling:
+    - `critical`/`high`: fail-closed (block and escalate to user).
+    - `medium`/`low`: continue with safe defaults (`balanced` + blocker-only hard stop list) and emit telemetry warning.
 - Evaluate `go_no_go_evaluate(phase_exit)` between execution steps.
 - Evaluate `go_no_go_evaluate(check_exit)` before declaring check complete.
 - **Record every evaluation**: after each `go_no_go_evaluate`, call `go_no_go_record` to persist the verdict. Render the decision matrix via `go_no_go_render` in inter-stage reports.
@@ -32,6 +37,17 @@ Analyze a decomposed spec and propose the optimal execution strategy per phase, 
 - **Retry limit**: maximum 2 cycles of `asclepius -> re-evaluate` per step. If still `no_go` after 2 retries, escalate to user with full context.
 - **Degradation policy**: if `go_no_go_evaluate` itself fails (API error, timeout), BLOCK advancement and ask user for explicit decision. Never assume `go` on evaluation failure.
 - Present plan and wait for user approval before executing anything.
+- **Directive precedence** (when instructions conflict):
+  1) explicit user directive in current session
+  2) active check/ADR/WAVE locked objective
+  3) this skill contract
+  4) conversational style preferences
+- **Escalation budget by mode**:
+  - `throughput`: no proactive confirmations during Stage 3; escalate only hard blockers.
+  - `balanced`: max 1 objective escalation per phase.
+  - `conservative`: confirmations per step are allowed by design.
+- **Loop breaker**: after 2 consecutive meta/status reports without code/test progression, execute the next safe protocol step immediately.
+- **Tracking granularity default**: phase-level state in Oracle; task-level detail in journal/handoff unless audit explicitly requires per-task transitions.
 
 ## Routing
 
@@ -46,6 +62,20 @@ Analyze a decomposed spec and propose the optimal execution strategy per phase, 
    Evaluate validity (`scope`, session, ttl, fingerprint, priority).
    - If valid: mark `ticketEligible=true`.
    - If invalid: store rejection reason (`scope|session|ttl|fingerprint|priority|missing`) for telemetry.
+4b. Load `guardrailsContract` from check body and validate required keys:
+   - `directivePrecedence`
+   - `executionModeContract`
+   - `loopBreaker`
+   - `hardBlockers`
+   - `phaseGatePolicy`
+   - `approvalInheritance`
+   - `postDecomposeHandoff`
+   - `trackingGranularity`
+   - `evidenceRequirements`
+   Record telemetry:
+   - `guardrails_contract_source` (`check_body` | `safe_default`)
+   - `guardrails_contract_valid` (`true|false`)
+   Apply priority-aware fail-closed policy (see Policy).
 5. **Deterministic planner**: Call `execution_plan_build` with the check path and desired mode. This computes DAG grouping, risk scores, and strategy selection deterministically.
    - If planner returns `source: 'planner'`: use the computed plan directly (manual Steps 6–8 are skipped — the planner owns DAG/strategy).
    - If planner returns `source: 'manual-fallback'`: present `[FALLBACK]` badge and use the conservative plan. The `fallbackReason` field explains why (e.g., `PLANNER_DISABLED`, API error).
@@ -76,6 +106,7 @@ without explicit user decisions on all 3 menus.
     - **(A)** Direct execution without human intervention
     - **(B)** Assisted execution with human checkpoints
     - Maps to Execution Mode: A = `throughput`, B = `balanced` (user can further refine to `conservative`).
+    - If `guardrailsContract.executionModeContract.mode` is stricter than the selected mode, prefer stricter mode and report enforcement in telemetry.
     - **Telemetry value**: `autonomy_level` records the execution mode value (`throughput`, `balanced`, or `conservative`), NOT the menu label (A/B).
     - **Fail-closed**: if M2 not explicitly answered, execution MUST NOT proceed.
 
@@ -107,8 +138,13 @@ without explicit user decisions on all 3 menus.
     e. If verdict is `no_go`: invoke `cellm:asclepius` via `Skill`, re-evaluate. Max 2 retries per step — if still `no_go`, escalate to user.
     f. If `go_no_go_evaluate` fails (error/timeout): BLOCK and ask user — never assume `go`.
     g. Present inter-stage report to user (include rendered go/no-go matrix).
-    h. Ask user to proceed / pause / abort.
+    h. Apply confirmation cadence by mode, constrained by `guardrailsContract.executionModeContract` and interrupt budget:
+       - `throughput`: continue automatically after report; ask only on hard blocker, band transition with increased risk, or explicit user pause request.
+       - `balanced`: ask once per phase (or at meaningful band transition), not per step, and never exceed per-phase budget.
+       - `conservative`: ask per step (`proceed / pause / abort`).
 15. Persist step outcome via `context_record_outcome` with key `{checkId}/{phaseId}/step-{n}`.
+    - Include `escalation_count` and `escalation_budget_mode`.
+    - If loop-breaker threshold is hit (`maxMetaUpdatesWithoutProgress`), execute next safe step and record `loop_breaker_triggered=true`.
 
 ### Stage 4: Post-Check (respects M3 user choice)
 
@@ -159,6 +195,10 @@ Present mode selection to user alongside the execution plan. User chooses one:
 | `throughput` | Confirm only at band transitions (high->medium, medium->low). `quality_gate` typecheck at every phase, full tests only at critical phases and `check_exit`. |
 
 **M2 vs Execution Mode**: Menu 2 is **fail-closed** — never substitute a default for a missing M2 answer. After M2 maps (A)→`throughput` or (B)→`balanced`, optionally offer a follow-up to refine to `conservative`; until then, `autonomy_level` is that mapped value. The "Default mode" row in the table means CELLM **recommends** `balanced` as the usual baseline in narrative only — not permission to skip M2.
+**Operational meaning**:
+- `throughput` is execution-direct mode with blocker-only escalation.
+- `balanced` is execution-assisted mode with checkpoint budget.
+- `conservative` is execution-audit mode with per-step confirmations.
 
 
 ## Execution Plan Format
@@ -202,7 +242,7 @@ STEP {n} COMPLETE — {phase title}
 
 {go_no_go_render output — decision matrix}
 
-Proceed? (yes / pause / abort)
+Next action follows mode cadence (auto in `throughput`, phase checkpoint in `balanced`, explicit prompt in `conservative`).
 ```
 
 In `balanced` and `throughput` modes, batch consecutive high-confidence steps and present a single grouped confirmation instead of per-step.
@@ -226,6 +266,7 @@ Read `references/telemetry.md` for full metric definitions and feedback format. 
 - `autonomy_level` records mode value (`throughput`/`balanced`/`conservative`), NEVER menu labels (A/B) or synonyms (`direct`/`assisted`).
 - `decomposition_source` uses `check.body.decompositionSource` if set, else `unknown` — never invent from context.
 - `certification_choice` is an array in user-stated order.
+- `guardrails_contract_source` and `guardrails_contract_valid` are mandatory for every run.
 
 ## CRITICAL TOOL ENFORCEMENT
 
@@ -248,4 +289,6 @@ Wrong: Writing "M1 — Executor: ..." as markdown text and waiting for user to t
 - **Skip go/no-go record/evaluate pairing** — every `go_no_go_evaluate` must be followed by `go_no_go_record` where applicable.
 - **Parallelize partially-completed phases** or **choose swarm for linear/high-risk work** — follow Strategy Selection Rules.
 - **Hide failures, skip telemetry, or change mode mid-run without user consent.**
-
+- **Re-ask `proceed/pause/abort` every step in `throughput` or `balanced`** — follow cadence by mode.
+- **Use style/process preference to override explicit user execution directive** — precedence is mandatory.
+- **Emit emojis in output/reporting** — strictly prohibited; use `[+]`, `[-]`, `[!]`, `[~]` markers only (preserve emojis only inside literal user quotes).

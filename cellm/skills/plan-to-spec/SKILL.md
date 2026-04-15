@@ -18,12 +18,22 @@ Convert a user-approved plan into a spec tree through the SCE decomposition brid
 ## Policy
 
 - Always check existing specs first (`spec_search`).
+- Directive precedence (when instructions conflict):
+  1) explicit user directive in current session
+  2) active ADR/WAVE locked objective
+  3) this skill contract
+  4) style/conversation preferences
 - **Approval inheritance**: If the user already approved the plan in this conversation (e.g. "confirmo", "aprovado", "go", or invoked this skill after explicit plan approval), decompose immediately WITHOUT re-asking. The plan approval IS the decomposition approval. Only ask for confirmation when there is genuine ambiguity (duplicate spec found, unclear scope, missing plan file).
 - Bulk decompose (`context_spec_decompose` / `decomposeSpec`) is a **single DB transaction** that can auto-activate the check (`autoStart`, default true) and insert phases immediately — there is **no** server pause between check and phases inside that call.
 - Incremental creation via `spec_create_node`: new checks start `pending`; `phase` / `task` under a check require the root check to be `active` (`spec_transition`) or the API returns `CHECK_NOT_APPROVED`.
 - Use `context_spec_decompose` as primary decomposition path.
 - Keep plan file as input artifact; DB is source of truth after conversion.
 - Right-size confirmations: avoid asking for the same decision twice in one run. Dedup confirmation is only required when a real conflict exists.
+- Escalation budget for this skill:
+  - One consolidated approval prompt maximum when no inherited approval exists.
+  - Zero additional confirmation prompts after decomposition succeeds.
+  - Escalate only hard blockers (API failure, empty decomposition after retry, conflicting source-of-truth).
+- Loop breaker: after 2 consecutive meta/status updates without progressing decomposition state, execute the next safe protocol step immediately.
 - On owner approval, create and persist `check.body.approvalTicket` to support conditional Stage 2 skip in `execute`. Required fields:
   - `ticketId`
   - `scope` (`decompose+execute-stage2`)
@@ -33,6 +43,9 @@ Convert a user-approved plan into a spec tree through the SCE decomposition brid
   - `ttlMinutes` (default `30`)
   - `executionMode` (`conservative` | `balanced` | `throughput`)
   - `treeFingerprint` (deterministic string from approved decomposition payload)
+- On decomposition, create and persist `check.body.guardrailsContract` (v1 minimum) as the canonical execution policy consumed by `execute`.
+  - Use template: `docs/technical/guardrails-contract-v1.md`
+  - Contract must include: directive precedence, execution mode contract, interrupt budget, loop breaker, hard blockers, gate policy, approval inheritance, post-decompose handoff, tracking granularity, evidence requirements.
 
 ## Routing
 
@@ -42,7 +55,10 @@ Convert a user-approved plan into a spec tree through the SCE decomposition brid
 4. **Approval gate** (context-aware):
    - If plan was already approved in this conversation → decompose immediately, default execution mode `balanced`.
    - If invoked standalone without prior approval → present one consolidated approval prompt (single ask): decompose now + desired execution mode (`conservative`/`balanced`/`throughput`).
-5. Build decomposition payload from **owner-approved** plan (including deadweight scan gaps) and include `check.body.approvalTicket`. Build `treeFingerprint` deterministically from approved payload summary:
+5. Build decomposition payload from **owner-approved** plan (including deadweight scan gaps) and include:
+   - `check.body.approvalTicket`
+   - `check.body.guardrailsContract` (from v1 template, optionally tightened by project context)
+   Build `treeFingerprint` deterministically from approved payload summary:
    - `phaseCount`
    - `taskCount` (recursive)
    - `edgeCount`
@@ -50,7 +66,7 @@ Convert a user-approved plan into a spec tree through the SCE decomposition brid
    Format: `p{phaseCount}-t{taskCount}-e{edgeCount}-cg{flag}`.
 6. Execute `context_spec_decompose` (fallback: `spec_decompose` / incremental `spec_create_node` only after check is `active` — never add phases/tasks under a `pending` check via incremental API).
 7. **Post-decomposition validation (MANDATORY)**: Run `spec_get_tree` AND `spec_get_counters` for the new check. If tree is empty or counters show 0 tasks, the decomposition FAILED silently. Retry once via fallback path (if using incremental path, ensure check is `active`). If still empty, **ABORT and report**: "Decomposition produced 0 tasks — check exists but is hollow. Manual intervention required." Never return success with 0 tasks.
-8. **Post-decomposition gate**: After successful decomposition (counters show tasks > 0), invoke `cellm:execute` via `Skill` tool with the check ID returned from decomposition (e.g., `spec-abc12345`). All execution decisions (executor, autonomy, certification) are handled by `cellm:execute` as the single mandatory gate. Do NOT present execution menus here — `cellm:execute` owns M1/M2/M3 exclusively.
+8. **Post-decomposition gate**: After successful decomposition (counters show tasks > 0), invoke `cellm:execute` via `Skill` tool with the check ID returned from decomposition (e.g., `spec-abc12345`) in the same execution flow (no extra approval ask). All execution decisions (executor, autonomy, certification) are handled by `cellm:execute` as the single mandatory gate. Do NOT present execution menus here — `cellm:execute` owns M1/M2/M3 exclusively.
 
 ## Spec Fallback YAML (CELLM_DEV_MODE only)
 
@@ -110,3 +126,7 @@ The skill does NOT need to manually add the Convergence Gate phase — it is inj
 - **Drop constraints/verification intent** — preserve execution-critical details.
 - **Present execution menus directly** — M1/M2/M3 belong to `cellm:execute`. This skill redirects after decomposition, never duplicates menu logic.
 - **Skip cellm:execute after decomposition** — mandatory gate, no exception.
+- **Re-ask approval after inherited approval is already established** — approval inheritance is authoritative unless a real ambiguity appears.
+- **Pause between successful decomposition and execute handoff for reassurance** — continue directly to `cellm:execute`.
+- **Decompose without `check.body.guardrailsContract`** for new specs — execution must be contract-backed, not inferred.
+- **Emit emojis in decomposition/status output** — strictly prohibited; use `[+]`, `[-]`, `[!]`, `[~]` markers only (preserve emojis only inside literal user quotes).
