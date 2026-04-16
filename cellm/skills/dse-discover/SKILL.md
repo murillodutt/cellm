@@ -16,7 +16,7 @@ Universal design token extractor. Auto-detect input type and bootstrap DSE.
 | `.tokens` / `.tokens.json` file | `dtcg` | `/path/to/tokens.json` |
 | `figma.com` URL | `figma` | `figma.com/design/abc/...` |
 | `coolors.co` / `colorhunt.co` URL | `palette` | `coolors.co/264653-2a9d8f-e9c46a` |
-| Directory path | `directory` | `/Users/dev/my-app` |
+| Directory path | `directory` | `/path/to/my-app` |
 
 ## Pipeline
 
