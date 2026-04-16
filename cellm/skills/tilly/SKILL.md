@@ -38,6 +38,9 @@ olympus certification. Every step earned by evidence, not theory.
 - Preserve plan continuity end-to-end: the final implementation, validation, and handoff must clearly map back to the chosen objective and plan.
 - If evidence forces a pivot, declare the pivot explicitly, update the active plan, and only then continue. Never drift silently into a different road.
 - If uncertainty depends on framework, API, library, tool behavior, or platform contract, search the documentation first. Prefer MCP knowledge sources such as `context7` when available; use `Nuxt` and `Nuxt-UI` MCPs for Nuxt ecosystem questions; otherwise consult the official web documentation before acting.
+- Default communication shape for execution turns: `Decision -> Action -> Evidence`.
+- For non-trivial change proposals, include: `owner`, `scope`, `acceptance criteria`.
+- Human affect cues (`haha`, `kkk`, `rsrs`, `😂`, `❤️`, `<3`, slang) are non-command by default and MUST NOT interrupt execution flow.
 
 ## Directive Precedence
 
@@ -80,6 +83,7 @@ Never use lower-priority guidance to block a higher-priority execution order.
   - `BALANCED`: max 1 objective escalation per phase.
   - `AUDIT`: escalations allowed when risk requires.
 - Loop breaker: after 2 consecutive meta/status messages without code/test progression, execute the next safe protocol step immediately.
+- Affect gate: only explicit directives (e.g., "pare", "pause", "stop", "mude de rumo") or objective blockers can interrupt ongoing execution.
 
 ## Routing
 
@@ -121,6 +125,7 @@ Never use lower-priority guidance to block a higher-priority execution order.
 14. Convert the outcome into an execution decision:
     - Single dominant option → state the choice and proceed.
     - Two or more materially different options → present A/B/C with recommended default and ask only if the choice carries product or business consequences the protocol cannot settle.
+    - Never ask "confirmation" for a dominant option already decided by evidence.
 
 ### Phase 1.5: Execution Gate (mandatory after diagnosis + strategy decision)
 
@@ -138,6 +143,10 @@ Never use lower-priority guidance to block a higher-priority execution order.
 16b. Persist/confirm `guardrailsContract` in the plan context before `/cellm:plan-to-spec`.
 17. Run Guardian protocol: question gaps, propose alternatives, validate blast radius.
 18. If the plan is already aligned with validated decisions and protocol, proceed to `/cellm:plan-to-spec`. Ask only when the plan introduces a new product or business tradeoff not previously resolved.
+18b. Any plan/proposal shared with the user must expose this minimum contract:
+    - Owner (single accountable owner for execution)
+    - Scope (in/out boundaries and impacted surfaces)
+    - Acceptance criteria (objective pass/fail conditions)
 19. Post-decomposition: verify DAG edges (fix inversions if needed).
 20. Smoke test: `spec_claim_next` returns Phase 1 task (not Phase N).
 21. **MANDATORY: Invoke `cellm:execute` via Skill tool with the check ID** (e.g., `spec-abc12345`).

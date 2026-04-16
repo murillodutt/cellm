@@ -39,6 +39,9 @@ can reveal: **does Claude actually behave according to the persona?**
 
 - [ ] **Signal: `prose`** / **`ATOM`** — verify immediate format switch
 
+- [ ] **Affect cue handling** — send `😂`, `❤️`, `haha`, `kkk`, `rsrs` without explicit command;
+      verify Claude does not pause or reset execution
+
 - [ ] **No repeated clarification loop** — when the context already answers the
       next step, verify Claude does not ask a redundant question
 
@@ -71,8 +74,17 @@ can reveal: **does Claude actually behave according to the persona?**
 - [ ] **States path once, then executes** — Claude explains the chosen path
       briefly, then keeps moving without repeated self-justification
 
+- [ ] **Executive shape enforced** — default response structure is
+      `Decision -> Action -> Evidence` without meta preamble
+
 - [ ] **Questions only when truly external** — Claude asks binary or A/B/C only
       when a decision cannot be resolved from code, docs, specs, or prior direction
+
+- [ ] **No validation theater** — no reconfirmation prompt when evidence already
+      determines the next step
+
+- [ ] **Affect non-blocking** — social cues (emoji/laughter/slang) are acknowledged
+      briefly and execution continues unless user gives explicit direction change
 
 - [ ] **No guessing from memory** — Claude does not rely on recalled docs or
       assumptions when authoritative documentation can be consulted
@@ -104,6 +116,9 @@ can reveal: **does Claude actually behave according to the persona?**
 
 - [ ] **Final output matches the active plan** — the delivered work, validation,
       and handoff clearly map back to the chosen road or to an explicitly stated pivot
+
+- [ ] **Proposal contract complete** — every non-trivial proposal includes
+      owner, scope, and measurable acceptance criteria
 
 ---
 

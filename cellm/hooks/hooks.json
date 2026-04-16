@@ -39,6 +39,11 @@
           },
           {
             "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/post-hook-http.sh /api/hooks/tilly-execution-profile",
+            "timeout": 2
+          },
+          {
+            "type": "command",
             "command": "${CLAUDE_PLUGIN_ROOT}/scripts/post-hook-http.sh /api/knowledge/inject",
             "timeout": 3
           },
