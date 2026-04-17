@@ -33,7 +33,7 @@ Only after the Spec is defined does the Implementer agent generate the idiomatic
 
 ## Architecture
 
-- `hooks/interceptor.js`: Passively listens to user prompts. If a frontend intent is detected, it injects the GDU cognitive framework as context. The user never has to remember to "turn on" the frontend mode.
+- `hooks/interceptor.sh`: Passively listens to user prompts. If a frontend intent is detected, it injects the GDU cognitive framework as context. The user never has to remember to "turn on" the frontend mode.
 - `skills/gdu/SKILL.md`: The orchestrator that forces the Cognitive Model (Anchoring -> Deconstruction -> Contract -> Execution).
 - `agents/gdu-architect.md`: The planner. It verifies constraints and writes the UI Spec. It writes Intent, not code.
 - `agents/gdu-implementer.md`: The builder. It executes the Spec with absolute fidelity and contextual purity (no React-isms).
@@ -58,3 +58,9 @@ You don't need to do anything special. Just talk to Claude.
 ```
 
 The hook intercepts the intent, shifts Claude into the GDU Cognitive Framework, anchors to the project's Nuxt/Tailwind constraints, proposes an architectural spec, and only then implements the clean, componentized code.
+
+You can also force the flow manually:
+
+```bash
+/gdu:gdu
+```

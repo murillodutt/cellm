@@ -104,8 +104,7 @@ Documentation maintenance with LLM-first templates, code evidence, and drift con
 
 | Event | What runs |
 |-------|----------|
-| **Stop** | docops-hook (drift reminder) |
-| **PreCompact** | docops-hook (drift reminder) |
+| **SessionEnd** | docops-hook (drift reminder) |
 
 ### Configuration
 
@@ -162,7 +161,7 @@ It prevents "AI slop" by forcing the AI to verify architectural rules, DSE token
 
 | Event | What runs |
 |-------|----------|
-| **UserPromptSubmit** | interceptor.js (Detects UI intents, auto-installs Nuxt UI skill if missing, and injects GDU cognitive override) |
+| **UserPromptSubmit** | interceptor.sh (Detects UI intents and injects GDU cognitive override. If `.stitch/` exists and prompt is design-heavy, Stitch takes priority.) |
 
 ---
 

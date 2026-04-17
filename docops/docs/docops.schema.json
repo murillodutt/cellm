@@ -23,7 +23,7 @@
     },
     "hooksEnabled": {
       "type": "boolean",
-      "description": "Enable drift reminder hooks (Stop, PreCompact)",
+      "description": "Enable drift reminder hook (SessionEnd)",
       "default": false
     },
     "namingConvention": {

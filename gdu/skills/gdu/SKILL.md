@@ -1,7 +1,7 @@
 ---
 description: "Frontend architecture orchestrator that routes UI work through SCE context, DSE policy, and enforceable contracts."
 cellm_scope: universal
-user-invocable: false
+user-invocable: true
 ---
 
 # gdu

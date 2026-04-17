@@ -16,7 +16,7 @@ See [../README.md](../README.md) for full reference.
 .claude-plugin/plugin.json   # Manifest
 skills/                      # 12 documentation skills
 agents/docops-writer.md      # Documentation specialist agent
-hooks/hooks.json             # Stop + PreCompact drift reminders
+hooks/hooks.json             # SessionEnd drift reminder
 scripts/docops-hook.sh       # Hook script
 templates/                   # en/ and pt-BR/ document templates
 ```

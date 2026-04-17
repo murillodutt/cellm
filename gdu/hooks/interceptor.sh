@@ -9,9 +9,24 @@
 
 INPUT=$(cat || true)
 
-# Extract prompt from JSON using sed (macOS compatible)
-PROMPT=$(echo "$INPUT" | sed -n 's/.*"prompt"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
+# Extract prompt from JSON.
+# Prefer jq (handles escaped quotes/newlines correctly), fallback to sed.
+if command -v jq >/dev/null 2>&1; then
+  PROMPT=$(printf '%s' "$INPUT" | jq -r '.prompt // empty' 2>/dev/null || true)
+else
+  PROMPT=$(echo "$INPUT" | sed -n 's/.*"prompt"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
+fi
 [ -z "$PROMPT" ] && exit 0
+
+# Stitch coexistence gate:
+# if the prompt is design-heavy and a .stitch workspace exists, let Stitch own
+# the first injection to avoid duplicated/competing context.
+if echo "$PROMPT" | grep -qiE '(stitch|design|design\\.md|visual|screen|canvas|vibe|mockup|wireframe|prototype|figma|palette|typography|color scheme|brand|aesthetic)'; then
+  GIT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || true)
+  if [ -n "$GIT_ROOT" ] && [ -d "$GIT_ROOT/.stitch" ]; then
+    exit 0
+  fi
+fi
 
 # Needs BOTH a subject keyword AND an action verb
 echo "$PROMPT" | grep -qiE '(interface|dashboard|tela|page|pagina|component|componente|layout|ui|frontend|visual|botao|button|estilo|style|tailwind|vue|nuxt|form|formulario|modal|sidebar|navbar|header|footer|card|table|tabela|menu|dialog|toast|dropdown)' || exit 0
