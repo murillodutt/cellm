@@ -46,4 +46,7 @@ if [[ -z "$MCP_SERVER_PATH" ]]; then
 fi
 
 # Run the MCP server
+# Signal MCP stdio mode so dev-logger redirects INFO logs to stderr.
+# MCP stdio protocol reserves stdout for JSON-RPC frames only.
+export CELLM_MCP_STDIO=1
 exec bun run "$MCP_SERVER_PATH"
