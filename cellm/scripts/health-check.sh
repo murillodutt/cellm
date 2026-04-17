@@ -22,7 +22,6 @@ cleanup() {
 trap cleanup EXIT
 
 # Configuration
-DEFAULT_PORT=31415
 READINESS_TIMEOUT=5
 
 # Parse arguments
