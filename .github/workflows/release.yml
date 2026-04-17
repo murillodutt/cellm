@@ -29,7 +29,7 @@ jobs:
       - name: Validate plugin structure
         run: |
           # Validate all plugin manifests
-          for plugin in cellm docops dse; do
+          for plugin in cellm docops gdu stitch; do
             manifest="${plugin}/.claude-plugin/plugin.json"
             if [ ! -f "$manifest" ]; then
               echo "::error::Missing ${manifest}"
@@ -44,7 +44,7 @@ jobs:
           import json
           mp = json.load(open('.claude-plugin/marketplace.json'))
           names = [p['name'] for p in mp['plugins']]
-          for expected in ['cellm', 'docops', 'dse']:
+          for expected in ['cellm', 'docops', 'gdu', 'stitch']:
               assert expected in names, f'Missing {expected}'
           print('[+] marketplace.json valid:', names)
           "
@@ -56,7 +56,7 @@ jobs:
           done
 
           # No commands directories
-          for plugin in cellm docops dse; do
+          for plugin in cellm docops gdu stitch; do
             if [ -d "${plugin}/commands" ]; then
               echo "::error::Found obsolete commands/ in ${plugin}"
               exit 1
@@ -116,8 +116,9 @@ jobs:
         run: |
           echo "cellm_skills=$(find cellm/skills -name 'SKILL.md' | wc -l | tr -d ' ')" >> $GITHUB_OUTPUT
           echo "docops_skills=$(find docops/skills -name 'SKILL.md' | wc -l | tr -d ' ')" >> $GITHUB_OUTPUT
-          echo "dse_skills=$(find dse/skills -name 'SKILL.md' | wc -l | tr -d ' ')" >> $GITHUB_OUTPUT
-          echo "agents=$(find cellm/agents docops/agents -name '*.md' 2>/dev/null | wc -l | tr -d ' ')" >> $GITHUB_OUTPUT
+          echo "gdu_skills=$(find gdu/skills -name 'SKILL.md' | wc -l | tr -d ' ')" >> $GITHUB_OUTPUT
+          echo "stitch_skills=$(find stitch/skills -name 'SKILL.md' | wc -l | tr -d ' ')" >> $GITHUB_OUTPUT
+          echo "agents=$(find cellm/agents docops/agents gdu/agents stitch/agents -name '*.md' 2>/dev/null | wc -l | tr -d ' ')" >> $GITHUB_OUTPUT
           echo "scripts=$(find cellm/scripts -name '*.sh' | wc -l | tr -d ' ')" >> $GITHUB_OUTPUT
 
       - name: Create Release
@@ -136,7 +137,8 @@ jobs:
             |--------|--------|-------------|
             | cellm | ${{ steps.count.outputs.cellm_skills }} | Core development (context + workflow) |
             | docops | ${{ steps.count.outputs.docops_skills }} | Documentation maintenance |
-            | dse | ${{ steps.count.outputs.dse_skills }} | Design system engine |
+            | gdu | ${{ steps.count.outputs.gdu_skills }} | Generative Development Utilities (Vue/Nuxt UI frontend) |
+            | stitch | ${{ steps.count.outputs.stitch_skills }} | Stitch design-to-code bridge |
 
             | Component | Count |
             |-----------|-------|

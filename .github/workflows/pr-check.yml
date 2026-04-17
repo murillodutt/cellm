@@ -31,7 +31,7 @@ jobs:
           if [[ ! "$PR_TITLE" =~ ^(feat|fix|docs|refactor|test|chore)(\([a-z-]+\))?:\ .+ ]]; then
             echo "::error::PR title must follow conventional commit format: type(scope): description"
             echo "Valid types: feat, fix, docs, refactor, test, chore"
-            echo "Valid scopes: skills, agents, hooks, scripts, docs, dse, docops"
+            echo "Valid scopes: skills, agents, hooks, scripts, docs, gdu, stitch, docops"
             exit 1
           fi
 
@@ -42,7 +42,7 @@ jobs:
         run: |
           git fetch origin ${{ github.base_ref }} --depth=1
 
-          SKILLS=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | grep -E "^(cellm|docops|dse)/skills/" | wc -l | tr -d ' ')
+          SKILLS=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | grep -E "^(cellm|docops|gdu|stitch)/skills/" | wc -l | tr -d ' ')
           AGENTS=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | grep -E "^(cellm|docops)/agents/" | wc -l | tr -d ' ')
           HOOKS=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | grep -E "^(cellm|docops)/hooks/" | wc -l | tr -d ' ')
           SCRIPTS=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | grep -E "^(cellm|docops)/scripts/" | wc -l | tr -d ' ')
@@ -77,7 +77,7 @@ jobs:
 
       - name: Validate plugin manifests
         run: |
-          for plugin in cellm docops dse; do
+          for plugin in cellm docops gdu stitch; do
             manifest="${plugin}/.claude-plugin/plugin.json"
             if [ ! -f "$manifest" ]; then
               echo "::error::Missing ${manifest}"
@@ -100,7 +100,7 @@ jobs:
           import json
           mp = json.load(open('.claude-plugin/marketplace.json'))
           names = [p['name'] for p in mp['plugins']]
-          for expected in ['cellm', 'docops', 'dse']:
+          for expected in ['cellm', 'docops', 'gdu', 'stitch']:
               assert expected in names, f'Missing {expected} in marketplace.json'
           print('[+] marketplace.json valid:', names)
           "
@@ -147,13 +147,14 @@ jobs:
 
             // Determine labels based on file paths
             for (const file of changedFiles) {
-              if (file.match(/^(cellm|docops|dse)\/skills\//)) labels.add('skills');
-              if (file.match(/^(cellm|docops)\/agents\//)) labels.add('agents');
-              if (file.match(/^(cellm|docops)\/hooks\//)) labels.add('hooks');
-              if (file.match(/^(cellm|docops)\/scripts\//)) labels.add('scripts');
+              if (file.match(/^(cellm|docops|gdu|stitch)\/skills\//)) labels.add('skills');
+              if (file.match(/^(cellm|docops|gdu|stitch)\/agents\//)) labels.add('agents');
+              if (file.match(/^(cellm|docops|gdu|stitch)\/hooks\//)) labels.add('hooks');
+              if (file.match(/^(cellm|docops|gdu|stitch)\/scripts\//)) labels.add('scripts');
               if (file.startsWith('.github/')) labels.add('documentation');
               if (file.startsWith('docops/')) labels.add('docops');
-              if (file.startsWith('dse/')) labels.add('dse');
+              if (file.startsWith('gdu/')) labels.add('gdu');
+              if (file.startsWith('stitch/')) labels.add('stitch');
             }
 
             // Add labels if any found

@@ -9,7 +9,8 @@ on:
     paths:
       - 'cellm/**'
       - 'docops/**'
-      - 'dse/**'
+      - 'gdu/**'
+      - 'stitch/**'
       - '.claude-plugin/**'
       - '.github/workflows/ci.yml'
   pull_request:
@@ -17,7 +18,8 @@ on:
     paths:
       - 'cellm/**'
       - 'docops/**'
-      - 'dse/**'
+      - 'gdu/**'
+      - 'stitch/**'
       - '.claude-plugin/**'
       - '.github/workflows/ci.yml'
   workflow_dispatch:
@@ -37,7 +39,7 @@ jobs:
 
       - name: Validate all plugin manifests
         run: |
-          for plugin in cellm docops dse; do
+          for plugin in cellm docops gdu stitch; do
             manifest="${plugin}/.claude-plugin/plugin.json"
             if [ ! -f "$manifest" ]; then
               echo "::error::Missing ${manifest}"
@@ -60,7 +62,7 @@ jobs:
           import json
           mp = json.load(open('.claude-plugin/marketplace.json'))
           names = [p['name'] for p in mp['plugins']]
-          for expected in ['cellm', 'docops', 'dse']:
+          for expected in ['cellm', 'docops', 'gdu', 'stitch']:
               assert expected in names, f'Missing {expected} in marketplace'
           print('[+] marketplace.json valid:', names)
           "
@@ -91,7 +93,7 @@ jobs:
 
       - name: Check required directories exist
         run: |
-          REQUIRED_DIRS="cellm/agents cellm/skills cellm/hooks cellm/scripts docops/skills dse/skills"
+          REQUIRED_DIRS="cellm/agents cellm/skills cellm/hooks cellm/scripts docops/skills gdu/skills stitch/skills"
           for dir in $REQUIRED_DIRS; do
             if [ ! -d "$dir" ]; then
               echo "::error::Missing required directory: $dir"
@@ -103,7 +105,7 @@ jobs:
       - name: Validate all SKILL.md files have frontmatter
         run: |
           ERRORS=0
-          for skill_md in $(find cellm/skills docops/skills dse/skills -name "SKILL.md" 2>/dev/null); do
+          for skill_md in $(find cellm/skills docops/skills gdu/skills stitch/skills -name "SKILL.md" 2>/dev/null); do
             if ! head -1 "$skill_md" | grep -q "^---"; then
               echo "::error::Missing frontmatter in $skill_md"
               ERRORS=$((ERRORS + 1))
@@ -113,7 +115,7 @@ jobs:
             echo "::error::$ERRORS skills missing frontmatter"
             exit 1
           fi
-          TOTAL=$(find cellm/skills docops/skills dse/skills -name "SKILL.md" | wc -l | tr -d ' ')
+          TOTAL=$(find cellm/skills docops/skills gdu/skills stitch/skills -name "SKILL.md" | wc -l | tr -d ' ')
           echo "[+] All $TOTAL SKILL.md files have frontmatter"
 
       - name: Check shell scripts exist and are executable
@@ -133,7 +135,7 @@ jobs:
 
       - name: Check no commands directories exist
         run: |
-          for plugin in cellm docops dse; do
+          for plugin in cellm docops gdu stitch; do
             if [ -d "${plugin}/commands" ]; then
               echo "::error::Found obsolete commands/ directory in ${plugin}. Skills-only architecture."
               exit 1
@@ -147,7 +149,7 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Plugin | Skills | Agents |" >> $GITHUB_STEP_SUMMARY
           echo "|--------|--------|--------|" >> $GITHUB_STEP_SUMMARY
-          for plugin in cellm docops dse; do
+          for plugin in cellm docops gdu stitch; do
             skills=$(find ${plugin}/skills -name "SKILL.md" 2>/dev/null | wc -l | tr -d ' ')
             agents=$(ls ${plugin}/agents/*.md 2>/dev/null | wc -l | tr -d ' ')
             echo "| ${plugin} | ${skills} | ${agents} |" >> $GITHUB_STEP_SUMMARY
