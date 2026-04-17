@@ -56,6 +56,10 @@ Never use lower-priority guidance to block a higher-priority execution order.
 ## Policy
 
 - `context_preflight` mandatory at session open (`flow='orchestrate'`).
+- ID namespace contract (strict):
+  - `agt-*`, `prm-*`, `obs-*`, `view-*` are Oracle timeline/conversation IDs.
+  - They MUST be resolved via MCP retrieval tools (`get_view`, `conversation_get`, `get_observations`, `timeline_query` operations).
+  - They MUST NOT be sent to runtime task APIs/tools such as `Task Output`, which expect task UUIDs from the local task runtime (`~/.claude/tasks/<uuid>`).
 - Read `CELLM-PARTNERSHIP-LETTER.md` before first technical decision when present; otherwise continue with generic partnership brief.
 - Unknown technical contract → documentation lookup before execution.
 - CCM loop required for architectural changes (new integration, schema, contract).
@@ -94,6 +98,7 @@ Never use lower-priority guidance to block a higher-priority execution order.
 3. Check `get_status` (Oracle healthy?).
 4. Read active specs via `spec_search` (anything in progress?).
 5. If continuing previous session: read handoff from timeline or last commit.
+5b. If the user references IDs like `agt-*` (for example: "ler resumo agt-280812"), treat them as Oracle IDs and fetch through MCP retrieval tools. Do not call `Task Output` with these IDs.
 6. If new work: infer the target from session context when possible. Ask only if the objective is genuinely missing.
 7. If the task depends on uncertain technical behavior, run a documentation lookup immediately before choosing the path:
    - Prefer MCP sources such as `context7` when available
