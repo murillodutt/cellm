@@ -2,8 +2,10 @@
 # CELLM Oracle - Track Tool Use v2 (PostToolUse hook, async)
 # Captures tool usage for AI analysis.
 # Runs with "async": true — non-blocking, errors are non-visible.
-
-set -euo pipefail
+#
+# Important: do NOT use "set -e" here. Hook payloads can be malformed/truncated
+# (e.g. very large tool outputs), and this script must degrade silently.
+set -uo pipefail
 
 CELLM_DIR="${HOME}/.cellm"
 LOG_FILE="${CELLM_DIR}/oracle-hook.log"
@@ -16,16 +18,22 @@ source "$(dirname "${BASH_SOURCE[0]}")/_get-port.sh"
 source "$(dirname "${BASH_SOURCE[0]}")/_get-base-url.sh"
 
 input=""
-[[ ! -t 0 ]] && input=$(head -c 65536)
+[[ ! -t 0 ]] && input=$(cat || true)
 [[ -z "${input}" ]] && exit 0
 
 command -v jq &>/dev/null || exit 0
 
-session_id=$(echo "${input}" | jq -r '.session_id // "unknown"')
-tool_name=$(echo "${input}" | jq -r '.tool_name // "unknown"')
-tool_input=$(echo "${input}" | jq -c '.tool_input // {}')
-tool_response=$(echo "${input}" | jq -c '.tool_response // ""')
-cwd=$(echo "${input}" | jq -r '.cwd // ""')
+# Guard against malformed JSON payloads: skip instead of failing hook.
+if ! printf '%s' "${input}" | jq -e . >/dev/null 2>&1; then
+  log "Malformed hook payload (skipping)"
+  exit 0
+fi
+
+session_id=$(printf '%s' "${input}" | jq -r '.session_id // "unknown"' 2>/dev/null || echo "unknown")
+tool_name=$(printf '%s' "${input}" | jq -r '.tool_name // "unknown"' 2>/dev/null || echo "unknown")
+tool_input=$(printf '%s' "${input}" | jq -c '.tool_input // {}' 2>/dev/null || echo "{}")
+tool_response=$(printf '%s' "${input}" | jq -r '.tool_response // ""' 2>/dev/null || echo "")
+cwd=$(printf '%s' "${input}" | jq -r '.cwd // ""' 2>/dev/null || echo "")
 
 [[ "${session_id}" == "unknown" || "${session_id}" == "null" || -z "${session_id}" ]] && exit 0
 
