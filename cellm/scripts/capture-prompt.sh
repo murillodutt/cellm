@@ -20,7 +20,7 @@ source "$(dirname "${BASH_SOURCE[0]}")/_get-base-url.sh"
 
 input=""
 if [[ ! -t 0 ]]; then
-  input=$(head -c 65536 2>/dev/null) || input=""
+  input=$(cat 2>/dev/null) || input=""
 fi
 [[ -z "${input}" ]] && exit 0
 
@@ -39,9 +39,6 @@ prompt_content=$(echo "${input}" | jq -r '.prompt // ""')
 
 # Skip system messages
 [[ "${prompt_content}" == "<task-notification>"* || "${prompt_content}" == "<system-reminder>"* ]] && exit 0
-
-# Truncate long prompts
-[[ ${#prompt_content} -gt 10000 ]] && prompt_content="${prompt_content:0:10000}[truncated]"
 
 payload=$(jq -n \
   --arg sid "${session_id}" \
