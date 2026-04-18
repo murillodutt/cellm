@@ -1,7 +1,7 @@
 {
   "name": "docops",
   "description": "DocOps - Documentation maintenance workflows with LLM-first templates, code evidence, and drift control.",
-  "version": "0.36.48",
+  "version": "0.36.49",
   "author": {
     "name": "Murillo Dutt",
     "email": "contact@cellm.ai"
