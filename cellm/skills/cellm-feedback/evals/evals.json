@@ -1,0 +1,40 @@
+{
+  "skill_name": "cellm-feedback",
+  "evals": [
+    {
+      "id": 1,
+      "name": "proactive-mcp-schema-runtime-mismatch",
+      "prompt": "acabei de invocar knowledge_ops knowledge_add sem passar scope porque o schema JSONSchema mostra scope com anyOf/default sugerindo opcional, mas o runtime retornou \"Invalid input: scope: expected string, received undefined\". Já registrei os 5 atoms depois passando scope explicitamente, funcionou. isso ja aconteceu antes comigo no spec_search (query obrigatorio mesmo com filtro state). queria documentar para a equipe CELLM",
+      "expected_output": "Skill generates docs/evidence/<date>-cellm-feedback-<slug>.md with 1-2 findings (bug class schema-vs-runtime). Includes both knowledge_ops scope case and spec_search query case as cross-reference. Classification: bug/medium/harness. Channel: oracle-issue. Acceptance criteria listed. No atom registration for the bug itself (it's a bug, not a reusable pattern), but optionally cross-links to existing atoms.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "name": "proactive-mechanical-edit-loop-detection",
+      "prompt": "Preciso atualizar 27 referencias stale de docs/plans para docs/waves em 29 arquivos do projeto. Vou disparar 27 Edit tool calls em paralelo usando replace_all=false com old_string/new_string identicos exceto pelo path",
+      "expected_output": "Skill should intercept before execution: recognize mechanical-edit-loop anti-pattern, point to ANTI-MECHANICALEDIT-LOOP atom (ka_7591dbf8), recommend Bash sed script. If the edits already happened, skill generates feedback MD documenting the self-audit and registers/references the anti-pattern atom. Distinguishes between 'prevent before' and 'document after' modes based on tense.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "name": "explicit-deprecation-window-short",
+      "prompt": "vamos aprender com isto: toda chamada de context_preflight e get_status retorna deprecation field com sunsetDate 2026-05-15 (4 semanas). A skill Tilly e outras consumidoras ainda referenciam os nomes antigos. Nao existe sweep automatico. Quero mandar para a equipe CELLM como achado de governance",
+      "expected_output": "Skill generates MD with 1 finding: deprecation-without-consumer-sweep. Type: decision/governance. Severity: medium. Channel: plan + atom. Proposes cellm:migrate-deprecated inventory script. Acceptance: inventory of all deprecated tool usage in CELLM skills before 2026-05-15. Optionally registers atom for 'deprecation-migration-gap' pattern since it's reusable for future deprecations.",
+      "files": []
+    },
+    {
+      "id": 4,
+      "name": "near-miss-project-local-bug",
+      "prompt": "Encontrei um bug no nosso codigo: o campo cpf esta sendo serializado como numero em vez de string no endpoint /api/golden-record/ingest. Preciso corrigir",
+      "expected_output": "Skill should NOT trigger. This is a project-local bug in application code, not a CELLM plugin/harness/tool issue. The user needs code fix (cellm:asclepius or direct Edit), not CELLM feedback. Skill should either not activate, or if invoked explicitly, should redirect: 'This is a project-local bug; cellm-feedback is for CELLM plugin/harness/tool issues. Consider cellm:asclepius or direct fix.'",
+      "files": []
+    },
+    {
+      "id": 5,
+      "name": "near-miss-anthropic-api-latency-not-cellm",
+      "prompt": "minha sessão está super lenta hoje, cada tool call demora 15s. Acho que a skill Tilly tem um bug de performance que precisa ser reportado para a equipe CELLM",
+      "expected_output": "Skill should NOT trigger (or should redirect). Slow tool calls alone suggest external vendor/API latency, not CELLM behavior. Require cellm-specific evidence (hook output, plugin logs, reproducible path in CELLM code) before activating upstream feedback flow.",
+      "files": []
+    }
+  ]
+}
