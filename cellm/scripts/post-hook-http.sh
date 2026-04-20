@@ -73,7 +73,8 @@ if [[ "${qz_enabled}" == "true" ]]; then
 fi
 
 effective_cap=$(get_cli_context_cap_for_mode "${qz_mode}")
-ui_derived_cap=$(( qz_cap * 3 ))
+# Keep CLI context window tight: derive from UI cap with small headroom only.
+ui_derived_cap=$(( (qz_cap * 3 + 1) / 2 )) # ~1.5x
 effective_cap=$(min_int "${effective_cap}" "${ui_derived_cap}")
 
 quantize_if_needed() {

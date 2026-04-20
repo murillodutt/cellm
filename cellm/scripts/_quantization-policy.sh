@@ -7,6 +7,7 @@
 #   - get_ui_quantization_enabled <base_url>
 #   - get_ui_quantization_cap <base_url>
 #   - get_cli_context_cap_for_mode <mode>
+#   - get_cli_sessionstart_cap_for_mode <mode>
 #   - quantize_hook_context <text> <mode> <max_chars>
 #
 # This script is intentionally dependency-light. jq is optional.
@@ -135,9 +136,18 @@ get_ui_quantization_cap() {
 get_cli_context_cap_for_mode() {
   local mode="$1"
   case "${mode}" in
-    compact) printf '2200' ;;
-    comprehensive) printf '5200' ;;
-    *) printf '3600' ;; # standard
+    compact) printf '1200' ;;
+    comprehensive) printf '1800' ;;
+    *) printf '1500' ;; # standard
+  esac
+}
+
+get_cli_sessionstart_cap_for_mode() {
+  local mode="$1"
+  case "${mode}" in
+    compact) printf '7200' ;;
+    comprehensive) printf '10800' ;;
+    *) printf '9000' ;; # standard
   esac
 }
 
@@ -153,15 +163,64 @@ maybe_strip_filler() {
   printf '%s' "${text}"
 }
 
+collapse_blank_lines() {
+  awk '
+    BEGIN { blank = 0 }
+    {
+      if ($0 ~ /^[[:space:]]*$/) {
+        blank++
+        if (blank <= 2) print ""
+        next
+      }
+      blank = 0
+      print
+    }
+  '
+}
+
 quantize_hook_context() {
   local text="$1"
   local mode="$2"
   local max_chars="$3"
+  local must_keep="${4:-}"
   local processed cap cut
+  local script_dir py_tool
 
-  processed=$(printf '%s' "${text}" | sed -E -e 's/\r$//' -e 's/[ \t]+$//' -e ':a;N;$!ba;s/\n{3,}/\n\n/g')
+  script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+  py_tool="${script_dir}/cli-quantize.py"
+
+  # Preferred path: Caverman-style detect/compress/validate/fallback in Python helper.
+  if command -v python3 >/dev/null 2>&1 && [[ -f "${py_tool}" ]]; then
+    local py_out
+    local -a py_args
+    py_args=(--mode "${mode}" --max-chars "${max_chars}")
+    if [[ -n "${must_keep}" ]]; then
+      local -a keep_arr
+      local item
+      IFS='|' read -r -a keep_arr <<< "${must_keep}"
+      for item in "${keep_arr[@]}"; do
+        [[ -n "${item}" ]] && py_args+=(--must-keep "${item}")
+      done
+    fi
+
+    py_out="$(printf '%s' "${text}" | python3 "${py_tool}" "${py_args[@]}" 2>/dev/null || true)"
+    if [[ -n "${py_out}" ]]; then
+      printf '%s' "${py_out}"
+      return 0
+    fi
+  fi
+
+  processed=$(printf '%s\n' "${text}" | sed -E -e 's/\r$//' -e 's/[[:blank:]]+$//')
+  processed=$(printf '%s\n' "${processed}" | collapse_blank_lines)
   processed=$(maybe_strip_filler "${processed}")
-  processed=$(printf '%s' "${processed}" | sed -E -e 's/[ \t]{2,}/ /g' -e 's/[ ]+([,.;:!?])/\1/g')
+  processed=$(printf '%s' "${processed}" | sed -E -e 's/[[:blank:]]{2,}/ /g' -e 's/[ ]+([,.;:!?])/\1/g')
+  # Deduplicate exact repeated lines while preserving order.
+  processed=$(printf '%s\n' "${processed}" | awk '
+    BEGIN { RS="\n"; ORS="\n" }
+    /^[[:space:]]*$/ { print ""; next }
+    { if (!seen[$0]++) print $0 }
+  ')
+  processed=$(printf '%s\n' "${processed}" | collapse_blank_lines)
 
   if [[ ! "${max_chars}" =~ ^[0-9]+$ ]]; then
     max_chars=$(get_cli_context_cap_for_mode "${mode}")
@@ -174,6 +233,20 @@ quantize_hook_context() {
   fi
 
   cut="${processed:0:$((cap - 3))}"
+  # Prefer paragraph boundary when the tail fragment is short.
+  if [[ "${cut}" == *$'\n'* ]]; then
+    local tail="${cut##*$'\n'}"
+    if (( ${#tail} <= 120 )); then
+      cut="${cut%$'\n'*}"
+    fi
+  fi
+  # Prefer word boundary near the end.
+  if [[ "${cut}" == *" "* ]]; then
+    local last_word="${cut##* }"
+    if (( ${#last_word} <= 30 )); then
+      cut="${cut% *}"
+    fi
+  fi
   printf '%s...' "${cut}"
 }
 
@@ -184,23 +257,31 @@ build_cli_output_quantization_directive() {
       cat <<'EOF'
 [CELLM_QUANTIZATION_POLICY]
 Mode: compact
-Always respond with concise technical prose. Remove pleasantries and hedging.
-Keep factual precision and safety details intact.
+Style: caveman-full technical brevity.
+Remove pleasantries, hedging, repetition, and long transitions.
+Prefer fragments and direct action/result phrasing.
+Keep technical nouns, code tokens, error strings, and safety constraints intact.
+Target response size: <= 450 chars (or <= 120 tokens), unless safety/ambiguity requires more.
 EOF
       ;;
     comprehensive)
       cat <<'EOF'
 [CELLM_QUANTIZATION_POLICY]
 Mode: comprehensive
-Prefer concise technical prose with full clarity on risks and decisions.
-Avoid repetition and conversational filler.
+Style: low-compression technical prose.
+Be concise but fully explicit on risks, decisions, and acceptance criteria.
+Avoid conversational filler and duplication.
+Target response size: <= 1400 chars (or <= 360 tokens), unless safety/ambiguity requires more.
 EOF
       ;;
     *)
       cat <<'EOF'
 [CELLM_QUANTIZATION_POLICY]
 Mode: standard
-Respond concisely, technically precise, and avoid conversational filler.
+Style: balanced compression (lite).
+Use short sentences and direct technical wording; avoid filler and hedging.
+Keep key rationale and next-step clarity.
+Target response size: <= 900 chars (or <= 240 tokens), unless safety/ambiguity requires more.
 EOF
       ;;
   esac

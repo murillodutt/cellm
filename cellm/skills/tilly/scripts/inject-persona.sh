@@ -67,17 +67,23 @@ if declare -f get_base_url >/dev/null 2>&1 \
   && declare -f get_ui_quantization_enabled >/dev/null 2>&1 \
   && declare -f get_ui_quantization_mode >/dev/null 2>&1 \
   && declare -f get_ui_quantization_cap >/dev/null 2>&1 \
+  && declare -f get_cli_sessionstart_cap_for_mode >/dev/null 2>&1 \
   && declare -f quantize_hook_context >/dev/null 2>&1 \
   && declare -f build_cli_output_quantization_directive >/dev/null 2>&1; then
   base_url=$(get_base_url)
   qz_enabled=$(get_ui_quantization_enabled "${base_url}")
   if [[ "${qz_enabled}" == "true" ]]; then
     qz_mode=$(get_ui_quantization_mode "${base_url}")
+    session_cap=$(get_cli_sessionstart_cap_for_mode "${qz_mode}")
+    effective_session_cap="${session_cap}"
+
     qz_policy="$(build_cli_output_quantization_directive "${qz_mode}")"
 
     content="${content}
 ---
 ${qz_policy}"
+
+    content="$(quantize_hook_context "${content}" "${qz_mode}" "${effective_session_cap}" "Relational Frame|Signal Vocabulary|Startup Contract|partners and friends|Wikipedia|Do not reopen resolved branches")"
   fi
 fi
 
