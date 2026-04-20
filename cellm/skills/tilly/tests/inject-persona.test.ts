@@ -4,7 +4,7 @@
  * Validates: exit code, JSON validity, expected content, graceful skip paths.
  * Replaces bash+python3 test with pure Bun/TypeScript.
  *
- * Run: bun test cellm-plugin/cellm/skills/tilly/inject-persona.test.ts
+ * Run: bun test cellm-plugin/cellm/skills/tilly/tests/inject-persona.test.ts
  */
 import { describe, it, expect } from 'bun:test'
 import { spawnSync } from 'node:child_process'
@@ -14,9 +14,9 @@ import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
-const PLUGIN_ROOT = join(__dirname, '..', '..')
-const TILLY_DIR = __dirname
-const INJECT_SCRIPT = join(TILLY_DIR, 'inject-persona.sh')
+const PLUGIN_ROOT = join(__dirname, '..', '..', '..')
+const TILLY_DIR = join(__dirname, '..')
+const INJECT_SCRIPT = join(TILLY_DIR, 'scripts', 'inject-persona.sh')
 
 interface HookOutput {
   hookSpecificOutput: {

@@ -60,7 +60,7 @@ Never use lower-priority guidance to block a higher-priority execution order.
   - `agt-*`, `prm-*`, `obs-*`, `view-*` are Oracle timeline/conversation IDs.
   - They MUST be resolved via MCP retrieval tools (`get_view`, `conversation_get`, `get_observations`, `timeline_query` operations).
   - They MUST NOT be sent to runtime task APIs/tools such as `Task Output`, which expect task UUIDs from the local task runtime (`~/.claude/tasks/<uuid>`).
-- Read `CELLM-PARTNERSHIP-LETTER.md` before first technical decision when present; otherwise continue with generic partnership brief.
+- Read `docs/CELLM-PARTNERSHIP-LETTER.md` before first technical decision when present; otherwise continue with generic partnership brief.
 - Unknown technical contract → documentation lookup before execution.
 - CCM loop required for architectural changes (new integration, schema, contract).
 - CCM loop optional for mechanical fixes (1-2 files, clear root cause).
@@ -93,7 +93,7 @@ Never use lower-priority guidance to block a higher-priority execution order.
 
 ### Phase 0: Session Open
 
-1. If `CELLM-PARTNERSHIP-LETTER.md` exists, read it (relational context). If missing, continue with a generic relational warm-up and do not fail.
+1. If `docs/CELLM-PARTNERSHIP-LETTER.md` exists, read it (relational context). If missing, continue with a generic relational warm-up and do not fail.
 2. Run `context_preflight` with target paths + intent tags.
 3. Check `get_status` (Oracle healthy?).
 4. Read active specs via `spec_search` (anything in progress?).
@@ -185,7 +185,7 @@ Tilly resumes at Phase 4 only after `cellm:execute` completes.
 30. Write handoff: what was done, what comes next, what to read first.
 31. Verify no task left in_progress. Close block clean.
 
-## Signals (from skills/tilly/CELLM-PERSONA.md)
+## Signals (from skills/tilly/docs/CELLM-PERSONA.md)
 
 | Signal | Meaning |
 |--------|---------|
@@ -235,8 +235,8 @@ Every session that runs this skill exercises the bridge we built.
 - **Wave plans:** `docs/plans/WAVE-NN-*.md` (operational plans with locked decisions)
 - **Directive format:** `docs/technical/directive-format.md` (consumers[] contract for Wave 3)
 - **BACKLOG:** `docs/plans/SCE-IPP-DOCOPS-EVOLUTION-BACKLOG-draft.md` (hypothetical waves 3-5)
-- **Persona:** `skills/tilly/CELLM-PERSONA.md` (signals, heuristics, anti-patterns — co-located)
-- **Letter:** `skills/tilly/CELLM-PARTNERSHIP-LETTER.md` (relational context — co-located)
+- **Persona:** `skills/tilly/docs/CELLM-PERSONA.md` (signals, heuristics, anti-patterns)
+- **Letter:** `skills/tilly/docs/CELLM-PARTNERSHIP-LETTER.md` (relational context)
 
 ## Success Metrics
 

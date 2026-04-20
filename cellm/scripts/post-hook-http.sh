@@ -18,6 +18,7 @@ DEFAULT_PORT=31415
 
 source "$(dirname "${BASH_SOURCE[0]}")/_get-port.sh"
 source "$(dirname "${BASH_SOURCE[0]}")/_get-base-url.sh"
+source "$(dirname "${BASH_SOURCE[0]}")/_quantization-policy.sh"
 
 api_path="${1:-}"
 [[ -z "${api_path}" ]] && exit 0
@@ -61,9 +62,41 @@ response=$(curl -sf --max-time 3 --connect-timeout 1 \
 # Skip empty responses or Nitro's serialized empty string '""'
 [[ -z "${response}" || "${response}" == '""' || "${response}" == 'null' ]] && exit 0
 
+# UI-driven quantization policy (single source of truth).
+# Applies only to additionalContext payload delivered back to Claude CLI.
+qz_enabled=$(get_ui_quantization_enabled "${base_url}")
+qz_mode="standard"
+qz_cap="1200"
+if [[ "${qz_enabled}" == "true" ]]; then
+  qz_mode=$(get_ui_quantization_mode "${base_url}")
+  qz_cap=$(get_ui_quantization_cap "${base_url}")
+fi
+
+effective_cap=$(get_cli_context_cap_for_mode "${qz_mode}")
+ui_derived_cap=$(( qz_cap * 3 ))
+effective_cap=$(min_int "${effective_cap}" "${ui_derived_cap}")
+
+quantize_if_needed() {
+  local input_text="$1"
+  if [[ "${qz_enabled}" != "true" ]]; then
+    printf '%s' "${input_text}"
+    return 0
+  fi
+  quantize_hook_context "${input_text}" "${qz_mode}" "${effective_cap}"
+}
+
 # If endpoint already returns hookSpecificOutput JSON, pass through as-is.
 # Otherwise, wrap plain text in the hook envelope so Claude Code can parse it.
 if printf '%s' "${response}" | grep -q '"hookSpecificOutput"'; then
+  # If hookSpecificOutput has additionalContext and jq exists, quantize that field.
+  if command -v jq >/dev/null 2>&1; then
+    existing_ctx=$(printf '%s' "${response}" | jq -r '.hookSpecificOutput.additionalContext // empty' 2>/dev/null || true)
+    if [[ -n "${existing_ctx}" ]]; then
+      quantized_ctx=$(quantize_if_needed "${existing_ctx}")
+      response=$(printf '%s' "${response}" | jq --arg ctx "${quantized_ctx}" '.hookSpecificOutput.additionalContext = $ctx' 2>/dev/null || printf '%s' "${response}")
+    fi
+  fi
+
   # Inject hookEventName if missing and we know the event type
   if [[ -n "${hook_event}" ]] && ! printf '%s' "${response}" | grep -q '"hookEventName"'; then
     # Insert hookEventName as first key inside hookSpecificOutput
@@ -72,6 +105,7 @@ if printf '%s' "${response}" | grep -q '"hookSpecificOutput"'; then
     printf '%s\n' "${response}"
   fi
 else
+  response=$(quantize_if_needed "${response}")
   # Use jq for JSON-safe embedding of arbitrary strings (handles quotes, backslashes, control chars)
   if [[ -n "${hook_event}" ]]; then
     printf '%s' "${response}" | jq -Rc --arg event "${hook_event}" \
