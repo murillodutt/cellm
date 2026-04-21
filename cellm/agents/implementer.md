@@ -1,7 +1,9 @@
 ---
+name: implementer
 description: Senior Nuxt 4 developer for implementing features and writing code. Implements features, creates components, builds APIs, and fixes bugs following project patterns and specs.
 tools: Read, Grep, Glob, Edit, Write, Bash
 model: sonnet
+color: green
 skills:
   - vue
   - nuxt

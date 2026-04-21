@@ -28,6 +28,8 @@ quantization.
 - `/cellm:prose level <off|minimal|full>` -> troca nivel sem perder TTL
 - `/cellm:prose status` -> mostra estado sanitizado
 
+Implementacao operacional: `cellm-plugin/cellm/scripts/prose.sh`.
+
 ## Runtime Check (quantization-aware)
 
 Antes de comprimir entrada/saida:

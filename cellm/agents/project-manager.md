@@ -1,7 +1,9 @@
 ---
+name: project-manager
 description: Project manager for task orchestration and status tracking. Creates tasks from specs, orchestrates execution via implementer agent, tracks progress, and reports status with dependency-aware ordering.
 tools: Read, Grep, Glob, Write, Edit
 model: opus
+color: yellow
 ---
 
 # Project Manager

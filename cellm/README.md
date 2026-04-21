@@ -43,7 +43,7 @@ Two types of skills coexist in the flat `skills/` directory:
 
 A massive audit of this plugin revealed several structural gaps caused by assuming behavior instead of strictly following the official Claude Code extensibility documentation. When creating or modifying artifacts, **strictly adhere to these rules**:
 
-1. **Namespace Collisions (`name` field)**: NEVER include the `name` field in the frontmatter of plugin Skills or Agents. The namespace is exclusively derived from the file or directory name. Forcing it manually causes silent routing failures and shadow-prefixing.
+1. **Frontmatter Contract (`name` field)**: Follow Claude Code `plugin-dev` contract. Agents and Skills must declare explicit `name` in YAML frontmatter (kebab-case, stable identifier). Keep file/directory naming aligned with frontmatter to avoid routing drift.
 2. **Intent Clarity (`user-invocable`)**: EVERY Skill must explicitly declare its routing intention. If it acts as a slash command for the developer, it MUST have `user-invocable: true`. If it is a passive interceptor or contextual background knowledge, it MUST have `user-invocable: false`. Ambiguity breaks the CLI autocomplete and command router.
 3. **Boundary Setting (`## NEVER` blocks)**: LLMs require strict negative constraints to prevent hallucinations and proactive assumptions. Every Skill must end with a `## NEVER` block containing explicit anti-patterns. 
 4. **Hook Semantics**: Hooks operate in a strict state machine. Use `PreToolUse` ONLY for permission blocking or payload mutations (`continue: true/false`). Use `PostToolUse` for reactive feedback loops (e.g., reminders to read related files). You cannot use PreToolUse to send a "reminder" while simultaneously allowing the tool to execute.
