@@ -3,6 +3,8 @@
 #
 # Source this file after _get-base-url.sh and _get-port.sh.
 # Exposes:
+#   - get_ui_quantization_band <base_url>
+#   - get_ui_quantization_intensity <base_url>
 #   - get_ui_quantization_mode <base_url>
 #   - get_ui_quantization_enabled <base_url>
 #   - get_ui_quantization_cap <base_url>
@@ -15,6 +17,12 @@
 CELLM_DIR="${HOME}/.cellm"
 QZ_CACHE_FILE="${CELLM_DIR}/cache/ui-settings-qz.json"
 QZ_CACHE_TTL_SEC=10
+
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if [[ -f "${script_dir}/_prose-override.sh" ]]; then
+  # shellcheck disable=SC1091
+  source "${script_dir}/_prose-override.sh" || true
+fi
 
 ensure_qz_cache_dir() {
   mkdir -p "${CELLM_DIR}/cache" >/dev/null 2>&1 || true
@@ -87,6 +95,30 @@ normalize_qz_mode() {
   esac
 }
 
+normalize_qz_band() {
+  local raw
+  raw="$(printf '%s' "${1:-}" | tr '[:upper:]' '[:lower:]' | tr -d '[:space:]')"
+  case "${raw}" in
+    off|safe|balanced|aggressive) printf '%s' "${raw}" ;;
+    compact|feedback_first) printf 'aggressive' ;;
+    comprehensive) printf 'safe' ;;
+    *) printf 'balanced' ;;
+  esac
+}
+
+normalize_qz_intensity() {
+  local raw v
+  raw="${1:-55}"
+  if [[ ! "${raw}" =~ ^-?[0-9]+$ ]]; then
+    printf '55'
+    return 0
+  fi
+  v="${raw}"
+  (( v < 0 )) && v=0
+  (( v > 100 )) && v=100
+  printf '%s' "${v}"
+}
+
 normalize_qz_enabled() {
   local raw
   raw="$(printf '%s' "${1:-}" | tr '[:upper:]' '[:lower:]' | tr -d '[:space:]')"
@@ -111,24 +143,104 @@ normalize_qz_cap() {
 
 get_ui_quantization_mode() {
   local base_url="$1"
-  local json raw
+  local json raw band prose_band
   json=$(fetch_ui_settings_json "${base_url}")
+  band=$(extract_json_value "${json}" '.quantization.band // empty' '')
+  prose_band="balanced"
+  if declare -f prose_effective_quantization_band >/dev/null 2>&1; then
+    prose_band=$(prose_effective_quantization_band)
+  fi
+  if [[ "${prose_band}" == "off" ]]; then
+    printf 'standard'
+    return 0
+  fi
+  if [[ "${prose_band}" == "safe" ]]; then
+    printf 'comprehensive'
+    return 0
+  fi
+  if [[ -n "${band}" ]]; then
+    case "$(normalize_qz_band "${band}")" in
+      safe) printf 'comprehensive'; return 0 ;;
+      aggressive) printf 'compact'; return 0 ;;
+      *) printf 'standard'; return 0 ;;
+    esac
+  fi
   raw=$(extract_json_value "${json}" '.quantization.mode // empty' 'standard')
   normalize_qz_mode "${raw}"
 }
 
-get_ui_quantization_enabled() {
+get_ui_quantization_band() {
   local base_url="$1"
   local json raw
   json=$(fetch_ui_settings_json "${base_url}")
+  raw=$(extract_json_value "${json}" '.quantization.band // empty' '')
+  if [[ -n "${raw}" ]]; then
+    normalize_qz_band "${raw}"
+    return 0
+  fi
+  raw=$(extract_json_value "${json}" '.quantization.mode // empty' 'standard')
+  normalize_qz_band "${raw}"
+}
+
+get_ui_quantization_intensity() {
+  local base_url="$1"
+  local json raw
+  json=$(fetch_ui_settings_json "${base_url}")
+  raw=$(extract_json_value "${json}" '.quantization.intensity // 55' '55')
+  normalize_qz_intensity "${raw}"
+}
+
+get_ui_quantization_enabled() {
+  local base_url="$1"
+  local json raw band prose_band
+  json=$(fetch_ui_settings_json "${base_url}")
   raw=$(extract_json_value "${json}" '.quantization.enabled // false' 'false')
+  prose_band="balanced"
+  if declare -f prose_effective_quantization_band >/dev/null 2>&1; then
+    prose_band=$(prose_effective_quantization_band)
+  fi
+  if [[ "${prose_band}" == "off" ]]; then
+    printf 'false'
+    return 0
+  fi
+  band=$(extract_json_value "${json}" '.quantization.band // empty' '')
+  if [[ "$(normalize_qz_band "${band}")" == "off" ]]; then
+    printf 'false'
+    return 0
+  fi
   normalize_qz_enabled "${raw}"
 }
 
 get_ui_quantization_cap() {
   local base_url="$1"
-  local json raw
+  local json raw band intensity prose_band
   json=$(fetch_ui_settings_json "${base_url}")
+  band=$(normalize_qz_band "$(extract_json_value "${json}" '.quantization.band // empty' '')")
+  prose_band="balanced"
+  if declare -f prose_effective_quantization_band >/dev/null 2>&1; then
+    prose_band=$(prose_effective_quantization_band)
+    if [[ "${prose_band}" == "off" ]]; then
+      band="off"
+    elif [[ "${prose_band}" == "safe" ]]; then
+      band="safe"
+    fi
+  fi
+  intensity=$(normalize_qz_intensity "$(extract_json_value "${json}" '.quantization.intensity // 55' '55')")
+  if [[ "${band}" == "off" ]]; then
+    printf '10000'
+    return 0
+  fi
+  if [[ "${band}" == "safe" ]]; then
+    # maxCap - intensity * 33.95 (rounded) on [300..10000]
+    printf '%s' "$(( 10000 - (intensity * 3395 + 50) / 100 ))"
+    return 0
+  fi
+  if [[ "${band}" == "aggressive" ]]; then
+    # maxCap - (6305 + intensity*33.95) on [300..10000]
+    printf '%s' "$(( 10000 - 6305 - (intensity * 3395 + 50) / 100 ))"
+    return 0
+  fi
+
   raw=$(extract_json_value "${json}" '.quantization.maxNonFeedbackChars // 1200' '1200')
   normalize_qz_cap "${raw}"
 }

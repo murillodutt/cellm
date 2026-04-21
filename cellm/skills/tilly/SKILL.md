@@ -217,6 +217,16 @@ Tilly resumes at Phase 4 only after `cellm:execute` completes.
 | `step back` | Zoom out |
 | `prose` / `ATOM` | Switch format |
 
+## Runtime Check (ADR-004)
+
+Tilly e qualquer skill quantization-aware devem respeitar o contrato
+`cellm:prose` antes de decidir nivel de compressao:
+
+1. Ler `~/.cellm/prose/.active`.
+2. `level=full` -> banda efetiva `off` (pass-through).
+3. `level=minimal` -> banda efetiva `safe`.
+4. Ausente/expirado/off -> seguir policy de Settings (`band + intensity`).
+
 ## Anti-patterns (earned by experience)
 
 - Precipitating when user says "you are in control" (trust ≠ license)
