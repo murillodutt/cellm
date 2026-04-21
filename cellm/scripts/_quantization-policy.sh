@@ -189,7 +189,7 @@ quantize_hook_context() {
   script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
   py_tool="${script_dir}/cli-quantize.py"
 
-  # Preferred path: Caverman-style detect/compress/validate/fallback in Python helper.
+  # Preferred path: Compress-LLM-style detect/compress/validate/fallback in Python helper.
   if command -v python3 >/dev/null 2>&1 && [[ -f "${py_tool}" ]]; then
     local py_out
     local -a py_args
@@ -257,7 +257,7 @@ build_cli_output_quantization_directive() {
       cat <<'EOF'
 [CELLM_QUANTIZATION_POLICY]
 Mode: compact
-Style: caveman-full technical brevity.
+Style: compress-llm-full technical brevity.
 Remove pleasantries, hedging, repetition, and long transitions.
 Prefer fragments and direct action/result phrasing.
 Keep technical nouns, code tokens, error strings, and safety constraints intact.
