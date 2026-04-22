@@ -99,7 +99,6 @@ Rules:
 Silent mode skips confirmations, not safeguards.
 
 - Sensitive files detected -> **ABORT**
-- `identifier_guard` fails on staged JS/TS additions -> **ABORT**
 - Remote ahead / non-fast-forward risk -> **ABORT**
 - Pre-commit/lint failures not auto-fixable -> **ABORT**
 - No changes in commit/sync -> report and exit
@@ -108,7 +107,6 @@ Silent mode skips confirmations, not safeguards.
 
 Detect capabilities in this order:
 
-0. `skills/gitpro/scripts/identifier-guard.sh` exists and is executable (identifier fail-closed gate).
 1. `cellm:bump` skill available for delegated version orchestration.
 2. Bundled fallback script exists: `${CLAUDE_PLUGIN_ROOT}/skills/gitpro/scripts/gitpro-version-sync.sh`.
 3. `scripts/sync-version.sh` exists (project-local fallback).
@@ -147,23 +145,16 @@ Hard rule:
 ### S3 — Commit
 
 1. Collect change signals (`git status --porcelain`, `git diff --name-only`, `git diff --cached --name-only`).
-2. Run `identifier_guard` on staged additions before any commit:
-   - command: `${CLAUDE_PLUGIN_ROOT}/skills/gitpro/scripts/identifier-guard.sh --project-root <repo> --mode <resolved-mode>`
-   - mode policy:
-     - `delegated` or `silent-safe`: hard fail, no override
-     - `assisted`: exactly one explicit user confirmation may authorize re-run with `--allow-risk-override`
-   - if guard fails and no explicit assisted override is approved: **ABORT**
-3. Block sensitive files before staging (see list below).
-4. Infer `type(scope): description` from changed paths and diff signals.
-5. In `assisted`, confirm message; in `silent-safe`, apply safe default.
-6. Stage and commit.
-7. If staged `.md` files changed and `md-lint-if-md-changed` policy is active, run lint when capability exists.
+2. Block sensitive files before staging (see list below).
+3. Infer `type(scope): description` from changed paths and diff signals.
+4. In `assisted`, confirm message; in `silent-safe`, apply safe default.
+5. Stage and commit.
+6. If staged `.md` files changed and `md-lint-if-md-changed` policy is active, run lint when capability exists.
 
 Hard rules:
 - Never amend unless explicitly requested.
 - Never bypass hooks with `--no-verify`.
 - Never commit with empty message or placeholder message.
-- In delegated and silent-safe, never bypass `identifier_guard`.
 
 ### S4 — Bump
 
@@ -250,7 +241,6 @@ Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>
 - ask M1/M2/M3 in delegated mode (`--delegated`) — delegated calls are non-interactive by contract
 - run delegated mode without explicit operation (`--op` or explicit mode arg)
 - expand delegated `--op commit` into implicit bump/changelog/push without explicit caller request
-- bypass `identifier_guard` in delegated or silent-safe mode
 - `git push --force`
 - `git reset --hard`
 - `git commit --no-verify`

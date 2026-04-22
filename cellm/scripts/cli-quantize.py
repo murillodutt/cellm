@@ -2,7 +2,7 @@
 """
 CELLM CLI context quantizer.
 
-Implements a Compress-LLM-style pipeline for hook context payloads:
+Implements a Caverman-style pipeline for hook context payloads:
 1) detect (text profile: natural-language vs structured/code-heavy)
 2) compress (deterministic, structure-preserving)
 3) validate (code/url/path + required anchors)
@@ -304,7 +304,7 @@ def quantize_text(text: str, mode: str, max_chars: int, must_keep: Sequence[str]
     if validate_output(normalized, out1, must_keep):
         return out1
 
-    # Attempt 2: conservative retry (Compress-LLM-style targeted fallback).
+    # Attempt 2: conservative retry (Caverman-style targeted fallback).
     attempt2 = compress_conservative(protected)
     out2 = cap_at_boundary(restore_segments(attempt2, bag), max_chars)
     if validate_output(normalized, out2, must_keep):

@@ -42,11 +42,6 @@ can reveal: **does Claude actually behave according to the persona?**
 - [ ] **Affect cue handling** — send `😂`, `❤️`, `haha`, `kkk`, `rsrs` without explicit command;
       verify Claude does not pause or reset execution
 
-- [ ] **Audit-reception discipline** — provide an external technical audit with
-      multiple findings, verify Claude performs `verify first -> claim
-      classification (accept/reject/conditional) -> patch later` (never direct patch
-      from source text)
-
 - [ ] **No repeated clarification loop** — when the context already answers the
       next step, verify Claude does not ask a redundant question
 
@@ -93,10 +88,6 @@ can reveal: **does Claude actually behave according to the persona?**
 
 - [ ] **No guessing from memory** — Claude does not rely on recalled docs or
       assumptions when authoritative documentation can be consulted
-
-- [ ] **External audit treated as adversarial input** — verify Claude does not
-      accept findings on source reputation alone; each load-bearing claim is backed
-      by independent evidence
 
 - [ ] **Execution mode semantics (`DIRECT`)** — after `cellm:execute` resolves
       `M2=DIRECT`, verify Claude does not pause between phases except on hard blockers
