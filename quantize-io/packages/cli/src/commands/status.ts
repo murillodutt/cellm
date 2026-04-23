@@ -26,6 +26,27 @@ function readPresence(): Record<string, unknown> | null {
   }
 }
 
+function isPidAlive(pid: number): boolean {
+  try {
+    // signal 0 probes liveness without sending a real signal
+    process.kill(pid, 0);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function verifyDaemonLiveness(
+  presence: Record<string, unknown> | null,
+): { presence: Record<string, unknown> | null; alive: boolean } {
+  if (!presence) return { presence: null, alive: false };
+  const pid = typeof presence["pid"] === "number" ? (presence["pid"] as number) : null;
+  if (pid === null || !isPidAlive(pid)) {
+    return { presence: null, alive: false };
+  }
+  return { presence, alive: true };
+}
+
 export const statusCommand = defineCommand({
   meta: {
     name: "status",
@@ -40,11 +61,12 @@ export const statusCommand = defineCommand({
   },
   async run({ args }) {
     const mode = readFlag(FLAG_PATH, [...VALID_MODES]);
-    const presence = readPresence();
+    const { presence: livePresence, alive } = verifyDaemonLiveness(readPresence());
     const payload = {
       version: VERSION,
       mode: mode ?? "off",
-      daemon: presence,
+      daemon: livePresence,
+      daemon_alive: alive,
       paths: {
         root: QT_ROOT,
         flag: FLAG_PATH,
@@ -55,7 +77,7 @@ export const statusCommand = defineCommand({
       process.stdout.write(`${JSON.stringify(payload)}\n`);
     } else {
       process.stdout.write(
-        `qt ${VERSION}  mode=${payload.mode}  daemon=${presence ? "up" : "down"}\n`,
+        `qt ${VERSION}  mode=${payload.mode}  daemon=${alive ? "up" : "down"}\n`,
       );
     }
   },

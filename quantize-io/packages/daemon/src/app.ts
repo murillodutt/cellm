@@ -98,7 +98,23 @@ export function createDaemonApp(options: DaemonAppOptions = {}): DaemonHandle {
       };
       if (options.callClaude) compressOpts.callClaude = options.callClaude;
 
-      const result = await compressFile(compressOpts);
+      let result: Awaited<ReturnType<typeof compressFile>>;
+      try {
+        result = await compressFile(compressOpts);
+      } catch (err) {
+        // Surface operational errors (file missing, sensitive refusal, oversize)
+        // as structured 4xx JSON instead of 500 + stacktrace.
+        const message = err instanceof Error ? err.message : String(err);
+        const status =
+          /not found|too large|sensitive/i.test(message) ? 400 : 500;
+        setResponseStatus(event, status);
+        return {
+          ok: false,
+          mode,
+          path: parsed.data.path,
+          error: message,
+        };
+      }
       metrics.record({
         bytesIn: result.bytesIn,
         bytesOut: result.bytesOut,
