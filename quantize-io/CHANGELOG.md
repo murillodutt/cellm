@@ -1,9 +1,42 @@
 # Changelog — Quantize-IO
 
-All notable changes to the Quantize-IO monorepo are tracked in this file.
-Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). SemVer for every package in `packages/*`.
+All notable changes to Quantize-IO (QT) are tracked in this file.
+Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). SemVer aligned to the CELLM family cadence (`oracle/VERSION` is the single source of truth).
 
-## [0.1.0] — 2026-04-23
+## [0.36.66] — 2026-04-23
+
+Runtime consolidated inside CELLM Oracle; plugin directory now ships only host-consumable surfaces.
+
+### Changed
+
+- Runtime packages (`core`, `cli`, `daemon`, `hooks`, `adapter-cellm`) moved from
+  `cellm-plugin/quantize-io/packages/*` to `oracle/packages/quantize-io-*/`.
+- Build scripts moved to `oracle/scripts/quantize-{build-bundle,embed-rules,release}.ts`.
+- `cellm-plugin/quantize-io/` now contains only adapters (`adapter-claude-code`,
+  `adapter-codex`), bundled `hooks.js`, docs, README and CHANGELOG.
+- Version chain consolidated to `oracle/VERSION` (D6.1-D6.6).
+  `quantize-embed-rules.ts` emits `version.ts` consumed by core/cli/daemon.
+
+### Fixed
+
+- F1: `qt compress` wraps I/O in try/catch and emits structured JSON errors
+  instead of raw stacktraces.
+- F2: `qt daemon start` subcommand now exists (delegates to `@quantize-io/daemon`);
+  adapter hint consistent with real CLI surface.
+- F3: `AbortSignal` threaded through daemon `fetch` so timeouts actually abort.
+- F4: daemon→CLI fallback on transport failures (connectivity / timeout / 5xx / parse).
+  Functional 4xx responses are not retried. Both-fail path emits consolidated
+  `Primary: … Secondary: …` error without raw stacktrace.
+- F5: vitest globs scoped to `src/` and `test/`, excluding `dist/**` to prevent
+  duplicate test runs of compiled output.
+
+### Follow-ups (tracked for future releases)
+
+- `qt daemon stop` / `qt daemon status` subcommands.
+- Codex adapter zero-install bundle.
+- Daemon metrics persistence (currently in-memory).
+
+## [0.1.0] — 2026-04-23 (historical baseline)
 
 Initial release as the 5th plugin of the CELLM family. Reescrita TS/Bun/Nitro do upstream Python `compress-llm` com paridade linha-a-linha.
 

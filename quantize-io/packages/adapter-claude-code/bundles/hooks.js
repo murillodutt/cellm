@@ -543,10 +543,10 @@ function _getBuiltinFlags(long, short, userNames, userAliases) {
   return [`--${long}`, `-${short}`];
 }
 
-// packages/hooks/src/activate.ts
+// packages/quantize-io-hooks/src/activate.ts
 import { unlinkSync } from "fs";
 
-// packages/core/dist/detect.js
+// packages/quantize-io-core/dist/detect.js
 var COMPRESSIBLE_EXTENSIONS = new Set([
   ".md",
   ".txt",
@@ -600,7 +600,7 @@ var CONFIG_EXTS = new Set([
   ".cfg",
   ".env"
 ]);
-// packages/core/dist/sensitive.js
+// packages/quantize-io-core/dist/sensitive.js
 var SENSITIVE_PATH_COMPONENTS = new Set([
   ".ssh",
   ".aws",
@@ -608,7 +608,7 @@ var SENSITIVE_PATH_COMPONENTS = new Set([
   ".kube",
   ".docker"
 ]);
-// packages/core/dist/safe-io.js
+// packages/quantize-io-core/dist/safe-io.js
 import { constants, closeSync, fchmodSync, lstatSync, mkdirSync, openSync, readSync, renameSync, writeSync } from "fs";
 import { Buffer as Buffer2 } from "buffer";
 import { dirname, join } from "path";
@@ -683,7 +683,7 @@ function readFlag(flagPath, whitelist) {
     return null;
   }
 }
-// packages/core/dist/rules.embedded.js
+// packages/quantize-io-core/dist/rules.embedded.js
 var RULES_MD_RAW = `# quantize-io response-mode rules
 
 > Bundled with \`@quantize-io/core\`. Loaded by \`@quantize-io/hooks\` at SessionStart and reinforced per turn by UserPromptSubmit.
@@ -730,7 +730,7 @@ var RULES_MD_RAW = `# quantize-io response-mode rules
 Every turn, the active mode is rechecked from \`~/.quantize/active-mode\`. If the flag file is missing or holds an unknown value, mode is \`off\`.
 `;
 
-// packages/core/dist/rules.js
+// packages/quantize-io-core/dist/rules.js
 var VALID_MODES = [
   "off",
   "lite",
@@ -796,11 +796,11 @@ function filterRulesByMode(mode, raw = loadRawRules()) {
 `).trimEnd() + `
 `;
 }
-// packages/core/dist/cache.js
+// packages/quantize-io-core/dist/cache.js
 import { homedir } from "os";
 import { join as join2 } from "path";
 var DEFAULT_CACHE_ROOT = join2(homedir(), ".quantize", "cache");
-// packages/hooks/src/paths.ts
+// packages/quantize-io-hooks/src/paths.ts
 import { homedir as homedir2 } from "os";
 import { join as join3 } from "path";
 function quantizeRoot() {
@@ -810,7 +810,7 @@ function flagPath() {
   return join3(quantizeRoot(), "active-mode");
 }
 
-// packages/hooks/src/activate.ts
+// packages/quantize-io-hooks/src/activate.ts
 var INDEPENDENT_MODES = new Set(["commit", "review", "compress"]);
 function resolveDefaultMode() {
   const envValue = (process.env["QT_DEFAULT_MODE"] ?? "").toLowerCase();
@@ -839,7 +839,7 @@ ${filtered}`;
   return { mode, skipped: false, stdout };
 }
 
-// packages/hooks/src/track.ts
+// packages/quantize-io-hooks/src/track.ts
 import { unlinkSync as unlinkSync2 } from "fs";
 var INDEPENDENT_MODES2 = new Set(["commit", "review", "compress"]);
 var ACTIVATE_RE = /\b(activate|enable|turn on|start|talk like)\b.*\bquantize-io\b/i;
@@ -919,7 +919,7 @@ async function readStdin() {
   return buf;
 }
 
-// packages/hooks/src/statusline.ts
+// packages/quantize-io-hooks/src/statusline.ts
 var ORANGE = "\x1B[38;5;172m";
 var RESET = "\x1B[0m";
 function renderStatusline() {
@@ -931,7 +931,7 @@ function renderStatusline() {
   return `${ORANGE}[QT:${mode.toUpperCase()}]${RESET}`;
 }
 
-// packages/hooks/src/index.ts
+// packages/quantize-io-hooks/src/index.ts
 var activate = defineCommand({
   meta: { name: "activate", description: "SessionStart activation hook." },
   async run() {
