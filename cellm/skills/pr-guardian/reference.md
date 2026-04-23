@@ -169,7 +169,7 @@ Merge with: /cellm:pr-guardian merge
 
 | Symptom | Cause | Resolution |
 |---|---|---|
-| "No PR found for current branch" | Branch not pushed, or PR not yet opened | `gh pr create` first; or switch to the branch with an open PR |
+| "No PR found for current branch" | Scheduled PR is idle, branch not pushed, or PR not yet opened | If the user asked to open review/release, run `cellm:gitpro pr-open`; otherwise no action is required |
 | Criterion 1 stays UNKNOWN | CI path-filter didn't trigger workflows | Push a no-op file touching a filtered path, or adjust `.github/workflows/*.yml` `paths:` lists |
 | Criterion 2 stays UNKNOWN | GitHub still computing mergeability | Retry after ~30 seconds; `gh pr view` forces a refresh |
 | Criterion 4 never passes in dev | Doing many small pushes resets the window | `CELLM_PR_GUARDIAN_MIN_HOURS=1` for development machines |
@@ -182,9 +182,10 @@ Merge with: /cellm:pr-guardian merge
 |---|---|
 | Manual: `/cellm:pr-guardian check` | user-invocable, interactive |
 | `cellm:gitpro --op pr-merge --delegated` | orchestrator flow; Guardian runs fail-closed |
+| `cellm:gitpro pr-open` | user-requested scheduled PR creation |
 | `cellm:olympus` final certification | delegates merge after triad + tests green |
 | `cellm:arena` quality gate | delegates merge after stress/prove passes |
 | `cellm:convergir` close-out | delegates merge after e2e convergence |
 | Oracle Settings UI | User configures `pr.*` keys; UI shows live verdict per open PR |
 
-All callers receive the same READY/BLOCKED verdict and the same checklist output. Consistency is the contract.
+All callers receive the same READY/BLOCKED verdict and the same checklist output when a PR exists. With no open PR, check callers receive IDLE; merge callers remain BLOCKED. Consistency is the contract.

@@ -1,9 +1,9 @@
 ---
-description: "Universal Git operations for any project: semantic commit, safe push, sync pipeline, and optional bump/changelog integrations when available. Supports delegated execution mode for orchestrators (e.g., sk-git) with no interactive menus."
+description: "Universal Git operations for any project: semantic commit, safe push, sync pipeline, user-requested PR opening, and optional bump/changelog integrations when available. Supports delegated execution mode for orchestrators (e.g., sk-git) with no interactive menus."
 cellm_scope: universal
 user-invocable: true
-argument-hint: "[--silent] [--delegated] [--op commit|push|sync|bump|check|status] [commit|push|sync|bump [patch|minor|major|x.y.z]|check]"
-allowed-tools: Read, Grep, Glob, AskUserQuestion, Skill, Bash(git *), Bash(bash *), Bash(bun *), Bash(node *)
+argument-hint: "[--silent] [--delegated] [--op commit|push|sync|bump|check|status|pr-open] [commit|push|sync|bump [patch|minor|major|x.y.z]|check|pr-open]"
+allowed-tools: Read, Grep, Glob, AskUserQuestion, Skill, Bash(git *), Bash(gh *), Bash(bash *), Bash(bun *), Bash(node *)
 ---
 
 # gitpro — Universal Git Workflow
@@ -15,6 +15,7 @@ allowed-tools: Read, Grep, Glob, AskUserQuestion, Skill, Bash(git *), Bash(bash 
 - Standardize semantic commits across projects.
 - Push safely to the current branch (never hardcoded branch targets).
 - Run sync workflows with optional version/changelog integration.
+- Open pull requests only as an explicit user-requested action.
 - Keep silent mode safe by aborting on dangerous states.
 
 ## Modes
@@ -27,6 +28,7 @@ allowed-tools: Read, Grep, Glob, AskUserQuestion, Skill, Bash(git *), Bash(bash 
 | `sync` | Ordered pipeline: check -> optional bump -> commit -> push |
 | `bump [version]` | Prefer `cellm:bump` delegation; fallback to project scripts if available |
 | `check` | Dry-run capability and version/changelog sync checks |
+| `pr-open` | Create a pull request for the current branch only after explicit user request |
 
 ## Delegated Mode (for orchestrators)
 
@@ -35,7 +37,7 @@ orchestrator (example: `sk-git`).
 
 Flags:
 - `--delegated`: enable delegated contract
-- `--op <mode>`: explicit operation (`commit|push|sync|bump|check|status`)
+- `--op <mode>`: explicit operation (`commit|push|sync|bump|check|status|pr-open`)
 
 Delegated contract:
 - skip Navigation Gate menus (M1/M2/M3)
@@ -62,6 +64,7 @@ Select operation route:
 - `push`
 - `sync`
 - `bump`
+- `pr-open`
 - `abort`
 
 Rules:
@@ -185,6 +188,25 @@ Execute in order:
 3. S3 commit (if changes exist)
 4. S5 push
 
+### S7 — Pull Request Open
+
+`pr-open` is the scheduled PR path. It exists for review/release moments and
+must not be folded into routine commit, push, or sync.
+
+Required flow:
+1. Confirm the user explicitly requested PR creation in this turn.
+2. Confirm current branch is not the protected base branch.
+3. Confirm the branch is pushed and has an upstream.
+4. Confirm no open PR already exists for this branch.
+5. Create the PR with `gh pr create` using the repository PR template when present.
+6. Return PR number, URL, base branch, head branch, and whether it is draft/ready.
+
+Hard rules:
+- Never create a PR from `main` or the configured base branch.
+- Never create a PR in delegated or silent mode unless the delegating caller explicitly requests `--op pr-open`.
+- Never create, reopen, or keep a permanent PR as part of normal sync.
+- If an open PR already exists, report it and do not create another.
+
 ## Type Inference
 
 | Signal | Type |
@@ -248,3 +270,5 @@ Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>
 - `git rebase` without explicit user authorization
 - silent auto-pull or silent auto-rebase
 - auto-committing sensitive files
+- auto-creating pull requests during commit, push, or sync
+- maintaining a permanent/always-open pull request

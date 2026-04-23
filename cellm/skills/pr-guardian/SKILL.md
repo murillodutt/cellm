@@ -1,5 +1,5 @@
 ---
-description: "Defend the target branch (main) from premature merges. Evaluates 10-criterion readiness checklist and performs governed squash-merge only when PR is READY. Never closes PRs for inactivity — opposite of stale-bot semantics. Use when: 'pr-check', 'pr-merge', 'merge this PR safely', 'is PR ready', 'guard merge', or /sk-git delegates pr-merge."
+description: "Defend the target branch (main) from premature merges. Evaluates 10-criterion readiness checklist and performs governed squash-merge only when a user-requested PR is READY. Never creates or keeps permanent PRs. Use when: 'pr-check', 'pr-merge', 'merge this PR safely', 'is PR ready', 'guard merge', or /sk-git delegates pr-merge."
 cellm_scope: universal
 user-invocable: true
 disable-model-invocation: false
@@ -9,9 +9,9 @@ allowed-tools: Read, Bash(gh *), Bash(git *)
 
 # PR Guardian — Governed Pull Request Merge
 
-PR Guardian governs the transition from "PR open" to "PR merged" by enforcing a deterministic readiness checklist. It defends the target branch (typically `main`) from premature merges caused by impulse, unverified CI state, missing review, or active conflicts.
+PR Guardian governs the transition from "user-requested PR open" to "PR merged" by enforcing a deterministic readiness checklist. It defends the target branch (typically `main`) from premature merges caused by impulse, unverified CI state, missing review, or active conflicts.
 
-Explicit anti-stale-bot semantics: Guardian **never** closes PRs for inactivity. PRs stay open until quality and governance criteria are met.
+Explicit scheduled-PR semantics: Guardian **never** creates or keeps permanent PRs. PRs are opened only on user request, then stay open until quality and governance criteria are met or the user closes them.
 
 ## Modes
 
@@ -27,15 +27,16 @@ Detailed criteria, fail-closed rules, and troubleshooting: see [reference.md](re
 Before any evaluation:
 
 1. `gh auth status` succeeds — Guardian is operational.
-2. Current branch has an open PR against the default branch — resolve via `gh pr view --json number,baseRefName,isDraft,mergeable,mergeStateStatus`.
+2. Current branch has an open PR against the default branch, or the caller passes an explicit PR number.
 
-Missing capability → abort with actionable message. Never assume defaults to unblock merge.
+Missing GitHub capability → abort with actionable message. No open PR is an idle scheduled-PR state for `check`; for `merge`, it is always blocking.
 
 ## check flow
 
 1. Run capability detection.
-2. Evaluate 10 criteria in order (see reference.md). Collect verdict per criterion.
-3. Emit structured report:
+2. If no open PR is found for the current branch, report `VERDICT: IDLE` with guidance to open one only on user request.
+3. Evaluate 10 criteria in order (see reference.md). Collect verdict per criterion.
+4. Emit structured report:
 
    ```
    VERDICT: READY | BLOCKED
@@ -45,9 +46,9 @@ Missing capability → abort with actionable message. Never assume defaults to u
    [PASS|FAIL|UNKN] 10. No outstanding change requests
    ```
 
-4. Exit code 0 when READY, non-zero when BLOCKED.
+5. Exit code 0 when READY or IDLE, non-zero when BLOCKED.
 
-`check` is read-only. Never mutates PR or repository.
+`check` is read-only. Never mutates PR or repository, and never creates a PR.
 
 ## merge flow
 
@@ -79,7 +80,7 @@ Silent mode skips confirmations, not safeguards.
 - Capability missing → ABORT
 - Any criterion UNKNOWN → ABORT (read as FAIL)
 - `gh` network/API error → ABORT
-- No open PR for current branch → ABORT
+- No open PR for current branch → IDLE for `check`, ABORT for `merge`
 
 ## --delegated Contract (for orchestrators)
 
@@ -97,13 +98,15 @@ Callers: `sk-git`, `cellm:olympus` (certification), `cellm:arena` (quality gate)
 - merge when any required check is FAILURE, PENDING, or absent
 - merge with conflicts (`mergeStateStatus != CLEAN`)
 - merge below `minOpenHours` without explicit override
+- create a PR; use `cellm:gitpro pr-open` only when the user asks to open one
 - modify GitHub branch protection settings from Guardian
+- keep a permanent/always-open PR for monitoring
 - close a PR for inactivity — Guardian never closes PRs; it only governs merges
 - short-circuit the 10-criteria evaluation; always complete all 10 for the full picture
 - push or rebase; Guardian only reads state and calls `gh pr merge`
 
 ## Related
 
-- `cellm:gitpro` — universal git operations (commit, push, sync, bump). Guardian is invoked by `gitpro --op pr-merge` in delegated mode.
+- `cellm:gitpro` — universal git operations (commit, push, sync, bump, pr-open). Guardian is invoked by `gitpro --op pr-merge` in delegated mode.
 - `cellm:olympus`, `cellm:arena`, `cellm:convergir` — quality orchestrators that delegate to Guardian for final merge.
 - Oracle Settings UI — "PR Guardian" section mirrors the ENV keys above to the SettingsManager.
