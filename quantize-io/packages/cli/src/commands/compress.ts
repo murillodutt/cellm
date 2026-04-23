@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 
 import { defineCommand } from "citty";
 
-import { compressFile, isValidMode } from "@quantize-io/core";
+import { compressFile, createFsCache, isValidMode } from "@quantize-io/core";
 
 export const compressCommand = defineCommand({
   meta: {
@@ -39,9 +39,12 @@ export const compressCommand = defineCommand({
 
     const before = readFileSync(args.path);
     const hash = createHash("sha256").update(before).digest("hex");
+    // Use fs-backed cache so repeated CLI invocations can hit the same cache.
+    // Memory cache is local to the process and resets on every spawn.
     const result = await compressFile({
       filepath: args.path,
       mode: args.mode,
+      cache: createFsCache(),
     });
 
     const savedPct =
