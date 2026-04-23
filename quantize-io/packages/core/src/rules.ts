@@ -1,6 +1,4 @@
-import { existsSync, readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
+import { RULES_MD_RAW } from "./rules.embedded.js";
 
 export type Mode =
   | "off"
@@ -33,20 +31,13 @@ export function isValidMode(value: string): value is Mode {
   return (VALID_MODES as readonly string[]).includes(value);
 }
 
-const HERE = dirname(fileURLToPath(import.meta.url));
-
-function findRulesPath(): string {
-  // After build: dist/rules.md (copied by build pipeline). In source execution
-  // (bun/tsx/vitest without build): fall back to src/rules.md one level up.
-  const local = join(HERE, "rules.md");
-  if (existsSync(local)) return local;
-  const sibling = join(HERE, "..", "src", "rules.md");
-  if (existsSync(sibling)) return sibling;
-  return local;
-}
-
+/**
+ * Returns the bundled rules.md content. The body is embedded at build time via
+ * scripts/embed-rules.ts so consumers (including bundled hooks) never need to
+ * read from disk. Edit src/rules.md and regenerate via `bun scripts/embed-rules.ts`.
+ */
 export function loadRawRules(): string {
-  return readFileSync(findRulesPath(), "utf8");
+  return RULES_MD_RAW;
 }
 
 /**

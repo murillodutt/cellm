@@ -1,7 +1,7 @@
 {
   "name": "@quantize-io/cli",
-  "version": "0.1.0",
-  "description": "qt CLI — compress, benchmark, status, mode, rules, daemon, uninstall.",
+  "version": "0.36.66",
+  "description": "qt CLI \u2014 compress, benchmark, status, mode, rules, daemon, uninstall.",
   "license": "MIT",
   "type": "module",
   "bin": {

@@ -115,15 +115,3 @@ export async function readStdin(): Promise<string> {
   return buf;
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
-  (async () => {
-    try {
-      const raw = await readStdin();
-      const data = JSON.parse(raw) as { prompt?: string };
-      const result = runTrack({ prompt: data.prompt ?? "" });
-      if (result.stdout) process.stdout.write(result.stdout);
-    } catch {
-      /* silent fail — never block the host turn */
-    }
-  })();
-}

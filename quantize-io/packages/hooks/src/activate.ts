@@ -49,9 +49,4 @@ export function runActivate(opts: { mode?: Mode } = {}): ActivateResult {
   return { mode, skipped: false, stdout };
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
-  const result = runActivate();
-  process.stdout.write(result.stdout);
-}
-
 export { VALID_MODES };

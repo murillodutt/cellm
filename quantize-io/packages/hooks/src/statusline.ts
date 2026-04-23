@@ -12,7 +12,3 @@ export function renderStatusline(): string {
   return `${ORANGE}[QT:${mode.toUpperCase()}]${RESET}`;
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
-  const out = renderStatusline();
-  if (out) process.stdout.write(out);
-}
