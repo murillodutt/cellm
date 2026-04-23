@@ -10,15 +10,20 @@
 
 ## Claude Code
 
-```bash
-claude plugin install @quantize-io/adapter-claude-code
-```
+The QT plugin ships through the CELLM marketplace. The marketplace entry
+resolves to `./quantize-io` (the plugin root), whose `.claude-plugin/plugin.json`
+registers `SessionStart`, `UserPromptSubmit`, and the `statusLine` command
+pointing to the bundled `packages/adapter-claude-code/bundles/hooks.js`.
 
-This registers `SessionStart`, `UserPromptSubmit`, and the `statusLine` command. No further configuration is needed.
+No direct `claude plugin install @quantize-io/adapter-claude-code` is required;
+enable `quantize-io@cellm` via the Claude Code plugin UI or add it to
+`~/.claude/settings.json` under `enabledPlugins`.
 
 ## Codex
 
-Install `@quantize-io/adapter-codex` through your Codex plugin manager, then reload Codex.
+The Codex adapter is still shipped independently under
+`packages/adapter-codex/`. Install via your Codex plugin manager and reload.
+Zero-install Codex bundle is tracked as a follow-up (SPEC §12).
 
 ## CLI (standalone)
 

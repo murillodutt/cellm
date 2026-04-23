@@ -8,16 +8,23 @@ This directory ships only what Claude Code and Codex consume at session time:
 
 ```
 cellm-plugin/quantize-io/
+  .claude-plugin/
+    plugin.json            # root manifest consumed by Claude Code (marketplace source)
   README.md
   CHANGELOG.md
+  docs/                    # user-facing install/cli/hooks/daemon/adapter docs
   packages/
-    adapter-claude-code/     # .claude-plugin manifest + bundles/hooks.js (zero-install)
-    adapter-codex/           # .codex-plugin manifest
+    adapter-claude-code/   # internal adapter with bundles/hooks.js (zero-install runtime)
+      .claude-plugin/
+        plugin.json        # inner manifest for advanced adapter-only installs
+    adapter-codex/         # .codex-plugin manifest (multi-host support)
 ```
 
 No TypeScript source, no `package.json`, no `node_modules`, no `bun.lock`.
-The marketplace entry points to `./quantize-io/packages/adapter-claude-code`
-and that subpath is the full footprint host users install.
+The marketplace entry points to `./quantize-io` (the plugin root) and the root
+`.claude-plugin/plugin.json` declares hooks that reference the bundled
+`packages/adapter-claude-code/bundles/hooks.js`. Multi-adapter internal layout
+stays intact: Codex adapter remains at `packages/adapter-codex/`.
 
 ## Runtime location
 
