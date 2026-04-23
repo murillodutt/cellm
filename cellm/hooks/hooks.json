@@ -12,7 +12,7 @@
           },
           {
             "type": "command",
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/session-aggregator.js\"",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/session-aggregator.cjs\"",
             "timeout": 4
           },
           {
@@ -34,7 +34,7 @@
           },
           {
             "type": "command",
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/submit-aggregator.js\"",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/submit-aggregator.cjs\"",
             "timeout": 3
           }
         ]
