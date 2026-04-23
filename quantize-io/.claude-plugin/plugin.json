@@ -1,0 +1,37 @@
+{
+  "name": "quantize-io",
+  "description": "Quantize-IO (QT) — Token I/O quantization for LLM hosts. 5th CELLM family plugin. Independent runtime (HTTP/CLI discovery only).",
+  "version": "0.36.67",
+  "author": {
+    "name": "Murillo Dutt",
+    "email": "contact@cellm.ai"
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun \"${CLAUDE_PLUGIN_ROOT}/packages/adapter-claude-code/bundles/hooks.js\" activate",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun \"${CLAUDE_PLUGIN_ROOT}/packages/adapter-claude-code/bundles/hooks.js\" track",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "bun \"${CLAUDE_PLUGIN_ROOT}/packages/adapter-claude-code/bundles/hooks.js\" statusline"
+  }
+}

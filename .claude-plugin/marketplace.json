@@ -36,7 +36,7 @@
     {
       "name": "quantize-io",
       "version": "0.36.67",
-      "source": "./quantize-io/packages/adapter-claude-code",
+      "source": "./quantize-io",
       "description": "Quantize-IO (QT): Token I/O quantization plugin. Standalone runtime with opt-in discovery of the CELLM family via HTTP/CLI."
     }
   ]
