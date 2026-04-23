@@ -12,13 +12,8 @@
           },
           {
             "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/post-hook-http.sh /api/hooks/init",
-            "timeout": 5
-          },
-          {
-            "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/post-hook-http.sh /api/hooks/context",
-            "timeout": 8
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/session-aggregator.js\"",
+            "timeout": 4
           },
           {
             "type": "command",
@@ -39,17 +34,7 @@
           },
           {
             "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/post-hook-http.sh /api/hooks/tilly-execution-profile",
-            "timeout": 2
-          },
-          {
-            "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/post-hook-http.sh /api/knowledge/inject",
-            "timeout": 3
-          },
-          {
-            "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/post-hook-http.sh /api/hooks/specs",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/submit-aggregator.js\"",
             "timeout": 3
           }
         ]
