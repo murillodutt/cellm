@@ -7,6 +7,10 @@
 //
 // Budget: 3500ms total, 1800ms per call. Never blocks Claude Code.
 // Runtime: bun >=1.2.
+//
+// Hardened for spec-49cc4b66 (2026-04-23):
+//   G1 partial-failure isolation — emit surviving contexts + [HOOK-WARN] marker
+//   G3 stdin capacity — 256KB cap + 1500ms deadline + visible truncation warning
 
 import { readFileSync } from 'node:fs'
 import { homedir } from 'node:os'
@@ -14,6 +18,8 @@ import { join } from 'node:path'
 
 const PER_CALL_TIMEOUT_MS = 1800
 const HOOK_BUDGET_MS = 3500
+const STDIN_BYTE_LIMIT = 256 * 1024
+const STDIN_DEADLINE_MS = 1500
 const WORKER_JSON = join(homedir(), '.cellm', 'worker.json')
 const DEFAULT_PORT = 31415
 const DEFAULT_HOST = '127.0.0.1'
@@ -23,6 +29,11 @@ const ENDPOINTS = [
   '/api/hooks/context',
   // inject-persona.sh is a local filesystem op; kept as separate shell hook.
 ]
+
+interface StdinRead {
+  payload: string
+  truncated: boolean
+}
 
 function resolveBaseUrl(): string {
   const envUrl = process.env.CELLM_WORKER_URL
@@ -35,26 +46,35 @@ function resolveBaseUrl(): string {
   }
 }
 
-async function readStdin(): Promise<string> {
-  if (process.stdin.isTTY) return ''
+async function readStdin(): Promise<StdinRead> {
+  if (process.stdin.isTTY) return { payload: '', truncated: false }
   let buf = ''
   let size = 0
-  const limit = 65_536
-  const deadline = new Promise<string>((resolve) => setTimeout(() => resolve(buf), 500))
+  let truncated = false
 
   const reader = (async () => {
     for await (const chunk of process.stdin) {
-      size += (chunk as Buffer).length
-      if (size > limit) break
-      buf += (chunk as Buffer).toString('utf8')
+      const next = chunk as Buffer
+      size += next.length
+      if (size > STDIN_BYTE_LIMIT) {
+        truncated = true
+        break
+      }
+      buf += next.toString('utf8')
     }
-    return buf
   })()
 
-  return Promise.race([reader, deadline])
+  const deadline = new Promise<void>((resolve) => setTimeout(resolve, STDIN_DEADLINE_MS))
+  await Promise.race([reader, deadline])
+  return { payload: buf, truncated }
 }
 
-async function postJson(baseUrl: string, apiPath: string, body: string, timeoutMs: number): Promise<string | null> {
+interface EndpointResult {
+  status: 'ok' | 'failure'
+  body: string | null
+}
+
+async function postJson(baseUrl: string, apiPath: string, body: string, timeoutMs: number): Promise<EndpointResult> {
   try {
     const res = await fetch(baseUrl + apiPath, {
       method: 'POST',
@@ -62,11 +82,12 @@ async function postJson(baseUrl: string, apiPath: string, body: string, timeoutM
       body,
       signal: AbortSignal.timeout(timeoutMs),
     })
-    if (!res.ok) return null
+    if (!res.ok) return { status: 'failure', body: null }
     const text = await res.text()
-    return text.length > 200_000 ? null : text
+    if (text.length > 200_000) return { status: 'failure', body: null }
+    return { status: 'ok', body: text }
   } catch {
-    return null
+    return { status: 'failure', body: null }
   }
 }
 
@@ -95,8 +116,8 @@ async function main(): Promise<void> {
   }, HOOK_BUDGET_MS)
 
   try {
-    const input = await readStdin()
-    const payload = input || '{}'
+    const stdin = await readStdin()
+    const payload = stdin.payload || '{}'
     const baseUrl = resolveBaseUrl()
 
     const results = await Promise.allSettled(
@@ -104,11 +125,28 @@ async function main(): Promise<void> {
     )
 
     const contexts: string[] = []
+    let failures = 0
     for (const r of results) {
-      if (r.status === 'fulfilled' && r.value) {
-        const ctx = extractContext(r.value)
-        if (ctx) contexts.push(ctx)
+      if (r.status !== 'fulfilled') {
+        failures += 1
+        continue
       }
+      if (r.value.status === 'failure') {
+        failures += 1
+        continue
+      }
+      const ctx = extractContext(r.value.body)
+      if (ctx) contexts.push(ctx)
+    }
+
+    if (stdin.truncated) {
+      contexts.unshift(
+        `[HOOK-WARN] prompt truncated at ${STDIN_BYTE_LIMIT} bytes — downstream hook search may miss later content`,
+      )
+    }
+
+    if (failures > 0 && failures < ENDPOINTS.length) {
+      contexts.push(`[HOOK-WARN] ${failures}/${ENDPOINTS.length} context endpoint(s) failed this turn`)
     }
 
     clearTimeout(budgetTimer)

@@ -1,0 +1,10 @@
+{
+  "name": "@quantize-io/adapter-codex",
+  "version": "0.1.0",
+  "description": "Codex plugin manifest for Quantize-IO.",
+  "license": "MIT",
+  "files": [
+    ".codex-plugin",
+    "README.md"
+  ]
+}

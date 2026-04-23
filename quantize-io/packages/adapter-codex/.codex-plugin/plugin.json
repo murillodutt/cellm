@@ -1,0 +1,18 @@
+{
+  "name": "quantize-io",
+  "description": "Quantize-IO (QT) — Token I/O quantization for Codex. Standalone runtime; optional local daemon.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Murillo Dutt",
+    "email": "contact@cellm.ai"
+  },
+  "hooks": {
+    "SessionStart": [
+      { "type": "command", "command": "bunx @quantize-io/hooks activate", "timeout": 5 }
+    ],
+    "UserPromptSubmit": [
+      { "type": "command", "command": "bunx @quantize-io/hooks track", "timeout": 5 }
+    ]
+  },
+  "skills": []
+}

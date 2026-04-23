@@ -1,0 +1,21 @@
+{
+  "name": "@quantize-io/hooks",
+  "version": "0.1.0",
+  "description": "SessionStart + UserPromptSubmit + statusline hooks for Claude Code / Codex.",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "@quantize-io/hooks": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc --build tsconfig.json",
+    "typecheck": "tsc --build tsconfig.json"
+  },
+  "dependencies": {
+    "@quantize-io/core": "workspace:*",
+    "citty": "0.2.2"
+  },
+  "devDependencies": {
+    "typescript": "6.0.2"
+  }
+}

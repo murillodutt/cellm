@@ -1,0 +1,10 @@
+{
+  "name": "@quantize-io/adapter-claude-code",
+  "version": "0.1.0",
+  "description": "Claude Code plugin manifest for Quantize-IO.",
+  "license": "MIT",
+  "files": [
+    ".claude-plugin",
+    "README.md"
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "name": "@quantize-io/core",
+  "version": "0.1.0",
+  "description": "Core primitives for Quantize-IO: detect, validate, compress, cache, rules, safe-io.",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc --project tsconfig.build.json && bun run copy:assets",
+    "copy:assets": "bun -e \"await Bun.write('dist/rules.md', await Bun.file('src/rules.md').text())\"",
+    "typecheck": "tsc --build tsconfig.json && bun run copy:assets && tsc --noEmit -p tsconfig.test.json",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "0.90.0",
+    "gpt-tokenizer": "3.4.0",
+    "unstorage": "1.17.5"
+  },
+  "devDependencies": {
+    "typescript": "6.0.2",
+    "vitest": "4.1.4"
+  },
+  "engines": {
+    "bun": ">=1.2.0",
+    "node": ">=20"
+  }
+}

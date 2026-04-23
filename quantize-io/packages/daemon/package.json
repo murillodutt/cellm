@@ -1,0 +1,20 @@
+{
+  "name": "@quantize-io/daemon",
+  "version": "0.1.0",
+  "description": "Opt-in Nitro daemon for Quantize-IO: /compress /health /rules /metrics.",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "build": "tsc --build tsconfig.json",
+    "typecheck": "tsc --build tsconfig.json"
+  },
+  "dependencies": {
+    "@quantize-io/core": "workspace:*",
+    "citty": "0.2.2",
+    "h3": "1.15.9",
+    "zod": "4.3.6"
+  },
+  "devDependencies": {
+    "typescript": "6.0.2"
+  }
+}
