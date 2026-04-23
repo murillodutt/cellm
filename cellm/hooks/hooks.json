@@ -85,6 +85,16 @@
             "timeout": 2
           }
         ]
+      },
+      {
+        "matcher": "Bash|Agent",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/worktree-gate.sh",
+            "timeout": 3
+          }
+        ]
       }
     ],
     "PostToolUse": [
