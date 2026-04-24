@@ -50,8 +50,9 @@ Auto-discover from project root:
 | Target | Detection | Sync Method |
 |--------|-----------|-------------|
 | `VERSION` | File exists at root | Write plain text |
+| `oracle/VERSION` | File exists | Write the same plain text version as root `VERSION`; required because QT runtime release gates read this file directly. |
 | `package.json` (root) | Always exists | JSON: update `version` field |
-| `**/package.json` (workspaces + siblings) | First: read root `package.json` -> check `workspaces` array -> Glob each pattern. Second: if no workspaces field, Glob `*/package.json` (direct subdirectories only, exclude node_modules) to find sibling packages like `oracle/package.json` | JSON: update `version` field |
+| `**/package.json` (workspaces + siblings) | First: read root `package.json` -> check `workspaces` array -> Glob each pattern. Second: if no workspaces field, Glob `*/package.json` (direct subdirectories only, exclude node_modules) to find sibling packages like `oracle/package.json`. Also include nested Oracle workspace packages matching `oracle/packages/*/package.json`, including `oracle/packages/quantize-io-*`. | JSON: update `version` field |
 | `**/.claude-plugin/plugin.json` | Glob (exclude node_modules) | JSON: update `version` field |
 | `**/.claude-plugin/marketplace.json` | Glob | JSON: Read file, parse JSON, iterate `plugins[]` array, update each entry's `version` field individually, write back. Do NOT use replace_all — entries may have different versions for independent sub-plugins. |
 | `VERSION.md` | File exists at root | Regex: `**Current Version**: X.Y.Z` |
@@ -98,9 +99,13 @@ Bash: python3 -c "..." that reads all targets, applies version, reports results
 ```
 This avoids N sequential Edit tool calls (12+ calls vs 1). The python script should:
 - Write VERSION first (abort if fails)
+- Write `oracle/VERSION` immediately after root `VERSION` when present
 - JSON parse/write for package.json and plugin.json files
 - JSON parse + iterate plugins[] for marketplace.json (never string replace)
 - Regex replace for markdown and custom targets
+- If `oracle/scripts/quantize-embed-rules.ts` exists, run it after writing version
+  targets so generated QT constants (`quantize-io-core/src/version.ts`) match
+  `oracle/VERSION`.
 - Print report with updated/failed targets
 
 **Fallback: individual Edit tool calls** (when Bash is not available or not permitted):
@@ -109,15 +114,18 @@ Write targets in this order:
 
 1. **VERSION** (source of truth) — if this fails, **ABORT everything**
    - If VERSION file does NOT exist: **do NOT create it**. Use `package.json` as source of truth instead. Write package.json first and treat it as the abort-on-fail target.
-2. **package.json** files — if fail, report and continue
-3. **plugin.json** + **marketplace.json** — if fail, report and continue
-4. **Markdown** (VERSION.md, CLAUDE.md) — if fail, report and continue
-5. **Custom targets** (from config) — if fail, report and continue
+2. **oracle/VERSION** — if present and this fails, **ABORT everything** because QT release gates use it as their source of truth.
+3. **package.json** files — if fail, report and continue
+4. **plugin.json** + **marketplace.json** — if fail, report and continue
+5. **Markdown** (VERSION.md, CLAUDE.md) — if fail, report and continue
+6. **Generated QT constants** — run `cd oracle && bun run scripts/quantize-embed-rules.ts` when available
+7. **Custom targets** (from config) — if fail, report and continue
 
 ### 6. Self-validation
 
 After all writes, verify sync is complete:
 - If `scripts/sync-version.sh` exists in the project: run `bash scripts/sync-version.sh --check-only`
+- If `oracle/scripts/quantize-release.ts` exists in the project: run `cd oracle && bun run scripts/quantize-release.ts --audit-only`
 - If not: re-read VERSION and at least 2 other targets, confirm version string matches
 - If validation fails: report which targets are out of sync before the summary
 
