@@ -1,6 +1,6 @@
 {
   "name": "@quantize-io/adapter-claude-code",
-  "version": "0.36.70",
+  "version": "0.36.66",
   "description": "Claude Code plugin manifest for Quantize-IO.",
   "license": "MIT",
   "scripts": {

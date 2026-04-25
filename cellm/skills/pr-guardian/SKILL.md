@@ -1,5 +1,5 @@
 ---
-description: "Defend the target branch (main) from premature merges. Evaluates 10-criterion readiness checklist and performs governed squash-merge only when a user-requested PR is READY. Never creates or keeps permanent PRs. Use when: 'pr-check', 'pr-merge', 'merge this PR safely', 'is PR ready', 'guard merge', or /sk-git delegates pr-merge."
+description: "Govern explicit weekly Super PRs or maintainer-requested PR merges. Evaluates a 10-criterion readiness checklist and performs governed merge only when a user-requested PR is READY. Never creates or keeps permanent PRs. Use when: 'pr-check', 'pr-merge', 'merge this PR safely', 'is PR ready', 'guard merge', or /sk-git delegates pr-merge."
 cellm_scope: universal
 user-invocable: true
 disable-model-invocation: false
@@ -9,9 +9,15 @@ allowed-tools: Read, Bash(gh *), Bash(git *)
 
 # PR Guardian — Governed Pull Request Merge
 
-PR Guardian governs the transition from "user-requested PR open" to "PR merged" by enforcing a deterministic readiness checklist. It defends the target branch (typically `main`) from premature merges caused by impulse, unverified CI state, missing review, or active conflicts.
+> UI location: Oracle settings → **Git Guardian** → **PR Readiness** (Octokit-anchored section). Skill id `cellm:pr-guardian` and all `CELLM_PR_GUARDIAN_*` ENV keys remain unchanged.
+>
+> Main-first policy: routine CELLM work lands directly on `main` after local pre-push validation. PR Guardian is reserved for explicit weekly Super PRs or maintainer-requested review/release checkpoints.
+>
+> Authority layering: **GitHub branch protection is cloud-authoritative** for the configured target branch. Configure it from **Git Guardian → Branch Protection**. This skill remains the **local preflight/explainer**: it reports whether the 10 criteria are READY before a requested PR merge is attempted.
 
-Explicit scheduled-PR semantics: Guardian **never** creates or keeps permanent PRs. PRs are opened only on user request, then stay open until quality and governance criteria are met or the user closes them.
+PR Guardian governs the transition from "user-requested PR open" to "PR merged" by enforcing a deterministic readiness checklist. It defends explicit Super PR or release-review rails from premature merges caused by impulse, unverified CI state, missing review, or active conflicts.
+
+Explicit PR semantics: Guardian **never** creates or keeps permanent PRs. PRs are opened only on user request, then stay open until quality and governance criteria are met or the user closes them.
 
 ## Modes
 

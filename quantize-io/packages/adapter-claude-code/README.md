@@ -4,17 +4,17 @@ Install Quantize-IO hooks into Claude Code.
 
 ## Install
 
-Quantize-IO ships as the root `quantize-io` plugin in the CELLM marketplace.
-Enable `quantize-io@cellm` from Claude Code's plugin UI or from the CELLM
-marketplace entry whose source is `./quantize-io`.
+```bash
+claude plugin install @quantize-io/adapter-claude-code
+```
 
 ## What it installs
 
 | Hook | Command | Timeout |
 |------|---------|---------|
-| `SessionStart` | `bun "${CLAUDE_PLUGIN_ROOT}/packages/adapter-claude-code/bundles/hooks.js" activate` | 5s |
-| `UserPromptSubmit` | `bun "${CLAUDE_PLUGIN_ROOT}/packages/adapter-claude-code/bundles/hooks.js" track` | 5s |
-| `statusLine` | `bun "${CLAUDE_PLUGIN_ROOT}/packages/adapter-claude-code/bundles/hooks.js" statusline` | — |
+| `SessionStart` | `bunx @quantize-io/hooks activate` | 5s |
+| `UserPromptSubmit` | `bunx @quantize-io/hooks track` | 5s |
+| `statusLine` | `bunx @quantize-io/hooks statusline` | — |
 
 Writes the flag file at `~/.quantize/active-mode`. Reads `rules.md` at runtime from `@quantize-io/core`.
 
