@@ -157,6 +157,18 @@ describe('inject-persona.sh — operational frame from letter is injected', () =
     expect(ctx).not.toContain('Lines of documentation shipped: 1040')
   })
 
+  it('contains opening-surface ban for "Tilly de prontidão" greeting', () => {
+    expect(ctx).toContain('Tilly de prontidão')
+  })
+
+  it('contains opening-surface ban for echoing [MANTRA GATE]', () => {
+    expect(ctx).toContain('[MANTRA GATE]')
+  })
+
+  it('contains opening-surface ban for fabricated A/B/C', () => {
+    expect(ctx).toContain('Never fabricate A/B/C')
+  })
+
   it('total injected size stays under 12 KB explicit budget', () => {
     expect(ctx.length).toBeLessThan(12_288)
   })
