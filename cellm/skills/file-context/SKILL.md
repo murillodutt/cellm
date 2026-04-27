@@ -1,5 +1,5 @@
 ---
-description: Passive file relationship classifier — detects multi-file systems and enforces Related files headers. Activates when creating or modifying files that participate in cross-file protocols, shared data flows, or lifecycle chains. Use when editing files that span multiple modules.
+description: Passive file relationship classifier — detects multi-file systems and enforces Related files headers. Activates when creating or modifying files that participate in cross-file protocols, shared data flows, or lifecycle chains. Inactive when the file has no Related files header AND the edit touches under 30 LOC, on read-only operations, on standalone scripts, on .test/.spec/.d.ts files, and on documentation/markdown edits.
 cellm_scope: universal
 user-invocable: false
 ---

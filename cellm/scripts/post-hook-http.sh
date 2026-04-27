@@ -64,12 +64,45 @@ response=$(curl -sf --max-time 3 --connect-timeout 1 \
 
 # UI-driven quantization policy (single source of truth).
 # Applies only to additionalContext payload delivered back to Claude CLI.
-qz_enabled=$(get_ui_quantization_enabled "${base_url}")
+#
+# File-backed TTL cache: each post-hook-http call previously made up to 3
+# HTTP GETs to resolve quantization policy. With 3 PreToolUse Edit hooks
+# wrapped by this script, that was 9 policy GETs per single Edit. Cache
+# lives at ~/.cellm/cache/qz-policy.json with 60s TTL.
+qz_cache_dir="${CELLM_DIR}/cache"
+qz_cache_file="${qz_cache_dir}/qz-policy.json"
+qz_cache_ttl=60
+qz_enabled=""
 qz_mode="standard"
 qz_cap="1200"
-if [[ "${qz_enabled}" == "true" ]]; then
-  qz_mode=$(get_ui_quantization_mode "${base_url}")
-  qz_cap=$(get_ui_quantization_cap "${base_url}")
+
+mkdir -p "${qz_cache_dir}" 2>/dev/null
+
+# Try cache first
+if [[ -f "${qz_cache_file}" ]]; then
+  cache_age=$(( $(date +%s) - $(stat -f %m "${qz_cache_file}" 2>/dev/null || stat -c %Y "${qz_cache_file}" 2>/dev/null || echo 0) ))
+  # Guard against backwards clock skew producing a negative age (which would
+  # be < ttl and treated as "fresh forever" until next stat or restart).
+  if [[ "${cache_age}" -lt "${qz_cache_ttl}" && "${cache_age}" -ge 0 ]]; then
+    qz_enabled=$(grep -o '"enabled":[^,}]*' "${qz_cache_file}" 2>/dev/null | head -1 | cut -d':' -f2 | tr -d ' "')
+    qz_mode=$(grep -o '"mode":"[^"]*"' "${qz_cache_file}" 2>/dev/null | head -1 | cut -d'"' -f4)
+    qz_cap=$(grep -o '"cap":[^,}]*' "${qz_cache_file}" 2>/dev/null | head -1 | cut -d':' -f2 | tr -d ' "')
+    [[ -z "${qz_mode}" ]] && qz_mode="standard"
+    [[ -z "${qz_cap}" ]] && qz_cap="1200"
+  fi
+fi
+
+# Cache miss: resolve via HTTP and write cache
+if [[ -z "${qz_enabled}" ]]; then
+  qz_enabled=$(get_ui_quantization_enabled "${base_url}")
+  if [[ "${qz_enabled}" == "true" ]]; then
+    qz_mode=$(get_ui_quantization_mode "${base_url}")
+    qz_cap=$(get_ui_quantization_cap "${base_url}")
+  fi
+  # Atomic write to avoid race when concurrent sessions cache simultaneously.
+  qz_cache_tmp="${qz_cache_file}.$$"
+  printf '{"enabled":"%s","mode":"%s","cap":"%s"}\n' "${qz_enabled}" "${qz_mode}" "${qz_cap}" > "${qz_cache_tmp}" 2>/dev/null \
+    && mv -f "${qz_cache_tmp}" "${qz_cache_file}" 2>/dev/null || rm -f "${qz_cache_tmp}" 2>/dev/null
 fi
 
 effective_cap=$(get_cli_context_cap_for_mode "${qz_mode}")

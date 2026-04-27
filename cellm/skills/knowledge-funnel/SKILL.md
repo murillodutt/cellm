@@ -1,5 +1,5 @@
 ---
-description: Passive CELLM knowledge classifier — routes mid-task discoveries to EPHEMERAL, REUSABLE, or ARCHITECTURAL before moving on. Activates when encountering insights, gotchas, decisions, or non-obvious behavior during any work.
+description: Passive CELLM knowledge classifier — routes mid-task discoveries to EPHEMERAL, REUSABLE, or ARCHITECTURAL before moving on. Activates ONLY when a novel insight, gotcha, decision, or non-obvious behavior surfaced this turn. Inactive on routine edits, pure execution of a known plan, tool output processing, status reporting, and any turn where no new knowledge was generated.
 cellm_scope: universal
 user-invocable: false
 allowed-tools: mcp__plugin_cellm_cellm-oracle__knowledge_add, mcp__plugin_cellm_cellm-oracle__context_record_outcome, mcp__plugin_cellm_cellm-oracle__context_promote, mcp__plugin_cellm_cellm-oracle__record_expertise, mcp__plugin_cellm_cellm-oracle__record_observation

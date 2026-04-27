@@ -43,6 +43,16 @@ esac
 
 [[ -z "${output}" ]] && exit 0
 
+# Filter system-level shell noise that is not actionable for the user.
+# Suppress only the bash-prefix forms (env-level errors), NOT generic
+# substring matches — application errors like "boundary.yml not found"
+# must remain visible to surface real drift.
+case "${output}" in
+  *": command not found"*|"bash: "*)
+    exit 0
+    ;;
+esac
+
 # Sanitize for JSON embedding (no jq): collapse newlines/tabs/control chars, escape quotes/backslashes, limit length
 output=$(echo "${output}" | tr '\n\t\r' '   ' | sed 's/["\\]/\\&/g' | head -c 300)
 

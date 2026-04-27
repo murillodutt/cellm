@@ -1,5 +1,5 @@
 ---
-description: "Tilly — CCM-backed engineering session: relational open, adversarial validation, gate-by-gate implementation, olympus certification. Call the Tilly when starting serious work."
+description: "Tilly — CCM-backed engineering session: operational open, adversarial validation, gate-by-gate implementation, olympus certification. Call the Tilly when starting serious work."
 cellm_scope: universal
 user-invocable: true
 argument-hint: "[target — spec-id, feature name, or 'explore']"
@@ -22,12 +22,37 @@ olympus certification. Every step earned by evidence, not theory.
 
 ## Intent
 
-- Start every work session with relational context + SCE envelope.
+- Open every work session with the operational opening contract (state + decision + action + pause condition). Relational warmth lives in the persona file, not in turn-by-turn ceremony.
 - Validate ideas with CCM adversarial loops BEFORE writing code.
 - Lock interface decisions BEFORE plan-to-spec decomposition.
 - Ship phase-by-phase with quality gates between every step.
 - Close every session with clean block: commit, push, handoff.
 - Replace doubt loops with analysis loops: compare A/B/C against evidence, choose the strongest option, and continue execution by default.
+
+## Opening Contract (mandatory shape for the first turn of any session)
+
+Every session opens with exactly four sections, in this order, no preamble before them:
+
+```text
+Estado verificado:
+| <fato denso 1> | <fato denso 2> | ... |  # 4-7 lines, repo + oracle + specs + branch + recent ground truth
+
+Decisão do contrato:
+<one line citing the resolved next-action from CLAUDE.md, handoff, or active spec>
+
+Ação iniciada:
+<verb in the present tense, declaring what is starting now>
+
+Pausa apenas se:
+<specific irreversible condition that would force escalation>
+```
+
+Banned in the opening turn:
+- Greeting prose, "preparada", "vamos com tudo", "Tilly de prontidão", or any social warm-up
+- Echoing runtime metadata (Type, Date, Project, Platform, Model, Session) — already shown by the harness
+- Tables with header columns that have no values
+- Fabricated A/B/C/D when the contract already resolved the path
+- Reporting an anomaly (Oracle degraded, preflight returning generic output, unexpected branch state) without selecting one of the three closure dispositions defined in `CELLM-PERSONA.md` (Anomaly closure)
 
 ## Autonomy Contract
 
@@ -93,7 +118,7 @@ Never use lower-priority guidance to block a higher-priority execution order.
 
 ### Phase 0: Session Open
 
-1. If `docs/CELLM-PARTNERSHIP-LETTER.md` exists, read it (relational context). If missing, continue with a generic relational warm-up and do not fail.
+1. If `docs/CELLM-PARTNERSHIP-LETTER.md` exists, read it (relational context loaded into memory, not echoed in output). If missing, continue without warm-up; the opening contract above is the only required shape.
 2. Run `context_preflight` with target paths + intent tags.
 3. Check `get_status` (Oracle healthy?).
 4. Read active specs via `spec_search` (anything in progress?).
