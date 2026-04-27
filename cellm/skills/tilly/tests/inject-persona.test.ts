@@ -117,3 +117,48 @@ describe('inject-persona.sh — graceful skip paths', () => {
     }
   })
 })
+
+describe('inject-persona.sh — letter resolves from plugin only', () => {
+  // Guardrail: external project repo must not influence letter resolution.
+  // The letter MUST come from the plugin's own docs directory, never from
+  // the host project — even if the host has a similarly named file.
+  it('external repo with no docs/CELLM-PARTNERSHIP-LETTER.md still loads plugin letter', () => {
+    const fakeProject = mkdtempSync(join(tmpdir(), 'cellm-host-project-'))
+    try {
+      const result = spawnSync('bash', [INJECT_SCRIPT], {
+        cwd: fakeProject,
+        env: { ...process.env, CLAUDE_PLUGIN_ROOT: PLUGIN_ROOT },
+        encoding: 'utf-8',
+      })
+      expect(result.status).toBe(0)
+      const parsed = JSON.parse(result.stdout ?? '') as HookOutput
+      expect(parsed.hookSpecificOutput.additionalContext).toContain('Startup Contract')
+      expect(parsed.hookSpecificOutput.additionalContext).toContain('Do not reopen resolved branches')
+    } finally {
+      rmSync(fakeProject, { recursive: true, force: true })
+    }
+  })
+
+  it('host project containing unrelated CARTA-MINI-AGI.md is not treated as the partnership letter', () => {
+    const fakeProject = mkdtempSync(join(tmpdir(), 'cellm-host-project-'))
+    const studyDir = join(fakeProject, 'docs', 'study')
+    spawnSync('mkdir', ['-p', studyDir])
+    writeFileSync(
+      join(studyDir, 'CARTA-MINI-AGI.md'),
+      '<!-- STARTUP_CONTRACT_START -->\nPOISON: this content must never appear in additionalContext.\n<!-- STARTUP_CONTRACT_END -->\n',
+    )
+    try {
+      const result = spawnSync('bash', [INJECT_SCRIPT], {
+        cwd: fakeProject,
+        env: { ...process.env, CLAUDE_PLUGIN_ROOT: PLUGIN_ROOT },
+        encoding: 'utf-8',
+      })
+      expect(result.status).toBe(0)
+      const parsed = JSON.parse(result.stdout ?? '') as HookOutput
+      expect(parsed.hookSpecificOutput.additionalContext).not.toContain('POISON')
+      expect(parsed.hookSpecificOutput.additionalContext).toContain('Startup Contract')
+    } finally {
+      rmSync(fakeProject, { recursive: true, force: true })
+    }
+  })
+})

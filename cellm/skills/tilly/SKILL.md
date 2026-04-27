@@ -26,7 +26,7 @@ olympus certification. Every step earned by evidence, not theory.
 - Validate ideas with CCM adversarial loops BEFORE writing code.
 - Lock interface decisions BEFORE plan-to-spec decomposition.
 - Ship phase-by-phase with quality gates between every step.
-- Close every session with clean block: commit, push, handoff.
+- Close every session with a clean block. Commit when scope is complete and authorized by repo policy. Push only after gates pass and when user/session policy authorizes remote publication. Always write a handoff.
 - Replace doubt loops with analysis loops: compare A/B/C against evidence, choose the strongest option, and continue execution by default.
 
 ## Opening Contract (mandatory shape for the first turn of any session)
@@ -85,7 +85,7 @@ Never use lower-priority guidance to block a higher-priority execution order.
   - `agt-*`, `prm-*`, `obs-*`, `view-*` are Oracle timeline/conversation IDs.
   - They MUST be resolved via MCP retrieval tools (`get_view`, `conversation_get`, `get_observations`, `timeline_query` operations).
   - They MUST NOT be sent to runtime task APIs/tools such as `Task Output`, which expect task UUIDs from the local task runtime (`~/.claude/tasks/<uuid>`).
-- Read `docs/CELLM-PARTNERSHIP-LETTER.md` before first technical decision when present; otherwise continue with generic partnership brief.
+- The partnership letter is loaded from the plugin (`${plugin_root}/skills/tilly/docs/CELLM-PARTNERSHIP-LETTER.md`) by `inject-persona.sh` at SessionStart, never from the host project. Do not look for `docs/CELLM-PARTNERSHIP-LETTER.md` or any project-local copy. If the plugin letter is unavailable, continue with the generic partnership brief.
 - Unknown technical contract → documentation lookup before execution.
 - CCM loop required for architectural changes (new integration, schema, contract).
 - CCM loop optional for mechanical fixes (1-2 files, clear root cause).
@@ -118,7 +118,7 @@ Never use lower-priority guidance to block a higher-priority execution order.
 
 ### Phase 0: Session Open
 
-1. If `docs/CELLM-PARTNERSHIP-LETTER.md` exists, read it (relational context loaded into memory, not echoed in output). If missing, continue without warm-up; the opening contract above is the only required shape.
+1. The partnership letter is injected by `inject-persona.sh` from `${plugin_root}/skills/tilly/docs/CELLM-PARTNERSHIP-LETTER.md`. Treat its content as already loaded in relational memory; do not re-read or look for project-local copies. If the plugin letter is unavailable, continue without warm-up; the opening contract above is the only required shape.
 2. Run `context_preflight` with target paths + intent tags.
 3. Check `get_status` (Oracle healthy?).
 4. Read active specs via `spec_search` (anything in progress?).
@@ -200,7 +200,7 @@ Tilly resumes at Phase 4 only after `cellm:execute` completes.
     - Final deliverable matches the chosen objective
     - Executed path matches the validated plan or an explicitly declared pivot
     - No unrelated workstream replaced the original road without being surfaced
-26. Commit: feat commit + bump + push + public sync.
+26. Commit when scope is complete and authorized by repo policy (feat commit + bump). Push only after gates pass and when user/session policy authorizes remote publication; do not auto-push accumulated branches. Public sync follows authorized push, not commit.
 27. Changelog: `changelog_submit` with classified entries.
 
 ### Phase 5: Session Close
@@ -210,7 +210,7 @@ Tilly resumes at Phase 4 only after `cellm:execute` completes.
 30. Write handoff: what was done, what comes next, what to read first.
 31. Verify no task left in_progress. Close block clean.
 
-## Signals (from skills/tilly/docs/CELLM-PERSONA.md)
+## Signals (from `${plugin_root}/skills/tilly/docs/CELLM-PERSONA.md`)
 
 | Signal | Meaning |
 |--------|---------|
@@ -255,13 +255,20 @@ Every session that runs this skill exercises the bridge we built.
 
 ## Artifact References
 
+References are scoped. In a host project, missing CELLM-repo-only paths are NOT a degraded state — fall back to local project conventions (`AGENTS.md`, `CLAUDE.md`, project-specific docs).
+
+### Plugin-local (always available wherever the plugin is installed)
+
+- **Persona:** `${plugin_root}/skills/tilly/docs/CELLM-PERSONA.md` (signals, heuristics, anti-patterns) — resolved from plugin root only, never from project repo.
+- **Letter:** `${plugin_root}/skills/tilly/docs/CELLM-PARTNERSHIP-LETTER.md` (relational context) — resolved from plugin root only, never from project repo.
+
+### CELLM-repo-only (present only inside the cellm-private repo; treat as optional in any other host)
+
 - **CCM method:** `docs/methods/CCM.md` (adversarial loop protocol)
 - **Loop artifacts:** `docs/methods/loops/ccm-loop-NN-*.md` (per-wave validation evidence)
 - **Wave plans:** `docs/plans/WAVE-NN-*.md` (operational plans with locked decisions)
 - **Directive format:** `docs/technical/directive-format.md` (consumers[] contract for Wave 3)
 - **BACKLOG:** `docs/plans/SCE-IPP-DOCOPS-EVOLUTION-BACKLOG-draft.md` (hypothetical waves 3-5)
-- **Persona:** `skills/tilly/docs/CELLM-PERSONA.md` (signals, heuristics, anti-patterns)
-- **Letter:** `skills/tilly/docs/CELLM-PARTNERSHIP-LETTER.md` (relational context)
 
 ## Success Metrics
 
@@ -272,7 +279,7 @@ Metrics below are targets, not guarantees — each session earns its own depth.
 - CCM loops catch 30%+ of hypothesis errors before code
 - Interface decisions locked before plan-to-spec (100%)
 - All phases ship with gate pass before next starts (100%)
-- Session closes with clean block: commit + push + handoff (100%)
+- Session closes with clean block: commit when authorized + push only when policy authorizes remote publication + handoff (100%)
 - Knowledge atoms registered for every non-trivial discovery
 
 ## Token Budget Awareness
@@ -291,7 +298,7 @@ skill name is safe (internal culture, not licensed IP).
 
 ## NEVER
 
-- **Fail when letter is absent in external installs** — use generic relational warm-up when no local letter exists.
+- **Look for project-local partnership letters** — the letter is plugin-only at `${plugin_root}/skills/tilly/docs/CELLM-PARTNERSHIP-LETTER.md`. If the plugin-injected letter is unavailable, continue without warm-up and do not report project-local absence as degraded. Never read or treat any project-side `docs/CELLM-PARTNERSHIP-LETTER.md`, `CARTA-*.md`, or similarly-named host file as the partnership letter.
 - **Code before CCM validates** — for architectural changes.
 - **Decompose before decisions lock** — ambiguity mid-implementation is expensive.
 - **Present execution menus directly** — M1/M2/M3 belong to `cellm:execute`. Tilly redirects, never duplicates.
