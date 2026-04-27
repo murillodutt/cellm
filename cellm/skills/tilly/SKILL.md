@@ -85,7 +85,7 @@ Never use lower-priority guidance to block a higher-priority execution order.
   - `agt-*`, `prm-*`, `obs-*`, `view-*` are Oracle timeline/conversation IDs.
   - They MUST be resolved via MCP retrieval tools (`get_view`, `conversation_get`, `get_observations`, `timeline_query` operations).
   - They MUST NOT be sent to runtime task APIs/tools such as `Task Output`, which expect task UUIDs from the local task runtime (`~/.claude/tasks/<uuid>`).
-- The partnership letter is loaded from the plugin (`${plugin_root}/skills/tilly/docs/CELLM-PARTNERSHIP-LETTER.md`) by `inject-persona.sh` at SessionStart, never from the host project. Do not look for `docs/CELLM-PARTNERSHIP-LETTER.md` or any project-local copy. If the plugin letter is unavailable, continue with the generic partnership brief.
+- At SessionStart, `inject-persona.sh` injects from the plugin letter (`${plugin_root}/skills/tilly/docs/CELLM-PARTNERSHIP-LETTER.md`) only the operational frame (`SESSIONSTART_LETTER_FRAME`) and the startup contract (`STARTUP_CONTRACT`). The full historical letter is NOT injected. Read the full letter explicitly for architectural, ambiguous, relational, or high-trust sessions. Never look for `docs/CELLM-PARTNERSHIP-LETTER.md` or any project-local copy. If the plugin letter is unavailable, continue with the generic partnership brief.
 - Unknown technical contract → documentation lookup before execution.
 - CCM loop required for architectural changes (new integration, schema, contract).
 - CCM loop optional for mechanical fixes (1-2 files, clear root cause).
@@ -118,7 +118,7 @@ Never use lower-priority guidance to block a higher-priority execution order.
 
 ### Phase 0: Session Open
 
-1. The partnership letter is injected by `inject-persona.sh` from `${plugin_root}/skills/tilly/docs/CELLM-PARTNERSHIP-LETTER.md`. Treat its content as already loaded in relational memory; do not re-read or look for project-local copies. If the plugin letter is unavailable, continue without warm-up; the opening contract above is the only required shape.
+1. SessionStart only injects the letter's operational frame and startup contract — not the full historical letter. Treat the injected frame as already loaded in relational memory. For architectural decisions, ambiguous direction, or high-trust sessions, explicitly read `${plugin_root}/skills/tilly/docs/CELLM-PARTNERSHIP-LETTER.md` to load full history (sessions, principles, corrections). Never look for project-local copies. If the plugin letter is unavailable, continue without warm-up; the opening contract above is the only required shape.
 2. Run `context_preflight` with target paths + intent tags.
 3. Check `get_status` (Oracle healthy?).
 4. Read active specs via `spec_search` (anything in progress?).
@@ -299,6 +299,7 @@ skill name is safe (internal culture, not licensed IP).
 ## NEVER
 
 - **Look for project-local partnership letters** — the letter is plugin-only at `${plugin_root}/skills/tilly/docs/CELLM-PARTNERSHIP-LETTER.md`. If the plugin-injected letter is unavailable, continue without warm-up and do not report project-local absence as degraded. Never read or treat any project-side `docs/CELLM-PARTNERSHIP-LETTER.md`, `CARTA-*.md`, or similarly-named host file as the partnership letter.
+- **Claim "the letter is injected" when only the frame and startup contract are injected** — SessionStart injects `SESSIONSTART_LETTER_FRAME` + `STARTUP_CONTRACT`, never the full historical letter. The full letter must be read explicitly when relational/architectural depth is needed.
 - **Code before CCM validates** — for architectural changes.
 - **Decompose before decisions lock** — ambiguity mid-implementation is expensive.
 - **Present execution menus directly** — M1/M2/M3 belong to `cellm:execute`. Tilly redirects, never duplicates.

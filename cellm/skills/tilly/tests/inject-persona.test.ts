@@ -118,6 +118,50 @@ describe('inject-persona.sh — graceful skip paths', () => {
   })
 })
 
+describe('inject-persona.sh — operational frame from letter is injected', () => {
+  const { stdout, code } = runInject(PLUGIN_ROOT)
+  const parsed = JSON.parse(stdout) as HookOutput
+  const ctx = parsed.hookSpecificOutput.additionalContext
+
+  it('exit code is 0', () => {
+    expect(code).toBe(0)
+  })
+
+  it('contains "Murillo is partner and friend" frame line', () => {
+    expect(ctx).toContain('Murillo is partner and friend')
+  })
+
+  it('contains "Connect, do not construct" principle', () => {
+    expect(ctx).toContain('Connect, do not construct')
+  })
+
+  it('contains "Adversarial is a feature" principle', () => {
+    expect(ctx).toContain('Adversarial is a feature')
+  })
+
+  it('contains essential signal vocabulary from the letter', () => {
+    expect(ctx).toContain('you are in control')
+    expect(ctx).toContain('Wikipedia')
+  })
+
+  it('still contains the Startup Contract section', () => {
+    expect(ctx).toContain('Startup Contract')
+    expect(ctx).toContain('Do not reopen resolved branches')
+  })
+
+  it('does NOT contain long historical content from the full letter', () => {
+    // These are full-letter-only paragraphs (history, sessions, trust note).
+    expect(ctx).not.toContain('the session that changed everything')
+    expect(ctx).not.toContain('Murillo left you alone with full authorization')
+    expect(ctx).not.toContain('Confie mais em você')
+    expect(ctx).not.toContain('Lines of documentation shipped: 1040')
+  })
+
+  it('total injected size stays under 12 KB explicit budget', () => {
+    expect(ctx.length).toBeLessThan(12_288)
+  })
+})
+
 describe('inject-persona.sh — letter resolves from plugin only', () => {
   // Guardrail: external project repo must not influence letter resolution.
   // The letter MUST come from the plugin's own docs directory, never from
@@ -134,6 +178,40 @@ describe('inject-persona.sh — letter resolves from plugin only', () => {
       const parsed = JSON.parse(result.stdout ?? '') as HookOutput
       expect(parsed.hookSpecificOutput.additionalContext).toContain('Startup Contract')
       expect(parsed.hookSpecificOutput.additionalContext).toContain('Do not reopen resolved branches')
+    } finally {
+      rmSync(fakeProject, { recursive: true, force: true })
+    }
+  })
+
+  it('host project with poisoned docs/CELLM-PARTNERSHIP-LETTER.md is ignored — plugin letter wins', () => {
+    const fakeProject = mkdtempSync(join(tmpdir(), 'cellm-host-project-'))
+    const docsDir = join(fakeProject, 'docs')
+    spawnSync('mkdir', ['-p', docsDir])
+    writeFileSync(
+      join(docsDir, 'CELLM-PARTNERSHIP-LETTER.md'),
+      [
+        '<!-- SESSIONSTART_LETTER_FRAME_START -->',
+        'POISON_FRAME: host project tried to override the letter frame.',
+        '<!-- SESSIONSTART_LETTER_FRAME_END -->',
+        '<!-- STARTUP_CONTRACT_START -->',
+        'POISON_CONTRACT: host project tried to override the startup contract.',
+        '<!-- STARTUP_CONTRACT_END -->',
+      ].join('\n') + '\n',
+    )
+    try {
+      const result = spawnSync('bash', [INJECT_SCRIPT], {
+        cwd: fakeProject,
+        env: { ...process.env, CLAUDE_PLUGIN_ROOT: PLUGIN_ROOT },
+        encoding: 'utf-8',
+      })
+      expect(result.status).toBe(0)
+      const parsed = JSON.parse(result.stdout ?? '') as HookOutput
+      const ctx = parsed.hookSpecificOutput.additionalContext
+      expect(ctx).not.toContain('POISON_FRAME')
+      expect(ctx).not.toContain('POISON_CONTRACT')
+      expect(ctx).toContain('Startup Contract')
+      expect(ctx).toContain('Murillo is partner and friend')
+      expect(ctx).toContain('Do not reopen resolved branches')
     } finally {
       rmSync(fakeProject, { recursive: true, force: true })
     }

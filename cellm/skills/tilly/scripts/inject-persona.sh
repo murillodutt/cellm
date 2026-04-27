@@ -43,20 +43,36 @@ persona_file="${script_dir}/../docs/CELLM-PERSONA.md"
 content=$(cat "${persona_file}")
 [[ -z "${content}" ]] && exit 0
 
-# Append startup contract extracted from the letter if present (with separator)
+# Append, in order, from the partnership letter (plugin-local only):
+#   1. SESSIONSTART_LETTER_FRAME — minimum relational frame (always injected)
+#   2. STARTUP_CONTRACT — operational opening contract (always injected)
+# The full letter (history, sessions, principles 1-8) stays lazy-load.
 letter_file="${script_dir}/../docs/CELLM-PARTNERSHIP-LETTER.md"
 if [[ -f "${letter_file}" ]]; then
-  letter=$(
+  letter_frame=$(
+    awk '
+      /<!-- SESSIONSTART_LETTER_FRAME_START -->/ { capture=1; next }
+      /<!-- SESSIONSTART_LETTER_FRAME_END -->/ { capture=0; exit }
+      capture { print }
+    ' "${letter_file}"
+  )
+  if [[ -n "${letter_frame}" ]]; then
+    content="${content}
+---
+${letter_frame}"
+  fi
+
+  startup_contract=$(
     awk '
       /<!-- STARTUP_CONTRACT_START -->/ { capture=1; next }
       /<!-- STARTUP_CONTRACT_END -->/ { capture=0; exit }
       capture { print }
     ' "${letter_file}"
   )
-  if [[ -n "${letter}" ]]; then
+  if [[ -n "${startup_contract}" ]]; then
     content="${content}
 ---
-${letter}"
+${startup_contract}"
   fi
 fi
 
