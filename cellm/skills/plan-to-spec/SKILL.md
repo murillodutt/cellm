@@ -58,6 +58,8 @@ Convert a user-approved plan into a spec tree through the SCE decomposition brid
 5. Build decomposition payload from **owner-approved** plan (including deadweight scan gaps) and include:
    - `check.body.approvalTicket`
    - `check.body.guardrailsContract` (from v1 template, optionally tightened by project context)
+   - **Per-task `safety_notes`** (Facts-first v0.1 — spec-655de45c F5): for each task, scan the plan markdown for a "Safety:" / "Safety notes:" / "### Safety" bullet list **adjacent to or inside the task block**. Extract bullets verbatim into `task.body.safety_notes: string[]`. If absent, omit the field. Forward-only — never invent notes.
+   - **Per-check `decisionMode`** (Facts-first v0.1): when the plan declares the path is already resolved (no A/B/C decision pending), set `check.body.decisionMode = 'closed'`. Otherwise omit (legacy=open).
    Build `treeFingerprint` deterministically from approved payload summary:
    - `phaseCount`
    - `taskCount` (recursive)

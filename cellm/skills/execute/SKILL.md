@@ -251,6 +251,21 @@ In `balanced` and `throughput` modes, batch consecutive high-confidence steps an
 
 Read `references/go-nogo-contract.md` for evaluate/record/render parameter shapes. Key rule: every `go_no_go_evaluate` must be followed by `go_no_go_record`. Always include `phaseTypeKey` in phase_exit calls.
 
+## False Blockers Consult
+
+Before emitting STOP on a yellow gate, soft-block, or ambiguous escalation, consult `check.body.falseBlockers[]` (Facts-first Spec Driver v0.1, spec-655de45c F4).
+
+Procedure:
+
+1. Read `check.body.falseBlockers` from the spec body. If absent or empty, fall through to standard STOP rules.
+2. For each entry `{ signal, why_not_blocker }`, match `signal` against the current blocker description (case-insensitive contains).
+3. **On match**: do NOT stop. Invoke `context_record_outcome` with `kind: 'false_blocker_override'`, including `signal`, `why_not_blocker` (justification), `spec_id`, `phase_id` if known. Continue execution at the next safe step.
+4. **On no match**: STOP as designed. Do not invent overrides.
+
+Pattern promotion: when the same `signal` accumulates 3 or more `false_blocker_override` outcomes across specs, promote it to a knowledge atom (via `knowledge_ops`). This converts repeated runtime evidence into a stable rule rather than a per-spec exception.
+
+Hard rule: `falseBlockers` only suppress STOPs whose triggers are non-irreversible (gate yellow, advisory hint, ambiguous status). They do NOT suppress hard blockers — `stopConditions` matched, schema validation failure, destructive-action prompt, missing authority — which always halt regardless of `falseBlockers` content.
+
 ## Error Handling
 
 - `no_go` verdict -> check blockers: if test/verification failure invoke `cellm:asclepius`; if dependency/external blocker escalate to user. Max 2 retry cycles per step.

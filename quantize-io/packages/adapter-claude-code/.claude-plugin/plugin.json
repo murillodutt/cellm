@@ -1,7 +1,7 @@
 {
   "name": "quantize-io",
   "description": "Quantize-IO (QT) \u2014 Token I/O quantization for LLM hosts. 5th CELLM family plugin. Independent runtime (HTTP/CLI discovery only).",
-  "version": "0.36.75",
+  "version": "0.36.76",
   "author": {
     "name": "Murillo Dutt",
     "email": "contact@cellm.ai"
