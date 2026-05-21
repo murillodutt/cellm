@@ -10,6 +10,7 @@
 //   3. Aggregate their additionalContext payloads into a single hookSpecificOutput.
 //   4. Hard timeout 1500ms per call; hook budget 2500ms total.
 //   5. process.exit(0) on any path — never block Claude Code.
+//   6. Keep low-signal prompts thin to avoid UserPromptSubmit context shadowing.
 //
 // Invocation: bun ${CLAUDE_PLUGIN_ROOT}/hooks/submit-aggregator.ts
 // Runtime: bun >=1.2 (CELLM baseline). Uses fetch/AbortSignal.timeout natively.
@@ -23,6 +24,7 @@ import { readFileSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { join } from 'node:path'
 import { runFreezeSentinel } from './freeze-sentinel'
+import { recordHookStamp } from './hook-stamp'
 
 const PER_CALL_TIMEOUT_MS = 1500
 const HOOK_BUDGET_MS = 2500
@@ -31,6 +33,26 @@ const STDIN_DEADLINE_MS = 1500
 const WORKER_JSON = join(homedir(), '.cellm', 'worker.json')
 const DEFAULT_PORT = 31415
 const DEFAULT_HOST = '127.0.0.1'
+const LOW_SIGNAL_PROMPTS = new Set([
+  '.',
+  '...',
+  'ok',
+  'okay',
+  'k',
+  'sim',
+  's',
+  'yes',
+  'y',
+  'go',
+  'vai',
+  'segue',
+  'continua',
+  'continue',
+  'proceed',
+  'next',
+  'próximo',
+  'proximo',
+])
 
 // Parallel endpoints. Order matters for concat priority under context pressure:
 // specs first (active execution state — critical for turn-level grounding),
@@ -120,6 +142,44 @@ function extractContext(raw: string | null): string | null {
   }
 }
 
+export function extractPrompt(payload: string): string | null {
+  try {
+    const parsed: unknown = JSON.parse(payload)
+    if (parsed && typeof parsed === 'object' && 'prompt' in parsed) {
+      const prompt = (parsed as { prompt?: unknown }).prompt
+      return typeof prompt === 'string' ? prompt : null
+    }
+    return null
+  } catch {
+    return null
+  }
+}
+
+export function isLowSignalPrompt(prompt: string): boolean {
+  const normalized = prompt.trim().toLowerCase()
+  if (!normalized) return true
+  if (/^[\p{P}\p{S}]+$/u.test(normalized)) return normalized.length <= 4
+  return LOW_SIGNAL_PROMPTS.has(normalized)
+}
+
+export function shouldFetchRichContext(payload: string): boolean {
+  const prompt = extractPrompt(payload)
+  return prompt === null || !isLowSignalPrompt(prompt)
+}
+
+export function extractSessionId(payload: string): string | null {
+  try {
+    const parsed: unknown = JSON.parse(payload)
+    if (parsed && typeof parsed === 'object' && 'session_id' in parsed) {
+      const sessionId = (parsed as { session_id?: unknown }).session_id
+      return typeof sessionId === 'string' ? sessionId : null
+    }
+    return null
+  } catch {
+    return null
+  }
+}
+
 async function main(): Promise<void> {
   const budgetTimer = setTimeout(() => {
     process.stdout.write('')
@@ -129,28 +189,32 @@ async function main(): Promise<void> {
   try {
     const stdin = await readStdin()
     const payload = stdin.payload || '{}'
+    const startedAt = Date.now()
     const baseUrl = resolveBaseUrl()
     const freezeSentinelContext = runFreezeSentinel(payload, 'UserPromptSubmit')
 
-    const results = await Promise.allSettled(
-      ENDPOINTS.map((p) => postJson(baseUrl, p, payload, PER_CALL_TIMEOUT_MS))
-    )
-
     const contexts: string[] = []
     let failures = 0
-    for (const r of results) {
-      if (r.status !== 'fulfilled') {
-        failures += 1
-        continue
+
+    if (shouldFetchRichContext(payload)) {
+      const results = await Promise.allSettled(
+        ENDPOINTS.map((p) => postJson(baseUrl, p, payload, PER_CALL_TIMEOUT_MS))
+      )
+
+      for (const r of results) {
+        if (r.status !== 'fulfilled') {
+          failures += 1
+          continue
+        }
+        if (r.value.status === 'failure') {
+          failures += 1
+          continue
+        }
+        // status === 'ok' means transport succeeded. Silent (noop) envelope
+        // is legitimate — do NOT count it as a failure.
+        const ctx = extractContext(r.value.body)
+        if (ctx) contexts.push(ctx)
       }
-      if (r.value.status === 'failure') {
-        failures += 1
-        continue
-      }
-      // status === 'ok' means transport succeeded. Silent (noop) envelope
-      // is legitimate — do NOT count it as a failure.
-      const ctx = extractContext(r.value.body)
-      if (ctx) contexts.push(ctx)
     }
 
     if (stdin.truncated) {
@@ -178,7 +242,20 @@ async function main(): Promise<void> {
         additionalContext: contexts.join('\n\n'),
       },
     }
-    process.stdout.write(JSON.stringify(envelope))
+    const output = JSON.stringify(envelope)
+    recordHookStamp({
+      sessionId: extractSessionId(payload),
+      hookEvent: 'UserPromptSubmit',
+      hookName: 'submit-aggregator',
+      action: 'additionalContext',
+      targetKind: 'additional-context',
+      prompt: extractPrompt(payload),
+      inputBytes: Buffer.byteLength(payload, 'utf8'),
+      output,
+      durationMs: Date.now() - startedAt,
+      metadata: { contextCount: contexts.length, richContext: shouldFetchRichContext(payload) },
+    })
+    process.stdout.write(output)
     process.exit(0)
   } catch {
     clearTimeout(budgetTimer)
@@ -187,4 +264,6 @@ async function main(): Promise<void> {
   }
 }
 
-await main()
+if (import.meta.main) {
+  await main()
+}
