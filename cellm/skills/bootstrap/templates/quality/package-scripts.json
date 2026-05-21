@@ -1,0 +1,14 @@
+{
+  "_comment": "Quality:* and commit:check aliases. Merge into adopter package.json scripts. Bundled by cellm:bootstrap skill (Local Quality Recipe v1).",
+  "scripts": {
+    "quality:staged": "bun scripts/quality-router.ts --staged",
+    "quality:all": "bun scripts/quality-router.ts --all",
+    "quality:list": "bun scripts/quality-router.ts --list",
+    "quality:docs": "bun scripts/quality-router.ts --surface=markdown",
+    "quality:types": "bun scripts/quality-router.ts --surface=typescript",
+    "quality:lint": "bun scripts/quality-router.ts --surface=markdown",
+    "quality:test": "bun test",
+    "quality:diff": "bash -c 'git diff --check && git diff --cached --check'",
+    "commit:check": "bun run quality:all && bun run quality:test"
+  }
+}

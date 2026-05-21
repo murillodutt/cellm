@@ -154,6 +154,12 @@
             "command": "${CLAUDE_PLUGIN_ROOT}/scripts/capture-context.sh",
             "timeout": 10,
             "async": true
+          },
+          {
+            "type": "command",
+            "command": "bun \"${CLAUDE_PLUGIN_ROOT}/hooks/freeze-sentinel.ts\"",
+            "timeout": 2,
+            "async": true
           }
         ]
       }

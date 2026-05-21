@@ -1,0 +1,31 @@
+# Lefthook hooks — Local Quality Recipe v1
+#
+# Bundled by `cellm:bootstrap` skill. Provides surface-routed pre-commit
+# checks via scripts/quality-router.ts. Adopters extend with project-specific
+# pre-push checks (typecheck, full test suite, etc.) as needed.
+#
+# Hook contract:
+#   pre-commit  — adaptive surface gates (router) + git diff hygiene
+#   pre-push    — placeholder; adopters add full closure when ready
+#
+# To activate:
+#   bunx lefthook install
+#
+# To bypass (use sparingly, never silent):
+#   QR_SKIP_REASON=<reason> git commit ...   (logged by adopter governance)
+
+pre-commit:
+  parallel: true
+  jobs:
+    - name: quality-staged
+      run: bun scripts/quality-router.ts --staged
+
+    - name: git-diff-check
+      run: bash -c 'git diff --check && git diff --cached --check'
+
+# pre-push intentionally minimal — adopter wires full closure here.
+# Example:
+#   pre-push:
+#     jobs:
+#       - name: full-closure
+#         run: bun run commit:check

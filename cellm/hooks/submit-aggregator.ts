@@ -22,6 +22,7 @@
 import { readFileSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { join } from 'node:path'
+import { runFreezeSentinel } from './freeze-sentinel'
 
 const PER_CALL_TIMEOUT_MS = 1500
 const HOOK_BUDGET_MS = 2500
@@ -129,6 +130,7 @@ async function main(): Promise<void> {
     const stdin = await readStdin()
     const payload = stdin.payload || '{}'
     const baseUrl = resolveBaseUrl()
+    const freezeSentinelContext = runFreezeSentinel(payload, 'UserPromptSubmit')
 
     const results = await Promise.allSettled(
       ENDPOINTS.map((p) => postJson(baseUrl, p, payload, PER_CALL_TIMEOUT_MS))
@@ -156,6 +158,8 @@ async function main(): Promise<void> {
         `[HOOK-WARN] prompt truncated at ${STDIN_BYTE_LIMIT} bytes — downstream hook search may miss later content`,
       )
     }
+
+    if (freezeSentinelContext) contexts.unshift(freezeSentinelContext)
 
     if (failures > 0 && failures < ENDPOINTS.length) {
       contexts.push(`[HOOK-WARN] ${failures}/${ENDPOINTS.length} context endpoint(s) failed this turn`)
