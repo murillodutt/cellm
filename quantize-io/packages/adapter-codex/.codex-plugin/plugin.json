@@ -1,7 +1,7 @@
 {
   "name": "quantize-io",
   "description": "Quantize-IO (QT) \u2014 Token I/O quantization for Codex. Standalone runtime; optional local daemon.",
-  "version": "0.36.85",
+  "version": "0.36.86",
   "author": {
     "name": "Murillo Dutt",
     "email": "contact@cellm.ai"

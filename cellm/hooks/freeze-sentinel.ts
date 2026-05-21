@@ -54,6 +54,9 @@ interface Detection {
   nextAssistantAt: string | null
   silenceMs: number | null
   assistantAfterMarkerMs: number | null
+  hookPromptSeen?: boolean
+  hookPromptBytes?: number
+  hookPromptMarker?: '.' | null
 }
 
 async function readStdin(): Promise<string> {
@@ -333,12 +336,35 @@ export function runFreezeSentinel(raw: string, forcedHookEvent?: string): string
   if (!transcriptPath) return null
 
   const events = readRecentEvents(transcriptPath)
-  const detection = detect(events, sessionId, transcriptPath)
+  let detection = detect(events, sessionId, transcriptPath)
     ?? (hookEvent === 'Stop' ? detectLiveStopFallback(events, sessionId, transcriptPath) : null)
   if (!detection) return null
+  if (hookEvent === 'UserPromptSubmit') {
+    detection = enrichWithHookPrompt(detection, input.prompt, new Date().toISOString())
+  }
 
   writeDetection(detection, hookEvent)
   return hookEvent === 'UserPromptSubmit' ? buildContext(detection) : null
+}
+
+export function enrichWithHookPrompt(detection: Detection, prompt: string | null | undefined, observedAt: string): Detection {
+  if (typeof prompt !== 'string' || prompt.trim().length === 0) return detection
+
+  const promptMarker = prompt.trim() === '.' ? '.' : null
+  const humanMarkerAt = detection.humanMarkerAt ?? observedAt
+  const silenceMs = detection.silenceMs
+    ?? diffMs(detection.turnDurationAt ?? detection.stopHookSummaryAt, humanMarkerAt)
+
+  return {
+    ...detection,
+    kind: promptMarker === '.' ? 'post_stop_nudge' : detection.kind,
+    humanMarkerAt,
+    humanMarkerText: detection.humanMarkerText ?? promptMarker,
+    silenceMs,
+    hookPromptSeen: true,
+    hookPromptBytes: Buffer.byteLength(prompt, 'utf8'),
+    hookPromptMarker: promptMarker,
+  }
 }
 
 async function main(): Promise<void> {
